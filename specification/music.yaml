@@ -1,0 +1,899 @@
+openapi: 3.0.3
+info:
+  title: My_Stats Music
+  description: |-
+    Specification for API and Data types of Music service of My_Stats
+  version: 1.0.0
+tags:
+  - name: "genres"
+    description: "Genres & tags operations"
+  - name: "artists"
+    description: "Artists operations"
+  - name: "albums"
+    description: "Albums operations"
+  - name: "tracks"
+    description: "Tracks operations"
+  - name: "playlists"
+    description: "Playlists operations"
+    
+paths:
+  /genres:
+    get:
+      tags:
+        - genres
+      parameters:
+        - name: playlistId
+          in: query
+          required: false
+          description: Playlist service id
+          schema:
+            type: string
+      summary: Get genres list
+      description: Get stats of genres user used to listen to
+      operationId: getGenresList
+      responses:
+        200:
+          description: Genres were found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Genre"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        - spotifyToken: []
+        
+  /genres/{genre}:
+    get:
+      tags:
+        - genres
+      parameters:
+        - name: genre
+          in: path
+          required: true
+          description: Genre name
+          schema:
+            type: string
+      summary: Get genre
+      description: Get genre info
+      operationId: getGenre
+      responses:
+        200:
+          description: Genre was found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Genre"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Genre was not found
+      security:
+        - accessToken: []
+        - spotifyToken: []
+          
+  /period/genres:
+    get:
+      tags:
+        - genres
+      parameters:
+        - name: playlistId
+          in: query
+          required: false
+          description: Playlist service id
+          schema:
+            type: string
+      summary: Get genre period stats
+      description: Get genre stats by period
+      operationId: getPeriodGenres
+      responses:
+        200:
+          description: Genres by period were found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeriodGenres"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        - spotifyToken: []
+    
+  /artists:
+    get:
+      tags:
+        - artists
+      summary: Get artists list
+      description: Get stats of artists user used to listen to
+      operationId: getArtistsList
+      responses:
+        200:
+          description: Artists were found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Artist"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        - spotifyToken: []
+        
+  /artists/{artist}:
+    get:
+      tags:
+        - artists
+      parameters:
+        - name: artist
+          in: path
+          required: true
+          description: Artist service id
+          schema:
+            type: string
+      summary: Get artist
+      description: Get artist info
+      operationId: getArtist
+      responses:
+        200:
+          description: Artist was found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Artist was not found
+      security:
+        - accessToken: []
+        - spotifyToken: []
+        
+  /period/artists:
+    get:
+      tags:
+        - artists
+      summary: Get artits period stats
+      description: Get artits stats by period
+      operationId: getPeriodArtists
+      responses:
+        200:
+          description: Artists by period were found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeriodArtists"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        - spotifyToken: []
+        
+  /albums:
+    get:
+      tags:
+        - albums
+      parameters:
+        - name: artistId
+          in: query
+          required: false
+          description: Artist service id
+          schema:
+            type: string
+        - name: playlistId
+          in: query
+          required: false
+          description: Playlist service id
+          schema:
+            type: string
+      summary: Get albums list
+      description: Get stats of albums user used to listen to
+      operationId: getAlbumsList
+      responses:
+        200:
+          description: Albums were found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Album"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        - spotifyToken: []
+  
+  /albums/{album}:
+    get:
+      tags:
+        - albums
+      parameters:
+        - name: album
+          in: path
+          required: true
+          description: Album service id
+          schema:
+            type: string
+      summary: Get album
+      description: Get album info
+      operationId: getAlbum
+      responses:
+        200:
+          description: Album was found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Album"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Album was not found
+      security:
+        - accessToken: []
+        - spotifyToken: []
+        
+  /period/albums:
+    get:
+      tags:
+        - albums
+      parameters:
+        - name: playlistId
+          in: query
+          required: false
+          description: Playlist service id
+          schema:
+            type: string
+      summary: Get albums period stats
+      description: Get albums stats by period
+      operationId: getPeriodAlbums
+      responses:
+        200:
+          description: Albums by period were found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeriodAlbums"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        - spotifyToken: []
+        
+  /tracks:
+    get:
+      tags:
+        - tracks
+      parameters:
+        - name: genre
+          in: query
+          required: false
+          description: Genre name
+          schema:
+            type: string
+        - name: artistId
+          in: query
+          required: false
+          description: Artist service id
+          schema:
+            type: string
+        - name: albumId
+          in: query
+          required: false
+          description: Album service id
+          schema:
+            type: string
+        - name: playlistId
+          in: query
+          required: false
+          description: Playlist service id
+          schema:
+            type: string
+      summary: Get tracks list
+      description: Get stats of tracks user used to listen to
+      operationId: getTracksList
+      responses:
+        200:
+          description: Tracks were found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Track"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        - spotifyToken: []
+        
+  /tracks/{track}:
+    put:
+      tags:
+        - tracks
+      parameters:
+        - name: track
+          in: path
+          required: true
+          description: Track id
+          schema:
+            type: string
+      summary: Update track review
+      description: Update track review and rank
+      operationId: updateTrackReview
+      requestBody:
+        description: Track review and rank
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrackReview"
+      responses:
+        200:
+          description: Track review was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Track"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Track was not found
+      security:
+        - accessToken: []
+        - spotifyToken: []
+    delete:
+      tags:
+        - tracks
+      parameters:
+        - name: track
+          in: path
+          required: true
+          description: Track id
+          schema:
+            type: string
+      summary: Delete track review
+      description: Delete track review and rank
+      operationId: deleteTrackReview
+      responses:
+        200:
+          description: Track review was deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Track"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Track was not found
+      security:
+        - accessToken: []
+        - spotifyToken: []
+        
+  /period/tracks:
+    get:
+      tags:
+        - tracks
+      parameters:
+        - name: playlistId
+          in: query
+          required: false
+          description: Playlist service id
+          schema:
+            type: string
+      summary: Get tracks period stats
+      description: Get tracks stats by period
+      operationId: getPeriodTracks
+      responses:
+        200:
+          description: Tracks by period were found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeriodTracks"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        - spotifyToken: []
+        
+  /playlists:
+    get:
+      tags:
+        - playlists
+      summary: Get playlists list
+      description: Get stats of playlists user used to listen to
+      operationId: getPlaylists
+      responses:
+        200:
+          description: Playlists were found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Playlist"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        - spotifyToken: []
+    post:
+      tags:
+        - playlists
+      summary: Create playlist
+      description: Create playlist with current tracks list
+      operationId: createPlaylist
+      requestBody:
+        description: Playlist props and tracks list
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Playlist"
+      responses:
+        201:
+          description: Playlist was created successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Playlist"
+        400:
+          description: Invalid data
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        - spotifyToken: []
+        
+  /playlists/add/{playlistId}:
+    put:
+      tags:
+        - playlists
+      parameters:
+        - name: playlistId
+          in: path
+          required: true
+          description: Playlist service id
+          schema:
+            type: string
+      summary: Add tracks to playlist
+      description: Add tracks to selected playlist
+      operationId: addTracksToPlaylist
+      requestBody:
+        description: Tracks service id list
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                description: Track service id
+      responses:
+        200:
+          description: Playlist was created successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Playlist"
+        400:
+          description: Invalid data
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Playlist was not found
+      security:
+        - accessToken: []
+        - spotifyToken: []
+    
+  /playlists/remove/{playlistId}:
+    put:
+      tags:
+        - playlists
+      parameters:
+        - name: playlistId
+          in: path
+          required: true
+          description: Playlist service id
+          schema:
+            type: string
+      summary: Remove tracks from playlist
+      description: Remove tracks to selected playlist
+      operationId: removeTracksFromPlaylist
+      requestBody:
+        description: Tracks service id list
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                description: Track service id
+      responses:
+        200:
+          description: Playlist was created successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Playlist"
+        400:
+          description: Invalid data
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Playlist was not found
+      security:
+        - accessToken: []
+        - spotifyToken: []
+          
+components:
+  schemas:
+    AlbumBasic:
+      type: object
+      properties:
+        serviceId:
+          type: string
+        title:
+          type: string
+        cover:
+          type: string
+          format: url
+        releaseDate: 
+          type: string
+          format: date-iso
+        streams:
+          type: number
+          format: int32
+      required:
+        - serviceId
+        - title
+        - cover
+        - releaseDate
+        - streams
+          
+    ArtistBasic:
+      type: object
+      properties:
+        serviceId:
+          type: string
+        name:
+          type: string
+        streams: 
+          type: number
+          format: int32
+      required:
+        - serviceId
+        - name
+        - streams
+        
+    GenreBasic:
+      type: object
+      properties:
+        name:
+          type: string
+        streams:
+          type: number
+          format: int32
+      required:
+        - name
+        - streams
+        
+    TrackBasic:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        serviceId:
+          type: string
+        title:
+          type: string
+        artists:
+          type: array
+          items:
+            $ref: "#/components/schemas/ArtistBasic"
+        album:
+          $ref: "#/components/schemas/AlbumBasic"
+        streams: 
+          type: number
+          format: int32
+        explicit:
+          type: boolean
+      required:
+        - id
+        - serviceId
+        - title
+        - artists
+        - album
+        - streams
+        
+    TrackReview:
+      type: object
+      properties:
+        rank:
+          type: number
+          format: int32
+        rating:
+          type: number
+          format: int32
+          
+    Track:
+      allOf:
+        - $ref: "#/components/schemas/TrackBasic"
+        - $ref: "#/components/schemas/TrackReview"
+        - type: object
+          properties:
+            userRating:
+              type: number
+              format: int32
+            popularity:
+              type: number
+              format: int32
+            genres:
+              type: array
+              items:
+                type: string
+      required:
+        - genres
+        
+    Album:
+      allOf:
+        - $ref: "#/components/schemas/AlbumBasic"
+        - type: object
+          properties:
+            artist:
+              $ref: "#/components/schemas/ArtistBasic"
+            tracks:
+              type: number
+              format: int32
+            tracksPercent:
+              type: number
+              format: float
+            streamsPercent:
+              type: number
+              format: float
+            bestTrack:
+              $ref: "#/components/schemas/TrackBasic"
+            streamedTrack:
+              $ref: "#/components/schemas/TrackBasic"
+            rating:
+              type: number
+              format: int32
+            criticsRating:
+              type: number
+              format: int32
+            usersRating:
+              type: number
+              format: int32
+            genres:
+              type: array
+              items:
+                type: string
+      required:
+        - artist
+        - tracks
+        - tracksPercent
+        - streamsPercent
+        - bestTrack
+        - streamedTrack
+        - genres
+        
+    Artist:
+      allOf:
+        - $ref: "#/components/schemas/ArtistBasic"
+        - type: object
+          properties:
+            image:
+              type: string
+              format: url
+            country:
+              type: string
+            tracks:
+              type: number
+              format: int32
+            tracksPercent:
+              type: number
+              format: float
+            streamsPercent:
+              type: number
+              format: float
+            bestAlbum:
+              $ref: "#/components/schemas/AlbumBasic"
+            streamedAlbum:
+              $ref: "#/components/schemas/AlbumBasic"
+            rating:
+              type: number
+              format: int32
+            criticsRating:
+              type: number
+              format: int32
+            usersRating:
+              type: number
+              format: int32
+      required:
+        - image
+        - tracks
+        - tracksPercent
+        - streamsPercent
+        - bestAlbum
+        - streamedAlbum
+            
+    Genre:
+      allOf:
+        - $ref: "#/components/schemas/GenreBasic"
+        - type: object
+          properties:
+            tracks:
+              type: number
+              format: int32
+            topArtist:
+              type: string
+            streamedArtist:
+              type: string
+            rating:
+              type: number
+              format: int32
+            bestTrack:
+              $ref: "#/components/schemas/TrackBasic"
+            topTracks:
+              type: array
+              items:
+                $ref: "#/components/schemas/TrackBasic"
+            recommended:
+              type: array
+              items:
+                $ref: "#/components/schemas/TrackBasic"
+      required:
+        - name
+        - tracks
+        - streams
+        - topArtist
+        - streamedArtist
+        - topTracks
+        
+    Playlist:
+      type: object
+      properties:
+        serviceId:
+          type: string
+        name:
+          type: string
+          readOnly: true
+        cover:
+          type: string
+          format: url
+        tracks:
+          type: array
+          items:
+            type: string
+      required:
+        - serviceId
+        - name
+        - tracks
+    
+    Period:
+      type: object
+      properties:
+        month:
+          type: string
+        season:
+          type: string
+        year:
+          type: number
+      required:
+        - month
+        - season
+        - year
+        
+    PeriodGenres:
+      type: array
+      items:
+        type: object
+        properties:
+          period:
+            $ref: "#/components/schemas/Period"
+          genresList:
+            type: array
+            items: 
+              $ref: "#/components/schemas/GenreBasic"
+        required:
+          - period
+          - genresList
+    
+    PeriodArtists:
+      type: array
+      items:
+        type: object
+        properties:
+          period:
+            $ref: "#/components/schemas/Period"
+          artists:
+            type: array
+            items:
+              $ref: "#/components/schemas/ArtistBasic"
+        required:
+          - period
+          - artists
+    
+    PeriodAlbums:
+      type: array
+      items:
+        type: object
+        properties:
+          period:
+            $ref: "#/components/schemas/Period"
+          albums:
+            type: array
+            items:
+              $ref: "#/components/schemas/AlbumBasic"
+        required:
+          - period
+          - albums
+        
+    PeriodTracks:
+      type: array
+      items:
+        type: object
+        properties:
+          period:
+            $ref: "#/components/schemas/Period"
+          tracks:
+            type: array
+            items:
+              $ref: "#/components/schemas/TrackBasic"
+        required:
+          - period
+          - tracks
+        
+  securitySchemes:
+    accessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: jwt
+    spotifyToken:
+      type: http
+      scheme: bearer
+      bearerFormat: jwt
+  

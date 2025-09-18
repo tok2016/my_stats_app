@@ -1,0 +1,970 @@
+openapi: 3.0.3
+info:
+  title: My_Stats Users
+  description: |-
+    Specification for API and Data types of User service of My_Stats
+  version: 1.0.0
+tags:
+  - name: "user"
+    description: "Users operations"
+  - name: "confirm"
+    description: "Operation confirmation"
+  - name: "service"
+    description: "Service operations"
+  - name: "dashboard"
+    description: "Dashboard operations"
+  - name: "avatar"
+    description: "Avatar operations"
+  - name: "otherUsers"
+    description: "Operations with other user"
+paths:
+  /user:
+    get:
+      tags:
+        - user
+      summary: Get current user
+      description: Get current authorized user info
+      operationId: getCurrentUser
+      responses:
+        200: 
+          description: User is found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentUser"
+        401:
+          description: User is unauthorized
+      security:
+        - accessToken: []
+    post:
+      tags:
+        - user
+      summary: Create account
+      description: Create user account
+      operationId: createUser
+      requestBody:
+        description: New user credentials
+        content: 
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAuth"
+      responses:
+        201:
+          description: User account is created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAccess"
+        400:
+          description: Invalid data or account with given username or email already exists
+    put:
+      tags:
+        - user
+      summary: Update user info
+      description: Updtae current authorized user info
+      operationId: updateUser
+      requestBody:
+        description: User info
+        content:
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        200:
+          description: User data is updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentUser"
+        400:
+          description: Invalid data
+        401:
+          description: User is unauthorized
+      security:
+        - accessToken: []
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: Delete current authorized user after confirmation code
+      operationId: deleteUser
+      responses:
+        200:
+          description: User was deleted
+        401:
+          description: User is unauthorized
+      security:
+        - accessToken: []
+  
+  /login:
+    post:
+      tags:
+        - user
+      summary: Sign in
+      description: Sign user in
+      operationId: login
+      requestBody:
+        description: User credentials
+        content:
+          application/json:
+            schema:
+                $ref: "#/components/schemas/UserLogin"
+      responses:
+        200:
+          description: User is signed in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAccess"
+        400:
+          description: Invalid data
+        403:
+          description: Wrong password
+        404:
+          description: User is not found
+  
+  /refresh:
+    post:
+      tags:
+        - user
+      summary: Resfresh access token
+      description: Update access token by refresh token
+      operationId: refresh
+      responses:
+        200:
+          description: Token was refreshed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessToken"
+        400:
+          description: Invalid data
+        401: 
+          description: User is unauthorized
+      security:
+        - refreshToken: []
+        
+  /confirm:
+    post:
+      tags:
+        - confirm
+      summary: Form confirmation
+      description: Form confirmation by code
+      operationId: formConfirmation
+      requestBody:
+        description: User credential
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Operation"
+      responses:
+        201:
+          description: Confirmation operation was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Operation"
+        404:
+          description: User is not found
+    put:
+      tags:
+        - confirm
+      summary: Confirm operation
+      description: Confirm operation by code
+      operationId: confirm
+      requestBody:
+        description: User credential and confirmation code
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/Confirmation"
+      responses:
+        200:
+          description: Operation is confirmed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Operation"
+        400:
+          description: Invalid data
+        403:
+          description: Wrong code
+        404:
+          description: User is not found
+        
+  /resetPassword:
+    post:
+      tags:
+        - user
+      summary: Reset user password
+      description: Reset unauthorized user password after confirmation code
+      operationId: resetPassword
+      requestBody:
+        description: User credentials with new password
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLogin"
+      responses:
+        202:
+          description: New password is saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Operation"
+        400:
+          description: Invalid data
+        404:
+          description: User is not found
+          
+  /changePassword:
+    post:
+      tags: 
+        - user
+      summary: Change user password
+      description: Change current authorized password
+      operationId: chnagePassword
+      requestBody:
+        description: User old and new passwords
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordUpdate"
+      responses:
+        200:
+          description: Password was changed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAccess"
+        400:
+          description: Invalid data
+        401:
+          description: User is unauthorized
+      security:
+        - accessToken: []
+        
+  /user/{username}:
+    get:
+      tags:
+        - otherUsers
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Get other user
+      description: Get other user info by username
+      operationId: getOtherUser
+      responses:
+        200:
+          description: User is found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        403:
+          description: User profile is private or blocked
+        404:
+          description: User is not found
+          
+  /user/{username}/options:
+    get:
+      tags:
+        - otherUsers
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Get other user for admin
+      description: Get other user info by username for admin. Admin only
+      operationId: getOtherUserForAdmin
+      responses:
+        200:
+          description: User is found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentUser"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden for non-admin users
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+    post:
+      tags:
+        - otherUsers
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Create new user
+      description: Create new user. Admin only
+      operationId: createNewUser
+      requestBody:
+        description: User credentials and info
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewUser"
+      responses:
+        201:
+          description: New user was saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden for non-admin users
+      security:
+        - accessToken: []
+    put:
+      tags:
+        - otherUsers
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Update other user
+      description: Update other user by username. Admin only
+      operationId: updateOtherUser
+      requestBody:
+        description: User info
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        200:
+          description: User was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentUser"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden for non-admin users
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+    delete:
+      tags:
+        - otherUsers
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Delete other user
+      description: Delete other user by username. Admin only
+      operationId: deleteOtherUser
+      responses:
+        200:
+          description: User was deleted
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden for non-admin users
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+        
+  /user/{username}/avatar:
+    post: 
+      tags: 
+        - avatar
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Post new other user avatar
+      description: Post new avatar for other user and delete the previous if it exists. Only for admin and authorized user who is signed in path
+      operationId: postOtherUserAvatar
+      requestBody:
+        description: Image file
+        content: 
+          image/*: {}
+      responses:
+        201:
+          description: Avatar was saved
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Avatar"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden for non-admin users
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+    delete:
+      tags: 
+        - avatar
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Delete other user avatar
+      description: Delete current avatar for other user. Only for admin and authorized user who is signed in path
+      operationId: deleteOtherUserAvatar
+      responses:
+        200:
+          description: Avatar was deleted
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden for non-admin users
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+  
+  /users:
+    get:
+      tags:
+        - otherUsers
+      parameters:
+        - name: username
+          in: query
+          required: false
+          schema:
+            type: string
+      summary: Find users
+      description: Find users by username
+      operationId: findUsers
+      responses:
+        200:
+          description: Search was completed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        default:
+          description: Something went wrong
+  
+  /users/all:
+    get:
+      tags:
+        - otherUsers
+      summary: Get all users
+      description: Get all users. Admin only
+      operationId: getAllUsers
+      responses:
+        200:
+          description: Search was completed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        
+  /service/{username}:
+    get:
+      tags:
+        - service
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Get service credentials
+      description: Get service credentials of user. Only for admin and authorized user who is signed in path.
+      operationId: getService
+      responses:
+        200:
+          description: Service credentials were found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+    post:
+      tags:
+        - service
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Add service credentials
+      description: Add service credentials for user. Only for admin and authorized user who is signed in path.
+      operationId: addService
+      requestBody:
+        description: Service credentials
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceCredentials"
+      responses:
+        201:
+          description: Service credentials were added
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+    put:
+      tags:
+        - service
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Update service credentials
+      description: Update service credentials for user. Only for admin and authorized user who is signed in path.
+      operationId: updateService
+      requestBody:
+        description: Service credentials
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceCredentials"
+      responses:
+        200:
+          description: Service credentials were updated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+    delete:
+      tags:
+        - service
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Clear service credentials
+      description: Clear service credentials of user. Only for admin and authorized user who is signed in path.
+      operationId: deleteService
+      responses:
+        200:
+          description: Service credentials were cleared
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+      
+  /dashboard/{username}:
+    get:
+      tags:
+        - dashboard
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Get dashboard
+      description: Get user dashboard. Only for admin and authorized user who is signed in path.
+      operationId: getDashboard
+      responses:
+        200:
+          description: Dashboard was found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dashboard"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+    post:
+      tags:
+        - dashboard
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Add dashboard object
+      description: Add new object to user dashboard. Only for admin and authorized user who is signed in path.
+      operationId: addDashboard
+      requestBody:
+        description: Dashboard object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Dashboard"
+      responses:
+        201:
+          description: Dashboard object was saved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dashboard"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+    put:
+      tags:
+        - dashboard
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Update dashboard object
+      description: Update object on user dashboard. Only for admin and authorized user who is signed in path.
+      operationId: updateDashboard
+      requestBody:
+        description: Dashboard object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Dashboard"
+      responses:
+        200:
+          description: Dashboard object was updated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dashboard"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+    delete:
+      tags:
+        - dashboard
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Delete dashboard object
+      description: Delete object from user dashboard. Only for admin and authorized user who is signed in path.
+      operationId: deleteDashboard
+      responses:
+        200:
+          description: Dashboard object was deleted
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: User is not found
+      security:
+        - accessToken: []
+    
+components:
+  schemas:
+    UserAuth:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+      required:
+        - username
+        - email
+        - password
+        
+    UserLogin:
+      type: object
+      properties:
+        credential:
+          type: string
+          description: email or username
+        password:
+          type: string
+          format: password
+      required:
+        - credential
+        - password
+        
+    UserAccess:
+      type: object
+      properties:
+        access:
+          type: string
+        refresh:
+          type: string
+        username:
+          type: string
+      required:
+        - access
+        - refresh
+        - username
+        
+    UserUpdate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        birthdate:
+          type: string
+          format: date-iso
+        country:
+          type: string
+        isPublic:
+          type: boolean
+        dashboard:
+          type: array
+          items:
+            $ref: "#/components/schemas/Dashboard"
+          
+    User:
+      allOf:
+        - $ref: "#/components/schemas/UserUpdate"
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            username:
+              type: string
+            avatarUrl:
+              type: string
+              format: url
+            unblockDate:
+              type: string
+              format: date-iso
+            dashboard:
+              type: array
+              items:
+                $ref: "#/components/schemas/Dashboard"
+      required:
+        - id
+        - username
+        - email
+        
+    CurrentUser:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          properties: 
+            services:
+              type: array
+              items:
+                $ref: "#/components/schemas/Service"
+              readOnly: true
+              
+    NewUser:
+      allOf:
+        - $ref: "#/components/schemas/UserAuth"
+        - $ref: "#/components/schemas/UserUpdate"
+        
+    Avatar:
+      type: object
+      properties:
+        url:
+          type: string
+          format: url
+          
+    Operation:
+      type: object
+      properties:
+        credential:
+          type: string
+          description: email or username
+        isConfirmed:
+          type: boolean
+          readOnly: true
+      required:
+        - operationId
+        
+    Confirmation:
+      type: object
+      properties:
+        credential:
+          type: string
+          description: email or username
+        code:
+          type: string
+          format: number
+      required:
+        - operationId
+        - code
+        
+    PasswordUpdate:
+      type: object
+      properties:
+        old:
+          type: string
+          format: password
+        new: 
+          type: string
+          format: password
+          
+    ServiceName:
+      type: string
+      enum: 
+        - spotify
+        - steam
+    
+    ServiceCredentials:
+      type: object
+      properties:
+        service:
+          $ref: "#/components/schemas/ServiceName"
+        credential:
+          type: string
+          description: Email, username or id used in service
+      required:
+        - service
+        - credential
+        
+    Service:
+      allOf:
+        - $ref: "#/components/schemas/ServiceCredentials"
+        - type: object
+          properties:
+            status:
+              type: string
+              enum:
+                - notAuthorized
+                - error
+                - authorized
+                - notRequired
+                - unknown
+      required:
+        - service
+        - credential
+        - status
+        
+    AccessToken:
+      type: object
+      properties:
+        access:
+          type: string
+      required:
+        - access
+        
+    Dashboard:
+      type: object
+      properties:
+        metric:
+          type: string
+        service:
+          $ref: "#/components/schemas/ServiceName"
+        x:
+          type: number
+          format: int32
+        y:
+          type: number
+          format: int32
+        width:
+          type: number
+          format: int32
+        height:
+          type: number
+          format: int32
+      required:
+        - metric
+        - service
+        - x
+        - y
+        
+  securitySchemes:
+    accessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: jwt
+    refreshToken: 
+      type: http
+      scheme: bearer
+      bearerFormat: jwt
+      

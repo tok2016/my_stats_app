@@ -1,0 +1,8 @@
+Spotify: https://developer.spotify.com/documentation/web-api
+
+Steam public api: https://developer.valvesoftware.com/wiki/Steam_Web_API
+Steam App info: https://store.steampowered.com/api/appdetails?appids={appid}
+
+RAWG: https://rawg.io/apidocs
+AOTY scrapper: https://pypi.org/project/album-of-the-year-api/
+Metacritic scrapper: https://github.com/melroy89/metacritic_api

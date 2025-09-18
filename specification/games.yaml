@@ -1,0 +1,772 @@
+openapi: 3.0.3
+info:
+  title: My_Stats Video Games
+  description: |-
+    Specification for API and Data types of Video games service of My_Stats
+  version: 1.0.0
+tags:
+  - name: "genres"
+    description: "Genres & tags operations"
+  - name: "studios"
+    description: "Developers and publishers operations"
+  - name: "platforms"
+    description: "Platforms operations"
+  - name: "games"
+    description: "Video games operations"
+    
+paths:
+  /genres:
+    get:
+      tags:
+        - genres
+      summary: Get genres list
+      description: Get stats of genres user used to play
+      operationId: getGenresList
+      responses:
+        200:
+          description: Genres were found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Genre"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        
+  /genres/{genreId}:
+    get:
+      tags:
+        - genres
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: Genre service id
+          schema:
+            type: string
+      summary: Get genre
+      description: Get genre info
+      operationId: getGenre
+      responses:
+        200:
+          description: Genre was found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Genre"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Genre was not found
+      security:
+        - accessToken: []
+          
+  /period/genres:
+    get:
+      tags:
+        - genres
+      summary: Get genre period stats
+      description: Get genre stats by period
+      operationId: getPeriodGenres
+      responses:
+        200:
+          description: Genres by period were found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeriodGenres"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        
+  /studios:
+    get:
+      tags:
+        - studios
+      summary: Get studios list
+      description: Get stats of developers and publishers of games user used to play
+      operationId: getStudiosList
+      responses:
+        200:
+          description: Studios were found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudiosTuple"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        
+  /studios/{studioId}:
+    get:
+      tags:
+        - studios
+      parameters:
+        - name: studioId
+          in: path
+          required: true
+          description: Studio service id
+          schema:
+            type: string
+      summary: Get studio
+      description: Get studio info
+      operationId: getStudio
+      responses:
+        200:
+          description: Studio was found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Studio"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Studio was not found
+      security:
+        - accessToken: []
+        
+  /period/studios:
+    get:
+      tags:
+        - studios
+      summary: Get studio period stats
+      description: Get studio stats by period
+      operationId: getPeriodStudios
+      responses:
+        200:
+          description: Studios by period were found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeriodStudios"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        
+  /platforms:
+    get:
+      tags:
+        - platforms
+      summary: Get platforms list
+      description: Get stats of platforms of games user used to play
+      operationId: getPlatformsList
+      responses:
+        200:
+          description: Platforms were found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Platform"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        
+  /platforms/{platformId}:
+    get:
+      tags:
+        - platforms
+      parameters:
+        - name: platformId
+          in: path
+          required: true
+          description: Platform service id
+          schema:
+            type: string
+      summary: Get platform
+      description: Get platform info
+      operationId: getPlatform
+      responses:
+        200:
+          description: Platform was found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Platform"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Platform was not found
+      security:
+        - accessToken: []
+        
+  /period/platforms:
+    get:
+      tags:
+        - platforms
+      summary: Get platform period stats
+      description: Get platform stats by period
+      operationId: getPeriodPlatforms
+      responses:
+        200:
+          description: Platforms by period were found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeriodPlatforms"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        
+  /games:
+    get:
+      tags:
+        - games
+      parameters:
+        - name: genre
+          in: query
+          required: false
+          description: Genre service id
+          schema:
+            type: string
+        - name: studio
+          in: query
+          required: false
+          description: Studio service id
+          schema:
+            type: string
+        - name: platform
+          in: query
+          required: false
+          description: Platform service id
+          schema:
+            type: string
+      summary: Get games list
+      description: Get stats of video games user used to play
+      operationId: getGamesList
+      responses:
+        200:
+          description: Games were found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+    post:
+      tags:
+        - games
+      summary: Add new game
+      description: Add new game found in IGDB or RAWG
+      operationId: addNewGame
+      requestBody:
+        description: Game info
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewGame"
+      responses:
+        201:
+          description: Game was saved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+        
+  /games/{gameId}:
+    get:
+      tags:
+        - games
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          description: Game service id
+          schema:
+            type: string
+      summary: Get game
+      description: Get video game info
+      operationId: getGame
+      responses:
+        200:
+          description: Game was found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Game was not found
+      security:
+        - accessToken: []
+    put:
+      tags:
+        - games
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          description: Game service id
+          schema:
+            type: string
+      summary: Update game stats
+      description: Update video game user stats, such as review, rank, available platform, hours
+      operationId: updateGameStats
+      requestBody:
+        description: Game user stats info
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GameUpdate"
+      responses:
+        200:
+          description: Game stats were updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Game was not found
+      security:
+        - accessToken: []
+    delete:
+      tags:
+        - games
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          description: Game service id
+          schema:
+            type: string
+      summary: Delete game
+      description: Delete video game from user's library
+      operationId: deleteGame
+      responses:
+        200:
+          description: Game was deleted
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+        404:
+          description: Game was not found
+      security:
+        - accessToken: []
+        
+  /period/games:
+    get:
+      tags:
+        - games
+      summary: Get game period stats
+      description: Get game stats by period
+      operationId: getPeriodGames
+      responses:
+        200:
+          description: Games by period were found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeriodGames"
+        401:
+          description: User is unauthorized
+        403:
+          description: Operation is forbidden
+      security:
+        - accessToken: []
+          
+components:
+  schemas:
+    GenreBasic:
+      type: object
+      properties:
+        serviceId:
+          type: string
+        name:
+          type: string
+        hours:
+          type: number
+          format: int32
+      required:
+        - id
+        - name
+        - hours
+        
+    PlatformBasic:
+      type: object
+      properties:
+        serviceId:
+          type: string
+        name:
+          type: string
+        hours:
+          type: number
+          format: float
+      required:
+        - serviceId
+        - name
+        - hours
+        
+    SeriesBasic:
+      type: object
+      properties:
+        name:
+          type: string
+        firstGameId:
+          type: string
+      required:
+        - name
+        - firstGameId
+        
+    GameUpdate:
+      type: object
+      properties:
+        rank:
+          type: number
+          format: int32
+        hours:
+          type: number
+          format: float
+        rating:
+          type: number
+          format: int32
+        platform:
+          $ref: "#/components/schemas/PlatformBasic"
+        playDate:
+          type: string
+          format: date-iso
+          
+    NewGame:
+      allOf:
+        - $ref: "#/components/schemas/GameUpdate"
+        - type: object
+          properties:
+            serviceId: 
+              type: string
+            developers:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudioBasic"
+            publisher:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudioBasic"
+            allPlatforms:
+              type: array
+              items:
+                $ref: "#/components/schemas/PlatformBasic"
+            releaseDate:
+              type: string
+              format: date-iso
+            genres:
+              type: array
+              items:
+                type: string
+            cover:
+              type: string
+              format: url
+      required:
+        - serviceId
+        - developers
+        - publishers
+        - allPlatforms
+        - releaseDate
+        - genres
+          
+    GameBasic:
+      type: object
+      properties:
+        id:
+          type: string
+        serviceId: 
+          type: string
+        name:
+          type: string
+        rank:
+          type: number
+          format: int32
+        hours:
+          type: number
+          format: float
+        rating:
+          type: number
+          format: int32
+        cover:
+          type: string
+          format: url
+      required:
+        - id
+        - serviceId
+        - name
+        
+    Game:
+      allOf:
+        - $ref: "#/components/schemas/NewGame"
+        - type: object
+          properties:
+            id:
+              type: string
+            criticsRating:
+              type: number
+              format: int32
+            usersRating:
+              type: number
+              format: int32
+      required:
+        - id
+          
+    StudioType:
+      type: string
+      enum:
+        - developer
+        - publisher
+          
+    StudioBasic:
+      type: object
+      properties:
+        serviceId: 
+          type: string
+        name: 
+          type: string
+        type:
+          $ref: "#/components/schemas/StudioType"
+        hours:
+          type: number
+          format: float
+      required:
+        - serviceId
+        - name
+        - hours
+            
+    Platform:
+      allOf:
+        - $ref: "#/components/schemas/PlatformBasic"
+        - type: object
+          properties:
+            games:
+              type: number
+              format: int32
+            gamesPercent:
+              type: number
+              format: float
+            biggestSeries:
+              $ref: "#/components/schemas/StudioBasic"
+            topSeries:
+              $ref: "#/components/schemas/StudioBasic"
+            topGenre:
+              $ref: "#/components/schemas/GenreBasic"
+            rating:
+              type: number
+              format: int32
+            topGames:
+              type: array
+              items:
+                $ref: "#/components/schemas/GameBasic"
+    
+    Studio:
+      allOf:
+        - $ref: "#/components/schemas/StudioBasic"
+        - type: object
+          properties:
+            games:
+              type: number
+              format: int32
+            gamesPercent:
+              type: number
+              format: float
+            topSeries:
+              $ref: "#/components/schemas/SeriesBasic"
+            streamedGame:
+              $ref: "#/components/schemas/GameBasic"
+            rating:
+              type: number
+              format: int32
+            criticsRating:
+              type: number
+              format: int32
+            usersRating:
+              type: number
+              format: int32
+            bestGame:
+              $ref: "#/components/schemas/GameBasic"
+            country:
+              type: string
+      required:
+        - games
+        - gamesPercent
+        - topSeries
+        - streamedGame
+        
+    StudiosTuple:
+      type: object
+      properties:
+        developers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Studio"
+        publishers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Studio"
+      required:
+        - developers
+        - publishers
+    
+    Genre:
+      allOf:
+        - $ref: "#/components/schemas/GenreBasic"
+        - type: object
+          properties:
+            games:
+              type: number
+              format: int32
+            topSeries:
+              $ref: "#/components/schemas/SeriesBasic"
+            streamedGame:
+              $ref: "#/components/schemas/GameBasic"
+            bestGame:
+              $ref: "#/components/schemas/GameBasic"
+            rating:
+              type: number
+              format: int32
+            topGames:
+              type: array
+              items:
+                $ref: "#/components/schemas/GameBasic"
+            recommended:
+              type: array
+              items:
+                $ref: "#/components/schemas/GameBasic"
+      required:
+        - games
+        - topSeries
+        - streamedGame
+        - bestGame
+        - topGames
+        
+    Period:
+      type: object
+      properties:
+        month:
+          type: string
+        season:
+          type: string
+        year:
+          type: number
+      required:
+        - month
+        - season
+        - year
+    
+    PeriodGenres:
+      type: array
+      items:
+        type: object
+        properties:
+          period:
+            $ref: "#/components/schemas/Period"
+          genresList:
+            type: array
+            items: 
+              $ref: "#/components/schemas/GenreBasic"
+        required:
+          - period
+          - genresList
+        
+    StudioByPeriod:
+      type: object
+      properties:
+        period:
+          $ref: "#/components/schemas/Period"
+        studio:
+          $ref: "#/components/schemas/StudioBasic"
+      required:
+        - period
+        - studio
+        
+    PeriodStudios:
+      type: object
+      properties:
+        developers:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudioByPeriod"
+        publishers:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudioByPeriod"
+      required:
+        - developers
+        - publishers
+    
+    PeriodPlatforms:
+      type: array
+      items:
+        type: object
+        properties:
+          period:
+            $ref: "#/components/schemas/Period"
+          platform:
+            $ref: "#/components/schemas/PlatformBasic"
+        required:
+          - period
+          - platform
+    
+    PeriodGames:
+      type: array
+      items:
+        type: object
+        properties:
+          period:
+            $ref: "#/components/schemas/Period"
+          gamesList:
+            type: array
+            items:
+              $ref: "#/components/schemas/GameBasic"
+        required:
+          - period
+          - gamesList
+        
+  securitySchemes:
+    accessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: jwt
