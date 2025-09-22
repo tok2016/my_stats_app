@@ -8,5 +8,5 @@ export default interface Dashboard {
   y: number;
   width: number;
   height: number;
-  type: DashboardType
-};
+  type: DashboardType;
+}

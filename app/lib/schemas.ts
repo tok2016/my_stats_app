@@ -1,12 +1,31 @@
-import Dashboard from '@ts/users/dashboard';
-import {Schema, Types} from 'mongoose';
+import Credentials from '@ts/users/credentials';
+import { Schema, SchemaDefinitionProperty } from 'mongoose';
 
-export const CredentialsSchema = new Schema({
-  userId: Types.ObjectId,
-  username: String,
-  email: String,
-  password: String,
-  createdAt: Date
+type CredentialsSchema = Omit<Credentials, 'userId'> & {
+  userId: SchemaDefinitionProperty<Schema.Types.ObjectId>;
+};
+
+export const CredentialsSchema = new Schema<CredentialsSchema>({
+  userId: {
+    type: Schema.Types.ObjectId,
+    required: true
+  },
+  username: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    required: true
+  }
 });
 
 export const UsersSchema = new Schema({
@@ -15,18 +34,18 @@ export const UsersSchema = new Schema({
   country: String,
   isPublic: Boolean,
   unblockDate: Date,
-  dashboards: Types.Array<Dashboard>
+  dashboards: Schema.Types.Array
 });
 
 export const ServiceCredentialsSchema = new Schema({
-  userId: Types.ObjectId,
+  userId: Schema.Types.ObjectId,
   status: String,
   login: String,
   service: String
 });
 
 export const TracksSchema = new Schema({
-  userId: Types.ObjectId,
+  userId: Schema.Types.ObjectId,
   serviceId: String,
   rating: Number,
   rank: Number,
@@ -34,7 +53,7 @@ export const TracksSchema = new Schema({
 });
 
 export const GamesSchema = new Schema({
-  userId: Types.ObjectId,
+  userId: Schema.Types.ObjectId,
   serviceId: String,
   dataService: String,
   rating: Number,
