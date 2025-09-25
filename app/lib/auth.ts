@@ -1,11 +1,8 @@
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 import Token from '@ts/users/token';
-import Credentials from '@ts/users/credentials';
-import NewCredentials from '@ts/users/new-credentials';
 import { User } from '@ts/users/user';
 import UserAccess from '@ts/users/user-access';
 
@@ -66,8 +63,12 @@ export const generateAccessResponse = async (
     statusText: 'User account was created successfully'
   });
 
-  response.cookies.set('accessToken', userAccess.access);
-  response.cookies.set('refreshToken', userAccess.refresh);
+  response.cookies.set('accessToken', userAccess.access, {
+    maxAge: ACCESS_TTL / MILLISECONDS
+  });
+  response.cookies.set('refreshToken', userAccess.refresh, {
+    maxAge: REFRESH_TTL / MILLISECONDS
+  });
 
   return response;
 };
@@ -125,10 +126,8 @@ export const deleteTokens = async () => {
   cookiesStorage.delete('refreshToken');
 };
 
-export const getUserByUsername = async (username: string): Promise<User> => {
-  const credentials = await CredentialsModel.findOne({
-    username
-  });
+export const getUserById = async (id: string): Promise<User> => {
+  const credentials = await CredentialsModel.findById(id);
 
   if (!credentials) {
     throw new Error('User was not found');

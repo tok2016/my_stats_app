@@ -35,21 +35,31 @@ export const CredentialsValidator: z.ZodType<NewCredentials> = z.object({
 export const DashboardValidator: z.ZodType<Dashboard> = z.object({
   object: z.string().nonempty(),
   type: z.enum(DashboardTypes).default('text'),
-  x: z.number(),
-  y: z.number(),
-  width: z.number(),
-  height: z.number(),
+  x: z.number().default(0),
+  y: z.number().default(0),
+  width: z.number().default(0),
+  height: z.number().default(0),
   service: z.enum(ServiceNames).default('spotify')
 });
 
-export const UserUpdateValidator: z.ZodType<UserUpdate> = z.object({
-  email: z.email(),
-  birthdate: z.date(),
-  country: z.string(),
-  isPublic: z.boolean().default(false),
-  dashboards: z.array(DashboardValidator).max(MAX_DAHSBOARD_ITEMS).default([]),
-  unblockDate: z.date()
-});
+export const UserUpdateValidator: z.ZodType<UserUpdate> = z
+  .object({
+    email: z.email().optional(),
+    avatarUrl: z.url().optional().nullable(),
+    birthdate: z.string().optional().nullable(),
+    country: z.string().optional().nullable(),
+    isPublic: z.boolean().default(false),
+    dashboards: z
+      .array(DashboardValidator)
+      .max(MAX_DAHSBOARD_ITEMS)
+      .default([]),
+    unblockDate: z.string().optional().nullable()
+  })
+  .transform((input) => ({
+    ...input,
+    birthdate: input.birthdate ? new Date(input.birthdate) : undefined,
+    unblockDate: input.unblockDate ? new Date(input.unblockDate) : undefined
+  }));
 
 export const UserLoginValidator: z.ZodType<UserLogin> = z.object({
   credential: z.string().nonempty(),

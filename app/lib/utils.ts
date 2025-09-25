@@ -8,6 +8,14 @@ export const DashboardTypes = ['metric', 'media', 'text'] as const;
 
 export const ServiceNames = ['spotify', 'steam'] as const;
 
+export const ServiceStatuses = [
+  'authorized',
+  'unauthorized',
+  'notRequired',
+  'error',
+  'unknown'
+] as const;
+
 export const isExpired = (date: Date | string | number) =>
   new Date(date) < new Date();
 

@@ -7,7 +7,9 @@ import {
   UsersSchema
 } from './schemas';
 
-const mongo = mongoose.createConnection(process.env.DB_URL ?? '');
+const mongo = mongoose.createConnection(process.env.DB_URL ?? '', {
+  dbName: 'my_stats'
+});
 
 export const CredentialsModel = mongo.model('credentials', CredentialsSchema);
 export const UsersModel = mongo.model('users', UsersSchema);

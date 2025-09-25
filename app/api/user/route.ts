@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import {
-  extractToken,
-  generateAccessError,
-  getUserByUsername
-} from '@lib/auth';
+import { extractToken, generateAccessError, getUserById } from '@lib/auth';
 import { UserUpdateValidator } from '@lib/validationSchemas';
 import { CredentialsModel, UsersModel } from '@lib/models';
 import { uniteUserData } from '@lib/utils';
@@ -14,7 +10,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const token = await extractToken(bearer);
-    const user = await getUserByUsername(token.id);
+    const user = await getUserById(token.id);
 
     return NextResponse.json(user, {
       status: 200,
@@ -42,9 +38,10 @@ export async function PUT(req: NextRequest) {
     }
 
     const credentials = userUpdate.data.email
-      ? await CredentialsModel.findOneAndUpdate(
-          { id: token.id },
-          { email: userUpdate.data.email }
+      ? await CredentialsModel.findByIdAndUpdate(
+          token.id,
+          { email: userUpdate.data.email },
+          { new: true }
         )
       : await CredentialsModel.findById(token.id);
 
@@ -56,9 +53,10 @@ export async function PUT(req: NextRequest) {
     }
 
     delete userUpdate.data.email;
-    const userInfo = await UsersModel.findOneAndUpdate(
-      { id: credentials.userId },
-      userUpdate.data
+    const userInfo = await UsersModel.findByIdAndUpdate(
+      credentials.userId,
+      userUpdate.data,
+      { new: true }
     );
 
     if (!userInfo) {

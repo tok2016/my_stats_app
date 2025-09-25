@@ -41,5 +41,5 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  return await generateAccessResponse(credentials.username, credentials.id);
+  return await generateAccessResponse(credentials.id, credentials.username);
 }

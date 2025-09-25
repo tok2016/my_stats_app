@@ -1,4 +1,5 @@
 import Credentials from '@ts/users/credentials';
+import Service from '@ts/users/service';
 import UserInfo from '@ts/users/user-info';
 import { Schema } from 'mongoose';
 
@@ -40,11 +41,23 @@ export const UsersSchema = new Schema<UserInfo>({
   }
 });
 
-export const ServiceCredentialsSchema = new Schema({
-  userId: String,
-  status: String,
-  login: String,
-  service: String
+export const ServiceCredentialsSchema = new Schema<Service>({
+  userId: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    default: 'unknown'
+  },
+  login: {
+    type: String,
+    required: true
+  },
+  service: {
+    type: String,
+    default: 'spotify'
+  }
 });
 
 export const TracksSchema = new Schema({
