@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
 
-import UserAccess from '@ts/users/user-access';
-
 import { CredentialsValidator } from '@lib/validationSchemas';
-import { checkUserExistance, generateToken } from '@lib/auth';
+import { checkUserExistance, generateAccessResponse } from '@lib/auth';
 import { CredentialsModel, UsersModel } from '@lib/models';
 
 export async function POST(req: NextRequest) {
@@ -52,7 +50,7 @@ export async function POST(req: NextRequest) {
     ...newCredentials.data,
     password: hashedPassword,
     createdAt: new Date(),
-    userId: user._id
+    userId: user._id.toString()
   });
 
   if (credentials.validateSync()) {
@@ -62,14 +60,5 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const userAccess: UserAccess = {
-    access: await generateToken(newCredentials.data),
-    refresh: await generateToken(newCredentials.data, true),
-    username: credentials.username
-  };
-
-  return NextResponse.json(userAccess, {
-    status: 201,
-    statusText: 'User account was created successfully'
-  });
+  return await generateAccessResponse(credentials.username, credentials.id);
 }

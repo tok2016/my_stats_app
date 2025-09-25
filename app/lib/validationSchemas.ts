@@ -3,6 +3,7 @@ import z from 'zod';
 import { UserUpdate } from '@ts/users/user-update';
 import Dashboard from '@ts/users/dashboard';
 import NewCredentials from '@ts/users/new-credentials';
+import UserLogin from '@ts/users/user-login';
 
 import { DashboardTypes, ServiceNames } from './utils';
 
@@ -48,4 +49,9 @@ export const UserUpdateValidator: z.ZodType<UserUpdate> = z.object({
   isPublic: z.boolean().default(false),
   dashboards: z.array(DashboardValidator).max(MAX_DAHSBOARD_ITEMS).default([]),
   unblockDate: z.date()
+});
+
+export const UserLoginValidator: z.ZodType<UserLogin> = z.object({
+  credential: z.string().nonempty(),
+  password: z.string().nonempty()
 });

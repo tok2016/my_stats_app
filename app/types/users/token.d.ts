@@ -1,5 +1,6 @@
 import NewCredentials from './new-credentials';
 
-export type Token = Omit<NewCredentials, 'email'> & {
+export default interface Token {
+  id: string;
   expiresAt: string;
-};
+}

@@ -1,14 +1,10 @@
 import Credentials from '@ts/users/credentials';
 import UserInfo from '@ts/users/user-info';
-import { Schema, SchemaDefinitionProperty } from 'mongoose';
+import { Schema } from 'mongoose';
 
-type CredentialsSchema = Omit<Credentials, 'userId'> & {
-  userId: SchemaDefinitionProperty<Schema.Types.ObjectId>;
-};
-
-export const CredentialsSchema = new Schema<CredentialsSchema>({
+export const CredentialsSchema = new Schema<Credentials>({
   userId: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true
   },
   username: {
@@ -45,14 +41,14 @@ export const UsersSchema = new Schema<UserInfo>({
 });
 
 export const ServiceCredentialsSchema = new Schema({
-  userId: Schema.Types.ObjectId,
+  userId: String,
   status: String,
   login: String,
   service: String
 });
 
 export const TracksSchema = new Schema({
-  userId: Schema.Types.ObjectId,
+  userId: String,
   serviceId: String,
   rating: Number,
   rank: Number,
@@ -60,7 +56,7 @@ export const TracksSchema = new Schema({
 });
 
 export const GamesSchema = new Schema({
-  userId: Schema.Types.ObjectId,
+  userId: String,
   serviceId: String,
   dataService: String,
   rating: Number,

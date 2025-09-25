@@ -1,81 +1,103 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { Token } from '@ts/users/token';
-import { User } from '@ts/users/user';
-
-import { UsersModel } from '@lib/models';
-import { decodeToken, getCredentialsByToken } from '@lib/auth';
+import {
+  extractToken,
+  generateAccessError,
+  getUserByUsername
+} from '@lib/auth';
 import { UserUpdateValidator } from '@lib/validationSchemas';
+import { CredentialsModel, UsersModel } from '@lib/models';
+import { uniteUserData } from '@lib/utils';
 
 export async function GET(req: NextRequest) {
-  const accessToken = req.cookies.get('accessToken');
+  const bearer = req.headers.get('Authorization');
 
-  if (!accessToken) {
-    return new NextResponse('Unauthorized', {
-      status: 401,
-      statusText: 'Unauthorized'
-    });
-  }
-
-  const token = await decodeToken<Token>(accessToken.value);
   try {
-    const credentials = await getCredentialsByToken(token);
-    const user = await UsersModel.findById(credentials.userId);
+    const token = await extractToken(bearer);
+    const user = await getUserByUsername(token.id);
 
-    if (!user) {
+    return NextResponse.json(user, {
+      status: 200,
+      statusText: 'User was found'
+    });
+  } catch (err) {
+    return generateAccessError(err);
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  const bearer = req.headers.get('Authorization');
+
+  try {
+    const token = await extractToken(bearer);
+    const userUpdate = await UserUpdateValidator.safeParseAsync(
+      await req.json()
+    );
+
+    if (!userUpdate.success) {
+      return NextResponse.json(userUpdate.error.issues, {
+        status: 400,
+        statusText: 'Invalid data'
+      });
+    }
+
+    const credentials = userUpdate.data.email
+      ? await CredentialsModel.findOneAndUpdate(
+          { id: token.id },
+          { email: userUpdate.data.email }
+        )
+      : await CredentialsModel.findById(token.id);
+
+    if (!credentials) {
       return new NextResponse('User was not found', {
         status: 404,
         statusText: 'User was not found'
       });
     }
 
-    const userData: User = {
-      id: user.id,
-      username: credentials.username,
-      email: credentials.email,
-      createdAt: credentials.createdAt,
-      isPublic: user.isPublic,
-      avatarUrl: user.avatarUrl,
-      unblockDate: user.unblockDate,
-      dashboards: user.dashboards,
-      country: user.country,
-      birthdate: user.birthdate
-    };
+    delete userUpdate.data.email;
+    const userInfo = await UsersModel.findOneAndUpdate(
+      { id: credentials.userId },
+      userUpdate.data
+    );
 
-    return NextResponse.json(userData, {
-      status: 200,
-      statusText: 'User was found'
-    });
-  } catch (err) {
-    if (err instanceof Error) {
-      return new NextResponse(err.message, {
-        status: 401,
-        statusText: err.message
+    if (!userInfo) {
+      return new NextResponse('User data was not found', {
+        status: 404,
+        statusText: 'User data was not found'
       });
     }
 
-    return new NextResponse(null, {
-      status: 500,
-      statusText: 'Internal server error'
+    return NextResponse.json(uniteUserData(credentials, userInfo), {
+      status: 200,
+      statusText: 'User data was updated successfully'
     });
+  } catch (err) {
+    return generateAccessError(err);
   }
 }
 
-export async function PUT(req: NextRequest) {
-  const userUpdate = await UserUpdateValidator.safeParseAsync(await req.json());
+export async function DELETE(req: NextRequest) {
+  const bearer = req.headers.get('Authorization');
 
-  if (!userUpdate.success) {
-    return NextResponse.json(userUpdate.error.issues, {
-      status: 400,
-      statusText: 'Invalid data'
-    });
-  }
+  try {
+    const token = await extractToken(bearer);
+    const credentials = await CredentialsModel.findByIdAndDelete(token.id);
 
-  return NextResponse.json(
-    {},
-    {
-      status: 200,
-      statusText: 'User account was created successfully'
+    if (!credentials) {
+      return new NextResponse('User was not found', {
+        status: 404,
+        statusText: 'User was not found'
+      });
     }
-  );
+
+    await CredentialsModel.findByIdAndDelete(credentials.userId);
+
+    return new NextResponse('User was deleted successfully', {
+      status: 200,
+      statusText: 'User was deleted successfully'
+    });
+  } catch (err) {
+    return generateAccessError(err);
+  }
 }
