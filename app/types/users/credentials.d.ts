@@ -1,4 +1,4 @@
-import { NewCredentials } from './new-credentials';
+import NewCredentials from './new-credentials';
 
 export default interface Credentials extends NewCredentials {
   id: string;

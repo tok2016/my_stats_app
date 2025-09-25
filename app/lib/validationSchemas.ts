@@ -1,5 +1,9 @@
 import z from 'zod';
 
+import { UserUpdate } from '@ts/users/user-update';
+import Dashboard from '@ts/users/dashboard';
+import NewCredentials from '@ts/users/new-credentials';
+
 import { DashboardTypes, ServiceNames } from './utils';
 
 const MIN_USERNAME_LENGTH = 8;
@@ -8,7 +12,9 @@ const MAX_USERNAME_LENGTH = 32;
 const PASSWORD_MIN_LENGTH = 8;
 const PASSWORD_MAX_LENGTH = 32;
 
-export const CredentialsValidator = z.object({
+const MAX_DAHSBOARD_ITEMS = 6;
+
+export const CredentialsValidator: z.ZodType<NewCredentials> = z.object({
   email: z.email().nonempty(),
   username: z
     .string()
@@ -25,20 +31,21 @@ export const CredentialsValidator = z.object({
     .max(PASSWORD_MAX_LENGTH)
 });
 
-export const DashboardValidator = z.object({
+export const DashboardValidator: z.ZodType<Dashboard> = z.object({
   object: z.string().nonempty(),
   type: z.enum(DashboardTypes).default('text'),
   x: z.number(),
   y: z.number(),
   width: z.number(),
-  heigth: z.number(),
+  height: z.number(),
   service: z.enum(ServiceNames).default('spotify')
 });
 
-export const UserUpdateValidator = z.object({
+export const UserUpdateValidator: z.ZodType<UserUpdate> = z.object({
   email: z.email(),
   birthdate: z.date(),
   country: z.string(),
   isPublic: z.boolean().default(false),
-  dashboards: z.array(z.object(DashboardValidator)).default([])
+  dashboards: z.array(DashboardValidator).max(MAX_DAHSBOARD_ITEMS).default([]),
+  unblockDate: z.date()
 });

@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 
 import { Token } from '@ts/users/token';
 import Credentials from '@ts/users/credentials';
-import { NewCredentials } from '@ts/users/new-credentials';
+import NewCredentials from '@ts/users/new-credentials';
 
 import { CredentialsModel } from './models';
 import { MILLISECONDS } from './utils';
