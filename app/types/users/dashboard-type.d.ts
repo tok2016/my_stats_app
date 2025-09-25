@@ -1,1 +1,3 @@
-export type DashboardType = 'metric' | 'media' | 'text';
+import { DashboardTypes } from '@lib/utils';
+
+export type DashboardType = (typeof DashboardTypes)[number];

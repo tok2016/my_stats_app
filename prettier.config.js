@@ -5,7 +5,8 @@ const config = {
   useTabs: false,
   tabWidth: 2,
   trailingComma: 'none',
-  endOfLine: 'auto'
+  endOfLine: 'auto',
+  experimentalOperatorPosition: 'start'
 };
 
 export default config;

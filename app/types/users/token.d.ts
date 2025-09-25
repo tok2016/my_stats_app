@@ -1,5 +1,5 @@
-export default interface Token {
-  username: string;
-  password: string;
+import { NewCredentials } from './new-credentials';
+
+export type Token = Omit<NewCredentials, 'email'> & {
   expiresAt: string;
-}
+};

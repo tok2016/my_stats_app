@@ -1,15 +1,19 @@
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import { cookies } from 'next/headers';
 
-import Token from '@ts/users/token';
+import { Token } from '@ts/users/token';
+import Credentials from '@ts/users/credentials';
+import { NewCredentials } from '@ts/users/new-credentials';
 
 import { CredentialsModel } from './models';
+import { MILLISECONDS } from './utils';
 
-const ACCESS_TTL = 5 * 60 * 1000;
-const REFRESH_TTL = 30 * 24 * 60 * 60 * 1000;
+export const ACCESS_TTL = 5 * 60 * MILLISECONDS;
+export const REFRESH_TTL = 30 * 24 * 60 * 60 * MILLISECONDS;
 
 export const generateToken = async (
-  username: string,
-  password: string,
+  newCredentials: Omit<NewCredentials, 'email'>,
   isRefresh: boolean = false
 ): Promise<string> => {
   const expireDate = new Date(
@@ -17,8 +21,8 @@ export const generateToken = async (
   );
 
   const token: Token = {
-    username: username,
-    password: password,
+    username: newCredentials.username,
+    password: newCredentials.password,
     expiresAt: expireDate.toISOString()
   };
 
@@ -58,4 +62,43 @@ export const checkUserExistance = async (
   }
 
   return '';
+};
+
+export const getCredentialsByToken = async (
+  token: Token
+): Promise<Credentials> => {
+  const credentials = await CredentialsModel.findOne({
+    username: token.username
+  });
+
+  if (!credentials) {
+    throw new Error('User was not found');
+  }
+
+  const arePasswordSame = await bcrypt.compare(
+    token.password,
+    credentials.password
+  );
+  if (!arePasswordSame) {
+    throw new Error(`Passwords don't match`);
+  }
+
+  return {
+    id: credentials.id,
+    password: credentials.password,
+    username: credentials.username,
+    userId: credentials.userId.toString(),
+    email: credentials.email,
+    createdAt: credentials.createdAt
+  };
+};
+
+export const comapareTokens = (accessToken: Token, refreshToken: Token) =>
+  accessToken.username === refreshToken.username
+  && accessToken.password === refreshToken.password;
+
+export const deleteTokens = async () => {
+  const cookiesStorage = await cookies();
+  cookiesStorage.delete('accessToken');
+  cookiesStorage.delete('refreshToken');
 };

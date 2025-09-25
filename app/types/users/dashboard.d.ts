@@ -1,12 +1,5 @@
-import { DashboardType } from './dashboard-type';
-import { ServiceName } from './service-name';
+import z from 'zod';
 
-export default interface Dashboard {
-  object: string;
-  service: ServiceName;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  type: DashboardType;
-}
+import { DashboardValidator } from '@lib/validationSchemas';
+
+export type Dashboard = z.infer<typeof DashboardValidator>;

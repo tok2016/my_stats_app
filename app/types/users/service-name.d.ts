@@ -1,1 +1,3 @@
-export type ServiceName = 'spotify' | 'steam';
+import { ServiceNames } from '@lib/utils';
+
+export type ServiceName = (typeof ServiceNames)[number];
