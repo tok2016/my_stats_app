@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { extractToken, generateAccessError, getUserById } from '@lib/auth';
 import { UserUpdateValidator } from '@lib/validationSchemas';
-import { CredentialsModel, UsersModel } from '@lib/models';
+import {
+  CredentialsModel,
+  ServiceCredentialsModel,
+  UsersModel
+} from '@lib/models';
 import { uniteUserData } from '@lib/utils';
 
 export async function GET(req: NextRequest) {
@@ -89,7 +93,8 @@ export async function DELETE(req: NextRequest) {
       });
     }
 
-    await CredentialsModel.findByIdAndDelete(credentials.userId);
+    await UsersModel.findByIdAndDelete(credentials.userId);
+    await ServiceCredentialsModel.deleteMany({ userId: credentials.userId });
 
     return new NextResponse('User was deleted successfully', {
       status: 200,

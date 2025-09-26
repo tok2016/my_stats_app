@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import Token from '@ts/users/token';
 import { User } from '@ts/users/user';
 import UserAccess from '@ts/users/user-access';
+import Credentials from '@ts/users/credentials';
 
 import { CredentialsModel, UsersModel } from './models';
 import { isExpired, MILLISECONDS, uniteUserData } from './utils';
@@ -126,13 +127,18 @@ export const deleteTokens = async () => {
   cookiesStorage.delete('refreshToken');
 };
 
-export const getUserById = async (id: string): Promise<User> => {
+export const getCredentialsById = async (id: string): Promise<Credentials> => {
   const credentials = await CredentialsModel.findById(id);
 
   if (!credentials) {
     throw new Error('User was not found');
   }
 
+  return credentials;
+};
+
+export const getUserById = async (id: string): Promise<User> => {
+  const credentials = await getCredentialsById(id);
   const userInfo = await UsersModel.findById(credentials.userId);
 
   if (!userInfo) {
@@ -140,4 +146,13 @@ export const getUserById = async (id: string): Promise<User> => {
   }
 
   return uniteUserData(credentials, userInfo);
+};
+
+export const checkUserAuthorRights = async (
+  userId: string,
+  tokenRaw: string | null
+) => {
+  const token = await extractToken(tokenRaw);
+  const credentials = await getCredentialsById(token.id);
+  return credentials.userId === userId;
 };

@@ -5,7 +5,8 @@ import Dashboard from '@ts/users/dashboard';
 import NewCredentials from '@ts/users/new-credentials';
 import UserLogin from '@ts/users/user-login';
 
-import { DashboardTypes, ServiceNames } from './utils';
+import { DashboardTypes, ServiceNames, ServiceStatuses } from './utils';
+import NewService from '@ts/users/new-service';
 
 const MIN_USERNAME_LENGTH = 8;
 const MAX_USERNAME_LENGTH = 32;
@@ -64,4 +65,10 @@ export const UserUpdateValidator: z.ZodType<UserUpdate> = z
 export const UserLoginValidator: z.ZodType<UserLogin> = z.object({
   credential: z.string().nonempty(),
   password: z.string().nonempty()
+});
+
+export const ServiceValidator: z.ZodType<NewService> = z.object({
+  name: z.enum(ServiceNames).default('spotify'),
+  login: z.string().nonempty(),
+  status: z.enum(ServiceStatuses).default('unknown')
 });

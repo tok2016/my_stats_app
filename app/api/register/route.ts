@@ -53,12 +53,5 @@ export async function POST(req: NextRequest) {
     userId: user._id.toString()
   });
 
-  if (credentials.validateSync()) {
-    return new NextResponse(null, {
-      status: 500,
-      statusText: `Couldn't create new account`
-    });
-  }
-
   return await generateAccessResponse(credentials.id, credentials.username);
 }

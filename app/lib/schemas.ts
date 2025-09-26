@@ -54,7 +54,7 @@ export const ServiceCredentialsSchema = new Schema<Service>({
     type: String,
     required: true
   },
-  service: {
+  name: {
     type: String,
     default: 'spotify'
   }
