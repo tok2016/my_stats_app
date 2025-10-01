@@ -1,6 +1,7 @@
 import { DashboardValidator } from '@lib/validationSchemas';
-import { DashboardType } from './dashboard-type';
-import { ServiceName } from './service-name';
+import { DashboardTypes } from '@lib/utils';
+
+export type DashboardType = (typeof DashboardTypes)[number];
 
 export default interface Dashboard {
   object: string;

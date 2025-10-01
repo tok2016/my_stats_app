@@ -1,6 +1,14 @@
-import NewService from './new-service';
-import { ServiceName } from './service-name';
-import { ServiceStatus } from './service-status';
+import { ServiceNames, ServiceStatuses } from '@lib/utils';
+
+export type ServiceName = (typeof ServiceNames)[number];
+
+export type ServiceStatus = (typeof ServiceStatuses)[number];
+
+export interface NewService {
+  name: ServiceName;
+  login: string;
+  status: ServiceStatus;
+}
 
 export default interface Service extends NewService {
   id: string;

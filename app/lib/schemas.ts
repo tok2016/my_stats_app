@@ -1,6 +1,6 @@
 import Credentials from '@ts/users/credentials';
 import Service from '@ts/users/service';
-import UserInfo from '@ts/users/user-info';
+import { UserInfo } from '@ts/users/user';
 import { Schema } from 'mongoose';
 
 export const CredentialsSchema = new Schema<Credentials>({

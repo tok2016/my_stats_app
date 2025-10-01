@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 import Token from '@ts/users/token';
 import { User } from '@ts/users/user';
-import UserAccess from '@ts/users/user-access';
+import { UserAccess } from '@ts/users/user';
 import Credentials from '@ts/users/credentials';
 
 import { CredentialsModel, UsersModel } from './models';

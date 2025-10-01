@@ -1,12 +1,11 @@
 import z from 'zod';
 
-import { UserUpdate } from '@ts/users/user-update';
 import Dashboard from '@ts/users/dashboard';
-import NewCredentials from '@ts/users/new-credentials';
-import UserLogin from '@ts/users/user-login';
+import { UserLogin, UserUpdate } from '@ts/users/user';
 
 import { DashboardTypes, ServiceNames, ServiceStatuses } from './utils';
-import NewService from '@ts/users/new-service';
+import { NewService } from '@ts/users/service';
+import { NewCredentials } from '@ts/users/credentials';
 
 const MIN_USERNAME_LENGTH = 8;
 const MAX_USERNAME_LENGTH = 32;

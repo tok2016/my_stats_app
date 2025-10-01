@@ -1,6 +1,6 @@
 import Credentials from '@ts/users/credentials';
 import { User } from '@ts/users/user';
-import UserInfo from '@ts/users/user-info';
+import { UserInfo } from '@ts/users/user';
 
 export const MILLISECONDS = 1000;
 
