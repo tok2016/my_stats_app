@@ -1,6 +1,10 @@
+import path from 'path';
+
 import Credentials from '@ts/users/credentials';
 import { User } from '@ts/users/user';
 import { UserInfo } from '@ts/users/user';
+
+export const AVATAR_DIRECTORY = path.join(process.cwd(), 'avatars');
 
 export const MILLISECONDS = 1000;
 

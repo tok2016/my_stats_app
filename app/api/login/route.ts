@@ -29,12 +29,12 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const arePasswordSame = await bcrypt.compare(
+  const arePasswordsSame = await bcrypt.compare(
     userLogin.data.password,
     credentials.password
   );
 
-  if (!arePasswordSame) {
+  if (!arePasswordsSame) {
     return new NextResponse('Wrong password', {
       status: 400,
       statusText: 'Wrong password'
