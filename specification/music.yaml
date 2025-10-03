@@ -5,17 +5,17 @@ info:
     Specification for API and Data types of Music service of My_Stats
   version: 1.0.0
 tags:
-  - name: "genres"
-    description: "Genres & tags operations"
-  - name: "artists"
-    description: "Artists operations"
-  - name: "albums"
-    description: "Albums operations"
-  - name: "tracks"
-    description: "Tracks operations"
-  - name: "playlists"
-    description: "Playlists operations"
-    
+  - name: 'genres'
+    description: 'Genres & tags operations'
+  - name: 'artists'
+    description: 'Artists operations'
+  - name: 'albums'
+    description: 'Albums operations'
+  - name: 'tracks'
+    description: 'Tracks operations'
+  - name: 'playlists'
+    description: 'Playlists operations'
+
 paths:
   /genres:
     get:
@@ -39,7 +39,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Genre"
+                  $ref: '#/components/schemas/Genre'
         401:
           description: User is unauthorized
         403:
@@ -47,7 +47,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-        
+
   /genres/{genre}:
     get:
       tags:
@@ -68,7 +68,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Genre"
+                $ref: '#/components/schemas/Genre'
         401:
           description: User is unauthorized
         403:
@@ -78,7 +78,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-          
+
   /period/genres:
     get:
       tags:
@@ -99,7 +99,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PeriodGenres"
+                $ref: '#/components/schemas/PeriodGenres'
         401:
           description: User is unauthorized
         403:
@@ -107,7 +107,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-    
+
   /artists:
     get:
       tags:
@@ -123,7 +123,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Artist"
+                  $ref: '#/components/schemas/Artist'
         401:
           description: User is unauthorized
         403:
@@ -131,7 +131,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-        
+
   /artists/{artist}:
     get:
       tags:
@@ -152,7 +152,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Artist"
+                $ref: '#/components/schemas/Artist'
         401:
           description: User is unauthorized
         403:
@@ -162,7 +162,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-        
+
   /period/artists:
     get:
       tags:
@@ -176,7 +176,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PeriodArtists"
+                $ref: '#/components/schemas/PeriodArtists'
         401:
           description: User is unauthorized
         403:
@@ -184,7 +184,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-        
+
   /albums:
     get:
       tags:
@@ -213,7 +213,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Album"
+                  $ref: '#/components/schemas/Album'
         401:
           description: User is unauthorized
         403:
@@ -221,7 +221,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-  
+
   /albums/{album}:
     get:
       tags:
@@ -242,7 +242,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Album"
+                $ref: '#/components/schemas/Album'
         401:
           description: User is unauthorized
         403:
@@ -252,7 +252,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-        
+
   /period/albums:
     get:
       tags:
@@ -273,7 +273,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PeriodAlbums"
+                $ref: '#/components/schemas/PeriodAlbums'
         401:
           description: User is unauthorized
         403:
@@ -281,7 +281,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-        
+
   /tracks:
     get:
       tags:
@@ -322,7 +322,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Track"
+                  $ref: '#/components/schemas/Track'
         401:
           description: User is unauthorized
         403:
@@ -330,7 +330,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-        
+
   /tracks/{track}:
     put:
       tags:
@@ -350,14 +350,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TrackReview"
+              $ref: '#/components/schemas/TrackReview'
       responses:
         200:
           description: Track review was updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Track"
+                $ref: '#/components/schemas/Track'
         401:
           description: User is unauthorized
         403:
@@ -386,7 +386,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Track"
+                $ref: '#/components/schemas/Track'
         401:
           description: User is unauthorized
         403:
@@ -396,7 +396,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-        
+
   /period/tracks:
     get:
       tags:
@@ -417,7 +417,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PeriodTracks"
+                $ref: '#/components/schemas/PeriodTracks'
         401:
           description: User is unauthorized
         403:
@@ -425,7 +425,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-        
+
   /playlists:
     get:
       tags:
@@ -441,7 +441,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Playlist"
+                  $ref: '#/components/schemas/Playlist'
         401:
           description: User is unauthorized
         403:
@@ -460,7 +460,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Playlist"
+              $ref: '#/components/schemas/Playlist'
       responses:
         201:
           description: Playlist was created successfully
@@ -469,7 +469,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Playlist"
+                  $ref: '#/components/schemas/Playlist'
         400:
           description: Invalid data
         401:
@@ -479,7 +479,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-        
+
   /playlists/add/{playlistId}:
     put:
       tags:
@@ -511,7 +511,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Playlist"
+                  $ref: '#/components/schemas/Playlist'
         400:
           description: Invalid data
         401:
@@ -523,7 +523,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-    
+
   /playlists/remove/{playlistId}:
     put:
       tags:
@@ -555,7 +555,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Playlist"
+                  $ref: '#/components/schemas/Playlist'
         400:
           description: Invalid data
         401:
@@ -567,7 +567,7 @@ paths:
       security:
         - accessToken: []
         - spotifyToken: []
-          
+
 components:
   schemas:
     AlbumBasic:
@@ -580,7 +580,7 @@ components:
         cover:
           type: string
           format: url
-        releaseDate: 
+        releaseDate:
           type: string
           format: date-iso
         streams:
@@ -592,7 +592,7 @@ components:
         - cover
         - releaseDate
         - streams
-          
+
     ArtistBasic:
       type: object
       properties:
@@ -600,14 +600,14 @@ components:
           type: string
         name:
           type: string
-        streams: 
+        streams:
           type: number
           format: int32
       required:
         - serviceId
         - name
         - streams
-        
+
     GenreBasic:
       type: object
       properties:
@@ -619,7 +619,7 @@ components:
       required:
         - name
         - streams
-        
+
     TrackBasic:
       type: object
       properties:
@@ -633,10 +633,10 @@ components:
         artists:
           type: array
           items:
-            $ref: "#/components/schemas/ArtistBasic"
+            $ref: '#/components/schemas/ArtistBasic'
         album:
-          $ref: "#/components/schemas/AlbumBasic"
-        streams: 
+          $ref: '#/components/schemas/AlbumBasic'
+        streams:
           type: number
           format: int32
         explicit:
@@ -648,7 +648,7 @@ components:
         - artists
         - album
         - streams
-        
+
     TrackReview:
       type: object
       properties:
@@ -658,11 +658,11 @@ components:
         rating:
           type: number
           format: int32
-          
+
     Track:
       allOf:
-        - $ref: "#/components/schemas/TrackBasic"
-        - $ref: "#/components/schemas/TrackReview"
+        - $ref: '#/components/schemas/TrackBasic'
+        - $ref: '#/components/schemas/TrackReview'
         - type: object
           properties:
             userRating:
@@ -677,14 +677,14 @@ components:
                 type: string
       required:
         - genres
-        
+
     Album:
       allOf:
-        - $ref: "#/components/schemas/AlbumBasic"
+        - $ref: '#/components/schemas/AlbumBasic'
         - type: object
           properties:
             artist:
-              $ref: "#/components/schemas/ArtistBasic"
+              $ref: '#/components/schemas/ArtistBasic'
             tracks:
               type: number
               format: int32
@@ -695,9 +695,9 @@ components:
               type: number
               format: float
             bestTrack:
-              $ref: "#/components/schemas/TrackBasic"
+              $ref: '#/components/schemas/TrackBasic'
             streamedTrack:
-              $ref: "#/components/schemas/TrackBasic"
+              $ref: '#/components/schemas/TrackBasic'
             rating:
               type: number
               format: int32
@@ -719,10 +719,10 @@ components:
         - bestTrack
         - streamedTrack
         - genres
-        
+
     Artist:
       allOf:
-        - $ref: "#/components/schemas/ArtistBasic"
+        - $ref: '#/components/schemas/ArtistBasic'
         - type: object
           properties:
             image:
@@ -740,9 +740,9 @@ components:
               type: number
               format: float
             bestAlbum:
-              $ref: "#/components/schemas/AlbumBasic"
+              $ref: '#/components/schemas/AlbumBasic'
             streamedAlbum:
-              $ref: "#/components/schemas/AlbumBasic"
+              $ref: '#/components/schemas/AlbumBasic'
             rating:
               type: number
               format: int32
@@ -759,10 +759,10 @@ components:
         - streamsPercent
         - bestAlbum
         - streamedAlbum
-            
+
     Genre:
       allOf:
-        - $ref: "#/components/schemas/GenreBasic"
+        - $ref: '#/components/schemas/GenreBasic'
         - type: object
           properties:
             tracks:
@@ -776,15 +776,15 @@ components:
               type: number
               format: int32
             bestTrack:
-              $ref: "#/components/schemas/TrackBasic"
+              $ref: '#/components/schemas/TrackBasic'
             topTracks:
               type: array
               items:
-                $ref: "#/components/schemas/TrackBasic"
+                $ref: '#/components/schemas/TrackBasic'
             recommended:
               type: array
               items:
-                $ref: "#/components/schemas/TrackBasic"
+                $ref: '#/components/schemas/TrackBasic'
       required:
         - name
         - tracks
@@ -792,7 +792,7 @@ components:
         - topArtist
         - streamedArtist
         - topTracks
-        
+
     Playlist:
       type: object
       properties:
@@ -812,7 +812,7 @@ components:
         - serviceId
         - name
         - tracks
-    
+
     Period:
       type: object
       properties:
@@ -826,67 +826,67 @@ components:
         - month
         - season
         - year
-        
+
     PeriodGenres:
       type: array
       items:
         type: object
         properties:
           period:
-            $ref: "#/components/schemas/Period"
+            $ref: '#/components/schemas/Period'
           genresList:
             type: array
-            items: 
-              $ref: "#/components/schemas/GenreBasic"
+            items:
+              $ref: '#/components/schemas/GenreBasic'
         required:
           - period
           - genresList
-    
+
     PeriodArtists:
       type: array
       items:
         type: object
         properties:
           period:
-            $ref: "#/components/schemas/Period"
+            $ref: '#/components/schemas/Period'
           artists:
             type: array
             items:
-              $ref: "#/components/schemas/ArtistBasic"
+              $ref: '#/components/schemas/ArtistBasic'
         required:
           - period
           - artists
-    
+
     PeriodAlbums:
       type: array
       items:
         type: object
         properties:
           period:
-            $ref: "#/components/schemas/Period"
+            $ref: '#/components/schemas/Period'
           albums:
             type: array
             items:
-              $ref: "#/components/schemas/AlbumBasic"
+              $ref: '#/components/schemas/AlbumBasic'
         required:
           - period
           - albums
-        
+
     PeriodTracks:
       type: array
       items:
         type: object
         properties:
           period:
-            $ref: "#/components/schemas/Period"
+            $ref: '#/components/schemas/Period'
           tracks:
             type: array
             items:
-              $ref: "#/components/schemas/TrackBasic"
+              $ref: '#/components/schemas/TrackBasic'
         required:
           - period
           - tracks
-        
+
   securitySchemes:
     accessToken:
       type: http
@@ -896,4 +896,3 @@ components:
       type: http
       scheme: bearer
       bearerFormat: jwt
-  

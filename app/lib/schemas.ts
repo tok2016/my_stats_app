@@ -1,32 +1,120 @@
-import Dashboard from '@ts/users/dashboard';
-import {Schema, Types} from 'mongoose';
+import { Schema } from 'mongoose';
 
-export const CredentialsSchema = new Schema({
-  userId: Types.ObjectId,
-  username: String,
-  email: String,
-  password: String,
-  createdAt: Date
+import { CredentialsInSchema } from '@ts/users/credentials';
+import { DashboardInSchema } from '@ts/users/dashboard';
+import { ServiceInSchema } from '@ts/users/service';
+import { UserInfoInSchema } from '@ts/users/user';
+import { ConfirmationInSchema } from '@ts/users/confirmation';
+
+export const CredentialsSchema = new Schema<CredentialsInSchema>({
+  userId: {
+    type: String,
+    required: true
+  },
+  username: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    required: true
+  }
 });
 
-export const UsersSchema = new Schema({
+export const UsersSchema = new Schema<UserInfoInSchema>({
   avatarUrl: String,
   birthdate: Date,
   country: String,
-  isPublic: Boolean,
-  unblockDate: Date,
-  dashboards: Types.Array<Dashboard>
+  isPublic: {
+    type: Boolean,
+    default: false
+  },
+  unblockDate: Date
 });
 
-export const ServiceCredentialsSchema = new Schema({
-  userId: Types.ObjectId,
-  status: String,
-  login: String,
-  service: String
+export const DashboardsSchema = new Schema<DashboardInSchema>({
+  object: {
+    type: String,
+    required: true
+  },
+  type: {
+    type: String,
+    default: 'text'
+  },
+  x: {
+    type: Number,
+    default: 0
+  },
+  y: {
+    type: Number,
+    default: 0
+  },
+  width: {
+    type: Number,
+    default: 0
+  },
+  height: {
+    type: Number,
+    default: 0
+  },
+  service: {
+    type: String,
+    default: 'spotify'
+  },
+  userId: {
+    type: String,
+    required: true
+  }
+});
+
+export const ServiceCredentialsSchema = new Schema<ServiceInSchema>({
+  userId: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    default: 'unknown'
+  },
+  login: {
+    type: String,
+    required: true
+  },
+  name: {
+    type: String,
+    default: 'spotify'
+  }
+});
+
+export const ConfirmationsSchema = new Schema<ConfirmationInSchema>({
+  credential: {
+    type: String,
+    required: true
+  },
+  code: {
+    type: String,
+    required: true
+  },
+  isConfirmed: {
+    type: Boolean,
+    default: false
+  },
+  action: {
+    type: String,
+    default: 'password'
+  }
 });
 
 export const TracksSchema = new Schema({
-  userId: Types.ObjectId,
+  userId: String,
   serviceId: String,
   rating: Number,
   rank: Number,
@@ -34,7 +122,7 @@ export const TracksSchema = new Schema({
 });
 
 export const GamesSchema = new Schema({
-  userId: Types.ObjectId,
+  userId: String,
   serviceId: String,
   dataService: String,
   rating: Number,
