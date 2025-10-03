@@ -6,9 +6,15 @@ import Token from '@ts/users/token';
 import { User } from '@ts/users/user';
 import { UserAccess } from '@ts/users/user';
 import Credentials from '@ts/users/credentials';
+import Dashboard from '@ts/users/dashboard';
 
-import { CredentialsModel, UsersModel } from './models';
-import { isExpired, MILLISECONDS, uniteUserData } from './utils';
+import { CredentialsModel, DashboarsdModel, UsersModel } from './models';
+import {
+  formatDashboards,
+  isExpired,
+  MILLISECONDS,
+  uniteUserData
+} from './utils';
 
 export const ACCESS_TTL = 5 * 60 * MILLISECONDS;
 export const REFRESH_TTL = 30 * 24 * 60 * 60 * MILLISECONDS;
@@ -51,7 +57,8 @@ export const decodeToken = async (token: string): Promise<Token> => {
 
 export const generateAccessResponse = async (
   credentialsId: string,
-  username: string
+  username: string,
+  statusText?: string
 ) => {
   const userAccess: UserAccess = {
     access: await generateToken(credentialsId),
@@ -61,7 +68,7 @@ export const generateAccessResponse = async (
 
   const response = NextResponse.json(userAccess, {
     status: 201,
-    statusText: 'User account was created successfully'
+    statusText
   });
 
   response.cookies.set('accessToken', userAccess.access, {
@@ -140,12 +147,13 @@ export const getCredentialsById = async (id: string): Promise<Credentials> => {
 export const getUserById = async (id: string): Promise<User> => {
   const credentials = await getCredentialsById(id);
   const userInfo = await UsersModel.findById(credentials.userId);
+  const dashboards = await getDashboards(credentials.userId);
 
   if (!userInfo) {
     throw new Error('User data was not found');
   }
 
-  return uniteUserData(credentials, userInfo);
+  return uniteUserData(credentials, userInfo, dashboards);
 };
 
 export const checkUserAuthorRights = async (
@@ -155,4 +163,9 @@ export const checkUserAuthorRights = async (
   const token = await extractToken(tokenRaw);
   const credentials = await getCredentialsById(token.id);
   return credentials.userId === userId;
+};
+
+export const getDashboards = async (userId: string): Promise<Dashboard[]> => {
+  const dashboards = await DashboarsdModel.find({ userId });
+  return formatDashboards(dashboards);
 };

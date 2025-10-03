@@ -3,6 +3,7 @@ import path from 'path';
 import Credentials from '@ts/users/credentials';
 import { User } from '@ts/users/user';
 import { UserInfo } from '@ts/users/user';
+import Dashboard from '@ts/users/dashboard';
 
 export const AVATAR_DIRECTORY = path.join(process.cwd(), 'avatars');
 
@@ -25,16 +26,30 @@ export const isExpired = (date: Date | string | number) =>
 
 export const uniteUserData = (
   credentials: Credentials,
-  userInfo: UserInfo
+  userInfo: UserInfo,
+  dashboards: Dashboard[]
 ): User => ({
   id: userInfo.id,
   username: credentials.username,
   email: credentials.email,
   createdAt: credentials.createdAt,
   isPublic: userInfo.isPublic,
-  dashboards: userInfo.dashboards,
+  dashboards,
   avatarUrl: userInfo.avatarUrl,
   birthdate: userInfo.birthdate,
   country: userInfo.country,
   unblockDate: userInfo.unblockDate
 });
+
+export const formatDashboards = (rawDashboards: Dashboard[]): Dashboard[] =>
+  rawDashboards.map((dashboard) => ({
+    id: dashboard.id,
+    object: dashboard.object,
+    type: dashboard.type,
+    x: dashboard.x,
+    y: dashboard.y,
+    width: dashboard.width,
+    height: dashboard.height,
+    service: dashboard.service,
+    userId: dashboard.userId
+  }));

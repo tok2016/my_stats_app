@@ -19,9 +19,9 @@ export async function POST(
 ) {
   const { userId } = await params;
   if (!userId) {
-    return new NextResponse('Username was not given', {
+    return new NextResponse('User id was not given', {
       status: 400,
-      statusText: 'Username was not given'
+      statusText: 'User id was not given'
     });
   }
 

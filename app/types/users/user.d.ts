@@ -14,7 +14,6 @@ export interface UserInfo {
   country?: string | null;
   isPublic: boolean;
   unblockDate?: Date | null;
-  dashboards: Dashboard[];
 }
 
 export interface UserLogin {
@@ -23,7 +22,10 @@ export interface UserLogin {
 }
 
 export type UserUpdate = Partial<
-  Omit<UserInfo, 'id'> & Pick<Credentials, 'email'>
+  Omit<UserInfo, 'id' | 'dashboards'> & Pick<Credentials, 'email'>
 >;
 
-export type User = UserInfo & Omit<Credentials, 'password' | 'userId' | 'id'>;
+export type User = UserInfo
+  & Omit<Credentials, 'password' | 'userId' | 'id'> & {
+    dashboards: Dashboard[];
+  };

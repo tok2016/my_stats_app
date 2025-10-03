@@ -1,6 +1,6 @@
 import z from 'zod';
 
-import Dashboard from '@ts/users/dashboard';
+import { NewDashboard } from '@ts/users/dashboard';
 import { UserLogin, UserUpdate } from '@ts/users/user';
 import { NewService } from '@ts/users/service';
 import { NewCredentials } from '@ts/users/credentials';
@@ -13,8 +13,6 @@ const MAX_USERNAME_LENGTH = 32;
 
 const PASSWORD_MIN_LENGTH = 8;
 const PASSWORD_MAX_LENGTH = 32;
-
-const MAX_DAHSBOARD_ITEMS = 6;
 
 export const CredentialsValidator: z.ZodType<NewCredentials> = z.object({
   email: z.email().nonempty(),
@@ -33,7 +31,7 @@ export const CredentialsValidator: z.ZodType<NewCredentials> = z.object({
     .max(PASSWORD_MAX_LENGTH)
 });
 
-export const DashboardValidator: z.ZodType<Dashboard> = z.object({
+export const DashboardValidator: z.ZodType<NewDashboard> = z.object({
   object: z.string().nonempty(),
   type: z.enum(DashboardTypes).default('text'),
   x: z.number().default(0),
@@ -50,10 +48,6 @@ export const UserUpdateValidator: z.ZodType<UserUpdate> = z
     birthdate: z.string().optional().nullable(),
     country: z.string().optional().nullable(),
     isPublic: z.boolean().default(false),
-    dashboards: z
-      .array(DashboardValidator)
-      .max(MAX_DAHSBOARD_ITEMS)
-      .default([]),
     unblockDate: z.string().optional().nullable()
   })
   .transform((input) => ({

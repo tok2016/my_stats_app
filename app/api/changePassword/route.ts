@@ -58,7 +58,11 @@ export async function POST(req: NextRequest) {
       { new: true }
     );
 
-    return await generateAccessResponse(credentials.id, credentials.username);
+    return await generateAccessResponse(
+      credentials.id,
+      credentials.username,
+      'Password was changed successfully'
+    );
   } catch (err) {
     return generateAccessError(err);
   }

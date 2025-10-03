@@ -1,9 +1,11 @@
+import { ServiceName } from './service';
+
 import { DashboardValidator } from '@lib/validationSchemas';
 import { DashboardTypes } from '@lib/utils';
 
 export type DashboardType = (typeof DashboardTypes)[number];
 
-export default interface Dashboard {
+export interface NewDashboard {
   object: string;
   type: DashboardType;
   service: ServiceName;
@@ -11,4 +13,11 @@ export default interface Dashboard {
   y: number;
   width: number;
   height: number;
+}
+
+export type DashboardUpdate = Partial<NewDashboard>;
+
+export default interface Dashboard extends NewDashboard {
+  id: string;
+  userId: string;
 }

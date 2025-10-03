@@ -1,7 +1,9 @@
+import { Schema } from 'mongoose';
+
 import Credentials from '@ts/users/credentials';
+import Dashboard from '@ts/users/dashboard';
 import Service from '@ts/users/service';
 import { UserInfo } from '@ts/users/user';
-import { Schema } from 'mongoose';
 
 export const CredentialsSchema = new Schema<Credentials>({
   userId: {
@@ -34,10 +36,41 @@ export const UsersSchema = new Schema<UserInfo>({
     type: Boolean,
     default: false
   },
-  unblockDate: Date,
-  dashboards: {
-    type: Schema.Types.Mixed,
-    default: []
+  unblockDate: Date
+});
+
+export const DashboardsSchema = new Schema<Dashboard>({
+  object: {
+    type: String,
+    required: true
+  },
+  type: {
+    type: String,
+    default: 'text'
+  },
+  x: {
+    type: Number,
+    default: 0
+  },
+  y: {
+    type: Number,
+    default: 0
+  },
+  width: {
+    type: Number,
+    default: 0
+  },
+  height: {
+    type: Number,
+    default: 0
+  },
+  service: {
+    type: String,
+    default: 'spotify'
+  },
+  userId: {
+    type: String,
+    required: true
   }
 });
 
