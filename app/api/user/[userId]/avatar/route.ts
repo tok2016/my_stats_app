@@ -35,7 +35,7 @@ export async function POST(
       });
     }
 
-    const user = await UsersModel.findById(userId);
+    const user = await UsersModel.findById(userId).lean();
 
     if (!user) {
       return new NextResponse('User was not found', {
@@ -65,7 +65,7 @@ export async function POST(
     );
 
     await UsersModel.findByIdAndUpdate(
-      user.id,
+      user._id.toString(),
       { avatarUrl: fileName },
       { new: true }
     );

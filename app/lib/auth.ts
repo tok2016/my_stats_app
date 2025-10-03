@@ -6,16 +6,11 @@ import { NextResponse } from 'next/server';
 import Token from '@ts/users/token';
 import { User } from '@ts/users/user';
 import { UserAccess } from '@ts/users/user';
-import Credentials from '@ts/users/credentials';
+import Credentials, { CredentialsInSchema } from '@ts/users/credentials';
 import Dashboard from '@ts/users/dashboard';
 
-import { CredentialsModel, DashboarsdModel, UsersModel } from './models';
-import {
-  formatDashboards,
-  isExpired,
-  MILLISECONDS,
-  uniteUserData
-} from './utils';
+import { CredentialsModel, DashboardsModel, UsersModel } from './models';
+import { isExpired, MILLISECONDS, uniteUserData } from './utils';
 
 export const ACCESS_TTL = 5 * 60 * MILLISECONDS;
 export const REFRESH_TTL = 30 * 24 * 60 * 60 * MILLISECONDS;
@@ -38,6 +33,7 @@ export const generateToken = async (
       throw new Error('Internal server error');
     }
 
+    console.log(token);
     resolve(jwt.sign(token, process.env.SECRET_KEY, { algorithm: 'HS256' }));
   });
 };
@@ -109,7 +105,7 @@ export const checkUserExistance = async (
 ): Promise<string> => {
   const foundUsers = await CredentialsModel.find({
     $or: [{ username }, { email }]
-  });
+  }).lean();
 
   if (foundUsers[0]?.username === username) {
     return 'User with this username already exits';
@@ -145,14 +141,16 @@ export const deleteTokens = async () => {
   cookiesStorage.delete('refreshToken');
 };
 
-export const getCredentialsById = async (id: string): Promise<Credentials> => {
-  const credentials = await CredentialsModel.findById(id);
+export const getCredentialsById = async (
+  id: string
+): Promise<Credentials & CredentialsInSchema> => {
+  const credentials = await CredentialsModel.findById(id).lean();
 
   if (!credentials) {
     throw new Error('User was not found');
   }
 
-  return credentials;
+  return { ...credentials, id: credentials._id.toString() };
 };
 
 export const getCredentials = async (
@@ -160,18 +158,18 @@ export const getCredentials = async (
 ): Promise<Credentials> => {
   const credentials = await CredentialsModel.findOne({
     $or: [{ username: credential }, { email: credential }]
-  });
+  }).lean();
 
   if (!credentials) {
     throw new Error('User was not found');
   }
 
-  return credentials;
+  return { ...credentials, id: credentials._id.toString() };
 };
 
 export const getUserById = async (id: string): Promise<User> => {
   const credentials = await getCredentialsById(id);
-  const userInfo = await UsersModel.findById(credentials.userId);
+  const userInfo = await UsersModel.findById(credentials.userId).lean();
   const dashboards = await getDashboards(credentials.userId);
 
   if (!userInfo) {
@@ -191,6 +189,9 @@ export const checkUserAuthorRights = async (
 };
 
 export const getDashboards = async (userId: string): Promise<Dashboard[]> => {
-  const dashboards = await DashboarsdModel.find({ userId });
-  return formatDashboards(dashboards);
+  const dashboards = await DashboardsModel.find({ userId }).lean();
+  return dashboards.map((dashboard) => ({
+    ...dashboard,
+    id: dashboard._id.toString()
+  }));
 };

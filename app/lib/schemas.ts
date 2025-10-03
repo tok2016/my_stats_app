@@ -1,12 +1,12 @@
 import { Schema } from 'mongoose';
 
-import Credentials from '@ts/users/credentials';
-import Dashboard from '@ts/users/dashboard';
-import Service from '@ts/users/service';
-import { UserInfo } from '@ts/users/user';
-import Confirmation from '@ts/users/confirmation';
+import { CredentialsInSchema } from '@ts/users/credentials';
+import { DashboardInSchema } from '@ts/users/dashboard';
+import { ServiceInSchema } from '@ts/users/service';
+import { UserInfoInSchema } from '@ts/users/user';
+import { ConfirmationInSchema } from '@ts/users/confirmation';
 
-export const CredentialsSchema = new Schema<Credentials>({
+export const CredentialsSchema = new Schema<CredentialsInSchema>({
   userId: {
     type: String,
     required: true
@@ -29,7 +29,7 @@ export const CredentialsSchema = new Schema<Credentials>({
   }
 });
 
-export const UsersSchema = new Schema<UserInfo>({
+export const UsersSchema = new Schema<UserInfoInSchema>({
   avatarUrl: String,
   birthdate: Date,
   country: String,
@@ -40,7 +40,7 @@ export const UsersSchema = new Schema<UserInfo>({
   unblockDate: Date
 });
 
-export const DashboardsSchema = new Schema<Dashboard>({
+export const DashboardsSchema = new Schema<DashboardInSchema>({
   object: {
     type: String,
     required: true
@@ -75,7 +75,7 @@ export const DashboardsSchema = new Schema<Dashboard>({
   }
 });
 
-export const ServiceCredentialsSchema = new Schema<Service>({
+export const ServiceCredentialsSchema = new Schema<ServiceInSchema>({
   userId: {
     type: String,
     required: true
@@ -94,7 +94,7 @@ export const ServiceCredentialsSchema = new Schema<Service>({
   }
 });
 
-export const ConfirmationsSchema = new Schema<Confirmation>({
+export const ConfirmationsSchema = new Schema<ConfirmationInSchema>({
   credential: {
     type: String,
     required: true

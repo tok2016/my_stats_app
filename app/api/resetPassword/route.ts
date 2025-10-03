@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
   const confirmation = await ConfirmationsModel.findById(
     newPassword.data.operationId
-  );
+  ).lean();
 
   if (
     !confirmation
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     },
     { password: hashedPassword },
     { new: true }
-  );
+  ).lean();
 
   if (!updatedCredentials) {
     return new NextResponse('User was not found', {
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   await ConfirmationsModel.findByIdAndDelete(newPassword.data.operationId);
 
   return generateAccessResponse(
-    updatedCredentials.id,
+    updatedCredentials._id.toString(),
     updatedCredentials.username,
     'Password was reset successfully'
   );

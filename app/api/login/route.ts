@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       { username: userLogin.data.credential },
       { email: userLogin.data.credential }
     ]
-  });
+  }).lean();
 
   if (!credentials) {
     return new NextResponse('User was not found', {
@@ -28,6 +28,8 @@ export async function POST(req: NextRequest) {
       statusText: 'User was not found'
     });
   }
+
+  console.log(credentials);
 
   const arePasswordsSame = await bcrypt.compare(
     userLogin.data.password,
@@ -41,5 +43,8 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  return await generateAccessResponse(credentials.id, credentials.username);
+  return await generateAccessResponse(
+    credentials._id.toString(),
+    credentials.username
+  );
 }

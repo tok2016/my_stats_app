@@ -14,7 +14,7 @@ export async function PUT(
   const updatedConfirmation = await ConfirmationsModel.findByIdAndUpdate(
     operationId,
     { code: newCode }
-  );
+  ).lean();
 
   if (!updatedConfirmation) {
     return new NextResponse('Operation was not found', {
@@ -27,7 +27,7 @@ export async function PUT(
   console.log(newCode);
 
   const confirmationInfo: ConfirmationInfo = {
-    id: updatedConfirmation.id,
+    id: updatedConfirmation._id.toString(),
     credential: updatedConfirmation.credential,
     action: updatedConfirmation.action,
     isConfirmed: false

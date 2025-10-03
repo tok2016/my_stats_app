@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 export interface NewCredentials {
   email: string;
   username: string;
@@ -9,3 +11,7 @@ export default interface Credentials extends NewCredentials {
   userId: string;
   createdAt: Date;
 }
+
+export type CredentialsInSchema = Omit<Credentials, 'id'> & {
+  _id: Types.ObjectId;
+};

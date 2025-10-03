@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { unlink } from 'fs/promises';
+import path from 'path';
 
 import {
   checkUserExistance,
@@ -16,11 +18,11 @@ import {
 import {
   ConfirmationsModel,
   CredentialsModel,
-  DashboarsdModel,
+  DashboardsModel,
   ServiceCredentialsModel,
   UsersModel
 } from '@lib/models';
-import { uniteUserData } from '@lib/utils';
+import { AVATAR_DIRECTORY, uniteUserData } from '@lib/utils';
 
 export async function GET(req: NextRequest) {
   const bearer = req.headers.get('Authorization');
@@ -103,8 +105,8 @@ export async function PUT(req: NextRequest) {
           token.id,
           { email: userUpdate.data.email },
           { new: true }
-        )
-      : await CredentialsModel.findById(token.id);
+        ).lean()
+      : await CredentialsModel.findById(token.id).lean();
 
     if (!credentials) {
       return new NextResponse('User was not found', {
@@ -118,7 +120,7 @@ export async function PUT(req: NextRequest) {
       credentials.userId,
       userUpdate.data,
       { new: true }
-    );
+    ).lean();
 
     if (!userInfo) {
       return new NextResponse('User data was not found', {
@@ -148,7 +150,7 @@ export async function DELETE(req: NextRequest) {
     });
   }
 
-  const confirmation = await ConfirmationsModel.findById(operationId);
+  const confirmation = await ConfirmationsModel.findById(operationId).lean();
 
   if (
     !confirmation
@@ -163,7 +165,9 @@ export async function DELETE(req: NextRequest) {
 
   try {
     const token = await extractToken(bearer);
-    const credentials = await CredentialsModel.findByIdAndDelete(token.id);
+    const credentials = await CredentialsModel.findByIdAndDelete(
+      token.id
+    ).lean();
 
     if (!credentials) {
       return new NextResponse('User was not found', {
@@ -172,10 +176,14 @@ export async function DELETE(req: NextRequest) {
       });
     }
 
-    await UsersModel.findByIdAndDelete(credentials.userId);
+    const userInfo = await UsersModel.findByIdAndDelete(credentials.userId);
     await ServiceCredentialsModel.deleteMany({ userId: credentials.userId });
-    await DashboarsdModel.deleteMany({ userId: credentials.userId });
+    await DashboardsModel.deleteMany({ userId: credentials.userId });
     await ConfirmationsModel.findByIdAndDelete(operationId);
+
+    if (userInfo && userInfo.avatarUrl) {
+      await unlink(path.join(AVATAR_DIRECTORY, userInfo.avatarUrl));
+    }
 
     return new NextResponse('User was deleted successfully', {
       status: 200,

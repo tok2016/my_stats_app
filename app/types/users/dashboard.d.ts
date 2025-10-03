@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 import { ServiceName } from './service';
 
 import { DashboardValidator } from '@lib/validationSchemas';
@@ -21,3 +23,5 @@ export default interface Dashboard extends NewDashboard {
   id: string;
   userId: string;
 }
+
+export type DashboardInSchema = Omit<Dashboard, 'id'> & { _id: Types.ObjectId };

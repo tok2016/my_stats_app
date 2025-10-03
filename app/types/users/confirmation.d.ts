@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 import { ConfirmationActions } from '@lib/utils';
 
 export type ConfirmationAction = (typeof ConfirmationActions)[number];
@@ -22,3 +24,7 @@ export interface ConfirmationCode extends ConfirmationId {
 export default interface Confirmation extends ConfirmationInfo {
   code: string;
 }
+
+export type ConfirmationInSchema = Omit<Confirmation, 'id'> & {
+  _id: Types.ObjectId;
+};

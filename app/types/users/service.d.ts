@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 import { ServiceNames, ServiceStatuses } from '@lib/utils';
 
 export type ServiceName = (typeof ServiceNames)[number];
@@ -14,3 +16,5 @@ export default interface Service extends NewService {
   id: string;
   userId: string;
 }
+
+export type ServiceInSchema = Omit<Service, 'id'> & { _id: Types.ObjectId };

@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     const credentials = await getCredentials(newConfirmation.data.credential);
     const userCodes = await ConfirmationsModel.find({
       credential: credentials.username
-    });
+    }).lean();
 
     if (userCodes.length) {
       await ConfirmationsModel.deleteMany({ credential: credentials.username });
@@ -70,7 +70,9 @@ export async function PUT(req: NextRequest) {
     });
   }
 
-  const operation = await ConfirmationsModel.findById(confirmationCode.data.id);
+  const operation = await ConfirmationsModel.findById(
+    confirmationCode.data.id
+  ).lean();
   if (!operation) {
     return new NextResponse('Confirmation operation was not found', {
       status: 404,
@@ -89,7 +91,7 @@ export async function PUT(req: NextRequest) {
     confirmationCode.data.id,
     { isConfirmed: true },
     { new: true }
-  );
+  ).lean();
 
   if (!updatedOperation) {
     return new NextResponse('Operation was not found', {
@@ -99,7 +101,7 @@ export async function PUT(req: NextRequest) {
   }
 
   const operationInfo: ConfirmationInfo = {
-    id: updatedOperation.id,
+    id: updatedOperation._id.toString(),
     credential: updatedOperation.credential,
     action: updatedOperation.action,
     isConfirmed: updatedOperation.isConfirmed

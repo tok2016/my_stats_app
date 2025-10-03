@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Document } from 'mongoose';
 
 import Service from '@ts/users/service';
 
@@ -7,22 +6,14 @@ import { checkUserAuthorRights, generateAccessError } from '@lib/auth';
 import { ServiceCredentialsModel } from '@lib/models';
 import { ServiceValidator } from '@lib/validationSchemas';
 
-const transformServices = (
-  services: (Document<unknown, {}, Service, {}, {}> & Service)[]
-): Service[] =>
-  services.map((service) => ({
-    id: service.id,
-    name: service.name,
-    login: service.login,
-    status: service.status,
-    userId: service.userId
-  }));
-
 export const getServicesByUserId = async (
   userId: string
 ): Promise<Service[]> => {
-  const services = await ServiceCredentialsModel.find({ userId });
-  return transformServices(services);
+  const services = await ServiceCredentialsModel.find({ userId }).lean();
+  return services.map((service) => ({
+    ...service,
+    id: service._id.toString()
+  }));
 };
 
 export async function GET(

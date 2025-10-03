@@ -6,7 +6,7 @@ import {
   getDashboards
 } from '@lib/auth';
 import { DashboardValidator } from '@lib/validationSchemas';
-import { DashboarsdModel } from '@lib/models';
+import { DashboardsModel } from '@lib/models';
 
 export async function GET(
   req: NextRequest,
@@ -70,7 +70,7 @@ export async function POST(
       });
     }
 
-    await DashboarsdModel.create({ ...dashboard.data, userId });
+    await DashboardsModel.create({ ...dashboard.data, userId });
 
     const dashboards = await getDashboards(userId);
     return NextResponse.json(dashboards, {
@@ -123,7 +123,7 @@ export async function PUT(
       });
     }
 
-    await DashboarsdModel.findByIdAndUpdate(dashboardId, dashboard.data);
+    await DashboardsModel.findByIdAndUpdate(dashboardId, dashboard.data);
 
     const dashboards = await getDashboards(userId);
     return NextResponse.json(dashboards, {
@@ -159,14 +159,14 @@ export async function DELETE(
     }
 
     if (!dashboardId) {
-      await DashboarsdModel.deleteMany({ userId });
+      await DashboardsModel.deleteMany({ userId });
       return new NextResponse('All user dashboards were deleted', {
         status: 200,
         statusText: 'All user dashboards were deleted successfully'
       });
     }
 
-    await DashboarsdModel.deleteMany({ userId });
+    await DashboardsModel.deleteMany({ userId });
     return new NextResponse('', {
       status: 200,
       statusText: 'Dashboard was deleted successfully'
