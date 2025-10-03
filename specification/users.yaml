@@ -5,18 +5,18 @@ info:
     Specification for API and Data types of User service of My_Stats
   version: 1.0.0
 tags:
-  - name: "user"
-    description: "Users operations"
-  - name: "confirm"
-    description: "Operation confirmation"
-  - name: "service"
-    description: "Service operations"
-  - name: "dashboard"
-    description: "Dashboard operations"
-  - name: "avatar"
-    description: "Avatar operations"
-  - name: "otherUsers"
-    description: "Operations with other user"
+  - name: 'user'
+    description: 'Users operations'
+  - name: 'confirm'
+    description: 'Operation confirmation'
+  - name: 'service'
+    description: 'Service operations'
+  - name: 'dashboard'
+    description: 'Dashboard operations'
+  - name: 'avatar'
+    description: 'Avatar operations'
+  - name: 'otherUsers'
+    description: 'Operations with other user'
 paths:
   /user:
     get:
@@ -26,12 +26,12 @@ paths:
       description: Get current authorized user info
       operationId: getCurrentUser
       responses:
-        200: 
+        200:
           description: User is found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CurrentUser"
+                $ref: '#/components/schemas/CurrentUser'
         401:
           description: User is unauthorized
       security:
@@ -44,17 +44,17 @@ paths:
       operationId: createUser
       requestBody:
         description: New user credentials
-        content: 
+        content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserAuth"
+              $ref: '#/components/schemas/UserAuth'
       responses:
         201:
           description: User account is created successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserAccess"
+                $ref: '#/components/schemas/UserAccess'
         400:
           description: Invalid data or account with given username or email already exists
     put:
@@ -67,15 +67,15 @@ paths:
         description: User info
         content:
           application/json:
-            schema: 
-              $ref: "#/components/schemas/UserUpdate"
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
       responses:
         200:
           description: User data is updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CurrentUser"
+                $ref: '#/components/schemas/CurrentUser'
         400:
           description: Invalid data
         401:
@@ -95,7 +95,7 @@ paths:
           description: User is unauthorized
       security:
         - accessToken: []
-  
+
   /login:
     post:
       tags:
@@ -108,21 +108,21 @@ paths:
         content:
           application/json:
             schema:
-                $ref: "#/components/schemas/UserLogin"
+              $ref: '#/components/schemas/UserLogin'
       responses:
         200:
           description: User is signed in
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserAccess"
+                $ref: '#/components/schemas/UserAccess'
         400:
           description: Invalid data
         403:
           description: Wrong password
         404:
           description: User is not found
-  
+
   /refresh:
     post:
       tags:
@@ -136,14 +136,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccessToken"
+                $ref: '#/components/schemas/AccessToken'
         400:
           description: Invalid data
-        401: 
+        401:
           description: User is unauthorized
       security:
         - refreshToken: []
-        
+
   /confirm:
     post:
       tags:
@@ -156,14 +156,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Operation"
+              $ref: '#/components/schemas/Operation'
       responses:
         201:
           description: Confirmation operation was created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Operation"
+                $ref: '#/components/schemas/Operation'
         404:
           description: User is not found
     put:
@@ -176,22 +176,22 @@ paths:
         description: User credential and confirmation code
         content:
           application/json:
-              schema:
-                $ref: "#/components/schemas/Confirmation"
+            schema:
+              $ref: '#/components/schemas/Confirmation'
       responses:
         200:
           description: Operation is confirmed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Operation"
+                $ref: '#/components/schemas/Operation'
         400:
           description: Invalid data
         403:
           description: Wrong code
         404:
           description: User is not found
-        
+
   /resetPassword:
     post:
       tags:
@@ -204,22 +204,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserLogin"
+              $ref: '#/components/schemas/UserLogin'
       responses:
         202:
-          description: New password is saved
+          description: Application is accepted
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Operation"
+                $ref: '#/components/schemas/Operation'
         400:
           description: Invalid data
         404:
           description: User is not found
-          
+
   /changePassword:
     post:
-      tags: 
+      tags:
         - user
       summary: Change user password
       description: Change current authorized password
@@ -229,21 +229,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PasswordUpdate"
+              $ref: '#/components/schemas/PasswordUpdate'
       responses:
         200:
           description: Password was changed successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserAccess"
+                $ref: '#/components/schemas/UserAccess'
         400:
           description: Invalid data
         401:
           description: User is unauthorized
       security:
         - accessToken: []
-        
+
   /user/{username}:
     get:
       tags:
@@ -263,12 +263,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: '#/components/schemas/User'
         403:
           description: User profile is private or blocked
         404:
           description: User is not found
-          
+
   /user/{username}/options:
     get:
       tags:
@@ -288,7 +288,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CurrentUser"
+                $ref: '#/components/schemas/CurrentUser'
         401:
           description: User is unauthorized
         403:
@@ -314,14 +314,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NewUser"
+              $ref: '#/components/schemas/NewUser'
       responses:
         201:
           description: New user was saved
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: '#/components/schemas/User'
         401:
           description: User is unauthorized
         403:
@@ -345,14 +345,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserUpdate"
+              $ref: '#/components/schemas/UserUpdate'
       responses:
         200:
           description: User was updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CurrentUser"
+                $ref: '#/components/schemas/CurrentUser'
         401:
           description: User is unauthorized
         403:
@@ -384,10 +384,10 @@ paths:
           description: User is not found
       security:
         - accessToken: []
-        
+
   /user/{username}/avatar:
-    post: 
-      tags: 
+    post:
+      tags:
         - avatar
       parameters:
         - name: username
@@ -400,15 +400,15 @@ paths:
       operationId: postOtherUserAvatar
       requestBody:
         description: Image file
-        content: 
+        content:
           image/*: {}
       responses:
         201:
           description: Avatar was saved
-          content: 
+          content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Avatar"
+                $ref: '#/components/schemas/Avatar'
         401:
           description: User is unauthorized
         403:
@@ -418,7 +418,7 @@ paths:
       security:
         - accessToken: []
     delete:
-      tags: 
+      tags:
         - avatar
       parameters:
         - name: username
@@ -440,7 +440,7 @@ paths:
           description: User is not found
       security:
         - accessToken: []
-  
+
   /users:
     get:
       tags:
@@ -462,10 +462,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/User"
+                  $ref: '#/components/schemas/User'
         default:
           description: Something went wrong
-  
+
   /users/all:
     get:
       tags:
@@ -481,14 +481,14 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/User"
+                  $ref: '#/components/schemas/User'
         401:
           description: User is unauthorized
         403:
           description: Operation is forbidden
       security:
         - accessToken: []
-        
+
   /service/{username}:
     get:
       tags:
@@ -510,7 +510,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Service"
+                  $ref: '#/components/schemas/Service'
         401:
           description: User is unauthorized
         403:
@@ -536,7 +536,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ServiceCredentials"
+              $ref: '#/components/schemas/ServiceCredentials'
       responses:
         201:
           description: Service credentials were added
@@ -545,7 +545,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Service"
+                  $ref: '#/components/schemas/Service'
         401:
           description: User is unauthorized
         403:
@@ -571,7 +571,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ServiceCredentials"
+              $ref: '#/components/schemas/ServiceCredentials'
       responses:
         200:
           description: Service credentials were updated
@@ -580,7 +580,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Service"
+                  $ref: '#/components/schemas/Service'
         401:
           description: User is unauthorized
         403:
@@ -609,7 +609,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Service"
+                  $ref: '#/components/schemas/Service'
         401:
           description: User is unauthorized
         403:
@@ -618,7 +618,7 @@ paths:
           description: User is not found
       security:
         - accessToken: []
-      
+
   /dashboard/{username}:
     get:
       tags:
@@ -640,7 +640,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Dashboard"
+                  $ref: '#/components/schemas/Dashboard'
         401:
           description: User is unauthorized
         403:
@@ -666,7 +666,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Dashboard"
+              $ref: '#/components/schemas/Dashboard'
       responses:
         201:
           description: Dashboard object was saved
@@ -675,7 +675,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Dashboard"
+                  $ref: '#/components/schemas/Dashboard'
         401:
           description: User is unauthorized
         403:
@@ -701,7 +701,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Dashboard"
+              $ref: '#/components/schemas/Dashboard'
       responses:
         200:
           description: Dashboard object was updated
@@ -710,7 +710,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Dashboard"
+                  $ref: '#/components/schemas/Dashboard'
         401:
           description: User is unauthorized
         403:
@@ -742,7 +742,7 @@ paths:
           description: User is not found
       security:
         - accessToken: []
-    
+
 components:
   schemas:
     UserAuth:
@@ -760,7 +760,7 @@ components:
         - username
         - email
         - password
-        
+
     UserLogin:
       type: object
       properties:
@@ -773,7 +773,7 @@ components:
       required:
         - credential
         - password
-        
+
     UserAccess:
       type: object
       properties:
@@ -787,7 +787,7 @@ components:
         - access
         - refresh
         - username
-        
+
     UserUpdate:
       type: object
       properties:
@@ -804,11 +804,11 @@ components:
         dashboard:
           type: array
           items:
-            $ref: "#/components/schemas/Dashboard"
-          
+            $ref: '#/components/schemas/Dashboard'
+
     User:
       allOf:
-        - $ref: "#/components/schemas/UserUpdate"
+        - $ref: '#/components/schemas/UserUpdate'
         - type: object
           properties:
             id:
@@ -825,35 +825,35 @@ components:
             dashboard:
               type: array
               items:
-                $ref: "#/components/schemas/Dashboard"
+                $ref: '#/components/schemas/Dashboard'
       required:
         - id
         - username
         - email
-        
+
     CurrentUser:
       allOf:
-        - $ref: "#/components/schemas/User"
+        - $ref: '#/components/schemas/User'
         - type: object
-          properties: 
+          properties:
             services:
               type: array
               items:
-                $ref: "#/components/schemas/Service"
+                $ref: '#/components/schemas/Service'
               readOnly: true
-              
+
     NewUser:
       allOf:
-        - $ref: "#/components/schemas/UserAuth"
-        - $ref: "#/components/schemas/UserUpdate"
-        
+        - $ref: '#/components/schemas/UserAuth'
+        - $ref: '#/components/schemas/UserUpdate'
+
     Avatar:
       type: object
       properties:
         url:
           type: string
           format: url
-          
+
     Operation:
       type: object
       properties:
@@ -865,7 +865,7 @@ components:
           readOnly: true
       required:
         - operationId
-        
+
     Confirmation:
       type: object
       properties:
@@ -878,38 +878,38 @@ components:
       required:
         - operationId
         - code
-        
+
     PasswordUpdate:
       type: object
       properties:
         old:
           type: string
           format: password
-        new: 
+        new:
           type: string
           format: password
-          
+
     ServiceName:
       type: string
-      enum: 
+      enum:
         - spotify
         - steam
-    
+
     ServiceCredentials:
       type: object
       properties:
         service:
-          $ref: "#/components/schemas/ServiceName"
+          $ref: '#/components/schemas/ServiceName'
         credential:
           type: string
           description: Email, username or id used in service
       required:
         - service
         - credential
-        
+
     Service:
       allOf:
-        - $ref: "#/components/schemas/ServiceCredentials"
+        - $ref: '#/components/schemas/ServiceCredentials'
         - type: object
           properties:
             status:
@@ -924,7 +924,7 @@ components:
         - service
         - credential
         - status
-        
+
     AccessToken:
       type: object
       properties:
@@ -932,14 +932,14 @@ components:
           type: string
       required:
         - access
-        
+
     Dashboard:
       type: object
       properties:
         metric:
           type: string
         service:
-          $ref: "#/components/schemas/ServiceName"
+          $ref: '#/components/schemas/ServiceName'
         x:
           type: number
           format: int32
@@ -957,14 +957,13 @@ components:
         - service
         - x
         - y
-        
+
   securitySchemes:
     accessToken:
       type: http
       scheme: bearer
       bearerFormat: jwt
-    refreshToken: 
+    refreshToken:
       type: http
       scheme: bearer
       bearerFormat: jwt
-      

@@ -4,9 +4,15 @@ import { NewDashboard } from '@ts/users/dashboard';
 import { UserLogin, UserUpdate } from '@ts/users/user';
 import { NewService } from '@ts/users/service';
 import { NewCredentials } from '@ts/users/credentials';
-import PasswordUpdate from '@ts/users/password';
+import PasswordUpdate, { NewPassword } from '@ts/users/password';
 
-import { DashboardTypes, ServiceNames, ServiceStatuses } from './utils';
+import {
+  ConfirmationActions,
+  DashboardTypes,
+  ServiceNames,
+  ServiceStatuses
+} from './utils';
+import { ConfirmationCode, NewConfirmation } from '@ts/users/confirmation';
 
 const MIN_USERNAME_LENGTH = 8;
 const MAX_USERNAME_LENGTH = 32;
@@ -71,3 +77,19 @@ export const PasswordUpdateValidator: z.ZodType<PasswordUpdate> = z.object({
   old: z.string().nonempty(),
   new: z.string().nonempty()
 });
+
+export const NewConfirmationValidator: z.ZodType<NewConfirmation> = z.object({
+  credential: z.string().nonempty(),
+  action: z.enum(ConfirmationActions).default('password')
+});
+
+export const ConfirmationCodeValidator: z.ZodType<ConfirmationCode> =
+  NewConfirmationValidator.and(
+    z.object({
+      id: z.string().nonempty(),
+      code: z.string().nonempty()
+    })
+  );
+
+export const NewPasswordValidatior: z.ZodType<NewPassword> =
+  UserLoginValidator.and(z.object({ operationId: z.string().nonempty() }));

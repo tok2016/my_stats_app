@@ -9,9 +9,13 @@ export const AVATAR_DIRECTORY = path.join(process.cwd(), 'avatars');
 
 export const MILLISECONDS = 1000;
 
+const SIX_CODE_MULT = 1000000;
+
 export const DashboardTypes = ['metric', 'media', 'text'] as const;
 
 export const ServiceNames = ['spotify', 'steam'] as const;
+
+export const ConfirmationActions = ['password', 'delete'] as const;
 
 export const ServiceStatuses = [
   'authorized',
@@ -53,3 +57,6 @@ export const formatDashboards = (rawDashboards: Dashboard[]): Dashboard[] =>
     service: dashboard.service,
     userId: dashboard.userId
   }));
+
+export const generateCode = () =>
+  Math.floor(Math.random() * SIX_CODE_MULT).toString();

@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
@@ -92,6 +93,16 @@ export const generateAccessError = (error: unknown) =>
         statusText: 'Internal server error'
       });
 
+export const hashPassword = async (password: string): Promise<string> => {
+  if (!process.env.HASH_SALT) {
+    throw new Error('Internal server error');
+  }
+
+  const hashed = await bcrypt.hash(password, parseInt(process.env.HASH_SALT));
+
+  return hashed;
+};
+
 export const checkUserExistance = async (
   username: string,
   email: string
@@ -136,6 +147,20 @@ export const deleteTokens = async () => {
 
 export const getCredentialsById = async (id: string): Promise<Credentials> => {
   const credentials = await CredentialsModel.findById(id);
+
+  if (!credentials) {
+    throw new Error('User was not found');
+  }
+
+  return credentials;
+};
+
+export const getCredentials = async (
+  credential: string
+): Promise<Credentials> => {
+  const credentials = await CredentialsModel.findOne({
+    $or: [{ username: credential }, { email: credential }]
+  });
 
   if (!credentials) {
     throw new Error('User was not found');

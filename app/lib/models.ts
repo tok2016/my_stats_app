@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import {
+  ConfirmationsSchema,
   CredentialsSchema,
   DashboardsSchema,
   GamesSchema,
@@ -18,6 +19,10 @@ export const DashboarsdModel = mongo.model('dashboards', DashboardsSchema);
 export const ServiceCredentialsModel = mongo.model(
   'service_credentials',
   ServiceCredentialsSchema
+);
+export const ConfirmationsModel = mongo.model(
+  'confirmations',
+  ConfirmationsSchema
 );
 export const TracksModel = mongo.model('tracks', TracksSchema);
 export const GamesModel = mongo.model('games', GamesSchema);

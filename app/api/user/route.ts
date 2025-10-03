@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcrypt';
 
 import {
   checkUserExistance,
@@ -7,13 +6,15 @@ import {
   generateAccessError,
   generateAccessResponse,
   getDashboards,
-  getUserById
+  getUserById,
+  hashPassword
 } from '@lib/auth';
 import {
   CredentialsValidator,
   UserUpdateValidator
 } from '@lib/validationSchemas';
 import {
+  ConfirmationsModel,
   CredentialsModel,
   DashboarsdModel,
   ServiceCredentialsModel,
@@ -61,18 +62,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  if (!process.env.HASH_SALT) {
-    return new NextResponse(null, {
-      status: 500,
-      statusText: 'Internal server error'
-    });
-  }
-
-  const hashedPassword = await bcrypt.hash(
-    newCredentials.data.password,
-    parseInt(process.env.HASH_SALT)
-  );
-
+  const hashedPassword = await hashPassword(newCredentials.data.password);
   const user = await UsersModel.create({
     isPublic: false,
     dashboards: []
@@ -149,6 +139,27 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const bearer = req.headers.get('Authorization');
+  const operationId = req.nextUrl.searchParams.get('operationId');
+
+  if (!operationId) {
+    return new NextResponse('Operation was not confirmed', {
+      status: 401,
+      statusText: 'Operation was not confirmed'
+    });
+  }
+
+  const confirmation = await ConfirmationsModel.findById(operationId);
+
+  if (
+    !confirmation
+    || !confirmation.isConfirmed
+    || confirmation.action !== 'delete'
+  ) {
+    return new NextResponse('Operation was not confirmed', {
+      status: 401,
+      statusText: 'Operation was not confirmed'
+    });
+  }
 
   try {
     const token = await extractToken(bearer);
@@ -164,6 +175,7 @@ export async function DELETE(req: NextRequest) {
     await UsersModel.findByIdAndDelete(credentials.userId);
     await ServiceCredentialsModel.deleteMany({ userId: credentials.userId });
     await DashboarsdModel.deleteMany({ userId: credentials.userId });
+    await ConfirmationsModel.findByIdAndDelete(operationId);
 
     return new NextResponse('User was deleted successfully', {
       status: 200,

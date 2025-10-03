@@ -4,6 +4,7 @@ import Credentials from '@ts/users/credentials';
 import Dashboard from '@ts/users/dashboard';
 import Service from '@ts/users/service';
 import { UserInfo } from '@ts/users/user';
+import Confirmation from '@ts/users/confirmation';
 
 export const CredentialsSchema = new Schema<Credentials>({
   userId: {
@@ -90,6 +91,25 @@ export const ServiceCredentialsSchema = new Schema<Service>({
   name: {
     type: String,
     default: 'spotify'
+  }
+});
+
+export const ConfirmationsSchema = new Schema<Confirmation>({
+  credential: {
+    type: String,
+    required: true
+  },
+  code: {
+    type: String,
+    required: true
+  },
+  isConfirmed: {
+    type: Boolean,
+    default: false
+  },
+  action: {
+    type: String,
+    default: 'password'
   }
 });
 

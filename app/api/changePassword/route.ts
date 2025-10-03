@@ -5,7 +5,8 @@ import {
   extractToken,
   generateAccessError,
   generateAccessResponse,
-  getCredentialsById
+  getCredentialsById,
+  hashPassword
 } from '@lib/auth';
 import { PasswordUpdateValidator } from '@lib/validationSchemas';
 import { CredentialsModel } from '@lib/models';
@@ -40,18 +41,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (!process.env.HASH_SALT) {
-      return new NextResponse(null, {
-        status: 500,
-        statusText: 'Internal server error'
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(
-      passwordUpdate.data.new,
-      parseInt(process.env.HASH_SALT)
-    );
-
+    const hashedPassword = await hashPassword(passwordUpdate.data.new);
     await CredentialsModel.findByIdAndUpdate(
       token.id,
       { password: hashedPassword },
