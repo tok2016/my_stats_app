@@ -1,0 +1,293 @@
+@use 'utils';
+
+$input-padding-x: 16px;
+$input-padding-y: 0px;
+$option-padding-x: 8px;
+$option-padding-y: 4px;
+$input-min-height: 40px;
+$input-text-types: 'search', 'text', 'date', 'password';
+$input-themes: 'light', 'dark';
+
+$user-input-themes:
+  'light' utils.$user-text-color utils.$user-active-color utils.$user-bg-2-color,
+  'dark' utils.$user-text-color utils.$user-hover-color utils.$user-bg-2-color;
+
+$music-input-themes:
+  'light' utils.$music-text-color utils.$music-active-color
+    utils.$music-bg-2-color,
+  'dark' utils.$music-text-color utils.$music-hover-color
+    utils.$music-bg-2-color;
+
+$games-input-themes:
+  'light' utils.$games-text-color utils.$games-active-color
+    utils.$games-bg-2-color,
+  'dark' utils.$games-text-color utils.$games-hover-color
+    utils.$games-bg-2-color;
+
+$user-label-themes:
+  'light' utils.$user-text-color,
+  'dark' utils.$user-bg-2-color;
+
+$music-label-themes:
+  'light' utils.$music-text-color,
+  'dark' utils.$music-bg-2-color;
+
+$games-label-themes:
+  'light' utils.$games-text-color,
+  'dark' utils.$games-bg-2-color;
+
+@mixin input-select() {
+  @include utils.font(
+    utils.$regular-size,
+    utils.$regular-font,
+    utils.$tight-font
+  );
+
+  display: block;
+  border: none;
+  min-height: $input-min-height;
+  min-width: 200px;
+  padding: 0 $input-padding-x;
+
+  &::placeholder {
+    color: utils.$placeholder-color;
+  }
+}
+
+@each $type in $input-text-types {
+  input[type='#{$type}'] {
+    @include input-select();
+
+    &::-webkit-search-cancel-button {
+      display: none;
+    }
+  }
+}
+
+@mixin input-text($rounded, $outlined, $bg-color, $active-color, $text-color) {
+  color: $text-color;
+  background-color: $bg-color;
+  border-radius: if($rounded, 1000px, utils.$regular-radius);
+
+  box-shadow: if(
+    $outlined,
+    inset 0 0 0 2px utils.$placeholder-color,
+    0 0 utils.$blur utils.$spread $bg-color
+  );
+  transition: all utils.$active-time;
+
+  &:not(:placeholder-shown) {
+    box-shadow: if(
+      $outlined,
+      inset 0 0 0 2px $active-color,
+      0 0 utils.$blur utils.$spread $active-color
+    );
+  }
+
+  &:hover,
+  &:focus-visible {
+    box-shadow:
+      0 0 utils.$blur 2 * utils.$spread $active-color,
+      inset 0 0 0 2px if($outlined, $active-color, transparent);
+    outline: none;
+  }
+
+  &:active {
+    border-color: $active-color;
+    box-shadow:
+      0 0 utils.$blur 2 * utils.$spread $active-color,
+      inset 0 0 0 2px if($outlined, $active-color, transparent);
+    transition: all utils.$active-time;
+  }
+
+  &:disabled {
+    background-color: utils.$input-disabled;
+    color: utils.$placeholder-color;
+    box-shadow: if($outlined, inset 0 0 0 2px utils.$placeholder-color, none);
+  }
+}
+
+@mixin input-text-generator($types, $themes, $module) {
+  @each $type in $types {
+    @each $theme, $bg-color, $active-color, $text-color in $themes {
+      input[type='#{$type}'].#{$module}.#{$theme} {
+        @include input-text(
+          $type == 'search',
+          $theme == 'dark',
+          $bg-color,
+          $active-color,
+          $text-color
+        );
+      }
+    }
+  }
+}
+
+@include input-text-generator($input-text-types, $user-input-themes, 'user');
+@include input-text-generator($input-text-types, $music-input-themes, 'music');
+@include input-text-generator($input-text-types, $games-input-themes, 'games');
+
+@mixin option($bg-color, $hover-color, $text-color) {
+  @include utils.font(
+    utils.$regular-size,
+    utils.$regular-font,
+    utils.$wide-font
+  );
+  background-color: $bg-color !important;
+  color: $text-color !important;
+  padding: $option-padding-y $option-padding-x !important;
+  border-radius: utils.$regular-radius;
+  width: fit-content;
+  min-width: 100px;
+
+  &:first-of-type {
+    border-radius: utils.$regular-radius utils.$regular-radius 0 0;
+  }
+
+  &:last-of-type {
+    border-radius: 0 0 utils.$regular-radius utils.$regular-radius;
+  }
+
+  &:checked {
+    font-weight: utils.$bold-font !important;
+    background-color: $bg-color !important;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background-color: $hover-color !important;
+  }
+
+  &::checkmark {
+    display: none;
+  }
+}
+
+select {
+  @include input-select();
+
+  font-family: Inter;
+  appearance: base-select;
+  align-items: center;
+
+  &::picker(select) {
+    appearance: base-select;
+    top: -($input-min-height - utils.$regular-size) * 0.5 - $option-padding-x -
+      utils.$regular-size;
+    left: $input-padding-x - $option-padding-x;
+    width: max-content;
+    border: none;
+    background-color: transparent;
+  }
+
+  &::picker-icon {
+    content: url('../../public/chevron-down.svg');
+    width: utils.$regular-size;
+    height: utils.$regular-size;
+    transition: rotate utils.$active-time;
+  }
+
+  &:open::picker-icon {
+    rotate: 180deg;
+  }
+}
+
+@mixin select($outlined, $bg-color, $active-color, $text-color) {
+  @include input-text(false, $outlined, $bg-color, $active-color, $text-color);
+
+  font-family: Inter;
+  appearance: base-select;
+  align-items: center;
+
+  option {
+    @include option(utils.$white, $bg-color, utils.$user-bg-2-color);
+  }
+}
+
+@mixin select-generator($themes, $module) {
+  @each $theme, $bg-color, $active-color, $text-color in $themes {
+    select.#{$module}.#{$theme} {
+      @include select(false, $bg-color, $active-color, $text-color);
+    }
+  }
+}
+
+@include select-generator($user-input-themes, 'user');
+@include select-generator($music-input-themes, 'music');
+@include select-generator($games-input-themes, 'games');
+
+@mixin input-radio($bg-color, $on-color, $off-color, $disabled-color) {
+  appearance: none;
+  border-width: 2px;
+  border-style: solid;
+  border-color: $off-color;
+  border-radius: 1000px;
+  background-color: $bg-color;
+  width: 16px;
+  height: 16px;
+  margin-left: 0;
+  margin-top: 0;
+  position: relative;
+
+  &:checked {
+    border-color: $on-color;
+    box-shadow: 0 0 utils.$blur utils.$spread $on-color;
+    transition: all utils.$active-time;
+
+    &::before {
+      transform: scale(1);
+    }
+  }
+
+  &::before {
+    content: '';
+    background-color: $on-color;
+    position: absolute;
+    border-radius: 1000px;
+    width: 100%;
+    height: 100%;
+    transform: scale(0);
+    box-shadow: inset 0 0 0 2px $bg-color;
+    transition: transform utils.$active-time;
+  }
+
+  &:disabled {
+    border-color: $disabled-color;
+    box-shadow: none;
+
+    &::before {
+      transform: scale(0);
+    }
+  }
+}
+
+input[type='radio'] {
+  @include input-radio(
+    utils.$user-text-color,
+    utils.$user-active-color,
+    utils.$user-hover-color,
+    utils.$user-disabled-color
+  );
+}
+
+label {
+  @include utils.font(
+    utils.$regular-size,
+    utils.$regular-font,
+    utils.$wide-font
+  );
+  font-family: Inter;
+  text-align: left;
+}
+
+@mixin label-generator($themes, $module) {
+  @each $theme, $text-color in $themes {
+    label.#{$module}.#{$theme} {
+      color: $text-color;
+    }
+  }
+}
+
+label + input:not([type='checkbox']):not([type='radio']) {
+  margin-top: 8px;
+}

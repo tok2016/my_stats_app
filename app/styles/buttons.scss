@@ -1,0 +1,199 @@
+@use 'utils';
+
+@mixin button(
+  $filled,
+  $outlined,
+  $main-color,
+  $hover-color,
+  $active-color,
+  $disabled-color,
+  $text-color,
+  $text-color-hover,
+  $text-color-active,
+  $text-color-disabled
+) {
+  @include utils.font(utils.$large-size, utils.$bold-font, utils.$tight-font);
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  gap: 8px;
+  color: $text-color;
+  padding: 12px;
+  min-width: 100px;
+
+  border-radius: utils.$regular-radius;
+  border: none;
+  background-color: if($filled, $main-color, transparent);
+
+  box-shadow:
+    0 0 utils.$blur utils.$spread $main-color,
+    inset 0 0 utils.$blur utils.$spread if($outlined, $main-color, transparent),
+    inset 0 0 0 2px if($outlined, $main-color, transparent);
+  transition: all utils.$hover-time;
+
+  &:hover,
+  &:focus-visible {
+    color: $text-color-hover;
+    background-color: if($filled, $hover-color, transparent);
+    box-shadow:
+      0 0 utils.$blur 2 * utils.$spread $hover-color,
+      inset 0 0 utils.$blur 2 * utils.$spread
+        if($outlined, $hover-color, transparent),
+      inset 0 0 0 2px if($outlined, $hover-color, transparent);
+    outline: none;
+  }
+
+  &:active {
+    color: $text-color-active;
+    border-color: $active-color;
+    background-color: if($filled, $active-color, transparent);
+    box-shadow:
+      0 0 utils.$blur 2 * utils.$spread $main-color,
+      inset 0 0 utils.$blur 2 * utils.$spread
+        if($outlined, $main-color, transparent),
+      inset 0 0 0 2px if($outlined, $main-color, transparent);
+    transition: all utils.$active-time;
+  }
+
+  &:disabled {
+    color: $text-color-disabled;
+    border-color: $disabled-color;
+    background-color: if($filled, $disabled-color, transparent);
+    box-shadow: inset 0 0 0 2px if($outlined, $disabled-color, transparent);
+  }
+}
+
+button.user.filled {
+  @include button(
+    true,
+    false,
+    utils.$user-active-color,
+    utils.$user-hover-color,
+    utils.$user-highlight-color,
+    utils.$user-disabled-color,
+    utils.$white,
+    utils.$white,
+    utils.$white,
+    utils.$user-text-color
+  );
+}
+
+button.user.outlined-light {
+  @include button(
+    false,
+    true,
+    utils.$user-active-color,
+    utils.$user-hover-color,
+    utils.$user-highlight-color,
+    utils.$user-disabled-color,
+    utils.$user-text-color,
+    utils.$user-active-color,
+    utils.$white,
+    utils.$text-darker
+  );
+}
+
+button.user.outlined-dark {
+  @include button(
+    false,
+    true,
+    utils.$user-active-color,
+    utils.$user-hover-color,
+    utils.$user-highlight-color,
+    utils.$user-disabled-color,
+    utils.$user-bg-2-color,
+    utils.$user-hover-color,
+    utils.$user-active-color,
+    utils.$user-disabled-color
+  );
+}
+
+button.music.filled {
+  @include button(
+    true,
+    false,
+    utils.$music-active-color,
+    utils.$music-hover-color,
+    utils.$music-highlight-color,
+    utils.$music-disabled-color,
+    utils.$white,
+    utils.$white,
+    utils.$white,
+    utils.$music-text-color
+  );
+}
+
+button.music.outlined-light {
+  @include button(
+    false,
+    true,
+    utils.$music-active-color,
+    utils.$music-hover-color,
+    utils.$music-highlight-color,
+    utils.$music-disabled-color,
+    utils.$music-text-color,
+    utils.$music-active-color,
+    utils.$white,
+    utils.$text-darker
+  );
+}
+
+button.music.outlined-dark {
+  @include button(
+    false,
+    true,
+    utils.$music-active-color,
+    utils.$music-hover-color,
+    utils.$music-highlight-color,
+    utils.$music-disabled-color,
+    utils.$music-bg-2-color,
+    utils.$music-hover-color,
+    utils.$music-active-color,
+    utils.$music-disabled-color
+  );
+}
+
+button.games.filled {
+  @include button(
+    true,
+    false,
+    utils.$games-active-color,
+    utils.$games-hover-color,
+    utils.$games-highlight-color,
+    utils.$games-disabled-color,
+    utils.$white,
+    utils.$white,
+    utils.$white,
+    utils.$games-text-color
+  );
+}
+
+button.games.outlined-light {
+  @include button(
+    false,
+    true,
+    utils.$games-active-color,
+    utils.$games-hover-color,
+    utils.$games-highlight-color,
+    utils.$games-disabled-color,
+    utils.$games-text-color,
+    utils.$games-active-color,
+    utils.$white,
+    utils.$text-darker
+  );
+}
+
+button.games.outlined-dark {
+  @include button(
+    false,
+    true,
+    utils.$games-active-color,
+    utils.$games-hover-color,
+    utils.$games-highlight-color,
+    utils.$games-disabled-color,
+    utils.$games-bg-2-color,
+    utils.$games-hover-color,
+    utils.$games-active-color,
+    utils.$games-disabled-color
+  );
+}

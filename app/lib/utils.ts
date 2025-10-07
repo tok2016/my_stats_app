@@ -27,6 +27,16 @@ export const ServiceStatuses = [
   'unknown'
 ] as const;
 
+export const ButtonVariants = [
+  'filled',
+  'outlined-light',
+  'outlined-dark'
+] as const;
+
+export const InputVariants = ['light', 'dark'] as const;
+
+export const Modules = ['user', 'music', 'games'] as const;
+
 export const isExpired = (date: Date | string | number) =>
   new Date(date) < new Date();
 

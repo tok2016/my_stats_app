@@ -22,6 +22,8 @@
       "@ts/*": ["./app/types/*"],
       "@lib/*": ["./app/lib/*"],
       "@api/*": ["./app/api/*"],
+      "@styles/*": ["./app/styles/*"],
+      "@components/*": ["./app/components/*"],
       "@app/*": ["./app/*"]
     }
   },

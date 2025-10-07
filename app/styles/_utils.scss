@@ -1,0 +1,73 @@
+$user-active-color: #1fbba4;
+$user-hover-color: #0b7a72;
+$user-disabled-color: #5c807d;
+$user-highlight-color: #69dfce;
+$user-autofill-color: #8fecde;
+$user-text-color: #dee6e5;
+$user-bg-1-color: #050907;
+$user-bg-2-color: #0f2721;
+
+$music-active-color: #1fbb70;
+$music-hover-color: #0b7a34;
+$music-disabled-color: #5c806c;
+$music-highlight-color: #7aebb4;
+$music-autofill-color: #8fecbf;
+$music-text-color: #dee6e2;
+$music-bg-1-color: #0f2717;
+$music-bg-2-color: #0f2717;
+
+$games-active-color: #2eacc8;
+$games-hover-color: #146086;
+$games-disabled-color: #5c7780;
+$games-highlight-color: #a5eeff;
+$games-autofill-color: #8fdbec;
+$games-text-color: #dee4e6;
+$games-bg-1-color: #050709;
+$games-bg-2-color: #0f1b27;
+
+$diagram-color-1: #1fbb70;
+$diagram-color-2: #d5c534;
+$diagram-color-3: #c05431;
+$diagram-color-4: #982dc6;
+$diagram-color-5: #2eacc8;
+$diagram-color-6: #d235c7;
+$diagram-color-7: #c33333;
+$diagram-color-8: #3257df;
+$diagram-color-9: #63d43a;
+$diagram-color-10: #1fbba4;
+$diagram-color-11: #cdcdcd;
+
+$white: #ffffff;
+$black: #000000;
+$text-darker: #b8bfbe;
+$input-disabled: #b8bfbe;
+$placeholder-color: #919191;
+
+$shadow-length: 4px;
+$blur: 4px;
+$spread: 1px;
+$hover-time: 200ms;
+$active-time: 50ms;
+
+$large-radius: 12px;
+$regular-radius: 8px;
+$small-radius: 4px;
+
+$regular-font: 400;
+$medium-font: 500;
+$semi-bold-font: 600;
+$bold-font: 700;
+
+$large-size: 18px;
+$regular-size: 16px;
+$small-size: 14px;
+
+$tight-font: 1;
+$fit-font: 1.2;
+$wide-font: 1.4;
+
+@mixin font($font-size, $font-weight, $line-height) {
+  font-size: $font-size;
+  font-weight: $font-weight;
+  line-height: $line-height;
+}
