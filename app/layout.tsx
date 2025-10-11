@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { secondaryFont } from '@lib/fonts';
+import { mainFont, secondaryFont } from '@lib/fonts';
 
 import '@styles/global.scss';
 
@@ -16,7 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body className={`${secondaryFont.variable}`}>{children}</body>
+      <body className={`${mainFont.variable} ${secondaryFont.variable} user`}>
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,0 +1,37 @@
+@use 'utils';
+@use 'inputs';
+@use 'binary-inputs';
+
+$music-input-themes:
+  'light' utils.$music-text-color utils.$music-active-color
+    utils.$music-bg-2-color,
+  'dark' utils.$music-text-color utils.$music-hover-color
+    utils.$music-bg-2-color;
+
+$music-text-select-themes:
+  'light' utils.$music-text-color utils.$music-active-color
+    utils.$music-bg-2-color,
+  'dark' utils.$music-bg-2-color utils.$music-hover-color
+    utils.$music-bg-2-color;
+
+$music-radio-themes:
+  'light' utils.$music-text-color utils.$music-active-color
+    utils.$music-hover-color utils.$music-disabled-color,
+  'dark' utils.$music-text-color utils.$music-hover-color
+    utils.$music-active-color utils.$music-disabled-color;
+
+$music-range-themes:
+  'light' utils.$music-text-color,
+  'dark' utils.$text-darker;
+
+$music-label-themes:
+  'light' utils.$music-text-color,
+  'dark' utils.$music-bg-2-color;
+
+.music {
+  @include inputs.input-text-generator($music-input-themes);
+  @include inputs.textarea($music-input-themes);
+  @include inputs.range-generator($music-range-themes);
+  @include inputs.label-generator($music-label-themes);
+  @include binary-inputs.input-binary-generator($music-radio-themes);
+}

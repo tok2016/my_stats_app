@@ -42,32 +42,63 @@ $black: #000000;
 $text-darker: #b8bfbe;
 $input-disabled: #b8bfbe;
 $placeholder-color: #919191;
+$placeholder-darker: #4d4d4d;
+$danger-color: #d23e20;
 
-$shadow-length: 4px;
-$blur: 4px;
+$shadow-length: 0.25rem;
+$blur: 0.25rem; //4px
 $spread: 1px;
 $hover-time: 200ms;
 $active-time: 50ms;
 
-$large-radius: 12px;
-$regular-radius: 8px;
-$small-radius: 4px;
+$large-radius: 0.75rem;
+$regular-radius: 0.5rem;
+$small-radius: 0.25rem;
+$max-radius: 1000px;
+
+$inter: var(--font-inter);
+$ibm-plex: var(--font-ibm-plex);
 
 $regular-font: 400;
 $medium-font: 500;
 $semi-bold-font: 600;
 $bold-font: 700;
 
-$large-size: 18px;
-$regular-size: 16px;
-$small-size: 14px;
+$large-size: 1.125rem; //18px
+$regular-size: 1rem; //16px
+$small-size: 0.875rem; //14px
+
+$h1-size: 1.75rem; //28px
+$h2-size: 1.5rem; //24px
+$h3-size: 1.125rem; //18px
+$h4-size: 1rem; //16px
 
 $tight-font: 1;
 $fit-font: 1.2;
 $wide-font: 1.4;
 
+$input-label-gap: 0.5rem; //8px
+
 @mixin font($font-size, $font-weight, $line-height) {
   font-size: $font-size;
   font-weight: $font-weight;
   line-height: $line-height;
+}
+
+@mixin header($level) {
+  @if $level == 1 {
+    @include font($h1-size, $bold-font, $wide-font);
+  } @else if $level == 2 {
+    @include font($h2-size, $bold-font, $wide-font);
+  } @else if $level == 3 {
+    @include font($h3-size, $bold-font, $fit-font);
+  } @else {
+    @include font($h4-size, $bold-font, $fit-font);
+  }
+  font-family: $ibm-plex;
+}
+
+@mixin underline($color) {
+  text-decoration: underline dotted $color 2px;
+  text-underline-offset: 2px;
 }

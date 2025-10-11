@@ -1,0 +1,37 @@
+@use 'utils';
+@use 'inputs';
+@use 'binary-inputs';
+
+$user-input-themes:
+  'light' utils.$user-text-color utils.$user-active-color utils.$user-bg-2-color,
+  'dark' utils.$user-text-color utils.$user-hover-color utils.$user-bg-2-color;
+
+$user-text-select-themes:
+  'light' utils.$user-text-color utils.$text-darker utils.$user-active-color
+    utils.$placeholder-color utils.$user-bg-2-color,
+  'dark' utils.$user-bg-2-color utils.$user-hover-color utils.$user-hover-color
+    utils.$user-disabled-color utils.$user-bg-2-color;
+
+$user-radio-themes:
+  'light' utils.$user-text-color utils.$user-active-color
+    utils.$user-hover-color utils.$user-disabled-color,
+  'dark' utils.$user-text-color utils.$user-hover-color utils.$user-active-color
+    utils.$user-disabled-color;
+
+$user-range-themes:
+  'light' utils.$user-text-color,
+  'dark' utils.$text-darker;
+
+$user-label-themes:
+  'light' utils.$user-text-color,
+  'dark' utils.$user-bg-2-color;
+
+.user {
+  @include inputs.input-text-generator($user-input-themes);
+  @include inputs.textarea($user-input-themes);
+  @include inputs.select-generator($user-input-themes);
+  @include inputs.text-select-generator($user-text-select-themes);
+  @include inputs.range-generator($user-range-themes);
+  @include inputs.label-generator($user-label-themes);
+  @include binary-inputs.input-binary-generator($user-radio-themes);
+}

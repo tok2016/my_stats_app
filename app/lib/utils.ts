@@ -33,7 +33,9 @@ export const ButtonVariants = [
   'outlined-dark'
 ] as const;
 
-export const InputVariants = ['light', 'dark'] as const;
+export const InputThemes = ['light', 'dark'] as const;
+
+export const SelectVariants = ['plain', 'text'] as const;
 
 export const Modules = ['user', 'music', 'games'] as const;
 
@@ -60,3 +62,5 @@ export const uniteUserData = (
 
 export const generateCode = () =>
   Math.floor(Math.random() * SIX_CODE_MULT).toString();
+
+export const getIconCode = (iconName: string) => `mynaui:${iconName}`;

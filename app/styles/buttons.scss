@@ -1,5 +1,17 @@
 @use 'utils';
 
+button {
+  @include utils.font(utils.$large-size, utils.$bold-font, utils.$tight-font);
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  gap: 8px;
+  padding: 12px;
+  min-width: 100px;
+  border-radius: utils.$regular-radius;
+  border: none;
+}
+
 @mixin button(
   $filled,
   $outlined,
@@ -12,17 +24,7 @@
   $text-color-active,
   $text-color-disabled
 ) {
-  @include utils.font(utils.$large-size, utils.$bold-font, utils.$tight-font);
-  display: flex;
-  justify-content: space-around;
-  flex-direction: row;
-  gap: 8px;
   color: $text-color;
-  padding: 12px;
-  min-width: 100px;
-
-  border-radius: utils.$regular-radius;
-  border: none;
   background-color: if($filled, $main-color, transparent);
 
   box-shadow:
@@ -78,7 +80,22 @@ button.user.filled {
   );
 }
 
-button.user.outlined-light {
+button.user.secondary {
+  @include button(
+    true,
+    false,
+    utils.$user-text-color,
+    utils.$text-darker,
+    utils.$white,
+    utils.$placeholder-color,
+    utils.$user-hover-color,
+    utils.$user-hover-color,
+    utils.$user-active-color,
+    utils.$placeholder-darker
+  );
+}
+
+button.user.outlined.light {
   @include button(
     false,
     true,
@@ -93,7 +110,7 @@ button.user.outlined-light {
   );
 }
 
-button.user.outlined-dark {
+button.user.outlined.dark {
   @include button(
     false,
     true,
@@ -123,7 +140,22 @@ button.music.filled {
   );
 }
 
-button.music.outlined-light {
+button.music.secondary {
+  @include button(
+    true,
+    false,
+    utils.$music-text-color,
+    utils.$text-darker,
+    utils.$white,
+    utils.$placeholder-color,
+    utils.$music-hover-color,
+    utils.$music-hover-color,
+    utils.$music-active-color,
+    utils.$placeholder-darker
+  );
+}
+
+button.music.outlined.light {
   @include button(
     false,
     true,
@@ -138,7 +170,7 @@ button.music.outlined-light {
   );
 }
 
-button.music.outlined-dark {
+button.music.outlined.dark {
   @include button(
     false,
     true,
@@ -168,7 +200,22 @@ button.games.filled {
   );
 }
 
-button.games.outlined-light {
+button.music.secondary {
+  @include button(
+    true,
+    false,
+    utils.$games-text-color,
+    utils.$text-darker,
+    utils.$white,
+    utils.$placeholder-color,
+    utils.$games-hover-color,
+    utils.$games-hover-color,
+    utils.$games-active-color,
+    utils.$placeholder-darker
+  );
+}
+
+button.games.outlined.light {
   @include button(
     false,
     true,
@@ -183,7 +230,7 @@ button.games.outlined-light {
   );
 }
 
-button.games.outlined-dark {
+button.games.outlined.dark {
   @include button(
     false,
     true,
