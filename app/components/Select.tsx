@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Icon } from '@iconify/react';
 
-import { InputTheme, SelectVariant } from '@ts/ui/components-variants';
+import { SelectVariant } from '@ts/ui/components-variants';
 
 import { getIconCode } from '@lib/utils';
 
@@ -16,7 +16,6 @@ type SelectProps = {
   label?: string;
   id: string;
   options: Option[];
-  theme?: InputTheme;
   variant?: SelectVariant;
   className?: string;
   onSelect?: (value: string) => void;
@@ -42,7 +41,6 @@ export default function Select({
   label,
   id,
   options,
-  theme = 'light',
   variant = 'plain',
   className,
   onSelect
@@ -67,9 +65,7 @@ export default function Select({
   }, []);
 
   return (
-    <div
-      className={`${SelectTypes[variant].labelGroupClass} ${theme} ${className}`}
-    >
+    <div className={`${SelectTypes[variant].labelGroupClass} ${className}`}>
       <label htmlFor={id} id={`${id}-label`}>
         {label}
       </label>

@@ -1,6 +1,6 @@
 @use 'utils';
 
-@mixin radio-checkbox(
+@mixin binary-input-basic(
   $radius,
   $bg-color,
   $on-color,
@@ -39,7 +39,7 @@
 }
 
 @mixin radio($bg-color, $on-color, $off-color, $disabled-color) {
-  @include radio-checkbox(
+  @include binary-input-basic(
     utils.$max-radius,
     $bg-color,
     $on-color,
@@ -65,7 +65,7 @@
 }
 
 @mixin checkbox($bg-color, $on-color, $off-color, $disabled-color) {
-  @include radio-checkbox(
+  @include binary-input-basic(
     utils.$small-radius,
     $bg-color,
     $on-color,
@@ -90,7 +90,7 @@
 }
 
 @mixin switch($bg-color, $on-color, $off-color, $disabled-color) {
-  @include radio-checkbox(
+  @include binary-input-basic(
     utils.$max-radius,
     $bg-color,
     $on-color,
@@ -134,19 +134,22 @@
   }
 }
 
-@mixin input-binary-generator($themes) {
-  @each $theme, $bg-color, $on-color, $off-color, $disabled-color in $themes {
-    input[type='radio'].#{$theme} {
-      @include radio($bg-color, $on-color, $off-color, $disabled-color);
-    }
+@mixin radio-checkbox-switch(
+  $bg-color,
+  $on-color,
+  $off-color,
+  $disabled-color
+) {
+  input[type='radio'] {
+    @include radio($bg-color, $on-color, $off-color, $disabled-color);
+  }
 
-    input[type='checkbox'].#{$theme} {
-      @include checkbox($bg-color, $on-color, $off-color, $disabled-color);
-    }
+  input[type='checkbox'] {
+    @include checkbox($bg-color, $on-color, $off-color, $disabled-color);
+  }
 
-    input[type='checkbox'].switch.#{$theme} {
-      @include switch($bg-color, $on-color, $off-color, $disabled-color);
-    }
+  input[type='checkbox'].switch {
+    @include switch($bg-color, $on-color, $off-color, $disabled-color);
   }
 }
 

@@ -1,0 +1,87 @@
+@use 'utils';
+
+$slider-height: 0.5rem;
+
+.double-slider {
+  position: relative;
+  min-width: 12.5rem;
+}
+
+input[type='range'] {
+  appearance: none;
+  position: absolute;
+  height: 0;
+  top: $slider-height * 0.5;
+  left: 0;
+  min-width: 12.5rem;
+  width: 100%;
+
+  border-radius: 0.25rem;
+  pointer-events: none;
+  margin: 0;
+
+  z-index: 1;
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    height: 15px;
+    width: 15px;
+    border-radius: utils.$max-radius;
+    pointer-events: all;
+  }
+}
+
+input[type='range'].right {
+  height: 0;
+  top: $slider-height * 0.5;
+  left: 0;
+  z-index: 2;
+}
+
+.slider-background {
+  position: absolute;
+  width: 100%;
+  height: $slider-height;
+  top: 0;
+  left: 0;
+  border-radius: 0.25rem;
+}
+
+.slider-track {
+  position: absolute;
+  width: 100%;
+  height: $slider-height;
+  top: 0;
+  border-radius: 0.25rem;
+  transform-origin: top left;
+}
+
+@mixin slider($bg-color, $thumb-color, $track-color, $glow-color) {
+  input[type='range'] {
+    &::-webkit-slider-thumb {
+      background-color: $thumb-color;
+      box-shadow: 0 0 utils.$blur utils.$spread $glow-color;
+
+      &:hover,
+      &:focus-visible,
+      &:active {
+        box-shadow: 0 0 utils.$blur 2 * utils.$spread $glow-color;
+      }
+    }
+  }
+
+  .slider-background {
+    background-color: $bg-color;
+  }
+
+  .slider-track {
+    background-color: $track-color;
+  }
+}
+
+.slider-label {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}

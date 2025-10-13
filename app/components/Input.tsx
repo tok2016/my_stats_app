@@ -2,18 +2,17 @@
 
 import { ChangeEvent, HTMLInputTypeAttribute } from 'react';
 
-import { InputTheme } from '@ts/ui/components-variants';
-
 type InputProps = {
   label?: string;
   id: string;
   placeholder?: string;
   value?: string;
-  theme?: InputTheme;
-  type?: Extract<
-    HTMLInputTypeAttribute,
-    'text' | 'password' | 'date' | 'email' | 'search'
-  >;
+  type?:
+    | Extract<
+        HTMLInputTypeAttribute,
+        'text' | 'password' | 'date' | 'email' | 'search'
+      >
+    | 'textarea';
   className?: string;
   onChange?: (value: string) => void;
 };
@@ -23,26 +22,32 @@ export default function Input({
   id,
   value,
   placeholder,
-  theme = 'light',
   type = 'text',
   className,
   onChange
 }: InputProps) {
-  const onValueChange = (evt: ChangeEvent<HTMLInputElement>) =>
-    onChange?.(evt.target.value);
+  const onValueChange = (
+    evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => onChange?.(evt.target.value);
 
   return (
     <div className={`input-select-group ${className}`}>
-      <label htmlFor={id} className={theme}>
-        {label}
-      </label>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        className={theme}
-        onChange={onValueChange}
-      />
+      <label htmlFor={id}>{label}</label>
+
+      {type === 'textarea' ? (
+        <textarea
+          placeholder={placeholder}
+          value={value}
+          onChange={onValueChange}
+        ></textarea>
+      ) : (
+        <input
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={onValueChange}
+        />
+      )}
     </div>
   );
 }

@@ -7,19 +7,6 @@ $option-padding-y: 0.25rem;
 $input-min-height: 2.5rem;
 $input-text-types: 'search', 'text', 'date', 'password', 'email';
 
-$user-input-themes:
-  'light' utils.$user-text-color utils.$user-active-color utils.$user-bg-2-color,
-  'dark' utils.$user-text-color utils.$user-hover-color utils.$user-bg-2-color;
-
-$user-text-select-themes:
-  'light' utils.$user-text-color utils.$user-active-color utils.$user-bg-2-color,
-  'dark' utils.$user-bg-2-color utils.$user-hover-color utils.$user-bg-2-color;
-
-$range-themes:
-  'user' utils.$user-text-color,
-  'music' utils.$music-text-color,
-  'games' utils.$games-text-color;
-
 @mixin input-select() {
   @include utils.font(
     utils.$regular-size,
@@ -48,7 +35,13 @@ $range-themes:
   }
 }
 
-@mixin input-text($rounded, $outlined, $bg-color, $active-color, $text-color) {
+@mixin input-text-basic(
+  $rounded,
+  $outlined,
+  $bg-color,
+  $active-color,
+  $text-color
+) {
   color: $text-color;
   background-color: $bg-color;
   border-radius: if($rounded, utils.$max-radius, utils.$regular-radius);
@@ -77,7 +70,6 @@ $range-themes:
   }
 
   &:active {
-    border-color: $active-color;
     box-shadow:
       0 0 utils.$blur 2 * utils.$spread $active-color,
       inset 0 0 0 2px if($outlined, $active-color, transparent);
@@ -91,37 +83,48 @@ $range-themes:
   }
 }
 
-@mixin input-text-generator($themes) {
+@mixin input-text($outlined, $bg-color, $active-color, $text-color) {
   @each $type in $input-text-types {
-    @each $theme, $bg-color, $active-color, $text-color in $themes {
-      input[type='#{$type}'].#{$theme} {
-        @include input-text(
-          $type == 'search',
-          $theme == 'dark',
-          $bg-color,
-          $active-color,
-          $text-color
-        );
-      }
-    }
-  }
-}
-
-@mixin textarea($themes) {
-  @each $theme, $bg-color, $active-color, $text-color in $themes {
-    textarea.#{$theme} {
-      @include input-select();
-      @include input-text(
-        false,
-        $theme == 'dark',
+    input[type='#{$type}'] {
+      @include input-text-basic(
+        $type == 'search',
+        $outlined,
         $bg-color,
         $active-color,
         $text-color
       );
-      padding: 0.75rem $input-padding-x;
-      resize: vertical;
-      min-height: utils.$regular-size;
-      font-family: utils.$inter;
+    }
+  }
+}
+
+@mixin textarea($outlined, $bg-color, $active-color, $text-color) {
+  textarea {
+    @include input-select();
+    @include input-text-basic(
+      false,
+      $outlined,
+      $bg-color,
+      $active-color,
+      $text-color
+    );
+    padding: 0;
+    border: solid $bg-color;
+    border-width: 0.75rem $input-padding-x;
+    resize: vertical;
+    min-height: utils.$large-size;
+    font-family: utils.$inter;
+
+    &::-webkit-scrollbar-track {
+      background-color: utils.$text-darker;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: utils.$placeholder-color;
+      border: 2.5px solid utils.$text-darker;
+    }
+
+    &::-webkit-scrollbar-corner {
+      background-color: transparent;
     }
   }
 }
@@ -213,6 +216,43 @@ select {
   font-weight: utils.$bold-font;
 }
 
+@mixin plain-select($outlined, $bg-color, $active-color, $text-color) {
+  .input-select-group {
+    .select {
+      @include input-text-basic(
+        false,
+        $outlined,
+        $bg-color,
+        $active-color,
+        $text-color
+      );
+    }
+
+    .picker-icon {
+      color: $text-color;
+    }
+
+    .picker {
+      box-shadow: 0 0 utils.$blur utils.$spread $active-color;
+    }
+
+    .option {
+      color: $text-color;
+
+      &:hover,
+      &:focus-visible {
+        background-color: $bg-color;
+      }
+    }
+  }
+}
+
+@mixin input-select-textarea($outlined, $bg-color, $active-color, $text-color) {
+  @include input-text($outlined, $bg-color, $active-color, $text-color);
+  @include textarea($outlined, $bg-color, $active-color, $text-color);
+  @include plain-select($outlined, $bg-color, $active-color, $text-color);
+}
+
 .text-select-group {
   display: flex;
   flex-direction: row;
@@ -241,92 +281,46 @@ select {
   }
 }
 
-@mixin select-generator($themes) {
-  @each $theme, $bg-color, $active-color, $text-color in $themes {
-    .input-select-group.#{$theme} {
-      .select {
-        @include input-text(
-          false,
-          $theme == 'dark',
-          $bg-color,
-          $active-color,
-          $text-color
-        );
+@mixin text-select(
+  $main-color,
+  $hover-color,
+  $active-color,
+  $disabled-color,
+  $text-color
+) {
+  .text-select-group {
+    .select {
+      color: $main-color;
+
+      span {
+        @include utils.underline($main-color);
       }
 
-      .picker-icon {
-        color: $text-color;
+      &:hover,
+      &:focus-visible {
+        color: $hover-color;
       }
 
-      .picker {
-        box-shadow: 0 0 utils.$blur utils.$spread $active-color;
-      }
-
-      .option {
-        color: $text-color;
-
-        &:hover,
-        &:focus-visible {
-          background-color: $bg-color;
-        }
+      &:disabled {
+        color: $disabled-color;
       }
     }
-  }
-}
 
-@mixin text-select-generator($themes) {
-  @each $theme, $main-color, $hover-color, $active-color, $disabled-color,
-    $text-color in $themes
-  {
-    .text-select-group.#{$theme} {
-      .select {
-        color: $main-color;
-
-        span {
-          @include utils.underline($main-color);
-        }
-
-        &:hover,
-        &:focus-visible {
-          color: $hover-color;
-        }
-
-        &:disabled {
-          color: $disabled-color;
-        }
-      }
-
-      .picker {
-        box-shadow: 0 0 utils.$blur utils.$spread $active-color;
-      }
-
-      .picker-icon {
-        color: $main-color;
-      }
-
-      .option {
-        color: $text-color;
-
-        &:hover,
-        &:focus-visible {
-          background-color: $main-color;
-        }
-      }
+    .picker {
+      box-shadow: 0 0 utils.$blur utils.$spread $active-color;
     }
-  }
-}
 
-@mixin range($bg-color) {
-  appearance: none;
-  height: 0.5rem;
-  border-radius: 0.25rem;
-  background-color: $bg-color;
-}
+    .picker-icon {
+      color: $main-color;
+    }
 
-@mixin range-generator($themes) {
-  @each $theme, $bg-color in $themes {
-    input[type='range'].#{$theme} {
-      @include range($bg-color);
+    .option {
+      color: $text-color;
+
+      &:hover,
+      &:focus-visible {
+        background-color: $main-color;
+      }
     }
   }
 }
@@ -341,10 +335,8 @@ label {
   text-align: left;
 }
 
-@mixin label-generator($themes) {
-  @each $theme, $text-color in $themes {
-    label.#{$theme} {
-      color: $text-color;
-    }
+@mixin label($text-color) {
+  label {
+    color: $text-color;
   }
 }

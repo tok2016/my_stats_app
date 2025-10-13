@@ -1,37 +1,70 @@
 @use 'utils';
-@use 'inputs';
+@use 'text-inputs';
 @use 'binary-inputs';
-
-$music-input-themes:
-  'light' utils.$music-text-color utils.$music-active-color
-    utils.$music-bg-2-color,
-  'dark' utils.$music-text-color utils.$music-hover-color
-    utils.$music-bg-2-color;
-
-$music-text-select-themes:
-  'light' utils.$music-text-color utils.$music-active-color
-    utils.$music-bg-2-color,
-  'dark' utils.$music-bg-2-color utils.$music-hover-color
-    utils.$music-bg-2-color;
-
-$music-radio-themes:
-  'light' utils.$music-text-color utils.$music-active-color
-    utils.$music-hover-color utils.$music-disabled-color,
-  'dark' utils.$music-text-color utils.$music-hover-color
-    utils.$music-active-color utils.$music-disabled-color;
-
-$music-range-themes:
-  'light' utils.$music-text-color,
-  'dark' utils.$text-darker;
-
-$music-label-themes:
-  'light' utils.$music-text-color,
-  'dark' utils.$music-bg-2-color;
+@use 'number-inputs';
 
 .music {
-  @include inputs.input-text-generator($music-input-themes);
-  @include inputs.textarea($music-input-themes);
-  @include inputs.range-generator($music-range-themes);
-  @include inputs.label-generator($music-label-themes);
-  @include binary-inputs.input-binary-generator($music-radio-themes);
+  @include text-inputs.input-select-textarea(
+    false,
+    utils.$music-text-color,
+    utils.$music-active-color,
+    utils.$music-bg-2-color
+  );
+
+  @include text-inputs.text-select(
+    utils.$music-text-color,
+    utils.$text-darker,
+    utils.$music-active-color,
+    utils.$placeholder-color,
+    utils.$music-bg-2-color
+  );
+
+  @include text-inputs.label(utils.$music-text-color);
+
+  @include binary-inputs.radio-checkbox-switch(
+    utils.$music-text-color,
+    utils.$music-active-color,
+    utils.$music-hover-color,
+    utils.$music-disabled-color
+  );
+
+  @include number-inputs.slider(
+    utils.$music-text-color,
+    utils.$music-text-color,
+    utils.$music-active-color,
+    utils.$music-active-color
+  );
+
+  .light {
+    @include text-inputs.input-select-textarea(
+      true,
+      utils.$music-text-color,
+      utils.$music-hover-color,
+      utils.$music-bg-2-color
+    );
+
+    @include text-inputs.text-select(
+      utils.$music-bg-2-color,
+      utils.$music-hover-color,
+      utils.$music-hover-color,
+      utils.$music-disabled-color,
+      utils.$music-bg-2-color
+    );
+
+    @include text-inputs.label(utils.$music-bg-2-color);
+
+    @include binary-inputs.radio-checkbox-switch(
+      utils.$music-text-color,
+      utils.$music-hover-color,
+      utils.$music-active-color,
+      utils.$music-disabled-color
+    );
+
+    @include number-inputs.slider(
+      utils.$text-darker,
+      utils.$music-hover-color,
+      utils.$music-active-color,
+      utils.$music-hover-color
+    );
+  }
 }

@@ -1,5 +1,7 @@
+import DoubleSlider from '@components/DoubleSlider';
 import Input from '@components/Input';
 import Select from '@components/Select';
+import TextArea from '@components/TextArea';
 import '@styles/buttons.scss';
 import '@styles/user.scss';
 
@@ -10,7 +12,7 @@ export default function Home() {
         display: 'flex',
         flexDirection: 'column',
         gap: '10px',
-        width: '120px'
+        width: '200px'
       }}
     >
       <button className='user secondary'>Button</button>
@@ -53,13 +55,10 @@ export default function Home() {
         <input type='checkbox' id='switch-test' className='switch user light' />
       </div>
 
-      <input type='range' className='user' />
-
-      <textarea className='user light'></textarea>
+      <TextArea id='textarea-test' label='TextArea' />
 
       <Select
         label='New select'
-        theme='light'
         variant='text'
         id='new-select'
         options={[
@@ -67,6 +66,8 @@ export default function Home() {
           { label: '2', value: '2' }
         ]}
       />
+
+      <DoubleSlider min={0} max={100} />
     </div>
   );
 }
