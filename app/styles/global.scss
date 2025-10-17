@@ -13,26 +13,10 @@ body {
   min-height: 100vh;
 }
 
-@mixin module-style($background, $font-color) {
-  background: $background;
-  color: $font-color;
-}
-
 body {
-  @include module-style(
-    linear-gradient(
-      utils.$user-bg-1-color $bg-1-color-length,
-      utils.$user-bg-2-color
-    ),
-    utils.$user-text-color
-  );
+  background-color: black;
+  color: white;
   padding: 20px;
-}
-
-.outline {
-  border: 2px solid white;
-  width: 50px;
-  height: 20px;
 }
 
 ::-webkit-scrollbar {

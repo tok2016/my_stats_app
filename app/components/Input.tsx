@@ -2,19 +2,13 @@
 
 import { ChangeEvent, HTMLInputTypeAttribute } from 'react';
 
-type InputProps = {
-  label?: string;
-  id: string;
-  placeholder?: string;
-  value?: string;
-  type?:
-    | Extract<
-        HTMLInputTypeAttribute,
-        'text' | 'password' | 'date' | 'email' | 'search'
-      >
-    | 'textarea';
-  className?: string;
-  onChange?: (value: string) => void;
+import { TextInputProps } from '@ts/ui/components-props';
+
+type InputProps = TextInputProps & {
+  type?: Extract<
+    HTMLInputTypeAttribute,
+    'text' | 'password' | 'date' | 'email' | 'search'
+  >;
 };
 
 export default function Input({
@@ -34,20 +28,12 @@ export default function Input({
     <div className={`input-select-group ${className}`}>
       <label htmlFor={id}>{label}</label>
 
-      {type === 'textarea' ? (
-        <textarea
-          placeholder={placeholder}
-          value={value}
-          onChange={onValueChange}
-        ></textarea>
-      ) : (
-        <input
-          type={type}
-          placeholder={placeholder}
-          value={value}
-          onChange={onValueChange}
-        />
-      )}
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={onValueChange}
+      />
     </div>
   );
 }

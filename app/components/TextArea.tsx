@@ -2,14 +2,10 @@
 
 import { ChangeEvent, useRef } from 'react';
 
-type InputProps = {
-  label?: string;
-  id: string;
-  placeholder?: string;
-  value?: string;
-  className?: string;
+import { TextInputProps } from '@ts/ui/components-props';
+
+type TextAreaProps = TextInputProps & {
   autoHeight?: boolean;
-  onChange?: (value: string) => void;
 };
 
 const TEXTAREA_ADDITION = 10;
@@ -22,7 +18,7 @@ export default function TextArea({
   className,
   autoHeight = false,
   onChange
-}: InputProps) {
+}: TextAreaProps) {
   const ref = useRef<HTMLTextAreaElement>(null);
 
   const onValueChange = (evt: ChangeEvent<HTMLTextAreaElement>) => {

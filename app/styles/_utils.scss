@@ -13,7 +13,7 @@ $music-disabled-color: #5c806c;
 $music-highlight-color: #7aebb4;
 $music-autofill-color: #8fecbf;
 $music-text-color: #dee6e2;
-$music-bg-1-color: #0f2717;
+$music-bg-1-color: #050906;
 $music-bg-2-color: #0f2717;
 
 $games-active-color: #2eacc8;
@@ -24,6 +24,54 @@ $games-autofill-color: #8fdbec;
 $games-text-color: #dee4e6;
 $games-bg-1-color: #050709;
 $games-bg-2-color: #0f1b27;
+
+$active-colors: (
+  'user': #1fbba4,
+  'music': #1fbb70,
+  'games': #2eacc8
+);
+
+$hover-colors: (
+  'user': #0b7a72,
+  'music': #0b7a34,
+  'games': #146086
+);
+
+$disabled-colors: (
+  'user': #5c807d,
+  'music': #5c806c,
+  'games': #5c7780
+);
+
+$highlight-colors: (
+  'user': #69dfce,
+  'music': #7aebb4,
+  'games': #a5eeff
+);
+
+$autofill-colors: (
+  'user': #8fecde,
+  'music': #8fecbf,
+  'games': #8fdbec
+);
+
+$text-colors: (
+  'user': #dee6e5,
+  'music': #dee6e2,
+  'games': #dee4e6
+);
+
+$bg-1-colors: (
+  'user': #050907,
+  'music': #050906,
+  'games': #050709
+);
+
+$bg-2-colors: (
+  'user': #0f2721,
+  'music': #0f2717,
+  'games': #0f1b27
+);
 
 $diagram-color-1: #1fbb70;
 $diagram-color-2: #d5c534;

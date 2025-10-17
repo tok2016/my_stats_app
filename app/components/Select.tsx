@@ -4,20 +4,13 @@ import { useEffect, useState } from 'react';
 import { Icon } from '@iconify/react';
 
 import { SelectVariant } from '@ts/ui/components-variants';
+import { TextInputProps, Option } from '@ts/ui/components-props';
 
 import { getIconCode } from '@lib/utils';
 
-type Option = {
-  value: string;
-  label: string;
-};
-
-type SelectProps = {
-  label?: string;
-  id: string;
+type SelectProps = TextInputProps & {
   options: Option[];
   variant?: SelectVariant;
-  className?: string;
   onSelect?: (value: string) => void;
 };
 

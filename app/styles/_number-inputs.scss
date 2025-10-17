@@ -1,6 +1,8 @@
 @use 'utils';
 
 $slider-height: 0.5rem;
+$circle-diameter: 7.5rem;
+$inner-circle-diameter: 5.5rem;
 
 .double-slider {
   position: relative;
@@ -84,4 +86,66 @@ input[type='range'].right {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+}
+
+.circle-slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  align-self: center;
+}
+
+.circle-slider {
+  --angle: 45deg;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: $circle-diameter;
+  height: $circle-diameter;
+  border-radius: utils.$max-radius;
+
+  input {
+    display: none;
+  }
+
+  .value {
+    @include utils.header(1);
+    display: block;
+    text-align: center;
+    line-height: $inner-circle-diameter;
+
+    width: $inner-circle-diameter;
+    height: $inner-circle-diameter;
+    border-radius: utils.$max-radius;
+
+    -webkit-user-select: none; //thanks to safari I have to use this depricated rule
+    user-select: none;
+  }
+}
+
+@mixin circle-slider($bg-color, $track-color, $text-bg-color) {
+  .circle-slider {
+    background: conic-gradient(
+      $track-color var(--angle),
+      $bg-color var(--angle) 360deg
+    );
+    box-shadow: 0 0 utils.$blur utils.$spread $bg-color;
+
+    .value {
+      color: $bg-color;
+      background-color: $text-bg-color;
+      box-shadow: inset 0 0 utils.$blur utils.$spread $bg-color;
+    }
+
+    &:hover {
+      box-shadow: 0 0 utils.$blur 2 * utils.$spread $track-color;
+      .value {
+        box-shadow: inset 0 0 utils.$blur utils.$spread $track-color;
+      }
+    }
+  }
 }
