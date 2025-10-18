@@ -17,7 +17,7 @@ export default function Input({
   value,
   placeholder,
   type = 'text',
-  className,
+  className = '',
   onChange
 }: InputProps) {
   const onValueChange = (
@@ -29,6 +29,7 @@ export default function Input({
       <label htmlFor={id}>{label}</label>
 
       <input
+        id={id}
         type={type}
         placeholder={placeholder}
         value={value}

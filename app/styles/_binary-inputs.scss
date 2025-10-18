@@ -153,10 +153,25 @@
   }
 }
 
+.radio-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .input-binary-group {
   display: flex;
   flex-direction: row;
   width: fit-content;
   align-items: center;
-  gap: 0.5rem;
+  gap: utils.$input-label-gap;
+}
+
+.input-binary-group:has(.switch) {
+  width: 100%;
+  justify-content: space-between;
+
+  .switch {
+    order: 2;
+  }
 }

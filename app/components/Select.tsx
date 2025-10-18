@@ -35,7 +35,7 @@ export default function Select({
   id,
   options,
   variant = 'plain',
-  className,
+  className = '',
   onSelect
 }: SelectProps) {
   const [value, setValue] = useState<string>(options[0].value);

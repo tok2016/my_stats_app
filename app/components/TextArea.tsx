@@ -15,7 +15,7 @@ export default function TextArea({
   id,
   value,
   placeholder,
-  className,
+  className = '',
   autoHeight = false,
   onChange
 }: TextAreaProps) {

@@ -25,7 +25,7 @@ export default function CircleSlider({
   id,
   min,
   max,
-  className,
+  className = '',
   onChange
 }: CircleSliderProps) {
   const [value, setValue] = useState<number>(min);

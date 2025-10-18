@@ -20,7 +20,7 @@ export default function DoubleSlider({
   min,
   max,
   valueUnit,
-  className,
+  className = '',
   onChange
 }: DoubleSliderProps) {
   const [left, setLeft] = useState<number>(min);

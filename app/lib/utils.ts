@@ -27,11 +27,7 @@ export const ServiceStatuses = [
   'unknown'
 ] as const;
 
-export const ButtonVariants = [
-  'filled',
-  'outlined-light',
-  'outlined-dark'
-] as const;
+export const ButtonVariants = ['filled', 'outlined'] as const;
 
 export const InputThemes = ['light', 'dark'] as const;
 
