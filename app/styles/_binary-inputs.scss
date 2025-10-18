@@ -171,6 +171,10 @@
   width: 100%;
   justify-content: space-between;
 
+  label {
+    flex-grow: 1;
+  }
+
   .switch {
     order: 2;
   }

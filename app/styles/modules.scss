@@ -4,6 +4,7 @@
 @use 'text-inputs';
 @use 'binary-inputs';
 @use 'number-inputs';
+@use 'components';
 
 $bg-1-color-length: 28%;
 $modules: 'user', 'music', 'games';
@@ -16,7 +17,31 @@ $modules: 'user', 'music', 'games';
     );
     color: map.get(utils.$text-colors, $module);
 
+    h1,
+    h2,
+    h3,
+    h4,
+    p,
+    a,
+    span,
+    label {
+      color: map.get(utils.$text-colors, $module);
+    }
+
+    .colored {
+      color: map.get(utils.$active-colors, $module);
+    }
+
+    .underline {
+      @include utils.underline(map.get(utils.$text-colors, $module));
+    }
+
+    .colored.underline {
+      text-decoration-color: map.get(utils.$active-colors, $module);
+    }
+
     @include buttons.button-filled(
+      'primary',
       map.get(utils.$active-colors, $module),
       map.get(utils.$hover-colors, $module),
       map.get(utils.$highlight-colors, $module),
@@ -25,6 +50,18 @@ $modules: 'user', 'music', 'games';
       utils.$white,
       utils.$white,
       map.get(utils.$text-colors, $module)
+    );
+
+    @include buttons.button-filled(
+      'secondary',
+      map.get(utils.$text-colors, $module),
+      utils.$text-darker,
+      utils.$white,
+      utils.$placeholder-color,
+      map.get(utils.$hover-colors, $module),
+      map.get(utils.$hover-colors, $module),
+      map.get(utils.$active-colors, $module),
+      utils.$placeholder-darker
     );
 
     @include buttons.button-outlined(
@@ -53,8 +90,6 @@ $modules: 'user', 'music', 'games';
       map.get(utils.$bg-2-colors, $module)
     );
 
-    @include text-inputs.label(map.get(utils.$text-colors, $module));
-
     @include binary-inputs.radio-checkbox-switch(
       map.get(utils.$text-colors, $module),
       map.get(utils.$active-colors, $module),
@@ -75,17 +110,31 @@ $modules: 'user', 'music', 'games';
       map.get(utils.$bg-1-colors, $module)
     );
 
+    @include components.divider(map.get(utils.$text-colors, $module));
+
     .light {
-      @include buttons.button-filled(
-        map.get(utils.$text-colors, $module),
-        utils.$text-darker,
-        utils.$white,
-        utils.$placeholder-color,
-        map.get(utils.$hover-colors, $module),
-        map.get(utils.$hover-colors, $module),
-        map.get(utils.$active-colors, $module),
-        utils.$placeholder-darker
-      );
+      h1,
+      h2,
+      h3,
+      h4,
+      p,
+      a,
+      span,
+      label {
+        color: map.get(utils.$bg-2-colors, $module);
+      }
+
+      .colored {
+        color: map.get(utils.$hover-colors, $module);
+      }
+
+      .underline {
+        @include utils.underline(map.get(utils.$bg-2-colors, $module));
+      }
+
+      .colored.underline {
+        text-decoration-color: map.get(utils.$hover-colors, $module);
+      }
 
       @include buttons.button-outlined(
         map.get(utils.$active-colors, $module),
@@ -112,8 +161,6 @@ $modules: 'user', 'music', 'games';
         map.get(utils.$disabled-colors, $module),
         map.get(utils.$bg-2-colors, $module)
       );
-
-      @include text-inputs.label(map.get(utils.$bg-2-colors, $module));
 
       @include binary-inputs.radio-checkbox-switch(
         map.get(utils.$text-colors, $module),

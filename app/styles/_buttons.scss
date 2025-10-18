@@ -52,6 +52,7 @@ button {
 }
 
 @mixin button-filled(
+  $class,
   $main-color,
   $hover-color,
   $active-color,
@@ -61,7 +62,7 @@ button {
   $text-color-active,
   $text-color-disabled
 ) {
-  button.filled {
+  button.#{$class} {
     @include button(
       true,
       false,

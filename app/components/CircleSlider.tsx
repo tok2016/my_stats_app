@@ -46,11 +46,11 @@ export default function CircleSlider({
   const onMouseMove = (evt: MouseEvent<HTMLDivElement>) => {
     if (sliderRef.current && sliderState.current.isDown) {
       const closeCathetus =
-        evt.clientX
+        evt.pageX
         - sliderRef.current.offsetLeft
         - sliderRef.current.offsetWidth / 2;
       const farCathetus =
-        evt.clientY
+        evt.pageY
         - sliderRef.current.offsetTop
         - sliderRef.current.offsetHeight / 2;
 

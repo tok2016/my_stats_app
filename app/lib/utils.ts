@@ -1,8 +1,7 @@
 import path from 'path';
 
-import Credentials, { CredentialsInSchema } from '@ts/users/credentials';
+import { CredentialsInSchema } from '@ts/users/credentials';
 import { BasicUser, User, UserInfoInSchema } from '@ts/users/user';
-import { UserInfo } from '@ts/users/user';
 import Dashboard from '@ts/users/dashboard';
 
 export const AVATAR_DIRECTORY = path.join(process.cwd(), 'avatars');
@@ -27,7 +26,7 @@ export const ServiceStatuses = [
   'unknown'
 ] as const;
 
-export const ButtonVariants = ['filled', 'outlined'] as const;
+export const ButtonVariants = ['primary', 'secondary', 'outlined'] as const;
 
 export const InputThemes = ['light', 'dark'] as const;
 

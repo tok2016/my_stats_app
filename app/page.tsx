@@ -1,8 +1,10 @@
 import BinaryInput from '@components/BinaryInput';
 import Button from '@components/Button';
 import CircleSlider from '@components/CircleSlider';
+import Divider from '@components/Divider';
 import DoubleSlider from '@components/DoubleSlider';
 import Input from '@components/Input';
+import Pagination from '@components/Pagination';
 import RadioCheckboxGroup from '@components/RadioCheckboxGroup';
 import Select from '@components/Select';
 import TextArea from '@components/TextArea';
@@ -19,7 +21,7 @@ export default function Home() {
         width: '200px'
       }}
     >
-      <Button variant='filled' beforeIconCode='star-solid'>
+      <Button variant='primary' beforeIconCode='star-solid'>
         Button
       </Button>
 
@@ -53,6 +55,8 @@ export default function Home() {
 
       <TextArea id='textarea-test' label='TextArea' />
 
+      <Divider>Divider</Divider>
+
       <Select
         label='New select'
         variant='text'
@@ -76,6 +80,13 @@ export default function Home() {
         min={0}
         max={100}
       />
+
+      <p className='colored bold wide'>Wide colored bold text</p>
+      <a href='#' className='underline'>
+        Underlined link
+      </a>
+
+      <Pagination pages={5} current={3} />
     </div>
   );
 }

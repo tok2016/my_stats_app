@@ -19,7 +19,7 @@ type ButtonProps = {
 
 export default function Button({
   children,
-  variant = 'filled',
+  variant = 'primary',
   beforeIconCode,
   afterIconCode,
   className = '',

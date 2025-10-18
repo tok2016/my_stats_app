@@ -324,19 +324,3 @@ select {
     }
   }
 }
-
-label {
-  @include utils.font(
-    utils.$regular-size,
-    utils.$regular-font,
-    utils.$wide-font
-  );
-  font-family: utils.$inter;
-  text-align: left;
-}
-
-@mixin label($text-color) {
-  label {
-    color: $text-color;
-  }
-}

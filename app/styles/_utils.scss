@@ -91,7 +91,10 @@ $text-darker: #b8bfbe;
 $input-disabled: #b8bfbe;
 $placeholder-color: #919191;
 $placeholder-darker: #4d4d4d;
-$danger-color: #d23e20;
+
+$error-color: #c33333;
+$warning-color: #d5c534;
+$success-color: #1fbb70;
 
 $shadow-length: 0.25rem;
 $blur: 0.25rem; //4px
@@ -115,6 +118,7 @@ $bold-font: 700;
 $large-size: 1.125rem; //18px
 $regular-size: 1rem; //16px
 $small-size: 0.875rem; //14px
+$min-size: 0.8125rem;
 
 $h1-size: 1.75rem; //28px
 $h2-size: 1.5rem; //24px
