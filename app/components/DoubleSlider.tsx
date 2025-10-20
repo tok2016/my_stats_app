@@ -53,7 +53,7 @@ export default function DoubleSlider({
         <span>{label}</span>
         <span>
           {valueUnit}
-          {min}-{max}
+          {left > right ? right : left}-{right > left ? right : left}
         </span>
       </label>
 

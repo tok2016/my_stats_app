@@ -59,3 +59,12 @@ export const generateCode = () =>
   Math.floor(Math.random() * SIX_CODE_MULT).toString();
 
 export const getIconCode = (iconName: string) => `mynaui:${iconName}`;
+
+export const clamp = (value: number, min: number, max: number) => {
+  if (value < min) {
+    return min;
+  } else if (value > max) {
+    return max;
+  }
+  return value;
+};

@@ -53,14 +53,24 @@ export default function Home() {
         label='Switch'
       />
 
-      <TextArea id='textarea-test' label='TextArea' />
+      <TextArea id='textarea-test' label='TextArea' placeholder='placeholder' />
 
       <Divider>Divider</Divider>
 
       <Select
-        label='New select'
+        label='Plain select'
+        variant='plain'
+        id='plain-select'
+        options={[
+          { label: '1', value: '1' },
+          { label: '2', value: '2' }
+        ]}
+      />
+
+      <Select
+        label='Text select'
         variant='text'
-        id='new-select'
+        id='text-select'
         options={[
           { label: '1', value: '1' },
           { label: '2', value: '2' }
@@ -86,7 +96,7 @@ export default function Home() {
         Underlined link
       </a>
 
-      <Pagination pages={5} current={3} />
+      <Pagination pages={11} current={1} />
     </div>
   );
 }

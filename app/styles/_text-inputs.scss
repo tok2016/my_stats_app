@@ -48,15 +48,19 @@ $input-text-types: 'search', 'text', 'date', 'password', 'email';
 
   box-shadow: if(
     $outlined,
-    inset 0 0 0 2px utils.$placeholder-color,
+    0 0 0 2px utils.$placeholder-color,
     0 0 utils.$blur utils.$spread $bg-color
   );
   transition: all utils.$active-time;
 
+  @if ($outlined) {
+    padding: 0 calc($input-padding-x - 4px);
+  }
+
   &:not(:placeholder-shown) {
     box-shadow: if(
       $outlined,
-      inset 0 0 0 2px $active-color,
+      0 0 0 2px $active-color,
       0 0 utils.$blur utils.$spread $active-color
     );
   }
@@ -65,21 +69,21 @@ $input-text-types: 'search', 'text', 'date', 'password', 'email';
   &:focus-visible {
     box-shadow:
       0 0 utils.$blur 2 * utils.$spread $active-color,
-      inset 0 0 0 2px if($outlined, $active-color, transparent);
+      0 0 0 2px if($outlined, $active-color, transparent);
     outline: none;
   }
 
   &:active {
     box-shadow:
       0 0 utils.$blur 2 * utils.$spread $active-color,
-      inset 0 0 0 2px if($outlined, $active-color, transparent);
+      0 0 0 2px if($outlined, $active-color, transparent);
     transition: all utils.$active-time;
   }
 
   &:disabled {
     background-color: utils.$input-disabled;
     color: utils.$placeholder-color;
-    box-shadow: if($outlined, inset 0 0 0 2px utils.$placeholder-color, none);
+    box-shadow: if($outlined, 0 0 0 2px utils.$placeholder-color, none);
   }
 }
 
@@ -184,6 +188,7 @@ select {
   left: $input-padding-x - $option-padding-x;
 
   border-radius: utils.$regular-radius;
+  z-index: 5;
 }
 
 .picker.hidden {
@@ -226,6 +231,10 @@ select {
         $active-color,
         $text-color
       );
+
+      span {
+        color: $text-color;
+      }
     }
 
     .picker-icon {
@@ -286,7 +295,8 @@ select {
   $hover-color,
   $active-color,
   $disabled-color,
-  $text-color
+  $text-color,
+  $option-hover-color
 ) {
   .text-select-group {
     .select {
@@ -319,7 +329,7 @@ select {
 
       &:hover,
       &:focus-visible {
-        background-color: $main-color;
+        background-color: $option-hover-color;
       }
     }
   }

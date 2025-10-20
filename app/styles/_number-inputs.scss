@@ -127,7 +127,7 @@ input[type='range'].right {
   }
 }
 
-@mixin circle-slider($bg-color, $track-color, $text-bg-color) {
+@mixin circle-slider($bg-color, $track-color, $text-bg-color, $text-color) {
   .circle-slider {
     background: conic-gradient(
       $track-color var(--angle),
@@ -136,7 +136,7 @@ input[type='range'].right {
     box-shadow: 0 0 utils.$blur utils.$spread $bg-color;
 
     .value {
-      color: $bg-color;
+      color: $text-color;
       background-color: $text-bg-color;
       box-shadow: inset 0 0 utils.$blur utils.$spread $bg-color;
     }
