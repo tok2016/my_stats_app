@@ -9,9 +9,7 @@ import RadioCheckboxGroup from '@components/RadioCheckboxGroup';
 import Select from '@components/Select';
 import TextArea from '@components/TextArea';
 
-import '@styles/modules.scss';
-
-export default function Home() {
+export default function Test() {
   return (
     <div
       style={{

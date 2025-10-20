@@ -7,7 +7,7 @@ import { TextInputProps } from '@ts/ui/components-props';
 type InputProps = TextInputProps & {
   type?: Extract<
     HTMLInputTypeAttribute,
-    'text' | 'password' | 'date' | 'email' | 'search'
+    'text' | 'password' | 'date' | 'email'
   >;
 };
 
@@ -26,7 +26,9 @@ export default function Input({
 
   return (
     <div className={`input-select-group ${className}`}>
-      <label htmlFor={id}>{label}</label>
+      <label hidden={!label} htmlFor={id}>
+        {label}
+      </label>
 
       <input
         id={id}

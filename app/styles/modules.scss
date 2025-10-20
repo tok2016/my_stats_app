@@ -10,11 +10,13 @@ $bg-1-color-length: 28%;
 $modules: 'user', 'music', 'games';
 
 @each $module in $modules {
-  .#{$module} {
+  body:has(.#{$module}) {
     background: linear-gradient(
       map.get(utils.$bg-1-colors, $module) $bg-1-color-length,
       map.get(utils.$bg-2-colors, $module)
     );
+  }
+  .#{$module} {
     color: map.get(utils.$text-colors, $module);
 
     h1,
