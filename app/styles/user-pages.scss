@@ -1,0 +1,16 @@
+.guest-page {
+  margin: 9rem 7.5rem;
+
+  .title {
+    width: 37.5rem;
+    margin-bottom: 5.25rem;
+  }
+
+  .guest-page-form {
+    width: 17.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: stretch;
+  }
+}

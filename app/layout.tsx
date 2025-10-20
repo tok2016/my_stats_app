@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { mainFont, secondaryFont } from '@lib/fonts';
 
 import '@styles/global.scss';
+import '@styles/modules.scss';
 
 export const metadata: Metadata = {
   title: 'My_Stats',
@@ -16,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body className={`${mainFont.variable} ${secondaryFont.variable} user`}>
+      <body className={`${mainFont.variable} ${secondaryFont.variable}`}>
         {children}
       </body>
     </html>

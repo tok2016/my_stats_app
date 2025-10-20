@@ -99,6 +99,34 @@ $input-text-types: 'search', 'text', 'date', 'password', 'email';
       );
     }
   }
+
+  .search-icon {
+    color: $text-color;
+  }
+}
+
+.search-group {
+  position: relative;
+
+  .search-icon {
+    @include utils.font(
+      utils.$regular-size,
+      utils.$bold-font,
+      utils.$tight-font
+    );
+    position: absolute;
+    top: ($input-min-height - utils.$regular-size) * 0.5;
+    right: $input-padding-x;
+
+    * {
+      stroke-width: 3px;
+    }
+  }
+
+  input[type='search'] {
+    padding-right: 2 * $input-padding-x;
+    width: 100%;
+  }
 }
 
 @mixin textarea($outlined, $bg-color, $active-color, $text-color) {
