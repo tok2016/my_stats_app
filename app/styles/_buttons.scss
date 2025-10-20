@@ -1,0 +1,205 @@
+@use 'utils';
+
+$button-icon-size: 1.25rem;
+
+button {
+  @include utils.font(utils.$large-size, utils.$bold-font, utils.$tight-font);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  flex-direction: row;
+  gap: 1rem;
+  padding: 0.75rem;
+  min-height: $button-icon-size;
+  min-width: 6.25rem;
+  border-radius: utils.$regular-radius;
+  border: none;
+
+  svg {
+    font-size: $button-icon-size;
+  }
+}
+
+@mixin button(
+  $text-color,
+  $text-color-hover,
+  $text-color-active,
+  $text-color-disabled
+) {
+  color: $text-color;
+  transition: all utils.$hover-time;
+
+  &:hover,
+  &:focus-visible {
+    color: $text-color-hover;
+    outline: none;
+  }
+
+  &:active {
+    color: $text-color-active;
+    transition: all utils.$active-time;
+  }
+
+  &:disabled {
+    color: $text-color-disabled;
+  }
+}
+
+@mixin button-filled-base(
+  $main-color,
+  $hover-color,
+  $active-color,
+  $disabled-color,
+  $text-color,
+  $text-color-hover,
+  $text-color-active,
+  $text-color-disabled
+) {
+  @include button(
+    $text-color,
+    $text-color-hover,
+    $text-color-active,
+    $text-color-disabled
+  );
+
+  background-color: $main-color;
+  box-shadow: 0 0 utils.$blur utils.$spread $main-color;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $hover-color;
+    box-shadow: 0 0 utils.$blur 2 * utils.$spread $hover-color;
+  }
+
+  &:active {
+    background-color: $active-color;
+    box-shadow: 0 0 utils.$blur 2 * utils.$spread $main-color;
+  }
+
+  &:disabled {
+    background-color: $disabled-color;
+    box-shadow: none;
+  }
+}
+
+@mixin button-filled(
+  $class,
+  $main-color,
+  $hover-color,
+  $active-color,
+  $disabled-color,
+  $text-color,
+  $text-color-hover,
+  $text-color-active,
+  $text-color-disabled
+) {
+  button.#{$class} {
+    @include button-filled-base(
+      $main-color,
+      $hover-color,
+      $active-color,
+      $disabled-color,
+      $text-color,
+      $text-color-hover,
+      $text-color-active,
+      $text-color-disabled
+    );
+  }
+}
+
+@mixin button-outlined(
+  $main-color,
+  $hover-color,
+  $active-color,
+  $disabled-color,
+  $text-color,
+  $text-color-hover,
+  $text-color-active,
+  $text-color-disabled
+) {
+  button.outlined {
+    @include button(
+      $text-color,
+      $text-color-hover,
+      $text-color-active,
+      $text-color-disabled
+    );
+
+    background-color: transparent;
+    box-shadow:
+      0 0 utils.$blur utils.$spread $main-color,
+      inset 0 0 utils.$blur utils.$spread $main-color,
+      inset 0 0 0 2px $main-color;
+
+    &:hover,
+    &:focus-visible {
+      box-shadow:
+        0 0 utils.$blur 2 * utils.$spread $hover-color,
+        inset 0 0 utils.$blur 2 * utils.$spread $hover-color,
+        inset 0 0 0 2px $hover-color;
+    }
+
+    &:active {
+      box-shadow:
+        0 0 utils.$blur 2 * utils.$spread $main-color,
+        inset 0 0 utils.$blur 2 * utils.$spread $main-color,
+        inset 0 0 0 2px $main-color;
+    }
+
+    &:disabled {
+      box-shadow: inset 0 0 0 2px $disabled-color;
+    }
+  }
+}
+
+@mixin link($simple-hover, $simple-active, $colored-hover, $colored-active) {
+  a {
+    transition: color utils.$hover-time;
+
+    &:hover,
+    &:focus-visible {
+      color: $simple-hover;
+    }
+
+    &:active {
+      color: $simple-active;
+      transition: color utils.$active-time;
+    }
+  }
+
+  a.colored {
+    &:hover,
+    &:focus-visible {
+      color: $colored-hover;
+    }
+
+    &:active {
+      color: $colored-active;
+    }
+  }
+
+  a.underline {
+    transition: text-decoration-color utils.$hover-time;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration-color: $simple-hover;
+    }
+
+    &:active {
+      transition: text-decoration-color utils.$active-time;
+      text-decoration-color: $simple-active;
+    }
+  }
+
+  a.colored.underline {
+    &:hover,
+    &:focus-visible {
+      text-decoration-color: $colored-hover;
+    }
+
+    &:active {
+      text-decoration-color: $colored-active;
+    }
+  }
+}

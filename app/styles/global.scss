@@ -1,0 +1,113 @@
+@use 'utils';
+
+:root {
+  font-size: utils.$regular-size;
+  font-family: utils.$inter;
+}
+
+html,
+body {
+  max-width: 100vw;
+  min-height: 100vh;
+  font-family: utils.$inter;
+}
+
+body {
+  background-color: black;
+  color: white;
+  padding: 20px;
+}
+
+::-webkit-scrollbar {
+  width: 14px;
+  border-radius: utils.$small-radius;
+}
+
+::-webkit-scrollbar-track {
+  background-color: utils.$user-bg-2-color;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: utils.$user-hover-color;
+  border: solid 3px utils.$user-bg-2-color;
+  border-radius: utils.$small-radius;
+}
+
+h1 {
+  @include utils.header(1);
+}
+
+.title {
+  @include utils.font(2.25rem, utils.$regular-font, utils.$fit-font);
+}
+
+h2 {
+  @include utils.header(2);
+}
+
+h3 {
+  @include utils.header(3);
+}
+
+h4 {
+  @include utils.header(4);
+}
+
+p,
+a {
+  @include utils.font(
+    utils.$regular-size,
+    utils.$regular-font,
+    utils.$fit-font
+  );
+
+  text-decoration: none;
+  margin: 0;
+}
+
+label {
+  @include utils.font(
+    utils.$regular-size,
+    utils.$regular-font,
+    utils.$wide-font
+  );
+  font-family: utils.$inter;
+  text-align: left;
+}
+
+.tight {
+  line-height: utils.$tight-font;
+}
+
+.wide {
+  line-height: utils.$wide-font;
+}
+
+.small {
+  font-size: utils.$small-size;
+}
+
+.large {
+  font-size: utils.$large-size;
+}
+
+.hint {
+  @include utils.font(utils.$min-size, utils.$regular-font, utils.$fit-font);
+}
+
+b,
+.bold {
+  font-weight: utils.$bold-font;
+}
+
+.error {
+  color: utils.$error-color !important;
+}
+
+.warning {
+  color: utils.$warning-color !important;
+}
+
+.success {
+  color: utils.$success-color !important;
+}

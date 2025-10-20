@@ -22,7 +22,10 @@
       "@ts/*": ["./app/types/*"],
       "@lib/*": ["./app/lib/*"],
       "@api/*": ["./app/api/*"],
-      "@app/*": ["./app/*"]
+      "@styles/*": ["./app/styles/*"],
+      "@components/*": ["./app/components/*"],
+      "@app/*": ["./app/*"],
+      "@public/*": ["./public/*"]
     }
   },
   "include": [

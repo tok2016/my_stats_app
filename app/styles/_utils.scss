@@ -1,0 +1,156 @@
+$user-active-color: #1fbba4;
+$user-hover-color: #0b7a72;
+$user-disabled-color: #5c807d;
+$user-highlight-color: #69dfce;
+$user-autofill-color: #8fecde;
+$user-text-color: #dee6e5;
+$user-bg-1-color: #050907;
+$user-bg-2-color: #0f2721;
+
+$music-active-color: #1fbb70;
+$music-hover-color: #0b7a34;
+$music-disabled-color: #5c806c;
+$music-highlight-color: #7aebb4;
+$music-autofill-color: #8fecbf;
+$music-text-color: #dee6e2;
+$music-bg-1-color: #050906;
+$music-bg-2-color: #0f2717;
+
+$games-active-color: #2eacc8;
+$games-hover-color: #146086;
+$games-disabled-color: #5c7780;
+$games-highlight-color: #a5eeff;
+$games-autofill-color: #8fdbec;
+$games-text-color: #dee4e6;
+$games-bg-1-color: #050709;
+$games-bg-2-color: #0f1b27;
+
+$active-colors: (
+  'user': #1fbba4,
+  'music': #1fbb70,
+  'games': #2eacc8
+);
+
+$hover-colors: (
+  'user': #0b7a72,
+  'music': #0b7a34,
+  'games': #146086
+);
+
+$disabled-colors: (
+  'user': #5c807d,
+  'music': #5c806c,
+  'games': #5c7780
+);
+
+$highlight-colors: (
+  'user': #69dfce,
+  'music': #7aebb4,
+  'games': #a5eeff
+);
+
+$autofill-colors: (
+  'user': #8fecde,
+  'music': #8fecbf,
+  'games': #8fdbec
+);
+
+$text-colors: (
+  'user': #dee6e5,
+  'music': #dee6e2,
+  'games': #dee4e6
+);
+
+$bg-1-colors: (
+  'user': #050907,
+  'music': #050906,
+  'games': #050709
+);
+
+$bg-2-colors: (
+  'user': #0f2721,
+  'music': #0f2717,
+  'games': #0f1b27
+);
+
+$diagram-color-1: #1fbb70;
+$diagram-color-2: #d5c534;
+$diagram-color-3: #c05431;
+$diagram-color-4: #982dc6;
+$diagram-color-5: #2eacc8;
+$diagram-color-6: #d235c7;
+$diagram-color-7: #c33333;
+$diagram-color-8: #3257df;
+$diagram-color-9: #63d43a;
+$diagram-color-10: #1fbba4;
+$diagram-color-11: #cdcdcd;
+
+$white: #ffffff;
+$black: #000000;
+$text-darker: #b8bfbe;
+$input-disabled: #b8bfbe;
+$placeholder-color: #919191;
+$placeholder-darker: #4d4d4d;
+
+$error-color: #c33333;
+$warning-color: #d5c534;
+$success-color: #1fbb70;
+
+$shadow-length: 0.25rem;
+$blur: 0.25rem; //4px
+$spread: 1px;
+$hover-time: 200ms;
+$active-time: 50ms;
+
+$large-radius: 0.75rem;
+$regular-radius: 0.5rem;
+$small-radius: 0.25rem;
+$max-radius: 1000px;
+
+$inter: var(--font-inter);
+$ibm-plex: var(--font-ibm-plex);
+
+$regular-font: 400;
+$medium-font: 500;
+$semi-bold-font: 600;
+$bold-font: 700;
+
+$large-size: 1.125rem; //18px
+$regular-size: 1rem; //16px
+$small-size: 0.875rem; //14px
+$min-size: 0.8125rem;
+
+$h1-size: 1.75rem; //28px
+$h2-size: 1.5rem; //24px
+$h3-size: 1.125rem; //18px
+$h4-size: 1rem; //16px
+
+$tight-font: 1;
+$fit-font: 1.2;
+$wide-font: 1.4;
+
+$input-label-gap: 0.5rem; //8px
+
+@mixin font($font-size, $font-weight, $line-height) {
+  font-size: $font-size;
+  font-weight: $font-weight;
+  line-height: $line-height;
+}
+
+@mixin header($level) {
+  @if $level == 1 {
+    @include font($h1-size, $bold-font, $wide-font);
+  } @else if $level == 2 {
+    @include font($h2-size, $bold-font, $wide-font);
+  } @else if $level == 3 {
+    @include font($h3-size, $bold-font, $fit-font);
+  } @else {
+    @include font($h4-size, $bold-font, $fit-font);
+  }
+  font-family: $ibm-plex;
+}
+
+@mixin underline($color) {
+  text-decoration: underline dotted $color 2px;
+  text-underline-offset: 2px;
+}

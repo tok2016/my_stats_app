@@ -1,0 +1,336 @@
+@use 'utils';
+
+$input-padding-x: 1rem;
+$input-padding-y: 0rem;
+$option-padding-x: 0.5rem;
+$option-padding-y: 0.25rem;
+$input-min-height: 2.5rem;
+$input-text-types: 'search', 'text', 'date', 'password', 'email';
+
+@mixin input-select() {
+  @include utils.font(
+    utils.$regular-size,
+    utils.$regular-font,
+    utils.$tight-font
+  );
+
+  display: block;
+  border: none;
+  min-height: $input-min-height;
+  min-width: 12.5rem;
+  padding: 0 $input-padding-x;
+
+  &::placeholder {
+    color: utils.$placeholder-color;
+  }
+}
+
+@each $type in $input-text-types {
+  input[type='#{$type}'] {
+    @include input-select();
+
+    &::-webkit-search-cancel-button {
+      display: none;
+    }
+  }
+}
+
+@mixin input-text-basic(
+  $rounded,
+  $outlined,
+  $bg-color,
+  $active-color,
+  $text-color
+) {
+  color: $text-color;
+  background-color: $bg-color;
+  border-radius: if($rounded, utils.$max-radius, utils.$regular-radius);
+
+  box-shadow: if(
+    $outlined,
+    0 0 0 2px utils.$placeholder-color,
+    0 0 utils.$blur utils.$spread $bg-color
+  );
+  transition: all utils.$active-time;
+
+  @if ($outlined) {
+    padding: 0 calc($input-padding-x - 4px);
+  }
+
+  &:not(:placeholder-shown) {
+    box-shadow: if(
+      $outlined,
+      0 0 0 2px $active-color,
+      0 0 utils.$blur utils.$spread $active-color
+    );
+  }
+
+  &:hover,
+  &:focus-visible {
+    box-shadow:
+      0 0 utils.$blur 2 * utils.$spread $active-color,
+      0 0 0 2px if($outlined, $active-color, transparent);
+    outline: none;
+  }
+
+  &:active {
+    box-shadow:
+      0 0 utils.$blur 2 * utils.$spread $active-color,
+      0 0 0 2px if($outlined, $active-color, transparent);
+    transition: all utils.$active-time;
+  }
+
+  &:disabled {
+    background-color: utils.$input-disabled;
+    color: utils.$placeholder-color;
+    box-shadow: if($outlined, 0 0 0 2px utils.$placeholder-color, none);
+  }
+}
+
+@mixin input-text($outlined, $bg-color, $active-color, $text-color) {
+  @each $type in $input-text-types {
+    input[type='#{$type}'] {
+      @include input-text-basic(
+        $type == 'search',
+        $outlined,
+        $bg-color,
+        $active-color,
+        $text-color
+      );
+    }
+  }
+}
+
+@mixin textarea($outlined, $bg-color, $active-color, $text-color) {
+  textarea {
+    @include input-select();
+    @include input-text-basic(
+      false,
+      $outlined,
+      $bg-color,
+      $active-color,
+      $text-color
+    );
+    padding: 0;
+    border: solid $bg-color;
+    border-width: 0.75rem $input-padding-x;
+    resize: vertical;
+    min-height: utils.$large-size;
+    font-family: utils.$inter;
+
+    &::-webkit-scrollbar-track {
+      background-color: utils.$text-darker;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: utils.$placeholder-color;
+      border: 2.5px solid utils.$text-darker;
+    }
+
+    &::-webkit-scrollbar-corner {
+      background-color: transparent;
+    }
+  }
+}
+
+select {
+  display: none;
+}
+
+.select {
+  @include input-select();
+  font-family: utils.$inter;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.input-select-group {
+  display: flex;
+  flex-direction: column;
+  gap: utils.$input-label-gap;
+}
+
+.select-picker,
+.text-select-picker {
+  position: relative;
+  width: max-content;
+}
+
+.picker-icon {
+  @include utils.font(utils.$regular-size, utils.$bold-font, utils.$tight-font);
+  transition: rotate utils.$active-time;
+}
+
+.picker-icon * {
+  stroke-width: 3px;
+}
+
+.picker-icon.expanded {
+  rotate: 180deg;
+}
+
+.picker {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+
+  min-width: 6.25rem;
+  width: max-content;
+  margin: 0;
+  padding: 0;
+
+  position: absolute;
+  top: ($input-min-height - utils.$regular-size) * 0.5 - $option-padding-y *
+    1.75;
+  left: $input-padding-x - $option-padding-x;
+
+  border-radius: utils.$regular-radius;
+  z-index: 5;
+}
+
+.picker.hidden {
+  display: none;
+}
+
+.option {
+  @include utils.font(
+    utils.$regular-size,
+    utils.$regular-font,
+    utils.$wide-font
+  );
+  font-family: utils.$inter;
+  display: block;
+  background-color: utils.$white;
+  padding: $option-padding-y $option-padding-x;
+  margin: 0;
+  cursor: pointer;
+
+  &:first-of-type {
+    border-radius: utils.$regular-radius utils.$regular-radius 0 0;
+  }
+
+  &:last-of-type {
+    border-radius: 0 0 utils.$regular-radius utils.$regular-radius;
+  }
+}
+
+.option.selected {
+  font-weight: utils.$bold-font;
+}
+
+@mixin plain-select($outlined, $bg-color, $active-color, $text-color) {
+  .input-select-group {
+    .select {
+      @include input-text-basic(
+        false,
+        $outlined,
+        $bg-color,
+        $active-color,
+        $text-color
+      );
+
+      span {
+        color: $text-color;
+      }
+    }
+
+    .picker-icon {
+      color: $text-color;
+    }
+
+    .picker {
+      box-shadow: 0 0 utils.$blur utils.$spread $active-color;
+    }
+
+    .option {
+      color: $text-color;
+
+      &:hover,
+      &:focus-visible {
+        background-color: $bg-color;
+      }
+    }
+  }
+}
+
+@mixin input-select-textarea($outlined, $bg-color, $active-color, $text-color) {
+  @include input-text($outlined, $bg-color, $active-color, $text-color);
+  @include textarea($outlined, $bg-color, $active-color, $text-color);
+  @include plain-select($outlined, $bg-color, $active-color, $text-color);
+}
+
+.text-select-group {
+  display: flex;
+  flex-direction: row;
+  gap: utils.$input-label-gap;
+  width: max-content;
+}
+
+.text-select-picker {
+  .select {
+    @include utils.header(3);
+    background-color: transparent;
+    padding: 0;
+    justify-content: flex-start;
+    gap: 0.25rem;
+    min-width: max-content;
+    min-height: 1rem;
+  }
+
+  .picker {
+    top: -$option-padding-y;
+    left: -$option-padding-x;
+  }
+
+  .option.selected {
+    font-family: utils.$ibm-plex;
+  }
+}
+
+@mixin text-select(
+  $main-color,
+  $hover-color,
+  $active-color,
+  $disabled-color,
+  $text-color,
+  $option-hover-color
+) {
+  .text-select-group {
+    .select {
+      color: $main-color;
+
+      span {
+        @include utils.underline($main-color);
+      }
+
+      &:hover,
+      &:focus-visible {
+        color: $hover-color;
+      }
+
+      &:disabled {
+        color: $disabled-color;
+      }
+    }
+
+    .picker {
+      box-shadow: 0 0 utils.$blur utils.$spread $active-color;
+    }
+
+    .picker-icon {
+      color: $main-color;
+    }
+
+    .option {
+      color: $text-color;
+
+      &:hover,
+      &:focus-visible {
+        background-color: $option-hover-color;
+      }
+    }
+  }
+}

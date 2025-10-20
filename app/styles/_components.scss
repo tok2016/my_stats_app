@@ -1,0 +1,120 @@
+@use 'sass:map';
+@use 'utils';
+@use 'buttons';
+
+$border-style: 2px solid;
+$border-radius: 6px;
+
+.divider {
+  @include utils.font(utils.$min-size, utils.$regular-font, utils.$tight-font);
+  font-family: utils.$inter;
+
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+
+  * {
+    width: fit-content;
+    text-align: center;
+  }
+
+  .left,
+  .right {
+    box-sizing: border-box;
+    flex-grow: 1;
+    height: utils.$min-size * 0.5;
+    border-bottom: $border-style;
+  }
+}
+
+.divider.rounded {
+  .left {
+    border-left: $border-style;
+    border-bottom-left-radius: $border-radius;
+  }
+
+  .right {
+    border-right: $border-style;
+    border-bottom-right-radius: $border-radius;
+  }
+}
+
+@mixin divider($color) {
+  color: $color;
+
+  .left,
+  .right {
+    border-color: $color;
+  }
+}
+
+.pagination {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.5rem;
+
+  a {
+    @include utils.font(
+      utils.$regular-size,
+      utils.$regular-font,
+      utils.$tight-font
+    );
+    width: fit-content;
+    min-width: 1rem;
+    padding: 0.5rem;
+    text-align: center;
+    border-radius: utils.$regular-radius;
+  }
+}
+
+@mixin pagination(
+  $hover-color,
+  $active-color,
+  $text-color,
+  $text-color-hover,
+  $text-color-active,
+  $text-color-disabled
+) {
+  .pagination {
+    a {
+      color: $text-color;
+      background-color: transparent;
+
+      &:hover,
+      &:focus-visible {
+        background-color: $hover-color;
+        color: $text-color-hover;
+      }
+
+      &:active {
+        background-color: $active-color;
+        color: $text-color-active;
+      }
+
+      &:disabled {
+        background-color: transparent;
+        color: $text-color-disabled;
+      }
+    }
+  }
+}
+
+@mixin pagination-current($module) {
+  .pagination {
+    a.current {
+      @include buttons.button-filled-base(
+        map.get(utils.$active-colors, $module) !important,
+        map.get(utils.$hover-colors, $module) !important,
+        map.get(utils.$highlight-colors, $module) !important,
+        map.get(utils.$disabled-colors, $module) !important,
+        utils.$white !important,
+        utils.$white !important,
+        utils.$white !important,
+        map.get(utils.$text-colors, $module) !important
+      );
+    }
+  }
+}

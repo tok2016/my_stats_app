@@ -1,8 +1,7 @@
 import path from 'path';
 
-import Credentials, { CredentialsInSchema } from '@ts/users/credentials';
+import { CredentialsInSchema } from '@ts/users/credentials';
 import { BasicUser, User, UserInfoInSchema } from '@ts/users/user';
-import { UserInfo } from '@ts/users/user';
 import Dashboard from '@ts/users/dashboard';
 
 export const AVATAR_DIRECTORY = path.join(process.cwd(), 'avatars');
@@ -27,6 +26,14 @@ export const ServiceStatuses = [
   'unknown'
 ] as const;
 
+export const ButtonVariants = ['primary', 'secondary', 'outlined'] as const;
+
+export const InputThemes = ['light', 'dark'] as const;
+
+export const SelectVariants = ['plain', 'text'] as const;
+
+export const Modules = ['user', 'music', 'games'] as const;
+
 export const isExpired = (date: Date | string | number) =>
   new Date(date) < new Date();
 
@@ -50,3 +57,14 @@ export const uniteUserData = (
 
 export const generateCode = () =>
   Math.floor(Math.random() * SIX_CODE_MULT).toString();
+
+export const getIconCode = (iconName: string) => `mynaui:${iconName}`;
+
+export const clamp = (value: number, min: number, max: number) => {
+  if (value < min) {
+    return min;
+  } else if (value > max) {
+    return max;
+  }
+  return value;
+};

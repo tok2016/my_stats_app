@@ -1,95 +1,102 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import BinaryInput from '@components/BinaryInput';
+import Button from '@components/Button';
+import CircleSlider from '@components/CircleSlider';
+import Divider from '@components/Divider';
+import DoubleSlider from '@components/DoubleSlider';
+import Input from '@components/Input';
+import Pagination from '@components/Pagination';
+import RadioCheckboxGroup from '@components/RadioCheckboxGroup';
+import Select from '@components/Select';
+import TextArea from '@components/TextArea';
+
+import '@styles/modules.scss';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        width: '200px'
+      }}
+    >
+      <Button variant='primary' beforeIconCode='star-solid'>
+        Button
+      </Button>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <Input id='test-text' label='Test' placeholder='placeholder' />
+
+      <RadioCheckboxGroup
+        type='radio'
+        options={[
+          { label: 'Variant', value: 'variant' },
+          { label: 'Option', value: 'option' }
+        ]}
+        name='radio-test-2'
+      />
+
+      <RadioCheckboxGroup
+        type='checkbox'
+        options={[
+          { label: 'Variant', value: 'variant-checkbox' },
+          { label: 'Option', value: 'option-checkbox' }
+        ]}
+        name='radio-test-2'
+      />
+
+      <BinaryInput
+        type='checkbox'
+        id='switch'
+        name='switch'
+        isSwitch
+        label='Switch'
+      />
+
+      <TextArea id='textarea-test' label='TextArea' placeholder='placeholder' />
+
+      <Divider>Divider</Divider>
+
+      <Select
+        label='Plain select'
+        variant='plain'
+        id='plain-select'
+        options={[
+          { label: '1', value: '1' },
+          { label: '2', value: '2' }
+        ]}
+      />
+
+      <Select
+        label='Text select'
+        variant='text'
+        id='text-select'
+        options={[
+          { label: '1', value: '1' },
+          { label: '2', value: '2' }
+        ]}
+      />
+
+      <DoubleSlider
+        label='Double slider'
+        id='double-slider'
+        min={0}
+        max={100}
+      />
+
+      <CircleSlider
+        label='Circle slider'
+        id='circle-slider'
+        min={0}
+        max={100}
+      />
+
+      <p className='colored bold wide'>Wide colored bold text</p>
+      <a href='#' className='underline'>
+        Underlined link
+      </a>
+
+      <Pagination pages={11} current={1} />
     </div>
   );
 }
