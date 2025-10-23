@@ -10,7 +10,14 @@ import Credentials, { CredentialsInSchema } from '@ts/users/credentials';
 import Dashboard from '@ts/users/dashboard';
 
 import { CredentialsModel, DashboardsModel, UsersModel } from './models';
-import { isExpired, MILLISECONDS, uniteUserData } from './utils';
+import {
+  responseWithError,
+  isErrorResponse,
+  isExpired,
+  MILLISECONDS,
+  uniteUserData,
+  generateErrorResponse
+} from './utils';
 
 export const ACCESS_TTL = 5 * 60 * MILLISECONDS;
 export const REFRESH_TTL = 30 * 24 * 60 * 60 * MILLISECONDS;
@@ -30,10 +37,9 @@ export const generateToken = async (
 
   return new Promise<string>((resolve) => {
     if (!process.env.SECRET_KEY) {
-      throw new Error('Internal server error');
+      throw generateErrorResponse(500, 'Internal server error');
     }
 
-    console.log(token);
     resolve(jwt.sign(token, process.env.SECRET_KEY, { algorithm: 'HS256' }));
   });
 };
@@ -41,7 +47,7 @@ export const generateToken = async (
 export const decodeToken = async (token: string): Promise<Token> => {
   return new Promise<Token>((resolve) => {
     if (!process.env.SECRET_KEY) {
-      throw new Error('Internal server error');
+      throw generateErrorResponse(500, 'Internal server error');
     }
 
     resolve(
@@ -78,20 +84,20 @@ export const generateAccessResponse = async (
   return response;
 };
 
-export const generateAccessError = (error: unknown) =>
-  error instanceof Error
-    ? new NextResponse(error.message, {
-        status: 404,
-        statusText: error.message
-      })
-    : new NextResponse(null, {
-        status: 500,
-        statusText: 'Internal server error'
-      });
+export const generateAccessError = (error: unknown) => {
+  if (isErrorResponse(error)) {
+    return responseWithError(error.status, error.message, error.issues);
+  }
+
+  return responseWithError(
+    500,
+    typeof error === 'string' ? error : 'Internal server error'
+  );
+};
 
 export const hashPassword = async (password: string): Promise<string> => {
   if (!process.env.HASH_SALT) {
-    throw new Error('Internal server error');
+    throw generateErrorResponse(500, 'Internal server error');
   }
 
   const hashed = await bcrypt.hash(password, parseInt(process.env.HASH_SALT));
@@ -120,13 +126,13 @@ export const extractToken = async (tokenRaw: string | null): Promise<Token> => {
   const token = tokenRaw?.split(' ').at(-1);
 
   if (!token) {
-    throw new Error('Unauthorized');
+    throw generateErrorResponse(401, 'Unauthorized');
   }
 
   const decoded = await decodeToken(token);
 
   if (isExpired(decoded.expiresAt)) {
-    throw new Error('Session is expired');
+    throw generateErrorResponse(401, 'Session is expired');
   }
 
   return decoded;
@@ -147,7 +153,7 @@ export const getCredentialsById = async (
   const credentials = await CredentialsModel.findById(id).lean();
 
   if (!credentials) {
-    throw new Error('User was not found');
+    throw generateErrorResponse(404, 'User was not found');
   }
 
   return { ...credentials, id: credentials._id.toString() };
@@ -161,7 +167,7 @@ export const getCredentials = async (
   }).lean();
 
   if (!credentials) {
-    throw new Error('User was not found');
+    throw generateErrorResponse(404, 'User was not found');
   }
 
   return { ...credentials, id: credentials._id.toString() };
@@ -173,19 +179,26 @@ export const getUserById = async (id: string): Promise<User> => {
   const dashboards = await getDashboards(credentials.userId);
 
   if (!userInfo) {
-    throw new Error('User data was not found');
+    throw generateErrorResponse(404, 'User data was not found');
   }
 
   return uniteUserData(credentials, userInfo, dashboards);
 };
 
 export const checkUserAuthorRights = async (
-  userId: string,
+  userId: string | undefined,
   tokenRaw: string | null
 ) => {
+  if (!userId) {
+    throw generateErrorResponse(400, 'User id was not given');
+  }
+
   const token = await extractToken(tokenRaw);
   const credentials = await getCredentialsById(token.id);
-  return credentials.userId === userId;
+
+  if (credentials.userId !== userId) {
+    throw generateErrorResponse(403, 'Forbidden');
+  }
 };
 
 export const getDashboards = async (userId: string): Promise<Dashboard[]> => {

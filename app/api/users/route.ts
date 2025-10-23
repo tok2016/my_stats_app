@@ -1,7 +1,7 @@
 import { RootFilterQuery } from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
-import Credentials, { CredentialsInSchema } from '@ts/users/credentials';
+import { CredentialsInSchema } from '@ts/users/credentials';
 import { BasicUser, UserInfo } from '@ts/users/user';
 
 import { CredentialsModel, UsersModel } from '@lib/models';

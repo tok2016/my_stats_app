@@ -1,34 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { ZodOptional, ZodType } from 'zod';
+
+import { NewDashboard } from '@ts/users/dashboard';
 
 import {
   checkUserAuthorRights,
   generateAccessError,
   getDashboards
 } from '@lib/auth';
-import { DashboardValidator } from '@lib/validationSchemas';
+import { DashboardValidator, validateData } from '@lib/validationSchemas';
 import { DashboardsModel } from '@lib/models';
+import { responseWithError } from '@lib/utils';
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
   const { userId } = await params;
-  if (!userId) {
-    return new NextResponse('User id was not given', {
-      status: 400,
-      statusText: 'User id was not given'
-    });
-  }
-
   const bearer = req.headers.get('Authorization');
 
   try {
-    if (!(await checkUserAuthorRights(userId, bearer))) {
-      return new NextResponse('Unauthorized', {
-        status: 403,
-        statusText: 'Unauthorized'
-      });
-    }
+    await checkUserAuthorRights(userId, bearer);
 
     const dashboards = await getDashboards(userId);
     return NextResponse.json(dashboards, {
@@ -45,32 +37,16 @@ export async function POST(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   const { userId } = await params;
-  if (!userId) {
-    return new NextResponse('User id was not given', {
-      status: 400,
-      statusText: 'User id was not given'
-    });
-  }
-
   const bearer = req.headers.get('Authorization');
 
   try {
-    if (!(await checkUserAuthorRights(userId, bearer))) {
-      return new NextResponse('Unauthorized', {
-        status: 403,
-        statusText: 'Unauthorized'
-      });
-    }
+    await checkUserAuthorRights(userId, bearer);
 
-    const dashboard = await DashboardValidator.safeParseAsync(await req.json());
-    if (!dashboard.success) {
-      return NextResponse.json(dashboard.error.issues, {
-        status: 400,
-        statusText: 'Invalid data'
-      });
-    }
-
-    await DashboardsModel.create({ ...dashboard.data, userId });
+    const dashboard = await validateData<NewDashboard>(
+      DashboardValidator,
+      await req.json()
+    );
+    await DashboardsModel.create({ ...dashboard, userId });
 
     const dashboards = await getDashboards(userId);
     return NextResponse.json(dashboards, {
@@ -87,43 +63,22 @@ export async function PUT(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   const { userId } = await params;
-  if (!userId) {
-    return new NextResponse('User id was not given', {
-      status: 400,
-      statusText: 'User id was not given'
-    });
-  }
-
   const bearer = req.headers.get('Authorization');
   const dashboardId = req.nextUrl.searchParams.get('dashboardId');
 
   if (!dashboardId) {
-    return new NextResponse('Dashboard id was not given', {
-      status: 400,
-      statusText: 'Dashboard id was not given'
-    });
+    return responseWithError(400, 'Dashboard id was not given');
   }
 
   try {
-    if (!(await checkUserAuthorRights(userId, bearer))) {
-      return new NextResponse('Unauthorized', {
-        status: 403,
-        statusText: 'Unauthorized'
-      });
-    }
+    await checkUserAuthorRights(userId, bearer);
 
-    const dashboard = await DashboardValidator.optional().safeParseAsync(
-      await req.json()
-    );
+    const dashboard = await validateData<
+      NewDashboard,
+      ZodOptional<ZodType<NewDashboard>>
+    >(DashboardValidator.optional(), await req.json());
 
-    if (!dashboard.success) {
-      return NextResponse.json(dashboard.error.issues, {
-        status: 400,
-        statusText: 'Invalid data'
-      });
-    }
-
-    await DashboardsModel.findByIdAndUpdate(dashboardId, dashboard.data);
+    await DashboardsModel.findByIdAndUpdate(dashboardId, dashboard);
 
     const dashboards = await getDashboards(userId);
     return NextResponse.json(dashboards, {
@@ -140,23 +95,11 @@ export async function DELETE(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   const { userId } = await params;
-  if (!userId) {
-    return new NextResponse('User id was not given', {
-      status: 400,
-      statusText: 'User id was not given'
-    });
-  }
-
   const bearer = req.headers.get('Authorization');
   const dashboardId = req.nextUrl.searchParams.get('dashboardId');
 
   try {
-    if (!(await checkUserAuthorRights(userId, bearer))) {
-      return new NextResponse('Unauthorized', {
-        status: 403,
-        statusText: 'Unauthorized'
-      });
-    }
+    await checkUserAuthorRights(userId, bearer);
 
     if (!dashboardId) {
       await DashboardsModel.deleteMany({ userId });

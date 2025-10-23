@@ -9,6 +9,7 @@ import PasswordUpdate, { NewPassword } from '@ts/users/password';
 import {
   ConfirmationActions,
   DashboardTypes,
+  generateErrorResponse,
   ServiceNames,
   ServiceStatuses
 } from './utils';
@@ -20,22 +21,28 @@ const MAX_USERNAME_LENGTH = 32;
 const PASSWORD_MIN_LENGTH = 8;
 const PASSWORD_MAX_LENGTH = 32;
 
-export const CredentialsValidator: z.ZodType<NewCredentials> = z.object({
-  email: z.email().nonempty(),
-  username: z
-    .string()
-    .nonempty()
-    .min(MIN_USERNAME_LENGTH)
-    .max(MAX_USERNAME_LENGTH),
-  password: z
-    .string()
-    .nonempty()
-    .regex(/[a-zA-Z]+/g)
-    .regex(/\d+/g)
-    .regex(/[?!#+-@$&*]*/g)
-    .min(PASSWORD_MIN_LENGTH)
-    .max(PASSWORD_MAX_LENGTH)
-});
+export const CredentialsValidator: z.ZodType<NewCredentials> = z
+  .object({
+    email: z.email().nonempty(),
+    username: z
+      .string()
+      .nonempty()
+      .min(MIN_USERNAME_LENGTH)
+      .max(MAX_USERNAME_LENGTH),
+    password: z
+      .string()
+      .nonempty()
+      .regex(/[a-zA-Z]+/g)
+      .regex(/\d+/g)
+      .regex(/[?!#+-@$&*]*/g)
+      .min(PASSWORD_MIN_LENGTH)
+      .max(PASSWORD_MAX_LENGTH),
+    repeaetPassword: z.string().nonempty()
+  })
+  .refine((data) => data.password !== data.repeaetPassword, {
+    error: `Passwords don't match`,
+    path: ['repeaetPassword']
+  });
 
 export const DashboardValidator: z.ZodType<NewDashboard> = z.object({
   object: z.string().nonempty(),
@@ -93,3 +100,19 @@ export const ConfirmationCodeValidator: z.ZodType<ConfirmationCode> =
 
 export const NewPasswordValidatior: z.ZodType<NewPassword> =
   UserLoginValidator.and(z.object({ operationId: z.string().nonempty() }));
+
+export const validateData = async <
+  DataType,
+  ValidatorType extends z.ZodType = z.ZodType<DataType>
+>(
+  validator: ValidatorType,
+  data: unknown
+) => {
+  const validated = await validator.safeParseAsync(data);
+
+  if (!validated.success) {
+    throw generateErrorResponse(400, 'Invalid data', validated.error.issues);
+  }
+
+  return validated.data;
+};

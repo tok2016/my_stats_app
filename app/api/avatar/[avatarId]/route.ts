@@ -2,7 +2,7 @@ import { readFile } from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { AVATAR_DIRECTORY } from '@lib/utils';
+import { AVATAR_DIRECTORY, responseWithError } from '@lib/utils';
 
 export async function GET(
   _req: NextRequest,
@@ -25,10 +25,7 @@ export async function GET(
         'Content-Type': mimeType
       }
     });
-  } catch (err) {
-    return new NextResponse('Avatar was not found', {
-      status: 404,
-      statusText: 'Avatar was not found'
-    });
+  } catch {
+    return responseWithError(404, 'Avatar was not found');
   }
 }

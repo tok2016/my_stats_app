@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { ConfirmationsModel } from '@lib/models';
-import { generateCode } from '@lib/utils';
+import { generateCode, responseWithError } from '@lib/utils';
 import { ConfirmationInfo } from '@ts/users/confirmation';
 
 export async function PUT(
@@ -17,10 +17,7 @@ export async function PUT(
   ).lean();
 
   if (!updatedConfirmation) {
-    return new NextResponse('Operation was not found', {
-      status: 404,
-      statusText: 'Operation was not found'
-    });
+    return responseWithError(404, 'Operation was not found');
   }
 
   //send email with new code

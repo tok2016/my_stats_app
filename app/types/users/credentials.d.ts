@@ -1,12 +1,16 @@
 import { Types } from 'mongoose';
 
-export interface NewCredentials {
+interface BaseCredentials {
   email: string;
   username: string;
   password: string;
 }
 
-export default interface Credentials extends NewCredentials {
+export interface NewCredentials extends BaseCredentials {
+  repeaetPassword: string;
+}
+
+export default interface Credentials extends BaseCredentials {
   id: string;
   userId: string;
   createdAt: Date;

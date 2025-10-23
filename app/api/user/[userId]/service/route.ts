@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import Service from '@ts/users/service';
+import Service, { NewService } from '@ts/users/service';
 
 import { checkUserAuthorRights, generateAccessError } from '@lib/auth';
 import { ServiceCredentialsModel } from '@lib/models';
-import { ServiceValidator } from '@lib/validationSchemas';
+import { ServiceValidator, validateData } from '@lib/validationSchemas';
 
 export const getServicesByUserId = async (
   userId: string
@@ -24,13 +24,7 @@ export async function GET(
   const bearer = req.headers.get('Authorization');
 
   try {
-    if (!(await checkUserAuthorRights(userId, bearer))) {
-      return new NextResponse('Forbidden', {
-        status: 403,
-        statusText: 'Forbidden'
-      });
-    }
-
+    await checkUserAuthorRights(userId, bearer);
     const services = await getServicesByUserId(userId);
 
     return NextResponse.json(services, {
@@ -50,25 +44,13 @@ export async function POST(
   const bearer = req.headers.get('Authorization');
 
   try {
-    if (!(await checkUserAuthorRights(userId, bearer))) {
-      return new NextResponse('Forbidden', {
-        status: 403,
-        statusText: 'Forbidden'
-      });
-    }
-
-    const serviceCredentials = await ServiceValidator.safeParseAsync(
+    await checkUserAuthorRights(userId, bearer);
+    const serviceCredentials = await validateData<NewService>(
+      ServiceValidator,
       await req.json()
     );
 
-    if (!serviceCredentials.success) {
-      return NextResponse.json(serviceCredentials.error.issues, {
-        status: 400,
-        statusText: 'Invalid data'
-      });
-    }
-
-    switch (serviceCredentials.data.name) {
+    switch (serviceCredentials.name) {
       case 'spotify':
         //decode token and extract email and status
         break;
@@ -78,7 +60,7 @@ export async function POST(
     }
 
     await ServiceCredentialsModel.create({
-      ...serviceCredentials.data,
+      ...serviceCredentials,
       userId
     });
 
@@ -101,25 +83,13 @@ export async function PUT(
   const bearer = req.headers.get('Authorization');
 
   try {
-    if (!(await checkUserAuthorRights(userId, bearer))) {
-      return new NextResponse('Forbidden', {
-        status: 403,
-        statusText: 'Forbidden'
-      });
-    }
-
-    const serviceCredentials = await ServiceValidator.safeParseAsync(
+    await checkUserAuthorRights(userId, bearer);
+    const serviceCredentials = await validateData<NewService>(
+      ServiceValidator,
       await req.json()
     );
 
-    if (!serviceCredentials.success) {
-      return NextResponse.json(serviceCredentials.error.issues, {
-        status: 400,
-        statusText: 'Invalid data'
-      });
-    }
-
-    switch (serviceCredentials.data.name) {
+    switch (serviceCredentials.name) {
       case 'spotify':
         //decode token and extract email and status
         break;
@@ -129,10 +99,10 @@ export async function PUT(
     }
 
     await ServiceCredentialsModel.updateOne(
-      { userId, name: serviceCredentials.data.name },
+      { userId, name: serviceCredentials.name },
       {
-        login: serviceCredentials.data.login,
-        status: serviceCredentials.data.status
+        login: serviceCredentials.login,
+        status: serviceCredentials.status
       }
     );
 
@@ -156,12 +126,7 @@ export async function DELETE(
   const bearer = req.headers.get('Authorization');
 
   try {
-    if (!(await checkUserAuthorRights(userId, bearer))) {
-      return new NextResponse('Forbidden', {
-        status: 403,
-        statusText: 'Forbidden'
-      });
-    }
+    await checkUserAuthorRights(userId, bearer);
 
     if (!serviceName) {
       await ServiceCredentialsModel.deleteMany({ userId });

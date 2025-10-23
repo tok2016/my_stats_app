@@ -11,45 +11,26 @@ import {
   getUserById
 } from '@lib/auth';
 import { UsersModel } from '@lib/models';
-import { AVATAR_DIRECTORY } from '@lib/utils';
+import { AVATAR_DIRECTORY, responseWithError } from '@lib/utils';
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
   const { userId } = await params;
-  if (!userId) {
-    return new NextResponse('User id was not given', {
-      status: 400,
-      statusText: 'User id was not given'
-    });
-  }
-
   const bearer = req.headers.get('Authorization');
 
   try {
-    if (!(await checkUserAuthorRights(userId, bearer))) {
-      return new NextResponse('Forbidden', {
-        status: 403,
-        statusText: 'Forbidden'
-      });
-    }
-
+    await checkUserAuthorRights(userId, bearer);
     const user = await UsersModel.findById(userId).lean();
 
     if (!user) {
-      return new NextResponse('User was not found', {
-        status: 400,
-        statusText: 'User was not found'
-      });
+      return responseWithError(404, 'User was not found');
     }
 
     const avatarRaw = (await req.formData()).get('avatar') as Blob | null;
     if (!avatarRaw || !avatarRaw.type.includes('image')) {
-      return new NextResponse('Invalid file format', {
-        status: 400,
-        statusText: 'Invalid file format'
-      });
+      return responseWithError(400, 'Invalid file format');
     }
 
     if (user.avatarUrl) {
@@ -85,23 +66,10 @@ export async function DELETE(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   const { userId } = await params;
-  if (!userId) {
-    return new NextResponse('Username was not given', {
-      status: 400,
-      statusText: 'Username was not given'
-    });
-  }
-
   const bearer = req.headers.get('Authorization');
 
   try {
-    if (!(await checkUserAuthorRights(userId, bearer))) {
-      return new NextResponse('Forbidden', {
-        status: 403,
-        statusText: 'Forbidden'
-      });
-    }
-
+    await checkUserAuthorRights(userId, bearer);
     const user = await getUserById(userId);
 
     if (!user.avatarUrl) {
