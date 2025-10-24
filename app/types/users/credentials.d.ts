@@ -7,7 +7,7 @@ interface BaseCredentials {
 }
 
 export interface NewCredentials extends BaseCredentials {
-  repeaetPassword: string;
+  repeatPassword: string;
 }
 
 export default interface Credentials extends BaseCredentials {

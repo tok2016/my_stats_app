@@ -2,6 +2,7 @@
 
 $input-padding-x: 1rem;
 $input-padding-y: 0rem;
+$input-min-width: 12.5rem;
 $option-padding-x: 0.5rem;
 $option-padding-y: 0.25rem;
 $input-min-height: 2.5rem;
@@ -17,7 +18,7 @@ $input-text-types: 'search', 'text', 'date', 'password', 'email';
   display: block;
   border: none;
   min-height: $input-min-height;
-  min-width: 12.5rem;
+  min-width: $input-min-width;
   padding: 0 $input-padding-x;
 
   &::placeholder {
@@ -100,15 +101,18 @@ $input-text-types: 'search', 'text', 'date', 'password', 'email';
     }
   }
 
-  .search-icon {
+  .input-icon {
     color: $text-color;
   }
 }
 
-.search-group {
+.input-wrapper {
+  min-width: $input-min-width + $input-padding-x * 2;
   position: relative;
+  display: flex;
+  flex-direction: row;
 
-  .search-icon {
+  .input-icon {
     @include utils.font(
       utils.$regular-size,
       utils.$bold-font,
@@ -123,9 +127,16 @@ $input-text-types: 'search', 'text', 'date', 'password', 'email';
     }
   }
 
-  input[type='search'] {
-    padding-right: 2 * $input-padding-x;
-    width: 100%;
+  input {
+    flex-grow: 1;
+  }
+
+  &:has(.input-icon) {
+    input[type='search'],
+    input[type='password'],
+    input[type='text'] {
+      padding-right: 2 * $input-padding-x;
+    }
   }
 }
 

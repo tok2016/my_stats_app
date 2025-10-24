@@ -19,15 +19,15 @@ import {
   generateErrorResponse
 } from './utils';
 
-export const ACCESS_TTL = 5 * 60 * MILLISECONDS;
-export const REFRESH_TTL = 30 * 24 * 60 * 60 * MILLISECONDS;
+export const ACCESS_TTL = 5 * 60;
+export const REFRESH_TTL = 30 * 24 * 60 * 60;
 
 export const generateToken = async (
   credentialsId: string,
   isRefresh: boolean = false
 ): Promise<string> => {
   const expireDate = new Date(
-    Date.now() + (isRefresh ? REFRESH_TTL : ACCESS_TTL)
+    Date.now() + (isRefresh ? REFRESH_TTL : ACCESS_TTL) * MILLISECONDS
   );
 
   const token: Token = {
@@ -69,19 +69,20 @@ export const generateAccessResponse = async (
     username
   };
 
-  const response = NextResponse.json(userAccess, {
+  const cookiesStorage = await cookies();
+  cookiesStorage.set('accessToken', userAccess.access, {
+    httpOnly: true,
+    maxAge: ACCESS_TTL
+  });
+  cookiesStorage.set('refreshToken', userAccess.refresh, {
+    httpOnly: true,
+    maxAge: REFRESH_TTL
+  });
+
+  return NextResponse.json(userAccess, {
     status: 201,
     statusText
   });
-
-  response.cookies.set('accessToken', userAccess.access, {
-    maxAge: ACCESS_TTL / MILLISECONDS
-  });
-  response.cookies.set('refreshToken', userAccess.refresh, {
-    maxAge: REFRESH_TTL / MILLISECONDS
-  });
-
-  return response;
 };
 
 export const generateAccessError = (error: unknown) => {

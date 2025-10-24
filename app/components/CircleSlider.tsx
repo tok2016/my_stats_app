@@ -4,11 +4,14 @@ import { MouseEvent, useRef, useState } from 'react';
 
 import { SliderProps } from '@ts/ui/components-props';
 
+import Hint from './Hint';
+
 const MAX_ANGLE = 360;
 const STRAIGHT_ANGLE = 180;
 const TURN_ANGLE = 450;
 
 type CircleSliderProps = SliderProps & {
+  defaultValue?: number;
   onChange?: (value: number) => void;
 };
 
@@ -23,12 +26,16 @@ type CircleSliderState = {
 export default function CircleSlider({
   label,
   id,
+  name,
   min,
   max,
   className = '',
+  errorHint,
+  hint,
+  defaultValue,
   onChange
 }: CircleSliderProps) {
-  const [value, setValue] = useState<number>(min);
+  const [value, setValue] = useState<number>(defaultValue ?? min);
 
   const sliderRef = useRef<HTMLDivElement>(null);
   const sliderState = useRef<CircleSliderState>({
@@ -84,6 +91,7 @@ export default function CircleSlider({
       >
         <input
           id={id}
+          name={name}
           value={value}
           type='range'
           min={min}
@@ -93,6 +101,9 @@ export default function CircleSlider({
 
         <span className='value'>{value}</span>
       </div>
+
+      <Hint variant='error'>{errorHint}</Hint>
+      <Hint>{hint}</Hint>
     </div>
   );
 }

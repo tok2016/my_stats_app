@@ -37,11 +37,11 @@ export const CredentialsValidator: z.ZodType<NewCredentials> = z
       .regex(/[?!#+-@$&*]*/g)
       .min(PASSWORD_MIN_LENGTH)
       .max(PASSWORD_MAX_LENGTH),
-    repeaetPassword: z.string().nonempty()
+    repeatPassword: z.string().nonempty()
   })
-  .refine((data) => data.password !== data.repeaetPassword, {
+  .refine((data) => data.password === data.repeatPassword, {
     error: `Passwords don't match`,
-    path: ['repeaetPassword']
+    path: ['repeatPassword']
   });
 
 export const DashboardValidator: z.ZodType<NewDashboard> = z.object({

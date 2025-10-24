@@ -7,6 +7,7 @@ import { SelectVariant } from '@ts/ui/components-variants';
 import { TextInputProps, Option } from '@ts/ui/components-props';
 
 import { getIconCode } from '@lib/utils';
+import Hint from './Hint';
 
 type SelectProps = TextInputProps & {
   options: Option[];
@@ -33,9 +34,13 @@ const SelectTypes: Record<SelectVariant, SelectVariantProps> = {
 export default function Select({
   label,
   id,
+  name,
   options,
   variant = 'plain',
   className = '',
+  defaultValue,
+  hint,
+  errorHint,
   onSelect
 }: SelectProps) {
   const [value, setValue] = useState<string>(options[0].value);
@@ -55,7 +60,7 @@ export default function Select({
     window.addEventListener('click', onClose);
 
     return () => window.removeEventListener('click', onClose);
-  }, []);
+  }, [id]);
 
   return (
     <div className={`${SelectTypes[variant].labelGroupClass} ${className}`}>
@@ -64,7 +69,13 @@ export default function Select({
       </label>
 
       <div className={SelectTypes[variant].selectGroupClass}>
-        <select id={id} value={value} onChange={() => {}}>
+        <select
+          id={id}
+          name={name}
+          defaultValue={defaultValue}
+          value={value}
+          onChange={() => {}}
+        >
           {options.map((option) => (
             <option disabled hidden key={option.value} value={option.value}>
               {option.label}
@@ -93,6 +104,9 @@ export default function Select({
           ))}
         </ul>
       </div>
+
+      <Hint variant='error'>{errorHint}</Hint>
+      <Hint>{hint}</Hint>
     </div>
   );
 }

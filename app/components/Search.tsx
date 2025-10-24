@@ -1,28 +1,29 @@
 'use client';
 
-import { KeyboardEvent, useState } from 'react';
+import { KeyboardEvent, useRef } from 'react';
 import { Icon } from '@iconify/react';
 
-import { TextInputProps } from '@ts/ui/components-props';
+import { InputBaseProps } from '@ts/ui/components-props';
 
 import { getIconCode } from '@lib/utils';
 
-type SearchProps = Omit<TextInputProps, 'onChange' | 'value'> & {
+type SearchProps = Omit<InputBaseProps, 'label' | 'errorHint' | 'hint'> & {
+  placeholder?: string;
   onSearch: (query: string) => void;
 };
 
 export default function Search({
-  label,
   id,
+  name,
   placeholder,
   className = '',
   onSearch
 }: SearchProps) {
-  const [query, setQuery] = useState<string>('');
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const onSearchSubmit = () => {
-    if (query) {
-      onSearch(query);
+    if (searchRef.current?.value) {
+      onSearch(searchRef.current.value);
     }
   };
 
@@ -34,22 +35,18 @@ export default function Search({
 
   return (
     <div className={`input-select-group ${className}`}>
-      <label hidden={!label} htmlFor={id}>
-        {label}
-      </label>
-
-      <div className='search-group'>
+      <div className='input-wrapper'>
         <input
           id={id}
+          name={name}
+          ref={searchRef}
           type='search'
           placeholder={placeholder}
-          value={query}
-          onChange={(evt) => setQuery(evt.target.value)}
           onKeyDown={onEnterDown}
         />
 
         <Icon
-          className='search-icon'
+          className='input-icon'
           icon={getIconCode('search')}
           onClick={onSearchSubmit}
         />

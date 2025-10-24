@@ -4,9 +4,12 @@ import { ChangeEvent, useRef, useState } from 'react';
 
 import { SliderProps } from '@ts/ui/components-props';
 
+import Hint from './Hint';
+
 import '@styles/_number-inputs.scss';
 
 type DoubleSliderProps = SliderProps & {
+  defaultValues?: [number, number];
   valueUnit?: string;
   onChange?: (left: number, right: number) => void;
 };
@@ -17,14 +20,23 @@ const normalize = (value: number, min: number, max: number): number =>
 export default function DoubleSlider({
   label,
   id,
+  name,
   min,
   max,
   valueUnit,
   className = '',
+  errorHint,
+  hint,
+  defaultValues,
   onChange
 }: DoubleSliderProps) {
-  const [left, setLeft] = useState<number>(min);
-  const [right, setRight] = useState<number>(max);
+  const [left, setLeft] = useState<number>(
+    defaultValues ? defaultValues[0] : min
+  );
+
+  const [right, setRight] = useState<number>(
+    defaultValues ? defaultValues[1] : max
+  );
 
   const trackRef = useRef<HTMLInputElement>(null);
 
@@ -62,6 +74,7 @@ export default function DoubleSlider({
         <input
           type='range'
           id={id}
+          name={name}
           className='left'
           value={left}
           min={min}
@@ -71,6 +84,7 @@ export default function DoubleSlider({
         <input
           type='range'
           id={`${id}-right`}
+          name={`${name}-right`}
           className='right'
           value={right}
           min={min}
@@ -79,6 +93,9 @@ export default function DoubleSlider({
         />
         <div className='slider-track' ref={trackRef}></div>
       </div>
+
+      <Hint variant='error'>{errorHint}</Hint>
+      <Hint>{hint}</Hint>
     </div>
   );
 }

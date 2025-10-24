@@ -3,14 +3,18 @@
 import { InputBaseProps, Option } from '@ts/ui/components-props';
 
 import BinaryInput from './BinaryInput';
+import Hint from './Hint';
 
 type RadioGroupProps = Omit<InputBaseProps, 'id'> & {
   type?: 'radio' | 'checkbox';
-  name: string;
   options: Option[];
+  defaultValue?: string | string[];
   value?: string | string[];
   onChange?: (value: string | string[]) => void;
 };
+
+const isChecked = (current: string | string[] | undefined, value: string) =>
+  typeof current === 'undefined' ? undefined : current.includes(value);
 
 export default function RadioCheckboxGroup({
   label,
@@ -18,7 +22,10 @@ export default function RadioCheckboxGroup({
   type = 'radio',
   className = '',
   options,
+  defaultValue,
   value,
+  hint,
+  errorHint,
   onChange
 }: RadioGroupProps) {
   const onCheck = (id: string) =>
@@ -46,11 +53,15 @@ export default function RadioCheckboxGroup({
             id={option.value}
             name={name}
             label={option.label}
-            value={value ? value === option.value : undefined}
+            defaultValue={isChecked(defaultValue, option.value)}
+            value={isChecked(value, option.value)}
             onChange={onCheck(option.value)}
           />
         ))}
       </div>
+
+      <Hint variant='error'>{errorHint}</Hint>
+      <Hint>{hint}</Hint>
     </div>
   );
 }

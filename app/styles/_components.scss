@@ -118,3 +118,18 @@ $border-radius: 6px;
     }
   }
 }
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.5rem;
+  width: 22rem;
+  padding: 1.25rem;
+  border-radius: utils.$regular-radius;
+
+  h1,
+  span {
+    text-align: center;
+  }
+}

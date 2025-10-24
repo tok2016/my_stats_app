@@ -1,11 +1,18 @@
+import { ReactNode } from 'react';
+
 export interface InputBaseProps {
   label?: string;
   id: string;
+  name: string;
   className?: string;
+  hint?: ReactNode;
+  errorHint?: ReactNode;
 }
 
-export interface TextInputProps extends InputBaseProps {
+export interface TextInputProps extends InputBaseProps, InputHintProps {
+  required?: boolean;
   placeholder?: string;
+  defaultValue?: string;
   value?: string;
   onChange?: (value: string) => void;
 }

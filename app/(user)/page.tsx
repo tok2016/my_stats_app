@@ -4,8 +4,6 @@ import Button from '@components/Button';
 import Divider from '@components/Divider';
 import UserSearch from './components/UserSearch';
 
-import '@styles/user-pages.scss';
-
 export default function Guest() {
   return (
     <div className='guest-page'>
@@ -14,7 +12,7 @@ export default function Guest() {
       </h1>
 
       <div className='guest-page-form'>
-        <Link href='/login'>
+        <Link href='/register'>
           <Button variant='primary'>Start</Button>
         </Link>
 
