@@ -6,6 +6,7 @@ import { BasicUser, User, UserInfoInSchema } from '@ts/users/user';
 import Dashboard from '@ts/users/dashboard';
 import ErrorResponse, { ValidationIssue } from '@ts/requests';
 import FormState from '@ts/ui/form-state';
+import { ConfirmationInfo } from '@ts/users/confirmation';
 
 import { isAxiosError } from './axios-instanse';
 
@@ -15,7 +16,7 @@ export const MILLISECONDS = 1000;
 
 export const FOUND_USERS_LIMIT = 5;
 
-const SIX_CODE_MULT = 1000000;
+export const CODE_LENGTH = 6;
 
 const SUCCESS_CODE_START = 200;
 const SUCCESS_CODE_END = 300;
@@ -47,6 +48,13 @@ export const defaultFormState = <FormDataType>(): FormState<FormDataType> => ({
   message: ''
 });
 
+export const defaultConfirmation: ConfirmationInfo = {
+  isConfirmed: false,
+  id: '',
+  credential: '',
+  action: 'password'
+};
+
 export const isErrorResponse = (value: unknown): value is ErrorResponse =>
   (value as ErrorResponse).message !== undefined;
 
@@ -75,7 +83,7 @@ export const uniteUserData = (
 });
 
 export const generateCode = () =>
-  Math.floor(Math.random() * SIX_CODE_MULT).toString();
+  Math.floor(Math.random() * Math.pow(10, CODE_LENGTH)).toString();
 
 export const generateErrorResponse = (
   status: number,

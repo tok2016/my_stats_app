@@ -139,6 +139,12 @@ $modules: 'user', 'music', 'games';
 
     .light {
       background-color: map.get(utils.$text-colors, $module);
+      box-shadow: 0
+        0
+        utils.$blur
+        utils.$spread
+        map.get(utils.$text-colors, $module);
+
       h1,
       h2,
       h3,

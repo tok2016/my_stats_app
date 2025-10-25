@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
 export interface InputBaseProps {
-  label?: string;
+  label?: ReactNode;
   id: string;
   name: string;
   className?: string;

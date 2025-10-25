@@ -1,30 +1,29 @@
-'use server';
+import {
+  ConfirmationBaseAction,
+  ConfirmationInfo
+} from '@ts/users/confirmation';
 
-import { cookies } from 'next/headers';
+import AxiosInstanse from './axios-instanse';
+import { defaultConfirmation } from './utils';
 
-export const setTokenCookies = async (
-  accessToken: string,
-  refreshToken?: string
-) => {
-  const cookiesStorage = await cookies();
-  cookiesStorage.set('accessToken', accessToken);
-
-  if (refreshToken) {
-    cookiesStorage.set('refreshToken', refreshToken);
+export const getOperation = async (): Promise<ConfirmationInfo> => {
+  try {
+    const response = await AxiosInstanse.get<ConfirmationInfo>('/api/confirm');
+    return response.data;
+  } catch {
+    return defaultConfirmation;
   }
 };
 
-export const setCookie = async (name: string, value: string) => {
-  const cookiesStorage = await cookies();
-  cookiesStorage.set(name, value);
-};
+export const requestConfimation: ConfirmationBaseAction = async (
+  _prev,
+  formData
+) => {
+  const body = Object.fromEntries(formData.entries());
+  const response = await AxiosInstanse.post<ConfirmationInfo>(
+    '/api/confirm',
+    body
+  );
 
-export const getCookies = async (name: string) => {
-  const cookiesStorage = await cookies();
-  return cookiesStorage.get(name)?.value;
-};
-
-export const deleteCookie = async (name: string) => {
-  const cookiesStorage = await cookies();
-  cookiesStorage.delete(name);
+  return response.data;
 };

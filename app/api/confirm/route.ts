@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 import {
   ConfirmationCode,
@@ -14,6 +15,33 @@ import {
   validateData
 } from '@lib/validationSchemas';
 import { generateCode, responseWithError } from '@lib/utils';
+
+export async function GET() {
+  const cookiesStore = await cookies();
+  const operationId = cookiesStore.get('operation');
+
+  if (!operationId) {
+    return responseWithError(401, 'Operation was not given');
+  }
+
+  const operation = await ConfirmationsModel.findById(operationId);
+
+  if (!operation) {
+    return responseWithError(404, 'Operation was not found');
+  }
+
+  const operationInfo: ConfirmationInfo = {
+    id: operation.id,
+    credential: operation.credential,
+    action: operation.action,
+    isConfirmed: operation.isConfirmed
+  };
+
+  return NextResponse.json(operationInfo, {
+    status: 200,
+    statusText: 'Operation is found and valid'
+  });
+}
 
 export async function POST(req: NextRequest) {
   try {

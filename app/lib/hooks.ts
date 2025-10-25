@@ -1,4 +1,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useContext, useEffect, useState } from 'react';
+
+import { ConfirmationContext } from '@store/ConfirmationProvider';
 
 export const useURLSearchParams = () => {
   const searchParams = useSearchParams();
@@ -21,3 +24,25 @@ export const useURLSearchParams = () => {
 
   return { getParam, setParam, deleteParam } as const;
 };
+
+export const useFetch = <T>(action: () => Promise<T>, initialData: T) => {
+  const [data, setData] = useState<T>(initialData);
+  const [isPending, setPending] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const fetched = await action();
+      setData(fetched);
+      setPending(false);
+    };
+
+    console.log('fetch effect');
+
+    setPending(true);
+    fetchData();
+  }, [action]);
+
+  return [data, setData, isPending] as const;
+};
+
+export const useConfirm = () => useContext(ConfirmationContext);

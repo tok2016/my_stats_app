@@ -3,16 +3,14 @@
 import Link from 'next/link';
 import { useActionState } from 'react';
 
-import { NewCredentials } from '@ts/users/credentials';
-
-import Button from '@components/Button';
 import Input from '@components/Input';
 import { register } from '../actions';
 import { defaultFormState, getFormDataValue } from '@lib/utils';
+import SubmitButton from '@components/SubmitButton';
 
 export default function RegisterPage() {
   const [state, action, isPending] = useActionState(
-    register<NewCredentials>,
+    register,
     defaultFormState()
   );
 
@@ -70,9 +68,12 @@ export default function RegisterPage() {
         errorHint={state.issues?.repeatPassword}
       />
 
-      <Button variant='primary' type='submit' loading={isPending}>
+      <SubmitButton
+        loading={isPending}
+        errorHint={state.issues ? undefined : state.message}
+      >
         Sign up
-      </Button>
+      </SubmitButton>
 
       <span>
         Already have an account?{' '}

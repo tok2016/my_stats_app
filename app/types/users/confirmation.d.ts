@@ -2,6 +2,8 @@ import { Types } from 'mongoose';
 
 import { ConfirmationActions } from '@lib/utils';
 
+export type ConfirmationState = 'void' | 'pending' | 'confirmed';
+
 export type ConfirmationAction = (typeof ConfirmationActions)[number];
 
 export interface NewConfirmation {
@@ -28,3 +30,8 @@ export default interface Confirmation extends ConfirmationInfo {
 export type ConfirmationInSchema = Omit<Confirmation, 'id'> & {
   _id: Types.ObjectId;
 };
+
+export type ConfirmationBaseAction = (
+  prev: ConfirmationInfo,
+  formData: FormData
+) => Promise<ConfirmationInfo>;

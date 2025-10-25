@@ -207,3 +207,9 @@ button {
 a button {
   width: 100%;
 }
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: utils.$input-label-gap;
+}
