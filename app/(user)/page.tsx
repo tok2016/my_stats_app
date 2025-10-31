@@ -12,7 +12,7 @@ export default function Guest() {
       </h1>
 
       <div className='guest-page-form'>
-        <Link href='/register'>
+        <Link href='/login'>
           <Button variant='primary'>Start</Button>
         </Link>
 

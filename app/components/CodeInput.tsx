@@ -2,6 +2,7 @@
 
 import {
   ChangeEvent,
+  ClipboardEvent,
   createRef,
   KeyboardEvent,
   RefObject,
@@ -84,6 +85,20 @@ export default function CodeInput({
     }
   };
 
+  const onPaste = (evt: ClipboardEvent) => {
+    evt.preventDefault();
+
+    const code = evt.clipboardData.getData('text').trim();
+
+    for (let i = 0; i < code.length; i++) {
+      numberRefs.current[i].current.value = code[i];
+    }
+
+    if (codeRef.current) {
+      codeRef.current.value = code;
+    }
+  };
+
   return (
     <div className={`input-select-group ${className}`}>
       <label hidden={!label} htmlFor={`${id}-0`}>
@@ -102,6 +117,8 @@ export default function CodeInput({
             onChange={onNumberChange(i)}
             onFocus={onNumberFocus(i)}
             onKeyDown={onArrowDown(i)}
+            onPaste={onPaste}
+            autoComplete='off'
             placeholder=''
           />
         ))}

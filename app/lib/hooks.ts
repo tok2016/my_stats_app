@@ -1,7 +1,10 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useContext, useEffect, useState } from 'react';
+import { useActionState, useContext, useEffect, useState } from 'react';
+
+import FormState, { FormAction } from '@ts/ui/form-state';
 
 import { ConfirmationContext } from '@store/ConfirmationProvider';
+import { defaultFormState } from './utils';
 
 export const useURLSearchParams = () => {
   const searchParams = useSearchParams();
@@ -36,8 +39,6 @@ export const useFetch = <T>(action: () => Promise<T>, initialData: T) => {
       setPending(false);
     };
 
-    console.log('fetch effect');
-
     setPending(true);
     fetchData();
   }, [action]);
@@ -46,3 +47,28 @@ export const useFetch = <T>(action: () => Promise<T>, initialData: T) => {
 };
 
 export const useConfirm = () => useContext(ConfirmationContext);
+
+export const useRedirectActionForm = <DataType>(
+  baseAction: FormAction<DataType>,
+  path: string,
+  initialState: FormState<DataType> = defaultFormState()
+) => {
+  const { replace } = useRouter();
+
+  const redirectAction: FormAction<DataType> = async (prev, data) => {
+    const next = await baseAction(prev, data);
+
+    if (!next.error) {
+      replace(path);
+    }
+
+    return next;
+  };
+
+  const [state, action, isPending] = useActionState(
+    redirectAction,
+    initialState
+  );
+
+  return [state, action, isPending] as const;
+};

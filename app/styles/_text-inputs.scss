@@ -151,6 +151,7 @@ $code-input-padding-x: 0.75rem;
     width: $input-min-height - (2 * $code-input-padding-x);
     min-height: $input-min-height;
     padding: 0 $code-input-padding-x;
+    text-align: center;
   }
 }
 

@@ -4,7 +4,7 @@ import { NewDashboard } from '@ts/users/dashboard';
 import { UserLogin, UserUpdate } from '@ts/users/user';
 import { NewService } from '@ts/users/service';
 import { NewCredentials } from '@ts/users/credentials';
-import PasswordUpdate, { NewPassword } from '@ts/users/password';
+import Password, { NewPassword, PasswordUpdate } from '@ts/users/password';
 
 import {
   ConfirmationActions,
@@ -21,28 +21,35 @@ const MAX_USERNAME_LENGTH = 32;
 const PASSWORD_MIN_LENGTH = 8;
 const PASSWORD_MAX_LENGTH = 32;
 
-export const CredentialsValidator: z.ZodType<NewCredentials> = z
+const PasswordValidator: z.ZodType<Password> = z
   .object({
-    email: z.email().nonempty(),
-    username: z
-      .string()
-      .nonempty()
-      .min(MIN_USERNAME_LENGTH)
-      .max(MAX_USERNAME_LENGTH),
     password: z
       .string()
+      .trim()
       .nonempty()
       .regex(/[a-zA-Z]+/g)
       .regex(/\d+/g)
       .regex(/[?!#+-@$&*]*/g)
       .min(PASSWORD_MIN_LENGTH)
       .max(PASSWORD_MAX_LENGTH),
-    repeatPassword: z.string().nonempty()
+    repeatPassword: z.string().trim().nonempty()
   })
   .refine((data) => data.password === data.repeatPassword, {
     error: `Passwords don't match`,
     path: ['repeatPassword']
   });
+
+export const CredentialsValidator: z.ZodType<NewCredentials> =
+  PasswordValidator.and(
+    z.object({
+      email: z.email().nonempty(),
+      username: z
+        .string()
+        .nonempty()
+        .min(MIN_USERNAME_LENGTH)
+        .max(MAX_USERNAME_LENGTH)
+    })
+  );
 
 export const DashboardValidator: z.ZodType<NewDashboard> = z.object({
   object: z.string().nonempty(),
@@ -71,7 +78,7 @@ export const UserUpdateValidator: z.ZodType<UserUpdate> = z
 
 export const UserLoginValidator: z.ZodType<UserLogin> = z.object({
   credential: z.string().nonempty(),
-  password: z.string().nonempty()
+  password: z.string().trim().nonempty()
 });
 
 export const ServiceValidator: z.ZodType<NewService> = z.object({
@@ -80,10 +87,12 @@ export const ServiceValidator: z.ZodType<NewService> = z.object({
   status: z.enum(ServiceStatuses).default('unknown')
 });
 
-export const PasswordUpdateValidator: z.ZodType<PasswordUpdate> = z.object({
-  old: z.string().nonempty(),
-  new: z.string().nonempty()
-});
+export const PasswordUpdateValidator: z.ZodType<PasswordUpdate> =
+  PasswordValidator.and(
+    z.object({
+      oldPassword: z.string().trim().nonempty()
+    })
+  );
 
 export const NewConfirmationValidator: z.ZodType<NewConfirmation> = z.object({
   credential: z.string().nonempty(),
@@ -99,7 +108,12 @@ export const ConfirmationCodeValidator: z.ZodType<ConfirmationCode> =
   );
 
 export const NewPasswordValidatior: z.ZodType<NewPassword> =
-  UserLoginValidator.and(z.object({ operationId: z.string().nonempty() }));
+  PasswordValidator.and(
+    z.object({
+      credential: z.string().nonempty(),
+      operationId: z.string().nonempty()
+    })
+  );
 
 export const validateData = async <
   DataType,

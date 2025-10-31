@@ -1,15 +1,15 @@
 'use client';
 
-import { useActionState } from 'react';
 import Link from 'next/link';
 
 import Input from '@components/Input';
-import { defaultFormState, getFormDataValue } from '@lib/utils';
+import { getFormDataValue } from '@lib/utils';
 import { login } from '../actions';
 import SubmitButton from '@components/SubmitButton';
+import { useRedirectActionForm } from '@lib/hooks';
 
 export default function LoginPage() {
-  const [state, action, isPending] = useActionState(login, defaultFormState());
+  const [state, action, isPending] = useRedirectActionForm(login, '/iam');
 
   return (
     <form className='card light' action={action} noValidate>
@@ -26,13 +26,13 @@ export default function LoginPage() {
       />
 
       <Input
-        type='text'
+        type='password'
         id='password'
         name='password'
         label='Password'
         errorHint={state.issues?.password}
         hint={
-          <Link href='/confirm-login' className='colored bold underline'>
+          <Link href='/reset-password' className='colored bold underline'>
             Forgot password?
           </Link>
         }
@@ -41,7 +41,8 @@ export default function LoginPage() {
 
       <SubmitButton
         loading={isPending}
-        errorHint={state.issues ? undefined : state.message}
+        error={state.error || !!state.issues}
+        errorHint={state.message}
       >
         Sign in
       </SubmitButton>

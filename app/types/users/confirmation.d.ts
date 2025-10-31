@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+import { ReactNode } from 'react';
 
 import { ConfirmationActions } from '@lib/utils';
 
@@ -35,3 +36,8 @@ export type ConfirmationBaseAction = (
   prev: ConfirmationInfo,
   formData: FormData
 ) => Promise<ConfirmationInfo>;
+
+export type ConfirmationFormProps = {
+  baseAction: ConfirmationBaseAction;
+  addendum?: ReactNode;
+};

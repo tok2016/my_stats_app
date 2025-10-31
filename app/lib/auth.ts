@@ -8,6 +8,7 @@ import { User } from '@ts/users/user';
 import { UserAccess } from '@ts/users/user';
 import Credentials, { CredentialsInSchema } from '@ts/users/credentials';
 import Dashboard from '@ts/users/dashboard';
+import Confirmation, { ConfirmationInfo } from '@ts/users/confirmation';
 
 import { CredentialsModel, DashboardsModel, UsersModel } from './models';
 import {
@@ -208,4 +209,18 @@ export const getDashboards = async (userId: string): Promise<Dashboard[]> => {
     ...dashboard,
     id: dashboard._id.toString()
   }));
+};
+
+export const generateConfirmationResponse = (operation: Confirmation) => {
+  const operationInfo: ConfirmationInfo = {
+    id: operation.id,
+    credential: operation.credential,
+    action: operation.action,
+    isConfirmed: operation.isConfirmed
+  };
+
+  return NextResponse.json(operationInfo, {
+    status: 202,
+    statusText: 'Confirmation operation was accepted'
+  });
 };

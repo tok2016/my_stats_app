@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import bcrypt from 'bcrypt';
 
-import PasswordUpdate from '@ts/users/password';
+import { PasswordUpdate } from '@ts/users/password';
 
 import {
   extractToken,
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     );
 
     const arePasswordsSame = await bcrypt.compare(
-      passwordUpdate.old,
+      passwordUpdate.oldPassword,
       credentials.password
     );
 
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       return responseWithError(400, 'Wrong old password');
     }
 
-    const hashedPassword = await hashPassword(passwordUpdate.new);
+    const hashedPassword = await hashPassword(passwordUpdate.password);
     await CredentialsModel.findByIdAndUpdate(
       token.id,
       { password: hashedPassword },

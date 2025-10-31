@@ -7,6 +7,7 @@ import Dashboard from '@ts/users/dashboard';
 import ErrorResponse, { ValidationIssue } from '@ts/requests';
 import FormState from '@ts/ui/form-state';
 import { ConfirmationInfo } from '@ts/users/confirmation';
+import { NewPassword } from '@ts/users/password';
 
 import { isAxiosError } from './axios-instanse';
 
@@ -17,6 +18,8 @@ export const MILLISECONDS = 1000;
 export const FOUND_USERS_LIMIT = 5;
 
 export const CODE_LENGTH = 6;
+
+export const CONFIRMATION_TTL = 30 * 60;
 
 const SUCCESS_CODE_START = 200;
 const SUCCESS_CODE_END = 300;
@@ -55,6 +58,13 @@ export const defaultConfirmation: ConfirmationInfo = {
   action: 'password'
 };
 
+export const defaultNewPassword: NewPassword = {
+  credential: '',
+  operationId: '',
+  password: '',
+  repeatPassword: ''
+};
+
 export const isErrorResponse = (value: unknown): value is ErrorResponse =>
   (value as ErrorResponse).message !== undefined;
 
@@ -83,7 +93,13 @@ export const uniteUserData = (
 });
 
 export const generateCode = () =>
-  Math.floor(Math.random() * Math.pow(10, CODE_LENGTH)).toString();
+  Math.floor(Math.random() * Math.pow(10, CODE_LENGTH)).toLocaleString(
+    'en-US',
+    {
+      minimumIntegerDigits: CODE_LENGTH,
+      useGrouping: false
+    }
+  );
 
 export const generateErrorResponse = (
   status: number,
@@ -114,7 +130,7 @@ export const clamp = (value: number, min: number, max: number) => {
 
 export const getErrorFormState = <FormDataType>(
   err: unknown,
-  data: FormData
+  data?: FormData
 ): FormState<FormDataType> => {
   if (isAxiosError(err)) {
     if (isErrorResponse(err.response?.data)) {

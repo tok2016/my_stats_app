@@ -9,9 +9,18 @@ import { MILLISECONDS } from '@lib/utils';
 const SECONDS_UNAVAILABLE = 60;
 const SECONDS_IN_MINUTE = 60;
 
+const MIN_TIME_DIGITS = 2;
+
 const formatSeconds = (seconds: number) => {
-  const minutes = Math.floor(seconds / SECONDS_IN_MINUTE);
-  const secondsModules = Math.round(seconds % SECONDS_IN_MINUTE);
+  const minutes = Math.floor(seconds / SECONDS_IN_MINUTE).toLocaleString(
+    'en-US',
+    { minimumIntegerDigits: MIN_TIME_DIGITS }
+  );
+
+  const secondsModules = Math.round(seconds % SECONDS_IN_MINUTE).toLocaleString(
+    'en-US',
+    { minimumIntegerDigits: MIN_TIME_DIGITS }
+  );
 
   return `${minutes}:${secondsModules}`;
 };
@@ -25,23 +34,21 @@ export default function SendAgainTimer() {
       MILLISECONDS
     );
 
-    console.log(seconds);
-
     return () => {
       clearTimeout(timer);
     };
   }, [seconds]);
 
   return (
-    <>
+    <div className='send-again-timer'>
       <p className='colored bold'>{formatSeconds(seconds)}</p>
 
       <div className='button-group'>
         <Hint>Haven’t got a code yet?</Hint>
-        <Button variant='secondary' disabled={seconds > 0}>
+        <Button variant='outlined' disabled={seconds > 0} type='button'>
           Send again
         </Button>
       </div>
-    </>
+    </div>
   );
 }

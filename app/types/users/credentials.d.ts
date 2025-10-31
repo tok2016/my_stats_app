@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+import Password from './password';
 
 interface BaseCredentials {
   email: string;
@@ -6,9 +7,7 @@ interface BaseCredentials {
   password: string;
 }
 
-export interface NewCredentials extends BaseCredentials {
-  repeatPassword: string;
-}
+export type NewCredentials = BaseCredentials & Password;
 
 export default interface Credentials extends BaseCredentials {
   id: string;

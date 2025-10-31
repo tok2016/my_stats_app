@@ -7,18 +7,22 @@ import {
   NewConfirmation
 } from '@ts/users/confirmation';
 
-import { generateAccessError, getCredentials } from '@lib/auth';
+import {
+  generateAccessError,
+  generateConfirmationResponse,
+  getCredentials
+} from '@lib/auth';
 import { ConfirmationsModel } from '@lib/models';
 import {
   ConfirmationCodeValidator,
   NewConfirmationValidator,
   validateData
 } from '@lib/validationSchemas';
-import { generateCode, responseWithError } from '@lib/utils';
+import { CONFIRMATION_TTL, generateCode, responseWithError } from '@lib/utils';
 
 export async function GET() {
   const cookiesStore = await cookies();
-  const operationId = cookiesStore.get('operation');
+  const operationId = cookiesStore.get('operation')?.value;
 
   if (!operationId) {
     return responseWithError(401, 'Operation was not given');
@@ -45,12 +49,32 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const cookiesStore = await cookies();
+    const operationId = cookiesStore.get('operation')?.value;
+
     const newConfirmation = await validateData<NewConfirmation>(
       NewConfirmationValidator,
       await req.json()
     );
 
     const credentials = await getCredentials(newConfirmation.credential);
+
+    if (operationId) {
+      const currentOperation =
+        await ConfirmationsModel.findById(operationId).lean();
+
+      if (
+        currentOperation
+        && (currentOperation.credential === credentials.email
+          || currentOperation.credential === credentials.username)
+      ) {
+        return generateConfirmationResponse({
+          ...currentOperation,
+          id: currentOperation._id.toString()
+        });
+      }
+    }
+
     const userCodes = await ConfirmationsModel.find({
       credential: credentials.username
     }).lean();
@@ -61,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     const code = generateCode();
     const operation = await ConfirmationsModel.create({
-      credential: credentials.username,
+      credential: credentials.email,
       action: newConfirmation.action,
       code
     });
@@ -69,16 +93,15 @@ export async function POST(req: NextRequest) {
     //send email with code
     console.log(code);
 
-    const operationInfo: ConfirmationInfo = {
-      id: operation.id,
-      credential: operation.credential,
-      action: operation.action,
-      isConfirmed: false
-    };
+    cookiesStore.set('operation', operation.id, {
+      maxAge: CONFIRMATION_TTL,
+      httpOnly: true
+    });
 
-    return NextResponse.json(operationInfo, {
-      status: 202,
-      statusText: 'Confirmation operation was accepted'
+    return generateConfirmationResponse({
+      ...operation,
+      id: operation._id.toString(),
+      isConfirmed: false
     });
   } catch (err) {
     return generateAccessError(err);
@@ -113,16 +136,9 @@ export async function PUT(req: NextRequest) {
       return responseWithError(400, 'Operation was not found');
     }
 
-    const operationInfo: ConfirmationInfo = {
-      id: updatedOperation._id.toString(),
-      credential: updatedOperation.credential,
-      action: updatedOperation.action,
-      isConfirmed: updatedOperation.isConfirmed
-    };
-
-    return NextResponse.json(operationInfo, {
-      status: 200,
-      statusText: 'Operation was confirmed'
+    return generateConfirmationResponse({
+      ...updatedOperation,
+      id: updatedOperation._id.toString()
     });
   } catch (err) {
     return generateAccessError(err);

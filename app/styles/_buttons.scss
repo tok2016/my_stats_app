@@ -14,6 +14,7 @@ button {
   min-width: 6.25rem;
   border-radius: utils.$regular-radius;
   border: none;
+  cursor: pointer;
 
   svg {
     font-size: $button-icon-size;

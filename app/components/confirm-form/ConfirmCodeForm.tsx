@@ -1,10 +1,10 @@
 'use client';
 
-import { ReactNode, useActionState } from 'react';
+import { useActionState } from 'react';
 
 import {
-  ConfirmationBaseAction,
-  ConfirmationCode
+  ConfirmationCode,
+  ConfirmationFormProps
 } from '@ts/users/confirmation';
 
 import { defaultFormState } from '@lib/utils';
@@ -13,19 +13,14 @@ import SendAgainTimer from './SendAgainTimer';
 import { useConfirm } from '@lib/hooks';
 import CodeInput from '@components/CodeInput';
 
-type ConfirmCodePage = {
-  formAction: ConfirmationBaseAction;
-  addendum: ReactNode;
-};
-
-export default function ConfirmCodePage({
-  formAction,
+export default function ConfirmCodeForm({
+  baseAction,
   addendum
-}: ConfirmCodePage) {
+}: ConfirmationFormProps) {
   const { getFormAction, confirmation } = useConfirm();
 
   const [state, action, isPending] = useActionState(
-    getFormAction<ConfirmationCode>(formAction),
+    getFormAction<ConfirmationCode>(baseAction),
     defaultFormState()
   );
 
@@ -49,7 +44,8 @@ export default function ConfirmCodePage({
 
       <SubmitButton
         loading={isPending}
-        errorHint={state.issues ? undefined : state.message}
+        error={state.error || !!state.issues}
+        errorHint={state.message}
       >
         Continue
       </SubmitButton>

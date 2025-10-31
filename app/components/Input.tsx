@@ -52,6 +52,7 @@ export default function Input({
           placeholder={placeholder}
           defaultValue={defaultValue}
           value={value}
+          autoComplete={type === 'password' ? 'off' : 'on'}
           onChange={onValueChange}
         />
 

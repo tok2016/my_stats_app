@@ -7,12 +7,14 @@ import Hint from './Hint';
 
 type SubmitButtonProps = {
   loading?: boolean;
+  error?: boolean;
   children?: ReactNode;
   errorHint?: ReactNode;
 };
 
 export default function SubmitButton({
   loading,
+  error,
   children,
   errorHint
 }: SubmitButtonProps) {
@@ -21,7 +23,7 @@ export default function SubmitButton({
       <Button variant='primary' type='submit' loading={loading}>
         {children}
       </Button>
-      <Hint variant='error'>{errorHint}</Hint>
+      {error || <Hint variant='error'>{errorHint}</Hint>}
     </div>
   );
 }

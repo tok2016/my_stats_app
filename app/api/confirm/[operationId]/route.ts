@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { ConfirmationsModel } from '@lib/models';
 import { generateCode, responseWithError } from '@lib/utils';
-import { ConfirmationInfo } from '@ts/users/confirmation';
+import { generateConfirmationResponse } from '@lib/auth';
 
 export async function PUT(
   _req: NextRequest,
@@ -23,16 +23,10 @@ export async function PUT(
   //send email with new code
   console.log(newCode);
 
-  const confirmationInfo: ConfirmationInfo = {
+  return generateConfirmationResponse({
+    ...updatedConfirmation,
     id: updatedConfirmation._id.toString(),
-    credential: updatedConfirmation.credential,
-    action: updatedConfirmation.action,
     isConfirmed: false
-  };
-
-  return NextResponse.json(confirmationInfo, {
-    status: 200,
-    statusText: 'Confirmation code was updated'
   });
 }
 

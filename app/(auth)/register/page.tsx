@@ -1,18 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
 
 import Input from '@components/Input';
 import { register } from '../actions';
-import { defaultFormState, getFormDataValue } from '@lib/utils';
+import { getFormDataValue } from '@lib/utils';
 import SubmitButton from '@components/SubmitButton';
+import PasswordHint from '@components/password-form/PasswordHint';
+import { useRedirectActionForm } from '@lib/hooks';
 
 export default function RegisterPage() {
-  const [state, action, isPending] = useActionState(
-    register,
-    defaultFormState()
-  );
+  const [state, action, isPending] = useRedirectActionForm(register, '/iam');
 
   return (
     <form className='card light' action={action} noValidate>
@@ -47,15 +45,7 @@ export default function RegisterPage() {
         required
         defaultValue={getFormDataValue('password', state.data)}
         errorHint={state.issues?.password}
-        hint={
-          <>
-            <p className='hint'>Must include at least:</p>
-            <ul className='hint'>
-              <li>1 number and letter,</li>
-              <li>8 symbols overall</li>
-            </ul>
-          </>
-        }
+        hint={<PasswordHint />}
       />
 
       <Input
@@ -70,7 +60,8 @@ export default function RegisterPage() {
 
       <SubmitButton
         loading={isPending}
-        errorHint={state.issues ? undefined : state.message}
+        error={state.error || !!state.issues}
+        errorHint={state.message}
       >
         Sign up
       </SubmitButton>

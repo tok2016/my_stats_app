@@ -1,10 +1,13 @@
-import { UserLogin } from './user';
-
-export default interface PasswordUpdate {
-  old: string;
-  new: string;
+export default interface Password {
+  password: string;
+  repeatPassword: string;
 }
 
-export interface NewPassword extends UserLogin {
+export interface PasswordUpdate extends Password {
+  oldPassword: string;
+}
+
+export interface NewPassword extends Password {
+  credential: string;
   operationId: string;
 }

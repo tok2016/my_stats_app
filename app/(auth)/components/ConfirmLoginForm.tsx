@@ -2,22 +2,17 @@
 
 import { useActionState } from 'react';
 
-import {
-  ConfirmationBaseAction,
-  NewConfirmation
-} from '@ts/users/confirmation';
+import { ConfirmationFormProps, NewConfirmation } from '@ts/users/confirmation';
 
 import { defaultFormState, getFormDataValue } from '@lib/utils';
 import Input from '@components/Input';
 import SubmitButton from '@components/SubmitButton';
-import Reminder from '@components/confirm-form/Reminder';
 import { useConfirm } from '@lib/hooks';
 
 export default function ConfirmLoginForm({
-  baseAction
-}: {
-  baseAction: ConfirmationBaseAction;
-}) {
+  baseAction,
+  addendum
+}: ConfirmationFormProps) {
   const { getFormAction } = useConfirm();
 
   const [state, action, isPending] = useActionState(
@@ -41,12 +36,13 @@ export default function ConfirmLoginForm({
 
       <SubmitButton
         loading={isPending}
-        errorHint={state.issues ? undefined : state.message}
+        error={state.error || !!state.issues}
+        errorHint={state.message}
       >
         Continue
       </SubmitButton>
 
-      <Reminder />
+      {addendum}
     </form>
   );
 }

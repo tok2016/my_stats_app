@@ -1,10 +1,11 @@
 import { UserAccess, UserLogin } from '@ts/users/user';
 import FormState from '@ts/ui/form-state';
-import { ConfirmationInfo } from '@ts/users/confirmation';
+import { ConfirmationBaseAction } from '@ts/users/confirmation';
 import { NewCredentials } from '@ts/users/credentials';
 
-import { defaultConfirmation, getErrorFormState } from '@lib/utils';
+import { getErrorFormState } from '@lib/utils';
 import AxiosInstanse from '@lib/axios-instanse';
+import { NewPassword } from '@ts/users/password';
 
 export const register = async (
   _state: FormState<NewCredentials>,
@@ -42,11 +43,16 @@ export const login = async (
   }
 };
 
-export const getOperation = async (): Promise<ConfirmationInfo> => {
-  try {
-    const response = await AxiosInstanse.get<ConfirmationInfo>('/api/confirm');
-    return response.data;
-  } catch {
-    return defaultConfirmation;
-  }
+export const resetPassword: ConfirmationBaseAction = async (prev, formData) => {
+  const passwordData = Object.fromEntries(
+    formData.entries()
+  ) as Partial<NewPassword>;
+  const body: Partial<NewPassword> = {
+    ...passwordData,
+    credential: prev.credential,
+    operationId: prev.id
+  };
+
+  await AxiosInstanse.post('/api/resetPassword', body);
+  return prev;
 };
