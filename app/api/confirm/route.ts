@@ -1,29 +1,69 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { cookies } from 'next/headers';
 
-import { ConfirmationInfo } from '@ts/users/confirmation';
+import { ConfirmationCode, NewConfirmation } from '@ts/users/confirmation';
 
-import { generateAccessError, getCredentials } from '@lib/auth';
+import {
+  generateAccessError,
+  generateConfirmationResponse,
+  getCredentials
+} from '@lib/auth';
 import { ConfirmationsModel } from '@lib/models';
 import {
   ConfirmationCodeValidator,
-  NewConfirmationValidator
+  NewConfirmationValidator,
+  validateData
 } from '@lib/validationSchemas';
-import { generateCode } from '@lib/utils';
+import { CONFIRMATION_TTL, generateCode, responseWithError } from '@lib/utils';
 
-export async function POST(req: NextRequest) {
-  const newConfirmation = await NewConfirmationValidator.safeParseAsync(
-    await req.json()
-  );
+export async function GET() {
+  const cookiesStore = await cookies();
+  const operationId = cookiesStore.get('operation')?.value;
 
-  if (!newConfirmation.success) {
-    return NextResponse.json(newConfirmation.error.issues, {
-      status: 400,
-      statusText: 'Invalid data'
-    });
+  if (!operationId) {
+    return responseWithError(401, 'Operation was not given');
   }
 
+  const operation = await ConfirmationsModel.findById(operationId).lean();
+
+  if (!operation) {
+    return responseWithError(404, 'Operation was not found');
+  }
+
+  return generateConfirmationResponse({
+    ...operation,
+    id: operation._id.toString()
+  });
+}
+
+export async function POST(req: NextRequest) {
   try {
-    const credentials = await getCredentials(newConfirmation.data.credential);
+    const cookiesStore = await cookies();
+    const operationId = cookiesStore.get('operation')?.value;
+
+    const newConfirmation = await validateData<NewConfirmation>(
+      NewConfirmationValidator,
+      await req.json()
+    );
+
+    const credentials = await getCredentials(newConfirmation.credential);
+
+    if (operationId) {
+      const currentOperation =
+        await ConfirmationsModel.findById(operationId).lean();
+
+      if (
+        currentOperation
+        && (currentOperation.credential === credentials.email
+          || currentOperation.credential === credentials.username)
+      ) {
+        return generateConfirmationResponse({
+          ...currentOperation,
+          id: currentOperation._id.toString()
+        });
+      }
+    }
+
     const userCodes = await ConfirmationsModel.find({
       credential: credentials.username
     }).lean();
@@ -34,24 +74,25 @@ export async function POST(req: NextRequest) {
 
     const code = generateCode();
     const operation = await ConfirmationsModel.create({
-      credential: credentials.username,
-      action: newConfirmation.data.action,
+      credential: credentials.email,
+      action: newConfirmation.action,
       code
     });
 
     //send email with code
     console.log(code);
 
-    const operationInfo: ConfirmationInfo = {
-      id: operation.id,
+    cookiesStore.set('operation', operation.id, {
+      maxAge: CONFIRMATION_TTL,
+      httpOnly: true
+    });
+
+    return generateConfirmationResponse({
+      ...operation,
+      id: operation._id.toString(),
       credential: operation.credential,
       action: operation.action,
       isConfirmed: false
-    };
-
-    return NextResponse.json(operationInfo, {
-      status: 202,
-      statusText: 'Confirmation operation was accepted'
     });
   } catch (err) {
     return generateAccessError(err);
@@ -59,56 +100,38 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const confirmationCode = await ConfirmationCodeValidator.safeParseAsync(
-    await req.json()
-  );
+  try {
+    const confirmationCode = await validateData<ConfirmationCode>(
+      ConfirmationCodeValidator,
+      await req.json()
+    );
 
-  if (!confirmationCode.success) {
-    return NextResponse.json(confirmationCode.error.issues, {
-      status: 400,
-      statusText: 'Invalid data'
+    const operation = await ConfirmationsModel.findById(
+      confirmationCode.id
+    ).lean();
+    if (!operation) {
+      return responseWithError(404, 'Confirmation operation was not found');
+    }
+
+    if (confirmationCode.code !== operation.code) {
+      return responseWithError(400, 'Incorrect confirmation code');
+    }
+
+    const updatedOperation = await ConfirmationsModel.findByIdAndUpdate(
+      confirmationCode.id,
+      { isConfirmed: true },
+      { new: true }
+    ).lean();
+
+    if (!updatedOperation) {
+      return responseWithError(400, 'Operation was not found');
+    }
+
+    return generateConfirmationResponse({
+      ...updatedOperation,
+      id: updatedOperation._id.toString()
     });
+  } catch (err) {
+    return generateAccessError(err);
   }
-
-  const operation = await ConfirmationsModel.findById(
-    confirmationCode.data.id
-  ).lean();
-  if (!operation) {
-    return new NextResponse('Confirmation operation was not found', {
-      status: 404,
-      statusText: 'Confirmation operation was not found'
-    });
-  }
-
-  if (confirmationCode.data.code !== operation.code) {
-    return new NextResponse('Incorrect confirmation code', {
-      status: 400,
-      statusText: 'Incorrect confirmation code'
-    });
-  }
-
-  const updatedOperation = await ConfirmationsModel.findByIdAndUpdate(
-    confirmationCode.data.id,
-    { isConfirmed: true },
-    { new: true }
-  ).lean();
-
-  if (!updatedOperation) {
-    return new NextResponse('Operation was not found', {
-      status: 404,
-      statusText: 'Operation was not found'
-    });
-  }
-
-  const operationInfo: ConfirmationInfo = {
-    id: updatedOperation._id.toString(),
-    credential: updatedOperation.credential,
-    action: updatedOperation.action,
-    isConfirmed: updatedOperation.isConfirmed
-  };
-
-  return NextResponse.json(operationInfo, {
-    status: 200,
-    statusText: 'Operation was confirmed'
-  });
 }

@@ -1,3 +1,5 @@
+import '@styles/user-pages.scss';
+
 export default function UserLayout({
   children
 }: Readonly<{

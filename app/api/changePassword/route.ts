@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import bcrypt from 'bcrypt';
+
+import { PasswordUpdate } from '@ts/users/password';
 
 import {
   extractToken,
@@ -8,8 +10,9 @@ import {
   getCredentialsById,
   hashPassword
 } from '@lib/auth';
-import { PasswordUpdateValidator } from '@lib/validationSchemas';
+import { PasswordUpdateValidator, validateData } from '@lib/validationSchemas';
 import { CredentialsModel } from '@lib/models';
+import { responseWithError } from '@lib/utils';
 
 export async function POST(req: NextRequest) {
   const bearer = req.headers.get('Authorization');
@@ -18,30 +21,21 @@ export async function POST(req: NextRequest) {
     const token = await extractToken(bearer);
     const credentials = await getCredentialsById(token.id);
 
-    const passwordUpdate = await PasswordUpdateValidator.safeParseAsync(
+    const passwordUpdate = await validateData<PasswordUpdate>(
+      PasswordUpdateValidator,
       await req.json()
     );
 
-    if (!passwordUpdate.success) {
-      return NextResponse.json(passwordUpdate.error.issues, {
-        status: 400,
-        statusText: 'Invalid data'
-      });
-    }
-
     const arePasswordsSame = await bcrypt.compare(
-      passwordUpdate.data.old,
+      passwordUpdate.oldPassword,
       credentials.password
     );
 
     if (!arePasswordsSame) {
-      return new NextResponse('Wrong old password', {
-        status: 400,
-        statusText: 'Wrong old password'
-      });
+      return responseWithError(400, 'Wrong old password');
     }
 
-    const hashedPassword = await hashPassword(passwordUpdate.data.new);
+    const hashedPassword = await hashPassword(passwordUpdate.password);
     await CredentialsModel.findByIdAndUpdate(
       token.id,
       { password: hashedPassword },

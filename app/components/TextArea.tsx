@@ -4,6 +4,8 @@ import { ChangeEvent, useRef } from 'react';
 
 import { TextInputProps } from '@ts/ui/components-props';
 
+import Hint from './Hint';
+
 type TextAreaProps = TextInputProps & {
   autoHeight?: boolean;
 };
@@ -13,10 +15,14 @@ const TEXTAREA_ADDITION = 10;
 export default function TextArea({
   label,
   id,
+  name,
+  defaultValue,
   value,
   placeholder,
   className = '',
   autoHeight = false,
+  hint,
+  errorHint,
   onChange
 }: TextAreaProps) {
   const ref = useRef<HTMLTextAreaElement>(null);
@@ -41,11 +47,16 @@ export default function TextArea({
       <textarea
         ref={ref}
         id={id}
+        name={name}
         placeholder={placeholder}
+        defaultValue={defaultValue}
         value={value}
         className={autoHeight ? 'autoHeight' : ''}
         onChange={onValueChange}
       ></textarea>
+
+      <Hint variant='error'>{errorHint}</Hint>
+      <Hint>{hint}</Hint>
     </div>
   );
 }

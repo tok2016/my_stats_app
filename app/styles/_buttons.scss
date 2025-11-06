@@ -14,6 +14,7 @@ button {
   min-width: 6.25rem;
   border-radius: utils.$regular-radius;
   border: none;
+  cursor: pointer;
 
   svg {
     font-size: $button-icon-size;
@@ -206,4 +207,10 @@ button {
 
 a button {
   width: 100%;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: utils.$input-label-gap;
 }

@@ -11,12 +11,15 @@ $modules: 'user', 'music', 'games';
 
 @each $module in $modules {
   body:has(.#{$module}) {
+    display: flex;
+    flex-direction: column;
     background: linear-gradient(
       map.get(utils.$bg-1-colors, $module) $bg-1-color-length,
       map.get(utils.$bg-2-colors, $module)
     );
   }
   .#{$module} {
+    flex-grow: 1;
     color: map.get(utils.$text-colors, $module);
 
     h1,
@@ -136,6 +139,12 @@ $modules: 'user', 'music', 'games';
 
     .light {
       background-color: map.get(utils.$text-colors, $module);
+      box-shadow: 0
+        0
+        utils.$blur
+        utils.$spread
+        map.get(utils.$text-colors, $module);
+
       h1,
       h2,
       h3,

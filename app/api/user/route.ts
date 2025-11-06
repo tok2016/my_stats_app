@@ -13,7 +13,8 @@ import {
 } from '@lib/auth';
 import {
   CredentialsValidator,
-  UserUpdateValidator
+  UserUpdateValidator,
+  validateData
 } from '@lib/validationSchemas';
 import {
   ConfirmationsModel,
@@ -22,7 +23,9 @@ import {
   ServiceCredentialsModel,
   UsersModel
 } from '@lib/models';
-import { AVATAR_DIRECTORY, uniteUserData } from '@lib/utils';
+import { AVATAR_DIRECTORY, responseWithError, uniteUserData } from '@lib/utils';
+import { NewCredentials } from '@ts/users/credentials';
+import { UserUpdate } from '@ts/users/user';
 
 export async function GET(req: NextRequest) {
   const bearer = req.headers.get('Authorization');
@@ -41,47 +44,41 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const newCredentials = await CredentialsValidator.safeParseAsync(
-    await req.json()
-  );
+  try {
+    const newCredentials = await validateData<NewCredentials>(
+      CredentialsValidator,
+      await req.json()
+    );
 
-  if (!newCredentials.success) {
-    return NextResponse.json(newCredentials.error.issues, {
-      status: 400,
-      statusText: 'Invalid data'
+    const userExistance = await checkUserExistance(
+      newCredentials.username,
+      newCredentials.email
+    );
+
+    if (userExistance) {
+      return responseWithError(400, userExistance);
+    }
+
+    const hashedPassword = await hashPassword(newCredentials.password);
+    const user = await UsersModel.create({
+      isPublic: false
     });
-  }
 
-  const userExistance = await checkUserExistance(
-    newCredentials.data.username,
-    newCredentials.data.email
-  );
-
-  if (userExistance) {
-    return new NextResponse(userExistance, {
-      status: 400,
-      statusText: userExistance
+    const credentials = await CredentialsModel.create({
+      ...newCredentials,
+      password: hashedPassword,
+      createdAt: new Date(),
+      userId: user._id.toString()
     });
+
+    return await generateAccessResponse(
+      credentials.id,
+      credentials.username,
+      'User account was created successfully'
+    );
+  } catch (err) {
+    return generateAccessError(err);
   }
-
-  const hashedPassword = await hashPassword(newCredentials.data.password);
-  const user = await UsersModel.create({
-    isPublic: false,
-    dashboards: []
-  });
-
-  const credentials = await CredentialsModel.create({
-    ...newCredentials.data,
-    password: hashedPassword,
-    createdAt: new Date(),
-    userId: user._id.toString()
-  });
-
-  return await generateAccessResponse(
-    credentials.id,
-    credentials.username,
-    'User account was created successfully'
-  );
 }
 
 export async function PUT(req: NextRequest) {
@@ -89,44 +86,32 @@ export async function PUT(req: NextRequest) {
 
   try {
     const token = await extractToken(bearer);
-    const userUpdate = await UserUpdateValidator.safeParseAsync(
+    const userUpdate = await validateData<UserUpdate>(
+      UserUpdateValidator,
       await req.json()
     );
 
-    if (!userUpdate.success) {
-      return NextResponse.json(userUpdate.error.issues, {
-        status: 400,
-        statusText: 'Invalid data'
-      });
-    }
-
-    const credentials = userUpdate.data.email
+    const credentials = userUpdate.email
       ? await CredentialsModel.findByIdAndUpdate(
           token.id,
-          { email: userUpdate.data.email },
+          { email: userUpdate.email },
           { new: true }
         ).lean()
       : await CredentialsModel.findById(token.id).lean();
 
     if (!credentials) {
-      return new NextResponse('User was not found', {
-        status: 404,
-        statusText: 'User was not found'
-      });
+      return responseWithError(404, 'User was not found');
     }
 
-    delete userUpdate.data.email;
+    delete userUpdate.email;
     const userInfo = await UsersModel.findByIdAndUpdate(
       credentials.userId,
-      userUpdate.data,
+      userUpdate,
       { new: true }
     ).lean();
 
     if (!userInfo) {
-      return new NextResponse('User data was not found', {
-        status: 404,
-        statusText: 'User data was not found'
-      });
+      return responseWithError(404, 'User data was not found');
     }
 
     const dashboards = await getDashboards(credentials.userId);
@@ -144,10 +129,7 @@ export async function DELETE(req: NextRequest) {
   const operationId = req.nextUrl.searchParams.get('operationId');
 
   if (!operationId) {
-    return new NextResponse('Operation was not confirmed', {
-      status: 401,
-      statusText: 'Operation was not confirmed'
-    });
+    return responseWithError(401, 'Operation was not confirmed');
   }
 
   const confirmation = await ConfirmationsModel.findById(operationId).lean();
@@ -157,10 +139,7 @@ export async function DELETE(req: NextRequest) {
     || !confirmation.isConfirmed
     || confirmation.action !== 'delete'
   ) {
-    return new NextResponse('Operation was not confirmed', {
-      status: 401,
-      statusText: 'Operation was not confirmed'
-    });
+    return responseWithError(401, 'Operation was not confirmed');
   }
 
   try {
@@ -170,10 +149,7 @@ export async function DELETE(req: NextRequest) {
     ).lean();
 
     if (!credentials) {
-      return new NextResponse('User was not found', {
-        status: 404,
-        statusText: 'User was not found'
-      });
+      return responseWithError(404, 'User was not found');
     }
 
     const userInfo = await UsersModel.findByIdAndDelete(credentials.userId);

@@ -20,6 +20,7 @@ export default function UserSearch({ className }: UserSearchProps) {
     <Search
       className={className}
       id='user-search'
+      name='user-search'
       placeholder='Find a user by username'
       onSearch={onUserSearch}
     />

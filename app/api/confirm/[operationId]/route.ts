@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { ConfirmationsModel } from '@lib/models';
-import { generateCode } from '@lib/utils';
-import { ConfirmationInfo } from '@ts/users/confirmation';
+import { generateCode, responseWithError } from '@lib/utils';
+import { generateConfirmationResponse } from '@lib/auth';
 
 export async function PUT(
   _req: NextRequest,
@@ -17,25 +17,16 @@ export async function PUT(
   ).lean();
 
   if (!updatedConfirmation) {
-    return new NextResponse('Operation was not found', {
-      status: 404,
-      statusText: 'Operation was not found'
-    });
+    return responseWithError(404, 'Operation was not found');
   }
 
   //send email with new code
   console.log(newCode);
 
-  const confirmationInfo: ConfirmationInfo = {
+  return generateConfirmationResponse({
+    ...updatedConfirmation,
     id: updatedConfirmation._id.toString(),
-    credential: updatedConfirmation.credential,
-    action: updatedConfirmation.action,
     isConfirmed: false
-  };
-
-  return NextResponse.json(confirmationInfo, {
-    status: 200,
-    statusText: 'Confirmation code was updated'
   });
 }
 
