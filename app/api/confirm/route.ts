@@ -1,11 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 
-import {
-  ConfirmationCode,
-  ConfirmationInfo,
-  NewConfirmation
-} from '@ts/users/confirmation';
+import { ConfirmationCode, NewConfirmation } from '@ts/users/confirmation';
 
 import {
   generateAccessError,
@@ -28,22 +24,15 @@ export async function GET() {
     return responseWithError(401, 'Operation was not given');
   }
 
-  const operation = await ConfirmationsModel.findById(operationId);
+  const operation = await ConfirmationsModel.findById(operationId).lean();
 
   if (!operation) {
     return responseWithError(404, 'Operation was not found');
   }
 
-  const operationInfo: ConfirmationInfo = {
-    id: operation.id,
-    credential: operation.credential,
-    action: operation.action,
-    isConfirmed: operation.isConfirmed
-  };
-
-  return NextResponse.json(operationInfo, {
-    status: 200,
-    statusText: 'Operation is found and valid'
+  return generateConfirmationResponse({
+    ...operation,
+    id: operation._id.toString()
   });
 }
 
@@ -101,6 +90,8 @@ export async function POST(req: NextRequest) {
     return generateConfirmationResponse({
       ...operation,
       id: operation._id.toString(),
+      credential: operation.credential,
+      action: operation.action,
       isConfirmed: false
     });
   } catch (err) {

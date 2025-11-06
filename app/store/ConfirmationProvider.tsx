@@ -1,15 +1,14 @@
 'use client';
 
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useEffect, useState } from 'react';
 
 import {
   ConfirmationBaseAction,
   ConfirmationInfo,
-  ConfirmationState,
-  NewConfirmation
+  ConfirmationState
 } from '@ts/users/confirmation';
 
-import { useFetch } from '@lib/hooks';
+import { useAction } from '@lib/hooks';
 import {
   defaultConfirmation,
   defaultFormState,
@@ -45,10 +44,8 @@ export default function ConfirmationProvider({
   children
 }: ConfirmationProviderProps) {
   const [state, setState] = useState<ConfirmationState>('void');
-  const [confirmation, setConfirmation, isPending] = useFetch<ConfirmationInfo>(
-    getOperation,
-    defaultConfirmation
-  );
+  const [confirmation, getConfirmation, isPending, setConfirmation] =
+    useAction<ConfirmationInfo>(getOperation, defaultConfirmation);
 
   const getFormAction =
     <DataType,>(baseAction: ConfirmationBaseAction): FormAction<DataType> =>
@@ -67,6 +64,10 @@ export default function ConfirmationProvider({
         return getErrorFormState(err, data);
       }
     };
+
+  useEffect(() => {
+    getConfirmation();
+  }, [getConfirmation]);
 
   return (
     <ConfirmationContext.Provider

@@ -1,5 +1,5 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useActionState, useContext, useEffect, useState } from 'react';
+import { useActionState, useCallback, useContext, useState } from 'react';
 
 import FormState, { FormAction } from '@ts/ui/form-state';
 
@@ -28,22 +28,24 @@ export const useURLSearchParams = () => {
   return { getParam, setParam, deleteParam } as const;
 };
 
-export const useFetch = <T>(action: () => Promise<T>, initialData: T) => {
-  const [data, setData] = useState<T>(initialData);
+export const useAction = <DataType, ParameterType = undefined>(
+  action: (newData?: ParameterType) => Promise<DataType>,
+  initialData: DataType
+) => {
+  const [data, setData] = useState<DataType>(initialData);
   const [isPending, setPending] = useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const fetched = await action();
-      setData(fetched);
+  const startAction = useCallback(
+    async (newData?: ParameterType) => {
+      setPending(true);
+      const data = await action(newData);
+      setData(data);
       setPending(false);
-    };
+    },
+    [action]
+  );
 
-    setPending(true);
-    fetchData();
-  }, [action]);
-
-  return [data, setData, isPending] as const;
+  return [data, startAction, isPending, setData] as const;
 };
 
 export const useConfirm = () => useContext(ConfirmationContext);

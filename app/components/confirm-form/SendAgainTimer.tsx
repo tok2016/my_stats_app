@@ -4,7 +4,10 @@ import { useEffect, useState } from 'react';
 
 import Button from '../Button';
 import Hint from '../Hint';
-import { MILLISECONDS } from '@lib/utils';
+import { defaultFormState, MILLISECONDS } from '@lib/utils';
+import { useAction, useConfirm } from '@lib/hooks';
+import { sendCodeAgain } from '@lib/actions';
+import FormState from '@ts/ui/form-state';
 
 const SECONDS_UNAVAILABLE = 60;
 const SECONDS_IN_MINUTE = 60;
@@ -27,6 +30,11 @@ const formatSeconds = (seconds: number) => {
 
 export default function SendAgainTimer() {
   const [seconds, setSeconds] = useState<number>(SECONDS_UNAVAILABLE);
+  const { confirmation } = useConfirm();
+  const [state, changeCode, isPending] = useAction<FormState<unknown>, string>(
+    sendCodeAgain,
+    defaultFormState()
+  );
 
   useEffect(() => {
     const timer = setTimeout(
@@ -45,9 +53,16 @@ export default function SendAgainTimer() {
 
       <div className='button-group'>
         <Hint>Haven’t got a code yet?</Hint>
-        <Button variant='outlined' disabled={seconds > 0} type='button'>
+        <Button
+          variant='outlined'
+          disabled={seconds > 0}
+          loading={isPending}
+          type='button'
+          onClick={() => changeCode(confirmation.id)}
+        >
           Send again
         </Button>
+        <Hint variant='error'>{state.error ? state.message : ''}</Hint>
       </div>
     </div>
   );

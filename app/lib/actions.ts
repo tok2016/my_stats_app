@@ -49,7 +49,7 @@ export const confirmByCode: ConfirmationBaseAction = async (prev, formData) => {
 };
 
 export const sendCodeAgain = async (
-  operationId: string
+  operationId: string = ''
 ): Promise<FormState<never>> => {
   try {
     await AxiosInstanse.put(`/api/confirm/${operationId}`);
