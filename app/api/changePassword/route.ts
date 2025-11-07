@@ -4,7 +4,6 @@ import bcrypt from 'bcrypt';
 import { PasswordUpdate } from '@ts/users/password';
 
 import {
-  extractToken,
   generateAccessError,
   generateAccessResponse,
   getCredentialsById,
@@ -13,6 +12,7 @@ import {
 import { PasswordUpdateValidator, validateData } from '@lib/validationSchemas';
 import { CredentialsModel } from '@lib/models';
 import { responseWithError } from '@lib/utils';
+import { extractToken } from '@lib/token';
 
 export async function POST(req: NextRequest) {
   const bearer = req.headers.get('Authorization');

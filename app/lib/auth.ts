@@ -1,9 +1,8 @@
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import path from 'path';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-import Token from '@ts/users/token';
 import { User } from '@ts/users/user';
 import { UserAccess } from '@ts/users/user';
 import Credentials, { CredentialsInSchema } from '@ts/users/credentials';
@@ -14,50 +13,12 @@ import { CredentialsModel, DashboardsModel, UsersModel } from './models';
 import {
   responseWithError,
   isErrorResponse,
-  isExpired,
-  MILLISECONDS,
   uniteUserData,
   generateErrorResponse
 } from './utils';
+import { ACCESS_TTL, extractToken, generateToken, REFRESH_TTL } from './token';
 
-export const ACCESS_TTL = 5 * 60;
-export const REFRESH_TTL = 30 * 24 * 60 * 60;
-
-export const generateToken = async (
-  credentialsId: string,
-  isRefresh: boolean = false
-): Promise<string> => {
-  const expireDate = new Date(
-    Date.now() + (isRefresh ? REFRESH_TTL : ACCESS_TTL) * MILLISECONDS
-  );
-
-  const token: Token = {
-    id: credentialsId,
-    expiresAt: expireDate.toISOString()
-  };
-
-  return new Promise<string>((resolve) => {
-    if (!process.env.SECRET_KEY) {
-      throw generateErrorResponse(500, 'Internal server error');
-    }
-
-    resolve(jwt.sign(token, process.env.SECRET_KEY, { algorithm: 'HS256' }));
-  });
-};
-
-export const decodeToken = async (token: string): Promise<Token> => {
-  return new Promise<Token>((resolve) => {
-    if (!process.env.SECRET_KEY) {
-      throw generateErrorResponse(500, 'Internal server error');
-    }
-
-    resolve(
-      jwt.verify(token, process.env.SECRET_KEY, {
-        algorithms: ['HS256']
-      }) as Token
-    );
-  });
-};
+export const AVATAR_DIRECTORY = path.join(process.cwd(), 'avatars');
 
 export const generateAccessResponse = async (
   credentialsId: string,
@@ -123,25 +84,6 @@ export const checkUserExistance = async (
 
   return '';
 };
-
-export const extractToken = async (tokenRaw: string | null): Promise<Token> => {
-  const token = tokenRaw?.split(' ').at(-1);
-
-  if (!token) {
-    throw generateErrorResponse(401, 'Unauthorized');
-  }
-
-  const decoded = await decodeToken(token);
-
-  if (isExpired(decoded.expiresAt)) {
-    throw generateErrorResponse(401, 'Session is expired');
-  }
-
-  return decoded;
-};
-
-export const comapareTokens = (accessToken: Token, refreshToken: Token) =>
-  accessToken.id === refreshToken.id;
 
 export const deleteTokens = async () => {
   const cookiesStorage = await cookies();

@@ -6,12 +6,13 @@ import path from 'path';
 import Avatar from '@ts/users/avatar';
 
 import {
+  AVATAR_DIRECTORY,
   checkUserAuthorRights,
   generateAccessError,
   getUserById
 } from '@lib/auth';
 import { UsersModel } from '@lib/models';
-import { AVATAR_DIRECTORY, responseWithError } from '@lib/utils';
+import { responseWithError } from '@lib/utils';
 
 export async function POST(
   req: NextRequest,

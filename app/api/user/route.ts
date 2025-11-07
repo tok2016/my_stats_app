@@ -3,8 +3,8 @@ import { unlink } from 'fs/promises';
 import path from 'path';
 
 import {
+  AVATAR_DIRECTORY,
   checkUserExistance,
-  extractToken,
   generateAccessError,
   generateAccessResponse,
   getDashboards,
@@ -23,9 +23,10 @@ import {
   ServiceCredentialsModel,
   UsersModel
 } from '@lib/models';
-import { AVATAR_DIRECTORY, responseWithError, uniteUserData } from '@lib/utils';
+import { responseWithError, uniteUserData } from '@lib/utils';
 import { NewCredentials } from '@ts/users/credentials';
 import { UserUpdate } from '@ts/users/user';
+import { extractToken } from '@lib/token';
 
 export async function GET(req: NextRequest) {
   const bearer = req.headers.get('Authorization');

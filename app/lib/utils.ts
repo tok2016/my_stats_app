@@ -1,4 +1,3 @@
-import path from 'path';
 import { NextResponse } from 'next/server';
 
 import { CredentialsInSchema } from '@ts/users/credentials';
@@ -10,8 +9,6 @@ import { ConfirmationInfo } from '@ts/users/confirmation';
 import { NewPassword } from '@ts/users/password';
 
 import { isAxiosError } from './axios-instanse';
-
-export const AVATAR_DIRECTORY = path.join(process.cwd(), 'avatars');
 
 export const MILLISECONDS = 1000;
 
