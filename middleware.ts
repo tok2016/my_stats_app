@@ -27,6 +27,7 @@ export default async function middleware(req: NextRequest) {
   const isAuth = AUTH_PATHS_REGEX.test(pathnames[1]);
   const refresh = req.cookies.get('refreshToken');
   const access = req.cookies.get('accessToken');
+  let accessValue = access?.value;
 
   try {
     const refreshToken = await decodeToken(refresh?.value ?? '');
@@ -39,18 +40,18 @@ export default async function middleware(req: NextRequest) {
       : NextResponse.next();
 
     if (
-      !access
-      || (await isAccessLegit(await decodeToken(access.value), refreshToken))
+      !accessValue
+      || (await isAccessLegit(await decodeToken(accessValue), refreshToken))
     ) {
-      const newAccess = await generateToken(refreshToken.id);
-      response.cookies.set('accessToken', newAccess, {
+      accessValue = await generateToken(refreshToken.id);
+      response.cookies.set('accessToken', accessValue, {
         httpOnly: true,
         maxAge: ACCESS_TTL
       });
     }
 
     if (isApi) {
-      response.headers.set('Authorization', `bearer ${access?.value}`);
+      response.headers.set('Authorization', `bearer ${accessValue}`);
     }
 
     return response;
@@ -68,5 +69,14 @@ export default async function middleware(req: NextRequest) {
 }
 
 export const config: MiddlewareConfig = {
-  matcher: ['/(api|register|login|reset-password|iam|music|games|admin)']
+  matcher: [
+    '/api/:path*',
+    '/register',
+    '/login',
+    '/reset-password',
+    '/iam/:path*',
+    '/music/:path*',
+    '/games/:path*',
+    '/admin/:path*'
+  ]
 };

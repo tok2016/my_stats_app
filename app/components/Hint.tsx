@@ -1,8 +1,6 @@
-import { ReactNode } from 'react';
-
 type HintProps = {
   variant?: 'regular' | 'error';
-  children?: ReactNode;
+  children?: React.ReactNode;
 };
 
 export default function Hint({ variant = 'regular', children }: HintProps) {

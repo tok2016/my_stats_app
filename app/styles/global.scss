@@ -1,3 +1,4 @@
+@use 'sass:map';
 @use 'utils';
 
 :root {
@@ -26,12 +27,12 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background-color: utils.$user-bg-2-color;
+  background-color: map.get(utils.$bg-2-colors, 'user');
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: utils.$user-hover-color;
-  border: solid 3px utils.$user-bg-2-color;
+  background-color: map.get(utils.$hover-colors, 'user');
+  border: solid 3px map.get(utils.$bg-2-colors, 'user');
   border-radius: utils.$small-radius;
 }
 

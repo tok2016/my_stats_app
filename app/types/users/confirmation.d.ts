@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 import { ConfirmationActions } from '@lib/utils';
 

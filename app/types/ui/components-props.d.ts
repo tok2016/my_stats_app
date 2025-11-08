@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 export interface InputBaseProps {
   label?: ReactNode;
@@ -26,3 +26,17 @@ export interface SliderProps extends InputBaseProps {
   min: number;
   max: number;
 }
+
+export type SidebarSubButtonProps = {
+  name: string;
+  label: string;
+  href: string;
+};
+
+export type SidebarButtonProps = Omit<SidebarSubButtonProps, 'href'> & {
+  href?: string;
+} & {
+  icon: ReactNode;
+  subButtons?: SidebarSubButtonProps[];
+  onClick?: () => void;
+};

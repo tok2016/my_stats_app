@@ -62,6 +62,15 @@ export const defaultNewPassword: NewPassword = {
   repeatPassword: ''
 };
 
+export const defaultUser: User = {
+  id: '',
+  username: '',
+  email: '',
+  createdAt: new Date(),
+  dashboards: [],
+  isPublic: false
+};
+
 export const isErrorResponse = (value: unknown): value is ErrorResponse =>
   (value as ErrorResponse).message !== undefined;
 

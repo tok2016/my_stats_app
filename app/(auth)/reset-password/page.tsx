@@ -1,7 +1,5 @@
 'use client';
 
-import { ReactNode } from 'react';
-
 import { ConfirmationState } from '@ts/users/confirmation';
 
 import ConfirmLoginForm from '../components/ConfirmLoginForm';
@@ -12,7 +10,7 @@ import Reminder from '../components/Reminder';
 import NewPasswordForm from '@components/password-form/NewPasswordForm';
 import { resetPassword } from '../actions';
 
-const Forms: Record<ConfirmationState, ReactNode> = {
+const Forms: Record<ConfirmationState, React.ReactNode> = {
   void: (
     <ConfirmLoginForm baseAction={requestConfimation} addendum={<Reminder />} />
   ),

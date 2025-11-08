@@ -1,15 +1,13 @@
 'use client';
 
-import { ReactNode } from 'react';
-
 import Button from './Button';
 import Hint from './Hint';
 
 type SubmitButtonProps = {
   loading?: boolean;
   error?: boolean;
-  children?: ReactNode;
-  errorHint?: ReactNode;
+  children?: React.ReactNode;
+  errorHint?: React.ReactNode;
 };
 
 export default function SubmitButton({

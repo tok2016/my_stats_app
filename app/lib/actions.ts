@@ -58,3 +58,8 @@ export const sendCodeAgain = async (
     return getErrorFormState(err);
   }
 };
+
+export const getUser = async () => {
+  const user = await AxiosInstanse.get('/api/user');
+  return user;
+};

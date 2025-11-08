@@ -1,14 +1,14 @@
 'use client';
 
 import { Icon } from '@iconify/react';
-import { MouseEvent, ReactNode } from 'react';
+import { MouseEvent } from 'react';
 
 import { ButtonVariant } from '@ts/ui/components-variants';
 
 import { getIconCode } from '@lib/utils';
 
 type ButtonProps = {
-  children?: ReactNode;
+  children?: React.ReactNode;
   variant?: ButtonVariant;
   beforeIconCode?: string;
   afterIconCode?: string;

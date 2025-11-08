@@ -1,30 +1,3 @@
-$user-active-color: #1fbba4;
-$user-hover-color: #0b7a72;
-$user-disabled-color: #5c807d;
-$user-highlight-color: #69dfce;
-$user-autofill-color: #8fecde;
-$user-text-color: #dee6e5;
-$user-bg-1-color: #050907;
-$user-bg-2-color: #0f2721;
-
-$music-active-color: #1fbb70;
-$music-hover-color: #0b7a34;
-$music-disabled-color: #5c806c;
-$music-highlight-color: #7aebb4;
-$music-autofill-color: #8fecbf;
-$music-text-color: #dee6e2;
-$music-bg-1-color: #050906;
-$music-bg-2-color: #0f2717;
-
-$games-active-color: #2eacc8;
-$games-hover-color: #146086;
-$games-disabled-color: #5c7780;
-$games-highlight-color: #a5eeff;
-$games-autofill-color: #8fdbec;
-$games-text-color: #dee4e6;
-$games-bg-1-color: #050709;
-$games-bg-2-color: #0f1b27;
-
 $active-colors: (
   'user': #1fbba4,
   'music': #1fbb70,
@@ -87,6 +60,7 @@ $diagram-color-11: #cdcdcd;
 
 $white: #ffffff;
 $black: #000000;
+$black-alpha: #00000060;
 $text-darker: #b8bfbe;
 $input-disabled: #b8bfbe;
 $placeholder-color: #919191;

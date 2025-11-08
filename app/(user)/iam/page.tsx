@@ -1,3 +1,10 @@
+import Sidebar from '@components/profile-layout/SIdebar';
+
 export default function IamPage() {
-  return <h1>Profile</h1>;
+  return (
+    <>
+      <Sidebar />
+      <h1>Profile</h1>
+    </>
+  );
 }

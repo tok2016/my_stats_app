@@ -1,7 +1,5 @@
-import { ReactNode } from 'react';
-
 type DividerProps = {
-  children?: ReactNode;
+  children?: React.ReactNode;
   rounded?: boolean;
 };
 

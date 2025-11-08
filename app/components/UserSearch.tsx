@@ -5,9 +5,13 @@ import { useRouter } from 'next/navigation';
 
 type UserSearchProps = {
   className?: string;
+  placeholder?: string;
 };
 
-export default function UserSearch({ className }: UserSearchProps) {
+export default function UserSearch({
+  className,
+  placeholder = 'Find a user by username or email'
+}: UserSearchProps) {
   const { push } = useRouter();
 
   const onUserSearch = (query: string) => {
@@ -21,7 +25,7 @@ export default function UserSearch({ className }: UserSearchProps) {
       className={className}
       id='user-search'
       name='user-search'
-      placeholder='Find a user by username'
+      placeholder={placeholder}
       onSearch={onUserSearch}
     />
   );

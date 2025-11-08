@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, ReactNode, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 
 import {
   ConfirmationBaseAction,
@@ -22,7 +22,7 @@ type ConfirmationFormAction = <DataType>(
 ) => FormAction<DataType>;
 
 type ConfirmationProviderProps = {
-  children: ReactNode;
+  children: React.ReactNode;
 };
 
 type ConfirmationContextProps = {
