@@ -21,7 +21,9 @@ const isAccessLegit = async (accessToken: Token, refreshToken: Token) => {
 };
 
 export default async function middleware(req: NextRequest) {
-  const pathnames = req.nextUrl.pathname.split('/');
+  const pathnames = req.nextUrl.pathname
+    .split('/')
+    .map((endpoint) => endpoint.trim());
 
   const isApi = pathnames[1] === 'api';
   const isAuth = AUTH_PATHS_REGEX.test(pathnames[1]);
@@ -60,6 +62,9 @@ export default async function middleware(req: NextRequest) {
       isApi || !pathnames[1] || isAuth
         ? NextResponse.next()
         : NextResponse.redirect(new URL('/login', req.url));
+
+    console.log(pathnames[1]);
+    console.log(AUTH_PATHS_REGEX.test(pathnames[1]));
 
     response.cookies.delete('refreshToken');
     response.cookies.delete('accessToken');

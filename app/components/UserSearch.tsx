@@ -1,16 +1,16 @@
 'use client';
 
 import Search from '@components/Search';
+import { SearchProps } from '@ts/ui/components-props';
 import { useRouter } from 'next/navigation';
 
-type UserSearchProps = {
-  className?: string;
-  placeholder?: string;
-};
+type UserSearchProps = Omit<SearchProps, 'id' | 'name' | 'onSearch'>;
 
 export default function UserSearch({
   className,
-  placeholder = 'Find a user by username'
+  placeholder = 'Find a user by username',
+  onFocus,
+  onBlur
 }: UserSearchProps) {
   const { push } = useRouter();
 
@@ -27,6 +27,8 @@ export default function UserSearch({
       name='user-search'
       placeholder={placeholder}
       onSearch={onUserSearch}
+      onFocus={onFocus}
+      onBlur={onBlur}
     />
   );
 }

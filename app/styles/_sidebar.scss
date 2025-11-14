@@ -1,5 +1,6 @@
 @use 'utils';
 
+$sidebar-padding-x: 1rem;
 $sidebar-padding-y: 1.75rem;
 $sidebar-icon-width: 2.5rem;
 $sidebar-button-gap: 0.625rem;
@@ -16,7 +17,7 @@ $sidebar-expanded-width: 16rem;
 }
 
 .sidebar {
-  padding: $sidebar-padding-y 1rem;
+  padding: $sidebar-padding-y $sidebar-padding-x;
   border-right: solid 0.25rem;
 
   position: fixed;
@@ -90,10 +91,6 @@ $sidebar-expanded-width: 16rem;
     svg {
       width: 100%;
       height: 100%;
-
-      * {
-        stroke-width: 3px;
-      }
     }
 
     img {
@@ -108,6 +105,10 @@ $sidebar-expanded-width: 16rem;
     font-size: utils.$large-size;
     display: none;
     transition: rotate utils.$active-time;
+  }
+
+  svg * {
+    stroke-width: 3px;
   }
 }
 
@@ -126,7 +127,7 @@ $sidebar-expanded-width: 16rem;
 }
 
 .sidebar:hover,
-.sidebar:has(input:focus) {
+.sidebar.expanded {
   width: $sidebar-expanded-width;
 
   .input-wrapper {
@@ -258,4 +259,8 @@ $sidebar-expanded-width: 16rem;
   100% {
     min-height: unset;
   }
+}
+
+.profile {
+  padding-left: $sidebar-icon-width + $sidebar-padding-x * 2;
 }

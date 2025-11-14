@@ -3,21 +3,18 @@
 import { KeyboardEvent, useRef } from 'react';
 import { Icon } from '@iconify/react';
 
-import { InputBaseProps } from '@ts/ui/components-props';
+import { SearchProps } from '@ts/ui/components-props';
 
 import { getIconCode } from '@lib/utils';
-
-type SearchProps = Omit<InputBaseProps, 'label' | 'errorHint' | 'hint'> & {
-  placeholder?: string;
-  onSearch: (query: string) => void;
-};
 
 export default function Search({
   id,
   name,
   placeholder,
   className = '',
-  onSearch
+  onSearch,
+  onFocus,
+  onBlur
 }: SearchProps) {
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -43,6 +40,8 @@ export default function Search({
           type='search'
           placeholder={placeholder}
           onKeyDown={onEnterDown}
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
 
         <Icon

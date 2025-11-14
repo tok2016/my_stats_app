@@ -7,6 +7,8 @@ export interface InputBaseProps {
   className?: string;
   hint?: ReactNode;
   errorHint?: ReactNode;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 export interface TextInputProps extends InputBaseProps, InputHintProps {
@@ -16,6 +18,14 @@ export interface TextInputProps extends InputBaseProps, InputHintProps {
   value?: string;
   onChange?: (value: string) => void;
 }
+
+export type SearchProps = Omit<
+  InputBaseProps,
+  'label' | 'errorHint' | 'hint'
+> & {
+  placeholder?: string;
+  onSearch: (query: string) => void;
+};
 
 export type Option = {
   value: string;

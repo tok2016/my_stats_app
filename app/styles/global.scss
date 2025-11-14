@@ -15,8 +15,7 @@ body {
 body {
   background-color: black;
   color: white;
-  box-sizing: border-box;
-  padding: 1.25rem;
+  padding: 0;
   margin: 0;
   font-family: utils.$inter;
 }
@@ -34,6 +33,10 @@ body {
   background-color: map.get(utils.$hover-colors, 'user');
   border: solid 3px map.get(utils.$bg-2-colors, 'user');
   border-radius: utils.$small-radius;
+}
+
+::-webkit-scrollbar-corner {
+  background-color: map.get(utils.$bg-2-colors, 'user');
 }
 
 h1 {

@@ -1,5 +1,6 @@
 'use client';
 
+import { useReducer } from 'react';
 import { usePathname } from 'next/navigation';
 import { Icon } from '@iconify/react';
 
@@ -79,10 +80,11 @@ const SidebarButtons: SidebarButtonProps[] = [
 ];
 
 export default function Sidebar() {
+  const [isExpanded, toggleExpand] = useReducer((value) => !value, false);
   const path = usePathname().split('/')[1];
 
   return (
-    <div className='sidebar'>
+    <div className={`sidebar ${isExpanded ? 'expanded' : ''}`}>
       <div className='sidebar-upper'>
         <UserButton />
 
@@ -93,6 +95,8 @@ export default function Sidebar() {
         <UserSearch
           placeholder='Find user'
           className={path === 'user' || path === 'search' ? 'choosen' : ''}
+          onFocus={toggleExpand}
+          onBlur={toggleExpand}
         />
       </div>
 

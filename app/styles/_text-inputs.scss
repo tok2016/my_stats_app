@@ -132,7 +132,7 @@ $code-input-padding-x: 0.75rem;
     flex-grow: 1;
   }
 
-  &:has(.input-icon) {
+  &:has(> .input-icon) {
     input[type='search'],
     input[type='password'],
     input[type='text'] {

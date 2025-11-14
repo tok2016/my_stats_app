@@ -11,14 +11,21 @@ $bg-1-color-length: 28%;
 $modules: 'user', 'music', 'games';
 
 @each $module in $modules {
-  body:has(.#{$module}) {
-    display: flex;
+  // .#{$module}:has(> .sidebar) {
+  //   padding-right: sidebar.$sidebar-icon-width + sidebar.$sidebar-padding-x * 2;
+  // }
+
+  body > .#{$module} {
+    box-sizing: border-box;
+    padding: 4rem;
+    min-height: 100vh;
     flex-direction: column;
     background: linear-gradient(
       map.get(utils.$bg-1-colors, $module) $bg-1-color-length,
       map.get(utils.$bg-2-colors, $module)
     );
   }
+
   .#{$module} {
     flex-grow: 1;
     color: map.get(utils.$text-colors, $module);
