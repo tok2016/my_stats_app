@@ -76,24 +76,30 @@ $sidebar-expanded-width: 16rem;
     display: none;
   }
 
-  svg {
-    font-size: $sidebar-icon-width;
-
-    * {
-      stroke-width: 3px;
-    }
-  }
-
-  img,
-  svg {
+  .sidebar-icon {
     min-width: $sidebar-icon-width;
     min-height: $sidebar-icon-width;
-  }
-
-  img {
     width: $sidebar-icon-width;
     height: $sidebar-icon-width;
-    border-radius: utils.$large-radius;
+
+    .skeleton {
+      height: 100%;
+    }
+
+    img,
+    svg {
+      width: 100%;
+      height: 100%;
+
+      * {
+        stroke-width: 3px;
+      }
+    }
+
+    img {
+      object-fit: cover;
+      border-radius: utils.$large-radius;
+    }
   }
 
   .sidebar-expand {

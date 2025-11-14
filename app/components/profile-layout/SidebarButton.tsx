@@ -9,9 +9,12 @@ import { SidebarButtonProps } from '@ts/ui/components-props';
 import { getIconCode } from '@lib/utils';
 import { useSidebarState } from '@store/sidebar-store';
 import { useEffect, useState } from 'react';
+import Skeleton from '@components/Skeleton';
 
 type SubmenuState = 'closed' | 'expanded' | '';
 
+const SIDEBAR_ICON_CLASS = 'sidebar-icon';
+const SIDEBAR_LABEL_CLASS = 'sidebar-label';
 const EXPAND_TIME = 100;
 
 export default function SidebarButton({
@@ -20,12 +23,13 @@ export default function SidebarButton({
   label,
   subButtons,
   href,
+  loading = false,
   onClick
 }: SidebarButtonProps) {
   const [submenuState, setSubmenuState] = useState<SubmenuState>('');
 
   const { expanded, expand } = useSidebarState();
-  const isExpandable = !!subButtons;
+  const isExpandable = !!subButtons && !loading;
   const isExpanded = expanded === name;
 
   const endpoints = usePathname().split('/');
@@ -65,8 +69,21 @@ export default function SidebarButton({
         `}
         onClick={onButtonClick}
       >
-        {icon}
-        <span className='sidebar-label'>{label}</span>
+        {loading ? (
+          <Skeleton type='image' className={SIDEBAR_ICON_CLASS} />
+        ) : (
+          <div className={SIDEBAR_ICON_CLASS}>{icon}</div>
+        )}
+        {loading ? (
+          <Skeleton
+            type='text'
+            fontSize='large'
+            lineHeight='fit'
+            className={SIDEBAR_LABEL_CLASS}
+          />
+        ) : (
+          <span className={SIDEBAR_LABEL_CLASS}>{label}</span>
+        )}
         <Icon
           icon={getIconCode('chevron-down')}
           className={`sidebar-expand ${isExpandable ? '' : 'hidden'}`}

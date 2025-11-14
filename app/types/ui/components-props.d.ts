@@ -31,6 +31,7 @@ export type SidebarSubButtonProps = {
   name: string;
   label: string;
   href: string;
+  loading?: boolean;
 };
 
 export type SidebarButtonProps = Omit<SidebarSubButtonProps, 'href'> & {

@@ -4,6 +4,8 @@
 
 $border-style: 2px solid;
 $border-radius: 6px;
+$gloss-width: 2rem;
+$skeleton-icon-min-width: 2rem;
 
 .divider {
   @include utils.font(utils.$min-size, utils.$regular-font, utils.$tight-font);
@@ -143,4 +145,113 @@ $border-radius: 6px;
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
+}
+
+.skeletons {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.skeleton {
+  --font-size: #{utils.$regular-size};
+  --line-height: #{utils.$fit-font};
+
+  display: block;
+  border-radius: utils.$small-radius;
+  height: var(--font-size);
+  margin: calc((var(--font-size) * var(--line-height) - var(--font-size)) / 2) 0;
+
+  background-repeat: no-repeat;
+  background-size: $gloss-width;
+  background-position: -$gloss-width 0%;
+  background-image: linear-gradient(
+    90deg,
+    utils.$skeleton-gloss-transparent,
+    utils.$skeleton-gloss-brigt,
+    utils.$skeleton-gloss-transparent
+  );
+
+  animation: gloss 1s ease-in-out infinite;
+
+  svg {
+    min-width: $skeleton-icon-min-width;
+    min-height: $skeleton-icon-min-width;
+    width: 50% !important;
+    height: 50% !important;
+    stroke-width: 3px !important;
+  }
+}
+
+.skeleton.h1 {
+  --font-size: #{utils.$h1-size};
+  --line-height: #{utils.$wide-font};
+}
+
+.skeleton.h2 {
+  --font-size: #{utils.$h2-size};
+  --line-height: #{utils.$wide-font};
+}
+
+.skeleton.h3 {
+  --font-size: #{utils.$h3-size};
+  --line-height: #{utils.$fit-font};
+}
+
+.skeleton.h4 {
+  --font-size: #{utils.$h4-size};
+  --line-height: #{utils.$fit-font};
+}
+
+.skeleton.min {
+  --font-size: #{utils.$min-size};
+}
+
+.skeleton.small {
+  --font-size: #{utils.$small-size};
+}
+
+.skeleton.regular {
+  --font-size: #{utils.$regular-size};
+}
+
+.skeleton.large {
+  --font-size: #{utils.$large-size};
+}
+
+.skeleton.tight {
+  --line-height: #{utils.$tight-font};
+}
+
+.skeleton.fit {
+  --line-height: #{utils.$fit-font};
+}
+
+.skeleton.wide {
+  --line-height: #{utils.$wide-font};
+}
+
+.skeleton.image,
+.skeleton.graph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: utils.$regular-radius;
+  margin: 0;
+}
+
+@keyframes gloss {
+  to {
+    background-position: calc(100% + $gloss-width) 0%;
+  }
+}
+
+@mixin skeleton($bg-color, $icon-color) {
+  .skeleton {
+    background-color: $bg-color;
+
+    svg {
+      color: $icon-color !important;
+    }
+  }
 }

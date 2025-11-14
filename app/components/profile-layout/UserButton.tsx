@@ -32,6 +32,7 @@ export default function UserButton() {
     <SidebarButton
       name='iam'
       label={user.username}
+      loading={status === 'idle' || status === 'pending'}
       href='/iam'
       icon={
         user.avatarUrl ? (

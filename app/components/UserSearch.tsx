@@ -10,7 +10,7 @@ type UserSearchProps = {
 
 export default function UserSearch({
   className,
-  placeholder = 'Find a user by username or email'
+  placeholder = 'Find a user by username'
 }: UserSearchProps) {
   const { push } = useRouter();
 
