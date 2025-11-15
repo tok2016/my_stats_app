@@ -19,7 +19,7 @@ export default function Test() {
         width: '200px'
       }}
     >
-      <Button variant='primary' beforeIconCode='star-solid'>
+      <Button variant='primary' beforeIcon='star-solid'>
         Button
       </Button>
 

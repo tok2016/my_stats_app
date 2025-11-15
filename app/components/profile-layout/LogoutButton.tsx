@@ -1,10 +1,10 @@
 'use client';
 
-import { Icon } from '@iconify/react';
+import { LogoutSolid } from '@mynaui/icons-react';
 
 import { useUserState } from '@store/user-store';
 import SidebarButton from './SidebarButton';
-import { defaultUser, getIconCode } from '@lib/utils';
+import { defaultUser } from '@lib/utils';
 import { logout } from '@lib/server-actions';
 
 export default function LogoutButton() {
@@ -19,7 +19,7 @@ export default function LogoutButton() {
     <SidebarButton
       name='logout'
       label='Logout'
-      icon={<Icon icon={getIconCode('logout-solid')} />}
+      icon={<LogoutSolid />}
       onClick={onLogoutClick}
     />
   );

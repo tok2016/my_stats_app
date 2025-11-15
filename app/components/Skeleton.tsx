@@ -1,5 +1,4 @@
-import { Icon } from '@iconify/react';
-import { getIconCode } from '@lib/utils';
+import { ImageSolid, ChartColumnBigSolid } from '@mynaui/icons-react';
 
 type SkeletonProps = {
   type?: 'h1' | 'h2' | 'h3' | 'h4' | 'text' | 'image' | 'graph';
@@ -28,10 +27,8 @@ export default function Skeleton({
           className={`skeleton ${type} ${fontSize} ${lineHeight}`}
           style={{ height }}
         >
-          {type !== 'image' || <Icon icon={getIconCode('image-solid')} />}
-          {type !== 'graph' || (
-            <Icon icon={getIconCode('chart-column-big-solid')} />
-          )}
+          {type !== 'image' || <ImageSolid />}
+          {type !== 'graph' || <ChartColumnBigSolid />}
         </div>
       ))}
     </div>

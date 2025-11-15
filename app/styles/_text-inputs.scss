@@ -123,6 +123,9 @@ $code-input-padding-x: 0.75rem;
     top: ($input-min-height - utils.$regular-size) * 0.5;
     right: $input-padding-x;
 
+    width: 1rem;
+    height: 1rem;
+
     * {
       stroke-width: 3px;
     }

@@ -1,14 +1,11 @@
-import {
-  ButtonVariants,
-  InputThemes,
-  Modules,
-  SelectVariants
-} from '@lib/utils';
+import { Modules } from '@lib/utils';
 
-export type ButtonVariant = (typeof ButtonVariants)[number];
+export type ButtonVariant = 'primary' | 'secondary' | 'outlined';
 
-export type InputTheme = (typeof InputThemes)[number];
+export type IconButtonVariant = Exclude<ButtonVariant, 'outlined'> | 'text';
 
-export type SelectVariant = (typeof SelectVariants)[number];
+export type InputTheme = 'light' | 'dark';
+
+export type SelectVariant = 'plain' | 'text';
 
 export type Module = (typeof Modules)[number];

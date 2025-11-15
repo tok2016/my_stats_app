@@ -35,12 +35,6 @@ export const ServiceStatuses = [
   'unknown'
 ] as const;
 
-export const ButtonVariants = ['primary', 'secondary', 'outlined'] as const;
-
-export const InputThemes = ['light', 'dark'] as const;
-
-export const SelectVariants = ['plain', 'text'] as const;
-
 export const Modules = ['user', 'music', 'games'] as const;
 
 export const defaultFormState = <FormDataType>(): FormState<FormDataType> => ({
@@ -122,8 +116,6 @@ export const responseWithError = (
     status,
     statusText: message
   });
-
-export const getIconCode = (iconName: string) => `mynaui:${iconName}`;
 
 export const clamp = (value: number, min: number, max: number) => {
   if (value < min) {

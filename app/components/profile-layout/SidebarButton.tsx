@@ -1,12 +1,11 @@
 'use client';
 
-import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ChevronDown } from '@mynaui/icons-react';
 
 import { SidebarButtonProps } from '@ts/ui/components-props';
 
-import { getIconCode } from '@lib/utils';
 import { useSidebarState } from '@store/sidebar-store';
 import { useEffect, useState } from 'react';
 import Skeleton from '@components/Skeleton';
@@ -72,8 +71,9 @@ export default function SidebarButton({
         {loading ? (
           <Skeleton type='image' className={SIDEBAR_ICON_CLASS} />
         ) : (
-          <div className={SIDEBAR_ICON_CLASS}>{icon}</div>
+          <div className={`${SIDEBAR_ICON_CLASS} loaded`}>{icon}</div>
         )}
+
         {loading ? (
           <Skeleton
             type='text'
@@ -84,10 +84,11 @@ export default function SidebarButton({
         ) : (
           <span className={SIDEBAR_LABEL_CLASS}>{label}</span>
         )}
-        <Icon
-          icon={getIconCode('chevron-down')}
+
+        <ChevronDown
           className={`sidebar-expand ${isExpandable ? '' : 'hidden'}`}
         />
+
         {!href || <Link href={href} className='sidebar-link' scroll={false} />}
       </div>
 

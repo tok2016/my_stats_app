@@ -1,4 +1,6 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, type MouseEvent } from 'react';
+
+import { ButtonVariant } from './components-variants';
 
 export interface InputBaseProps {
   label?: ReactNode;
@@ -25,6 +27,18 @@ export type SearchProps = Omit<
 > & {
   placeholder?: string;
   onSearch: (query: string) => void;
+};
+
+export type ButtonProps = {
+  children?: ReactNode;
+  variant?: ButtonVariant;
+  beforeIcon?: ReactNode;
+  afterIcon?: ReactNode;
+  className?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  type?: HTMLButtonElement['type'];
+  onClick?: (evt: MouseEvent) => void;
 };
 
 export type Option = {

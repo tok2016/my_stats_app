@@ -1,6 +1,7 @@
 @use 'utils';
 
 $button-icon-size: 1.25rem;
+$icon-button-width: 2rem;
 
 button {
   @include utils.font(utils.$large-size, utils.$bold-font, utils.$tight-font);
@@ -153,6 +154,27 @@ button {
   }
 }
 
+@mixin button-text($main-color, $hover-color, $active-color, $disabled-color) {
+  button.text {
+    @include button($main-color, $hover-color, $active-color, $disabled-color);
+
+    background-color: transparent;
+
+    &:hover,
+    &:focus-visible {
+      box-shadow: 0 0 utils.$blur 2 * utils.$spread $hover-color;
+    }
+
+    &:active {
+      box-shadow: 0 0 utils.$blur 2 * utils.$spread $main-color;
+    }
+
+    &:disabled {
+      box-shadow: none;
+    }
+  }
+}
+
 @mixin link($simple-hover, $simple-active, $colored-hover, $colored-active) {
   a {
     transition: color utils.$hover-time;
@@ -213,4 +235,12 @@ a button {
   display: flex;
   flex-direction: column;
   gap: utils.$input-label-gap;
+}
+
+button.icon {
+  min-width: unset;
+  min-height: unset;
+  border-radius: utils.$max-radius;
+  font-size: $button-icon-size;
+  padding: ($icon-button-width - $button-icon-size) * 0.5;
 }

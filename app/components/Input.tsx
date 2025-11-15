@@ -1,11 +1,10 @@
 'use client';
 
+import { EyeSlash, Eye } from '@mynaui/icons-react';
 import { ChangeEvent, HTMLInputTypeAttribute, useReducer } from 'react';
-import { Icon } from '@iconify/react';
 
 import { TextInputProps } from '@ts/ui/components-props';
 
-import { getIconCode } from '@lib/utils';
 import Hint from './Hint';
 
 type InputType = Extract<
@@ -56,13 +55,12 @@ export default function Input({
           onChange={onValueChange}
         />
 
-        {type !== 'password' || (
-          <Icon
-            className='input-icon'
-            onClick={show}
-            icon={getIconCode(isShown ? 'eye-slash' : 'eye')}
-          />
-        )}
+        {type !== 'password'
+          || (isShown ? (
+            <EyeSlash className='input-icon' onClick={show} />
+          ) : (
+            <Eye className='input-icon' onClick={show} />
+          ))}
       </div>
 
       <Hint variant='error'>{errorHint}</Hint>

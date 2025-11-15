@@ -11,13 +11,9 @@ $bg-1-color-length: 28%;
 $modules: 'user', 'music', 'games';
 
 @each $module in $modules {
-  // .#{$module}:has(> .sidebar) {
-  //   padding-right: sidebar.$sidebar-icon-width + sidebar.$sidebar-padding-x * 2;
-  // }
-
   body > .#{$module} {
     box-sizing: border-box;
-    padding: 4rem;
+    padding: utils.$layout-padding;
     min-height: 100vh;
     flex-direction: column;
     background: linear-gradient(
@@ -93,6 +89,13 @@ $modules: 'user', 'music', 'games';
       map.get(utils.$active-colors, $module),
       utils.$white,
       utils.$text-darker
+    );
+
+    @include buttons.button-text(
+      map.get(utils.$active-colors, $module),
+      map.get(utils.$hover-colors, $module),
+      map.get(utils.$highlight-colors, $module),
+      map.get(utils.$disabled-colors, $module)
     );
 
     @include text-inputs.input-select-textarea(
@@ -204,6 +207,13 @@ $modules: 'user', 'music', 'games';
         map.get(utils.$bg-2-colors, $module),
         map.get(utils.$hover-colors, $module),
         map.get(utils.$active-colors, $module),
+        map.get(utils.$disabled-colors, $module)
+      );
+
+      @include buttons.button-text(
+        map.get(utils.$hover-colors, $module),
+        map.get(utils.$active-colors, $module),
+        map.get(utils.$highlight-colors, $module),
         map.get(utils.$disabled-colors, $module)
       );
 

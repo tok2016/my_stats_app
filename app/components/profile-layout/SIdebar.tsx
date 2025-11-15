@@ -2,11 +2,10 @@
 
 import { useReducer } from 'react';
 import { usePathname } from 'next/navigation';
-import { Icon } from '@iconify/react';
+import { MusicSolid, ControllerSolid } from '@mynaui/icons-react';
 
 import { SidebarButtonProps } from '@ts/ui/components-props';
 
-import { getIconCode } from '@lib/utils';
 import SidebarButton from './SidebarButton';
 import UserButton from './UserButton';
 import UserSearch from '@components/UserSearch';
@@ -16,7 +15,7 @@ const SidebarButtons: SidebarButtonProps[] = [
   {
     name: 'music',
     label: 'Music',
-    icon: <Icon icon={getIconCode('music-solid')} />,
+    icon: <MusicSolid />,
     subButtons: [
       {
         name: 'genres',
@@ -48,7 +47,7 @@ const SidebarButtons: SidebarButtonProps[] = [
   {
     name: 'games',
     label: 'Video Games',
-    icon: <Icon icon={getIconCode('controller-solid')} />,
+    icon: <ControllerSolid />,
     subButtons: [
       {
         name: 'genres',

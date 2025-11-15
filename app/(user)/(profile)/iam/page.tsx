@@ -1,7 +1,16 @@
+'use client';
+
+import ProfileInfo from '@app/(user)/components/ProfileInfo';
+import { useUserState } from '@store/user-store';
+
 export default function IamPage() {
+  const { user, status } = useUserState();
+
   return (
-    <>
-      <h1>Profile</h1>
-    </>
+    <ProfileInfo
+      user={user}
+      authorized
+      loading={status === 'idle' || status === 'pending'}
+    />
   );
 }

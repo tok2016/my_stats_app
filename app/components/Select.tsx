@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Icon } from '@iconify/react';
+import { ChevronDown } from '@mynaui/icons-react';
 
 import { SelectVariant } from '@ts/ui/components-variants';
 import { TextInputProps, Option } from '@ts/ui/components-props';
 
-import { getIconCode } from '@lib/utils';
 import Hint from './Hint';
 
 type SelectProps = TextInputProps & {
@@ -85,9 +84,8 @@ export default function Select({
 
         <div id={`${id}-label`} className='select'>
           <span id={`${id}-label`}>{value}</span>
-          <Icon
+          <ChevronDown
             id={`${id}-label`}
-            icon={getIconCode('chevron-down')}
             className={`picker-icon ${isExpanded ? 'expanded' : ''}`}
           />
         </div>

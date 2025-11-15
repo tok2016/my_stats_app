@@ -1,11 +1,9 @@
 'use client';
 
 import { KeyboardEvent, useRef } from 'react';
-import { Icon } from '@iconify/react';
+import { Search as SearchIcon } from '@mynaui/icons-react';
 
 import { SearchProps } from '@ts/ui/components-props';
-
-import { getIconCode } from '@lib/utils';
 
 export default function Search({
   id,
@@ -44,11 +42,7 @@ export default function Search({
           onBlur={onBlur}
         />
 
-        <Icon
-          className='input-icon'
-          icon={getIconCode('search')}
-          onClick={onSearchSubmit}
-        />
+        <SearchIcon className='input-icon' onClick={onSearchSubmit} />
       </div>
     </div>
   );

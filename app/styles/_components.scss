@@ -177,9 +177,9 @@ $skeleton-icon-min-width: 2rem;
   svg {
     min-width: $skeleton-icon-min-width;
     min-height: $skeleton-icon-min-width;
-    width: 50% !important;
-    height: 50% !important;
-    stroke-width: 3px !important;
+    width: 50%;
+    height: 50%;
+    stroke-width: 3px;
   }
 }
 
@@ -233,6 +233,7 @@ $skeleton-icon-min-width: 2rem;
 
 .skeleton.image,
 .skeleton.graph {
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -253,5 +254,21 @@ $skeleton-icon-min-width: 2rem;
     svg {
       color: $icon-color !important;
     }
+  }
+}
+
+.fetch-image {
+  position: relative;
+
+  .skeletons {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  img,
+  .skeletons {
+    width: 100%;
+    height: 100%;
   }
 }
