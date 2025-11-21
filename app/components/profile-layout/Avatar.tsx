@@ -24,6 +24,7 @@ export default function Avatar({ avatarId, loading, className }: AvatarProps) {
       src={`/api/avatar/${avatarId}`}
       width={AVATAR_WIDTH}
       height={AVATAR_WIDTH}
+      priority
     />
   );
 }

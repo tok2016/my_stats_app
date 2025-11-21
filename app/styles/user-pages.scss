@@ -65,9 +65,8 @@ $avatar-width: 10rem;
   background-color: map.get(utils.$bg-1-colors, 'user');
   border-bottom: solid 4px map.get(utils.$bg-2-colors, 'user');
 
-  font-family: utils.$ibm-plex;
-
   .avatar {
+    width: $avatar-width;
     height: $avatar-width;
   }
 }
@@ -77,6 +76,8 @@ $avatar-width: 10rem;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
+
+  font-family: utils.$ibm-plex;
 }
 
 .profile-details {
@@ -114,9 +115,7 @@ $avatar-width: 10rem;
     img,
     .skeleton {
       border-radius: 2px;
-    }
 
-    .skeleton {
       svg {
         display: none;
       }

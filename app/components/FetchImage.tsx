@@ -12,6 +12,7 @@ type FetchImageProps = {
   className?: string;
   imageClassName?: string;
   skeletonClassName?: string;
+  priority?: boolean;
 };
 
 const IMAGE_DEFAULT_WIDTH = 150;
@@ -22,7 +23,8 @@ export default function FetchImage({
   height = IMAGE_DEFAULT_WIDTH,
   className,
   imageClassName,
-  skeletonClassName
+  skeletonClassName,
+  priority
 }: FetchImageProps) {
   const [isPending, setPending] = useState<boolean>(true);
 
@@ -35,6 +37,7 @@ export default function FetchImage({
         height={height}
         className={`${imageClassName} ${isPending ? 'invisible' : ''}`}
         alt=''
+        priority={priority}
         onLoad={() => setPending(false)}
       />
     </div>

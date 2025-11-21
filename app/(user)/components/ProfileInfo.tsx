@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Lock, LockOpen, Share, Wrench } from '@mynaui/icons-react';
+import { Share, Wrench } from '@mynaui/icons-react';
 
 import { User } from '@ts/users/user';
 
@@ -9,6 +9,7 @@ import Avatar from '@components/profile-layout/Avatar';
 import CountryData from './CountryData';
 import IconButton from '@components/IconButton';
 import ProfileInfoSkeleton from './ProfileInfoSkeleton';
+import PublishButton from './PublishButton';
 
 type ProfileInfoProps = {
   user: User;
@@ -36,6 +37,12 @@ export default function ProfileInfo({
   authorized = false,
   loading = false
 }: ProfileInfoProps) {
+  const onShare = () => {
+    navigator.clipboard.writeText(
+      `${window.location.origin}/users/${user.username}`
+    );
+  };
+
   return (
     <div className='profile-info'>
       <Avatar avatarId={user.avatarUrl} loading={loading} />
@@ -71,11 +78,10 @@ export default function ProfileInfo({
 
         {!authorized || (
           <div className='profile-controlls'>
-            <IconButton
-              icon={user.isPublic && !loading ? <LockOpen /> : <Lock />}
-              loading={loading}
-            />
-            <IconButton icon={<Share />} loading={loading} />
+            <PublishButton isPublic={user.isPublic} loading={loading} />
+
+            <IconButton icon={<Share />} loading={loading} onClick={onShare} />
+
             <Link href='/iam/settings'>
               <IconButton icon={<Wrench />} />
             </Link>

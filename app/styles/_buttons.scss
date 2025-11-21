@@ -154,24 +154,35 @@ button {
   }
 }
 
-@mixin button-text($main-color, $hover-color, $active-color, $disabled-color) {
-  button.text {
+@mixin button-link($main-color, $hover-color, $active-color, $disabled-color) {
+  button.link {
     @include button($main-color, $hover-color, $active-color, $disabled-color);
 
     background-color: transparent;
 
+    * {
+      filter: drop-shadow(0 0 utils.$spread $main-color);
+    }
+
     &:hover,
-    &:focus-visible {
-      box-shadow: 0 0 utils.$blur 2 * utils.$spread $hover-color;
+    &:focus-visible * {
+      filter: drop-shadow(0 0 2 * utils.$spread $hover-color);
     }
 
-    &:active {
-      box-shadow: 0 0 utils.$blur 2 * utils.$spread $main-color;
+    &:active * {
+      filter: drop-shadow(0 0 2 * utils.$spread $active-color);
     }
 
-    &:disabled {
-      box-shadow: none;
+    &:disabled * {
+      filter: none;
     }
+  }
+}
+
+@mixin button-text($main-color, $hover-color, $active-color, $disabled-color) {
+  button.text {
+    @include button($main-color, $hover-color, $active-color, $disabled-color);
+    background-color: transparent;
   }
 }
 
@@ -235,6 +246,18 @@ a button {
   display: flex;
   flex-direction: column;
   gap: utils.$input-label-gap;
+}
+
+.buttons-flex-box {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: flex-start;
+  gap: 1.5rem;
+
+  button {
+    flex-grow: 1;
+  }
 }
 
 button.icon {

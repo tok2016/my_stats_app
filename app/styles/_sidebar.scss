@@ -176,9 +176,12 @@ $sidebar-expanded-width: 16rem;
       color: $text-color;
     }
 
-    // .sidebar-icon.loaded svg {
-    //   box-shadow: 0 0 utils.$blur utils.$spread $text-color;
-    // }
+    .sidebar-icon.loaded {
+      .avatar,
+      svg {
+        filter: drop-shadow(0 0 2 * utils.$spread $text-color);
+      }
+    }
 
     &:hover {
       span,
@@ -198,9 +201,12 @@ $sidebar-expanded-width: 16rem;
       color: $text-active-color;
     }
 
-    // .sidebar-icon.loaded svg {
-    //   box-shadow: 0 0 utils.$blur utils.$spread $text-active-color;
-    // }
+    .sidebar-icon.loaded {
+      .avatar,
+      svg {
+        filter: drop-shadow(0 0 2 * utils.$spread $text-active-color);
+      }
+    }
   }
 
   input.choosen {

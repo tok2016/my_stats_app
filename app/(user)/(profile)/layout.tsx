@@ -1,14 +1,18 @@
 import ProfileContent from '@components/profile-layout/ProfileContent';
 import Sidebar from '@components/profile-layout/SIdebar';
+import { getUser } from '@lib/serverActions';
 
-export default function ProfileLayout({
+export default async function ProfileLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log('server render');
+  const user = await getUser();
+
   return (
     <>
-      <Sidebar />
+      <Sidebar user={user} />
       <ProfileContent>{children}</ProfileContent>
     </>
   );

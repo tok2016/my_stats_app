@@ -6,11 +6,5 @@ import { useUserState } from '@store/user-store';
 export default function IamPage() {
   const { user, status } = useUserState();
 
-  return (
-    <ProfileInfo
-      user={user}
-      authorized
-      loading={status === 'idle' || status === 'pending'}
-    />
-  );
+  return <ProfileInfo user={user} authorized loading={status === 'pending'} />;
 }

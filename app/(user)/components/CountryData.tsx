@@ -13,16 +13,19 @@ type CountryDataProps = {
   country: string;
 };
 
+const COUNTRY_REGUEST_TIMEOUT = 10000;
+
 const defaultCountry: Country = { error: false, data: { name: '', flag: '' } };
 
 const getCountyData = async (country?: string) => {
-  if (!country) {
+  if (!country || !process.env.COUNTRIES_API) {
     return defaultCountry;
   }
 
   const countryData = await AxiosInstanse.post<Country>(
-    'https://countriesnow.space/api/v0.1/countries/flag/images',
-    { iso2: country }
+    process.env.COUNTRIES_API,
+    { iso2: country },
+    { timeout: COUNTRY_REGUEST_TIMEOUT }
   );
 
   return countryData.data;
@@ -50,6 +53,7 @@ export default function CountryData({ country }: CountryDataProps) {
         src={countryData.data.flag}
         width={20}
         height={20}
+        priority
       />
     </div>
   );

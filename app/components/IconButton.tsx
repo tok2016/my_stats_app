@@ -13,7 +13,7 @@ type IconButtonProps = Omit<
 
 export default function IconButton({
   icon,
-  variant = 'text',
+  variant = 'link',
   className,
   disabled,
   loading,

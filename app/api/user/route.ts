@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { unlink } from 'fs/promises';
 import path from 'path';
 
@@ -116,6 +117,9 @@ export async function PUT(req: NextRequest) {
     }
 
     const dashboards = await getDashboards(credentials.userId);
+
+    revalidatePath('/(user)/(profile)', 'layout');
+
     return NextResponse.json(uniteUserData(credentials, userInfo, dashboards), {
       status: 200,
       statusText: 'User data was updated successfully'

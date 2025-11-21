@@ -121,14 +121,20 @@ $skeleton-icon-min-width: 2rem;
   }
 }
 
-.card {
+.card,
+.card-flex-content {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 1.5rem;
-  width: 22rem;
+}
+
+.card {
+  position: relative;
+  width: 22em;
   padding: 1.25rem;
   border-radius: utils.$regular-radius;
+  box-sizing: border-box;
 
   h1,
   span {
@@ -138,6 +144,27 @@ $skeleton-icon-min-width: 2rem;
   .button-group {
     text-align: center;
   }
+
+  .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: utils.$black-alpha;
+  text-align: left;
 }
 
 .send-again-timer {

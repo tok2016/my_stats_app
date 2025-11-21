@@ -91,11 +91,18 @@ $modules: 'user', 'music', 'games';
       utils.$text-darker
     );
 
-    @include buttons.button-text(
+    @include buttons.button-link(
       map.get(utils.$active-colors, $module),
       map.get(utils.$hover-colors, $module),
       map.get(utils.$highlight-colors, $module),
       map.get(utils.$disabled-colors, $module)
+    );
+
+    @include buttons.button-text(
+      map.get(utils.$text-colors, $module),
+      utils.$text-darker,
+      utils.$white,
+      utils.$placeholder-color
     );
 
     @include text-inputs.input-select-textarea(
@@ -210,11 +217,18 @@ $modules: 'user', 'music', 'games';
         map.get(utils.$disabled-colors, $module)
       );
 
-      @include buttons.button-text(
+      @include buttons.button-link(
         map.get(utils.$hover-colors, $module),
         map.get(utils.$active-colors, $module),
         map.get(utils.$highlight-colors, $module),
         map.get(utils.$disabled-colors, $module)
+      );
+
+      @include buttons.button-text(
+        map.get(utils.$bg-2-colors, $module),
+        utils.$placeholder-darker,
+        utils.$text-darker,
+        utils.$placeholder-color
       );
 
       @include text-inputs.input-select-textarea(

@@ -16,7 +16,7 @@ type UserActions = {
 
 const userState = create<UserState & UserActions>((set) => ({
   user: defaultUser,
-  status: 'idle',
+  status: 'pending',
   setUserState: (userState) => set(userState)
 }));
 

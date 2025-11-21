@@ -30,8 +30,10 @@ export const useURLSearchParams = () => {
 
 export const useAction = <DataType, ParameterType = undefined>(
   action: (newData?: ParameterType) => Promise<DataType>,
-  initialData: DataType
+  initialData: DataType,
+  refreshPath: boolean = false
 ) => {
+  const { refresh } = useRouter();
   const [data, setData] = useState<DataType>(initialData);
   const [isPending, setPending] = useState<boolean>(false);
 
@@ -39,10 +41,15 @@ export const useAction = <DataType, ParameterType = undefined>(
     async (newData?: ParameterType) => {
       setPending(true);
       const data = await action(newData);
+
       setData(data);
       setPending(false);
+
+      if (refreshPath) {
+        refresh();
+      }
     },
-    [action]
+    [action, refresh, refreshPath]
   );
 
   return [data, startAction, isPending, setData] as const;

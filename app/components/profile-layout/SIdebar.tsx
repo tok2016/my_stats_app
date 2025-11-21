@@ -1,15 +1,17 @@
 'use client';
 
-import { useReducer } from 'react';
+import { memo, useEffect, useReducer } from 'react';
 import { usePathname } from 'next/navigation';
 import { MusicSolid, ControllerSolid } from '@mynaui/icons-react';
 
 import { SidebarButtonProps } from '@ts/ui/components-props';
+import { User } from '@ts/users/user';
 
 import SidebarButton from './SidebarButton';
-import UserButton from './UserButton';
 import UserSearch from '@components/UserSearch';
 import LogoutButton from './LogoutButton';
+import { useUserState } from '@store/user-store';
+import Avatar from './Avatar';
 
 const SidebarButtons: SidebarButtonProps[] = [
   {
@@ -78,14 +80,26 @@ const SidebarButtons: SidebarButtonProps[] = [
   }
 ];
 
-export default function Sidebar() {
+function SidebarRaw({ user }: { user: User }) {
+  const { setUserState, status } = useUserState();
+
   const [isExpanded, toggleExpand] = useReducer((value) => !value, false);
   const path = usePathname().split('/')[1];
+
+  useEffect(() => {
+    setUserState({ user, status: 'success' });
+  }, [user, setUserState]);
 
   return (
     <div className={`sidebar ${isExpanded ? 'expanded' : ''}`}>
       <div className='sidebar-upper'>
-        <UserButton />
+        <SidebarButton
+          name='iam'
+          label={user.username}
+          loading={status === 'pending'}
+          href='/iam'
+          icon={<Avatar avatarId={user.avatarUrl} />}
+        />
 
         {SidebarButtons.map((sidebarButton, i) => (
           <SidebarButton key={i} {...sidebarButton} />
@@ -103,3 +117,6 @@ export default function Sidebar() {
     </div>
   );
 }
+
+const Sidebar = memo(SidebarRaw);
+export default Sidebar;
