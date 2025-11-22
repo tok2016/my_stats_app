@@ -3,9 +3,9 @@
 import { LogoutSolid } from '@mynaui/icons-react';
 
 import { useUserState } from '@store/user-store';
-import SidebarButton from './SidebarButton';
 import { defaultUser } from '@lib/utils';
 import { logout } from '@lib/server-actions';
+import SidebarOption from './SidebarOption';
 
 export default function LogoutButton() {
   const { setUserState } = useUserState();
@@ -16,7 +16,7 @@ export default function LogoutButton() {
   };
 
   return (
-    <SidebarButton
+    <SidebarOption
       name='logout'
       label='Logout'
       icon={<LogoutSolid />}

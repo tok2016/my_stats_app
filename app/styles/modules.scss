@@ -160,6 +160,10 @@ $modules: 'user', 'music', 'games';
       utils.$skeleton-light-color
     );
 
+    @include components.card(map.get(utils.$bg-1-colors, $module));
+
+    @include components.tab(map.get(utils.$hover-colors, $module));
+
     @include sidebar.sidebar(
       map.get(utils.$bg-1-colors, $module),
       map.get(utils.$bg-2-colors, $module),
@@ -169,6 +173,8 @@ $modules: 'user', 'music', 'games';
     );
 
     .light {
+      @include utils.light-scrollbar();
+
       background-color: map.get(utils.$text-colors, $module);
       box-shadow: 0
         0

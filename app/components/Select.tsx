@@ -19,6 +19,8 @@ type SelectVariantProps = {
   selectGroupClass: string;
 };
 
+const PERCENT_TO_CHANGE_POSITION = 0.67;
+
 const SelectTypes: Record<SelectVariant, SelectVariantProps> = {
   plain: {
     labelGroupClass: 'input-select-group',
@@ -42,23 +44,30 @@ export default function Select({
   errorHint,
   onSelect
 }: SelectProps) {
-  const [value, setValue] = useState<string>(options[0].value);
+  const [option, setOption] = useState<Option>(options[0]);
   const [isExpanded, setExpanded] = useState<boolean>(false);
+  const [pickerPosition, setPickerPosition] = useState<'upper' | ''>('');
 
-  const onOptionClick = (value: string) => {
-    setValue(value);
+  const onOptionClick = (newOption: Option) => {
+    setOption(newOption);
     setExpanded(false);
-    onSelect?.(value);
+    onSelect?.(newOption.value);
   };
 
   useEffect(() => {
-    const onClose = (evt: MouseEvent) => {
+    const onExpand = (evt: MouseEvent) => {
       const { target } = evt;
       setExpanded(target instanceof Element && target.id?.includes(id));
-    };
-    window.addEventListener('click', onClose);
 
-    return () => window.removeEventListener('click', onClose);
+      setPickerPosition(
+        evt.clientY > window.innerHeight * PERCENT_TO_CHANGE_POSITION
+          ? 'upper'
+          : ''
+      );
+    };
+    window.addEventListener('click', onExpand);
+
+    return () => window.removeEventListener('click', onExpand);
   }, [id]);
 
   return (
@@ -72,7 +81,7 @@ export default function Select({
           id={id}
           name={name}
           defaultValue={defaultValue}
-          value={value}
+          value={option.value}
           onChange={() => {}}
         >
           {options.map((option) => (
@@ -83,21 +92,23 @@ export default function Select({
         </select>
 
         <div id={`${id}-label`} className='select'>
-          <span id={`${id}-label`}>{value}</span>
+          <span id={`${id}-label`}>{option.label}</span>
           <ChevronDown
             id={`${id}-label`}
             className={`picker-icon ${isExpanded ? 'expanded' : ''}`}
           />
         </div>
 
-        <ul className={`picker ${isExpanded ? '' : 'hidden'}`}>
-          {options.map((option) => (
+        <ul
+          className={`picker ${isExpanded ? '' : 'hidden'} ${pickerPosition}`}
+        >
+          {options.map((opt) => (
             <li
-              key={option.value}
-              className={`option ${option.value === value ? 'selected' : ''}`}
-              onClick={() => onOptionClick(option.value)}
+              key={opt.value}
+              className={`option ${opt.value === option.value ? 'selected' : ''}`}
+              onClick={() => onOptionClick(opt)}
             >
-              {option.label}
+              {opt.label}
             </li>
           ))}
         </ul>

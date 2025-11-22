@@ -58,7 +58,7 @@ export type SidebarSubButtonProps = {
   loading?: boolean;
 };
 
-export type SidebarButtonProps = Omit<SidebarSubButtonProps, 'href'> & {
+export type SidebarOptionProps = Omit<SidebarSubButtonProps, 'href'> & {
   href?: string;
 } & {
   icon: ReactNode;

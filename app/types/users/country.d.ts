@@ -5,3 +5,11 @@ export default interface Country {
     flag: string;
   };
 }
+
+export interface Countries {
+  error: boolean;
+  data: {
+    name: string;
+    Iso2: string;
+  }[];
+}

@@ -7,6 +7,7 @@ import ErrorResponse, { ValidationIssue } from '@ts/requests';
 import FormState from '@ts/ui/form-state';
 import { ConfirmationInfo } from '@ts/users/confirmation';
 import { NewPassword } from '@ts/users/password';
+import Country, { Countries } from '@ts/users/country';
 
 import { isAxiosError } from './axios-instanse';
 
@@ -63,6 +64,16 @@ export const defaultUser: User = {
   createdAt: new Date(),
   dashboards: [],
   isPublic: false
+};
+
+export const defaultCountry: Country = {
+  error: false,
+  data: { name: '', flag: '' }
+};
+
+export const defaultCountries: Countries = {
+  error: false,
+  data: []
 };
 
 export const isErrorResponse = (value: unknown): value is ErrorResponse =>

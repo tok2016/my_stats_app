@@ -135,3 +135,14 @@ $layout-padding: 3rem;
   text-decoration: underline dotted $color 2px;
   text-underline-offset: 2px;
 }
+
+@mixin light-scrollbar() {
+  &::-webkit-scrollbar-track {
+    background-color: $text-darker;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $white;
+    border-color: $text-darker;
+  }
+}

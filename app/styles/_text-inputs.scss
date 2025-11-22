@@ -212,6 +212,9 @@ select {
 .select-picker,
 .text-select-picker {
   position: relative;
+}
+
+.text-select-picker {
   width: max-content;
 }
 
@@ -234,7 +237,9 @@ select {
   flex-direction: column;
   position: absolute;
 
+  overflow: auto;
   min-width: 6.25rem;
+  max-height: 10rem;
   width: max-content;
   margin: 0;
   padding: 0;
@@ -246,6 +251,21 @@ select {
 
   border-radius: utils.$regular-radius;
   z-index: 5;
+
+  background-color: utils.$white;
+  border-radius: utils.$regular-radius;
+
+  @include utils.light-scrollbar();
+
+  &::-webkit-scrollbar-track {
+    border-radius: utils.$small-radius;
+  }
+}
+
+.picker.upper {
+  top: unset;
+  bottom: ($input-min-height - utils.$regular-size) * 0.5 - $option-padding-y *
+    1.75;
 }
 
 .picker.hidden {
@@ -260,18 +280,9 @@ select {
   );
   font-family: utils.$inter;
   display: block;
-  background-color: utils.$white;
   padding: $option-padding-y $option-padding-x;
   margin: 0;
   cursor: pointer;
-
-  &:first-of-type {
-    border-radius: utils.$regular-radius utils.$regular-radius 0 0;
-  }
-
-  &:last-of-type {
-    border-radius: 0 0 utils.$regular-radius utils.$regular-radius;
-  }
 }
 
 .option.selected {

@@ -4,16 +4,16 @@ import { memo, useEffect, useReducer } from 'react';
 import { usePathname } from 'next/navigation';
 import { MusicSolid, ControllerSolid } from '@mynaui/icons-react';
 
-import { SidebarButtonProps } from '@ts/ui/components-props';
+import { SidebarOptionProps } from '@ts/ui/components-props';
 import { User } from '@ts/users/user';
 
-import SidebarButton from './SidebarButton';
 import UserSearch from '@components/UserSearch';
 import LogoutButton from './LogoutButton';
 import { useUserState } from '@store/user-store';
 import Avatar from './Avatar';
+import SidebarOption from './SidebarOption';
 
-const SidebarButtons: SidebarButtonProps[] = [
+const SidebarOptions: SidebarOptionProps[] = [
   {
     name: 'music',
     label: 'Music',
@@ -93,7 +93,7 @@ function SidebarRaw({ user }: { user: User }) {
   return (
     <div className={`sidebar ${isExpanded ? 'expanded' : ''}`}>
       <div className='sidebar-upper'>
-        <SidebarButton
+        <SidebarOption
           name='iam'
           label={user.username}
           loading={status === 'pending'}
@@ -101,8 +101,8 @@ function SidebarRaw({ user }: { user: User }) {
           icon={<Avatar avatarId={user.avatarUrl} />}
         />
 
-        {SidebarButtons.map((sidebarButton, i) => (
-          <SidebarButton key={i} {...sidebarButton} />
+        {SidebarOptions.map((sidebarOption) => (
+          <SidebarOption key={sidebarOption.name} {...sidebarOption} />
         ))}
 
         <UserSearch

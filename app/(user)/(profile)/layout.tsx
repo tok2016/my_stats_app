@@ -7,7 +7,6 @@ export default async function ProfileLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  console.log('server render');
   const user = await getUser();
 
   return (

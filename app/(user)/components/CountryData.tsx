@@ -4,31 +4,14 @@ import { useEffect } from 'react';
 
 import Country from '@ts/users/country';
 
-import AxiosInstanse from '@lib/axios-instanse';
 import { useAction } from '@lib/hooks';
 import CountryDataSkeleton from './CountryDataSkeleton';
 import FetchImage from '@components/FetchImage';
+import { getCountyData } from '../actions';
+import { defaultCountry } from '@lib/utils';
 
 type CountryDataProps = {
   country: string;
-};
-
-const COUNTRY_REGUEST_TIMEOUT = 10000;
-
-const defaultCountry: Country = { error: false, data: { name: '', flag: '' } };
-
-const getCountyData = async (country?: string) => {
-  if (!country || !process.env.COUNTRIES_API) {
-    return defaultCountry;
-  }
-
-  const countryData = await AxiosInstanse.post<Country>(
-    process.env.COUNTRIES_API,
-    { iso2: country },
-    { timeout: COUNTRY_REGUEST_TIMEOUT }
-  );
-
-  return countryData.data;
 };
 
 export default function CountryData({ country }: CountryDataProps) {
