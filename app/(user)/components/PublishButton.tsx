@@ -3,13 +3,11 @@
 import { Lock, LockOpen } from '@mynaui/icons-react';
 
 import IconButton from '@components/IconButton';
-import Popup from '@components/Popup';
 import { usePopupState } from '@store/popup-store';
-import Button from '@components/Button';
 import { useAction } from '@lib/hooks';
 import { changeProfilePrivacy } from '../actions';
 import { defaultFormState } from '@lib/utils';
-import Hint from '@components/Hint';
+import PublishPopup from './PublishPopup';
 
 type PublishButtonProps = {
   isPublic?: boolean;
@@ -39,7 +37,7 @@ export default function PublishButton({
     true
   );
 
-  const onConfim = async () => {
+  const onConfirm = async () => {
     changePrivacy(isPublic);
   };
 
@@ -51,25 +49,15 @@ export default function PublishButton({
         onClick={onPopupToggle}
       />
 
-      <Popup name={PUBLISH_POPUP_NAME} onClose={clearData}>
-        <p>
-          {isPublic
-            ? `Do you really want to close your profile? Other user won't be able to see it anymore`
-            : 'Do you really want to publish your profile and make it available for everyone?'}
-        </p>
-
-        <div className='buttons-flex-box'>
-          <Button loading={isPending} onClick={onConfim}>
-            {isPublic ? 'Close' : 'Publish'}
-          </Button>
-
-          <Button variant='outlined' onClick={onPopupToggle}>
-            Cancel
-          </Button>
-        </div>
-
-        {!state.error || <Hint variant='error'>{state.message}</Hint>}
-      </Popup>
+      <PublishPopup
+        name={PUBLISH_POPUP_NAME}
+        isPublic={isPublic}
+        loading={isPending}
+        errorMessage={state.error ? state.message : ''}
+        onClose={clearData}
+        onCancel={onPopupToggle}
+        onConfirm={onConfirm}
+      />
     </>
   );
 }

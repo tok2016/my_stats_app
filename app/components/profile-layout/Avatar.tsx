@@ -11,6 +11,15 @@ type AvatarProps = {
 
 const AVATAR_WIDTH = 150;
 
+const getAvatarUrl = (avatarId: string) => {
+  try {
+    const avatarUrl = new URL(avatarId);
+    return avatarUrl.toString();
+  } catch {
+    return `/api/avatar/${avatarId}`;
+  }
+};
+
 export default function Avatar({ avatarId, loading, className }: AvatarProps) {
   if (loading) {
     return <Skeleton type='image' className={`avatar ${className}`} />;
@@ -21,7 +30,7 @@ export default function Avatar({ avatarId, loading, className }: AvatarProps) {
   return (
     <FetchImage
       className={`avatar ${className}`}
-      src={`/api/avatar/${avatarId}`}
+      src={getAvatarUrl(avatarId)}
       width={AVATAR_WIDTH}
       height={AVATAR_WIDTH}
       priority

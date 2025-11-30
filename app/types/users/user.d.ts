@@ -26,7 +26,7 @@ export interface UserLogin {
 }
 
 export type UserUpdate = Partial<
-  Omit<UserInfo, 'id' | 'dashboards'> & Pick<Credentials, 'email'>
+  Omit<UserInfo, 'id' | 'dashboards' | 'avatarUrl'> & Pick<Credentials, 'email'>
 >;
 
 export type BasicUser = UserInfo

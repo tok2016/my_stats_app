@@ -1,19 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import Service, { NewService } from '@ts/users/service';
+import { NewService, ServicesMap } from '@ts/users/service';
 
 import { checkUserAuthorRights, generateAccessError } from '@lib/auth';
 import { ServiceCredentialsModel } from '@lib/models';
 import { ServiceValidator, validateData } from '@lib/validationSchemas';
 
-export const getServicesByUserId = async (
-  userId: string
-): Promise<Service[]> => {
+const getServicesByUserId = async (userId: string): Promise<ServicesMap> => {
   const services = await ServiceCredentialsModel.find({ userId }).lean();
-  return services.map((service) => ({
-    ...service,
-    id: service._id.toString()
-  }));
+
+  const entries = services.map((service) => [
+    service.name,
+    {
+      ...service,
+      id: service._id.toString()
+    }
+  ]);
+
+  return Object.fromEntries(entries);
 };
 
 export async function GET(

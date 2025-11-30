@@ -1,14 +1,20 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { Option } from '@ts/ui/components-props';
 
-import BinaryInput from '@components/BinaryInput';
 import Input from '@components/Input';
-import Avatar from '@components/profile-layout/Avatar';
 import Select from '@components/Select';
 import Tab from '@components/Tab';
 import { useUserState } from '@store/user-store';
 import Button from '@components/Button';
+import PublishInput from './PublishInput';
+import SubmitButton from '@components/SubmitButton';
+import SteamAuthInfo from './SteamAuthInfo';
+import { useAction } from '@lib/hooks';
+import { getServices } from '@lib/serverActions';
+import AvatarInput from './AvatarInput';
 
 type SettingsFormProps = {
   countriesOptions: Option[];
@@ -16,11 +22,16 @@ type SettingsFormProps = {
 
 export default function SettingsForm({ countriesOptions }: SettingsFormProps) {
   const { user } = useUserState();
+  const [services, getUserServices, isPending] = useAction(getServices, {});
+
+  useEffect(() => {
+    getUserServices();
+  }, [getUserServices]);
 
   return (
     <form className='card settings'>
       <h2>{user.username}</h2>
-      <Avatar avatarId={user.avatarUrl} />
+      <AvatarInput avatarId={user.avatarUrl} />
 
       <Input
         type='email'
@@ -48,13 +59,7 @@ export default function SettingsForm({ countriesOptions }: SettingsFormProps) {
       />
 
       <Tab label='Privacy'>
-        <BinaryInput
-          type='checkbox'
-          id='isPublic'
-          name='isPublic'
-          label='Public'
-          isSwitch
-        />
+        <PublishInput isPublicDefault={user.isPublic} />
 
         <a href={undefined} className='colored bold'>
           Change password
@@ -65,7 +70,14 @@ export default function SettingsForm({ countriesOptions }: SettingsFormProps) {
         </a>
       </Tab>
 
-      <Button>Save</Button>
+      <Tab label='Service Authentication'>
+        <SteamAuthInfo serviceData={services.steam} />
+      </Tab>
+
+      <div className='buttons-flex-box'>
+        <SubmitButton>Save</SubmitButton>
+        <Button type='reset'>Cancel</Button>
+      </div>
     </form>
   );
 }

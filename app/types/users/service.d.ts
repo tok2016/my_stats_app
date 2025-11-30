@@ -18,3 +18,5 @@ export default interface Service extends NewService {
 }
 
 export type ServiceInSchema = Omit<Service, 'id'> & { _id: Types.ObjectId };
+
+export type ServicesMap = Partial<Record<ServiceName, Service>>;

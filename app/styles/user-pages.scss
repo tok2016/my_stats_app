@@ -3,6 +3,8 @@
 @use 'sidebar';
 
 $avatar-width: 10rem;
+$frame-border-width: 0.75rem;
+$frame-start-width: 200px;
 
 .user {
   position: relative;
@@ -123,8 +125,110 @@ $avatar-width: 10rem;
   }
 }
 
-.settings .avatar {
+.avatar-field {
   align-self: center;
   width: 13rem;
   height: 13rem;
+
+  cursor: pointer;
+
+  .avatar {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.avatar-editor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+
+  background-color: utils.$black-alpha;
+  z-index: 10;
+}
+
+.avatar-controlls {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+
+  width: 100%;
+  height: 100%;
+  padding: 4rem 8rem;
+  box-sizing: border-box;
+
+  .skeleton {
+    flex-grow: 1;
+  }
+
+  .buttons-flex-box {
+    width: 22rem;
+  }
+}
+
+.frame {
+  position: absolute;
+  top: calc(50vh - $frame-start-width / 2);
+  left: calc(50vw - $frame-start-width / 2);
+  min-width: $frame-start-width;
+  min-height: $frame-start-width;
+  flex-grow: 0;
+
+  border: solid 2px utils.$white;
+  box-sizing: border-box;
+  box-shadow: 0 0 0 99999px utils.$black-alpha;
+
+  cursor: move;
+  user-select: none;
+
+  > div {
+    position: absolute;
+    width: $frame-border-width;
+    height: $frame-border-width;
+    box-sizing: border-box;
+
+    border-radius: utils.$max-radius;
+    background-color: utils.$white;
+
+    user-select: none;
+  }
+
+  #ne {
+    top: -$frame-border-width * 0.5;
+    right: -$frame-border-width * 0.5;
+    cursor: nesw-resize;
+  }
+
+  #nw {
+    top: -$frame-border-width * 0.5;
+    left: -$frame-border-width * 0.5;
+    cursor: nwse-resize;
+  }
+
+  #se {
+    bottom: -$frame-border-width * 0.5;
+    right: -$frame-border-width * 0.5;
+    cursor: nwse-resize;
+  }
+
+  #sw {
+    bottom: -$frame-border-width * 0.5;
+    left: -$frame-border-width * 0.5;
+    cursor: nesw-resize;
+  }
+}
+
+.avatar-origin {
+  min-width: 200px;
+  min-height: 200px;
+  width: unset;
+  height: unset;
+
+  border-radius: utils.$large-radius;
+  pointer-events: none;
 }
