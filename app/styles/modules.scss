@@ -49,15 +49,17 @@ $modules: 'user', 'music', 'games';
       text-decoration-color: map.get(utils.$active-colors, $module);
     }
 
+    @include buttons.link('', utils.$text-darker, utils.$white);
+
     @include buttons.link(
-      utils.$text-darker,
-      utils.$white,
+      '.colored',
       map.get(utils.$hover-colors, $module),
       map.get(utils.$highlight-colors, $module)
     );
 
     @include buttons.button-filled(
       'primary',
+      '',
       map.get(utils.$active-colors, $module),
       map.get(utils.$hover-colors, $module),
       map.get(utils.$highlight-colors, $module),
@@ -70,6 +72,7 @@ $modules: 'user', 'music', 'games';
 
     @include buttons.button-filled(
       'secondary',
+      '',
       map.get(utils.$text-colors, $module),
       utils.$text-darker,
       utils.$white,
@@ -81,6 +84,7 @@ $modules: 'user', 'music', 'games';
     );
 
     @include buttons.button-outlined(
+      '',
       map.get(utils.$active-colors, $module),
       map.get(utils.$hover-colors, $module),
       map.get(utils.$highlight-colors, $module),
@@ -92,6 +96,7 @@ $modules: 'user', 'music', 'games';
     );
 
     @include buttons.button-link(
+      '',
       map.get(utils.$active-colors, $module),
       map.get(utils.$hover-colors, $module),
       map.get(utils.$highlight-colors, $module),
@@ -99,6 +104,7 @@ $modules: 'user', 'music', 'games';
     );
 
     @include buttons.button-text(
+      '',
       map.get(utils.$text-colors, $module),
       utils.$text-darker,
       utils.$white,
@@ -164,6 +170,8 @@ $modules: 'user', 'music', 'games';
 
     @include components.tab(map.get(utils.$hover-colors, $module));
 
+    @include components.spinner(map.get(utils.$text-colors, $module));
+
     @include sidebar.sidebar(
       map.get(utils.$bg-1-colors, $module),
       map.get(utils.$bg-2-colors, $module),
@@ -206,13 +214,19 @@ $modules: 'user', 'music', 'games';
       }
 
       @include buttons.link(
+        '',
         map.get(utils.$hover-colors, $module),
-        map.get(utils.$active-colors, $module),
+        map.get(utils.$active-colors, $module)
+      );
+
+      @include buttons.link(
+        '.colored',
         map.get(utils.$active-colors, $module),
         map.get(utils.$highlight-colors, $module)
       );
 
       @include buttons.button-outlined(
+        '',
         map.get(utils.$active-colors, $module),
         map.get(utils.$hover-colors, $module),
         map.get(utils.$highlight-colors, $module),
@@ -224,6 +238,7 @@ $modules: 'user', 'music', 'games';
       );
 
       @include buttons.button-link(
+        '',
         map.get(utils.$hover-colors, $module),
         map.get(utils.$active-colors, $module),
         map.get(utils.$highlight-colors, $module),
@@ -231,6 +246,7 @@ $modules: 'user', 'music', 'games';
       );
 
       @include buttons.button-text(
+        '',
         map.get(utils.$bg-2-colors, $module),
         utils.$placeholder-darker,
         utils.$text-darker,
@@ -289,6 +305,8 @@ $modules: 'user', 'music', 'games';
         utils.$skeleton-light-color,
         utils.$skeleton-color
       );
+
+      @include components.spinner(map.get(utils.$bg-2-colors, $module));
     }
   }
 }

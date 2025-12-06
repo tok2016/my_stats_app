@@ -12,7 +12,10 @@ import { resetPassword } from '../actions';
 
 const Forms: Record<ConfirmationState, React.ReactNode> = {
   void: (
-    <ConfirmLoginForm baseAction={requestConfimation} addendum={<Reminder />} />
+    <ConfirmLoginForm
+      baseAction={requestConfimation()}
+      addendum={<Reminder />}
+    />
   ),
   pending: (
     <ConfirmCodeForm baseAction={confirmByCode} addendum={<Reminder />} />

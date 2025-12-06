@@ -5,7 +5,7 @@ import { Lock, LockOpen } from '@mynaui/icons-react';
 import IconButton from '@components/IconButton';
 import { usePopupState } from '@store/popup-store';
 import { useAction } from '@lib/hooks';
-import { changeProfilePrivacy } from '../actions';
+import { changeProfilePrivacy } from '../../actions';
 import { defaultFormState } from '@lib/utils';
 import PublishPopup from './PublishPopup';
 

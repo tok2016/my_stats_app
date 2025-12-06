@@ -7,6 +7,8 @@ export type ButtonVariant =
   | 'link'
   | 'text';
 
+export type ButtonStatus = '' | 'error' | 'warning' | 'success';
+
 export type IconButtonVariant = Exclude<ButtonVariant, 'outlined'>;
 
 export type InputTheme = 'light' | 'dark';

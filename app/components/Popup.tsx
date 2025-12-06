@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { X } from '@mynaui/icons-react';
 
 import { InputTheme } from '@ts/ui/components-variants';
@@ -11,6 +13,7 @@ type PopupProps = {
   children: React.ReactNode;
   name: string;
   variant?: InputTheme;
+  closeOnBackground?: boolean;
   onClose?: () => void;
 };
 
@@ -18,8 +21,10 @@ export default function Popup({
   children,
   name,
   variant = 'light',
+  closeOnBackground,
   onClose
 }: PopupProps) {
+  const pathname = usePathname();
   const { popupName, togglePopup } = usePopupState();
 
   const onPopupClose = () => {
@@ -33,12 +38,20 @@ export default function Popup({
     }
   };
 
+  useEffect(() => {
+    togglePopup('');
+  }, [pathname, togglePopup]);
+
   if (popupName !== name) {
     return;
   }
 
   return (
-    <div className='popup' id={name} onClick={onBackgroundClick}>
+    <div
+      className='popup'
+      id={name}
+      onClick={closeOnBackground ? onBackgroundClick : undefined}
+    >
       <div className={`card ${variant}`}>
         {children}
         <IconButton

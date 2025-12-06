@@ -3,10 +3,13 @@
 import { ChevronDown } from '@mynaui/icons-react';
 import { useEffect, useReducer, useRef } from 'react';
 
+import Spinner from './Spinner';
+
 type DrawerProps = {
   label: React.ReactNode;
   children: React.ReactNode;
   expandable?: boolean;
+  loading?: boolean;
   className?: string;
   submenuClassName?: string;
   onExpand?: () => void;
@@ -18,6 +21,7 @@ export default function Drawer({
   label,
   children,
   expandable,
+  loading,
   className,
   submenuClassName,
   onExpand
@@ -54,10 +58,10 @@ export default function Drawer({
     <>
       <div
         className={`drawer ${isMenuExpanded ? 'expanded' : ''} ${className}`}
-        onClick={onExpandClick}
+        onClick={loading ? undefined : onExpandClick}
       >
         {label}
-        <ChevronDown className='drawer-expand' />
+        {loading ? <Spinner /> : <ChevronDown className='drawer-expand' />}
       </div>
 
       <div className={`drawer-submenu ${submenuClassName}`} ref={submenuRef}>

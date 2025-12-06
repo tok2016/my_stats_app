@@ -28,6 +28,7 @@ export default function SidebarOption(sidebarOption: SidebarOptionProps) {
     <Drawer
       expandable={isExpanded}
       label={button}
+      loading={sidebarOption.loading}
       submenuClassName='sidebar-submenu'
       onExpand={onExpand}
     >

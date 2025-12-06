@@ -1,7 +1,7 @@
 import Service from '@ts/users/service';
 
 import Input from '@components/Input';
-import { ServiceStatusColors, ServiceStatusNames } from '../utils';
+import { ServiceStatusColors, ServiceStatusNames } from '../../utils';
 
 type ServiceAuthInfoProps = {
   serviceData?: Service;
@@ -21,7 +21,7 @@ export default function SteamAuthInfo({
       <p>
         Status:{' '}
         <span
-          className={ServiceStatusColors[serviceData?.status ?? 'unauthorized']}
+          className={`bold ${ServiceStatusColors[serviceData?.status ?? 'unauthorized']}`}
         >
           {ServiceStatusNames[serviceData?.status ?? 'unauthorized']}
         </span>

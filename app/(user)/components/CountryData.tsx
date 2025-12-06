@@ -7,7 +7,7 @@ import Country from '@ts/users/country';
 import { useAction } from '@lib/hooks';
 import CountryDataSkeleton from './CountryDataSkeleton';
 import FetchImage from '@components/FetchImage';
-import { getCountyData } from '../actions';
+import { getCountyData } from '@lib/server-actions';
 import { defaultCountry } from '@lib/utils';
 
 type CountryDataProps = {
@@ -24,8 +24,10 @@ export default function CountryData({ country }: CountryDataProps) {
     findCountry(country);
   }, [country, findCountry]);
 
-  if (isPending || !countryData.data.name) {
+  if (isPending) {
     return <CountryDataSkeleton />;
+  } else if (!countryData.data.name) {
+    return <p>Unknown country</p>;
   }
 
   return (

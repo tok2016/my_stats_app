@@ -9,7 +9,7 @@ import Avatar from '@components/profile-layout/Avatar';
 import CountryData from './CountryData';
 import IconButton from '@components/IconButton';
 import ProfileInfoSkeleton from './ProfileInfoSkeleton';
-import PublishButton from './PublishButton';
+import PublishButton from './publish-controlls/PublishButton';
 
 type ProfileInfoProps = {
   user: User;

@@ -1,16 +1,16 @@
 import { UserAccess, UserLogin } from '@ts/users/user';
-import FormState from '@ts/ui/form-state';
+import { FormAction } from '@ts/ui/form-state';
 import { ConfirmationBaseAction } from '@ts/users/confirmation';
 import { NewCredentials } from '@ts/users/credentials';
+import { NewPassword } from '@ts/users/password';
 
 import { getErrorFormState } from '@lib/utils';
 import AxiosInstanse from '@lib/axios-instanse';
-import { NewPassword } from '@ts/users/password';
 
-export const register = async (
-  _state: FormState<NewCredentials>,
-  formData: FormData
-): Promise<FormState<NewCredentials>> => {
+export const register: FormAction<NewCredentials> = async (
+  _state,
+  formData
+) => {
   try {
     const body = Object.fromEntries(formData.entries());
     const response = await AxiosInstanse.post<UserAccess>('/api/user', body);
@@ -25,10 +25,7 @@ export const register = async (
   }
 };
 
-export const login = async (
-  _state: FormState<UserLogin>,
-  formData: FormData
-): Promise<FormState<UserLogin>> => {
+export const login: FormAction<UserLogin> = async (_state, formData) => {
   try {
     const body = Object.fromEntries(formData.entries());
     const response = await AxiosInstanse.post<UserAccess>('/api/login', body);

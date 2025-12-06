@@ -17,18 +17,18 @@ export const getOperation = async (): Promise<ConfirmationInfo> => {
   }
 };
 
-export const requestConfimation: ConfirmationBaseAction = async (
-  _prev,
-  formData
-) => {
-  const body = Object.fromEntries(formData.entries());
-  const response = await AxiosInstanse.post<ConfirmationInfo>(
-    '/api/confirm',
-    body
-  );
+export const requestConfimation =
+  (signal?: AbortSignal): ConfirmationBaseAction =>
+  async (_prev, formData) => {
+    const body = Object.fromEntries(formData.entries());
+    const response = await AxiosInstanse.post<ConfirmationInfo>(
+      '/api/confirm',
+      body,
+      { signal }
+    );
 
-  return response.data;
-};
+    return response.data;
+  };
 
 export const confirmByCode: ConfirmationBaseAction = async (prev, formData) => {
   const data = Object.fromEntries(
@@ -56,6 +56,16 @@ export const sendCodeAgain = async (
     return { error: false, message: '' };
   } catch (err) {
     return getErrorFormState(err);
+  }
+};
+
+export const deleteConfirmation = async (operationId: string) => {
+  if (!operationId) return;
+
+  try {
+    await AxiosInstanse.delete(`/api/confirm/${operationId}`);
+  } catch {
+    return;
   }
 };
 

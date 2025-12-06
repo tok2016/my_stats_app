@@ -5,6 +5,7 @@ import { ButtonProps } from '@ts/ui/components-props';
 export default function Button({
   children,
   variant = 'primary',
+  status = '',
   beforeIcon,
   afterIcon,
   className = '',
@@ -17,7 +18,7 @@ export default function Button({
     <button
       type={type}
       disabled={disabled || loading}
-      className={`${variant} ${className}`}
+      className={`${variant} ${status} ${className}`}
       onClick={onClick}
     >
       {beforeIcon}

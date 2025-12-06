@@ -1,6 +1,6 @@
 import { type ReactNode, type MouseEvent } from 'react';
 
-import { ButtonVariant } from './components-variants';
+import { ButtonStatus, ButtonVariant } from './components-variants';
 
 export interface InputBaseProps {
   label?: ReactNode;
@@ -32,6 +32,7 @@ export type SearchProps = Omit<
 export type ButtonProps = {
   children?: ReactNode;
   variant?: ButtonVariant;
+  status?: ButtonStatus;
   beforeIcon?: ReactNode;
   afterIcon?: ReactNode;
   className?: string;
@@ -40,6 +41,8 @@ export type ButtonProps = {
   type?: HTMLButtonElement['type'];
   onClick?: (evt: MouseEvent) => void;
 };
+
+export type ButtonStyle = Omit<ButtonProps, 'type' | 'children' | 'loading'>;
 
 export type Option = {
   value: string;

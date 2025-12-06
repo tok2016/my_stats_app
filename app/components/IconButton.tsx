@@ -14,6 +14,7 @@ type IconButtonProps = Omit<
 export default function IconButton({
   icon,
   variant = 'link',
+  status = '',
   className,
   disabled,
   loading,
@@ -24,7 +25,7 @@ export default function IconButton({
     <button
       type={type}
       disabled={disabled || loading}
-      className={`icon ${variant} ${className}`}
+      className={`icon ${variant} ${status} ${className}`}
       onClick={onClick}
     >
       {icon}

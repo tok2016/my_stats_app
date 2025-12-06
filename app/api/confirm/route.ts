@@ -27,6 +27,7 @@ export async function GET() {
   const operation = await ConfirmationsModel.findById(operationId).lean();
 
   if (!operation) {
+    cookiesStore.delete('operation');
     return responseWithError(404, 'Operation was not found');
   }
 

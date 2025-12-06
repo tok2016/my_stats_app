@@ -1,22 +1,22 @@
 'use client';
 
-import { useActionState } from 'react';
-
 import { ConfirmationFormProps, NewConfirmation } from '@ts/users/confirmation';
 
 import { defaultFormState, getFormDataValue } from '@lib/utils';
 import Input from '@components/Input';
 import SubmitButton from '@components/SubmitButton';
-import { useConfirm } from '@lib/hooks';
+import { useConfirm, useRedirectActionForm } from '@lib/hooks';
 
 export default function ConfirmLoginForm({
   baseAction,
-  addendum
+  addendum,
+  path
 }: ConfirmationFormProps) {
   const { getFormAction } = useConfirm();
 
-  const [state, action, isPending] = useActionState(
+  const [state, action, isPending] = useRedirectActionForm(
     getFormAction<NewConfirmation>(baseAction),
+    path,
     defaultFormState()
   );
 

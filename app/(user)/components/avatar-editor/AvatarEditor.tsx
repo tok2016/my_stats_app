@@ -5,13 +5,11 @@ import {
   type MouseEvent as ReactMouseEvent,
   useCallback,
   useEffect,
-  useRef,
-  useState
+  useRef
 } from 'react';
 
 import Button from '@components/Button';
 import { clamp } from '@lib/utils';
-import Skeleton from '@components/Skeleton';
 
 type AvatarEditorProps = {
   avatarUrl: string;
@@ -106,8 +104,6 @@ export default function AvatarEditor({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
-  const [isPending, setPending] = useState<boolean>(true);
-
   const resizeStateRef = useRef<ResizeStartState>({
     isMouseDown: false,
     mouseX: 0,
@@ -150,6 +146,7 @@ export default function AvatarEditor({
 
       resizeStateRef.current.mouseX = evt.pageX;
       resizeStateRef.current.mouseY = evt.pageY;
+
       resizeStateRef.current.x = frameRef.current.offsetLeft;
       resizeStateRef.current.y = frameRef.current.offsetTop;
       resizeStateRef.current.width = frameRef.current.offsetWidth;
@@ -172,10 +169,6 @@ export default function AvatarEditor({
       document.addEventListener('mouseup', onMouseUp);
       document.addEventListener('mouseleave', onMouseUp);
     }
-  };
-
-  const onPictureLoad = () => {
-    setPending(false);
   };
 
   const onSave = async () => {
@@ -230,8 +223,7 @@ export default function AvatarEditor({
 
   return (
     <div className='avatar-editor'>
-      <div className='avatar-controlls'>
-        {!isPending || <Skeleton type='image' className='avatar-origin' />}
+      <div className='avatar-origin'>
         <NextImage
           src={avatarUrl}
           alt=''
@@ -239,23 +231,8 @@ export default function AvatarEditor({
           width={1000}
           height={1000}
           priority
-          className='avatar-origin'
-          style={{ display: isPending ? 'none' : 'block' }}
-          onLoad={onPictureLoad}
         />
-        <canvas ref={canvasRef} hidden></canvas>
 
-        <div className='buttons-flex-box'>
-          <Button disabled={isPending} onClick={onSave} type='button'>
-            Save
-          </Button>
-          <Button onClick={onCancel} type='button'>
-            Cancel
-          </Button>
-        </div>
-      </div>
-
-      {isPending || (
         <div
           ref={frameRef}
           className='frame'
@@ -267,7 +244,18 @@ export default function AvatarEditor({
           <div id='sw'></div>
           <div id='nw'></div>
         </div>
-      )}
+      </div>
+
+      <canvas ref={canvasRef} hidden></canvas>
+
+      <div className='buttons-flex-box'>
+        <Button onClick={onSave} type='button'>
+          Save
+        </Button>
+        <Button onClick={onCancel} type='button' variant='secondary'>
+          Cancel
+        </Button>
+      </div>
     </div>
   );
 }

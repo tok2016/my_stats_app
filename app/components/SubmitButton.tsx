@@ -1,26 +1,43 @@
 'use client';
 
+import { ButtonStyle } from '@ts/ui/components-props';
+
 import Button from './Button';
 import Hint from './Hint';
 
 type SubmitButtonProps = {
+  buttonStyle?: ButtonStyle;
   loading?: boolean;
   error?: boolean;
   children?: React.ReactNode;
   errorHint?: React.ReactNode;
+  reset?: React.ReactNode;
+  onSubmit?: () => void;
 };
 
 export default function SubmitButton({
+  buttonStyle,
   loading,
   error,
   children,
-  errorHint
+  errorHint,
+  reset,
+  onSubmit
 }: SubmitButtonProps) {
   return (
     <div className='button-group'>
-      <Button variant='primary' type='submit' loading={loading}>
-        {children}
-      </Button>
+      <div className='buttons-flex-box'>
+        <Button
+          type='submit'
+          loading={loading}
+          onClick={onSubmit}
+          {...buttonStyle}
+        >
+          {children}
+        </Button>
+
+        {reset}
+      </div>
       {error || <Hint variant='error'>{errorHint}</Hint>}
     </div>
   );

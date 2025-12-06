@@ -77,7 +77,7 @@ export const defaultCountries: Countries = {
 };
 
 export const isErrorResponse = (value: unknown): value is ErrorResponse =>
-  (value as ErrorResponse).message !== undefined;
+  (value as ErrorResponse)?.message !== undefined;
 
 export const isExpired = (date: Date | string | number) =>
   new Date(date) < new Date();

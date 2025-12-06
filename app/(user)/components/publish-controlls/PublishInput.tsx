@@ -7,13 +7,15 @@ import PublishPopup from './PublishPopup';
 const PUBLISH_FORM_POPUP_NAME = 'publish-form';
 
 type PublishInputProps = {
-  isPublicDefault?: boolean;
+  wasPublic?: boolean;
+  defaultValue?: boolean;
 };
 
 export default function PublishInput({
-  isPublicDefault = false
+  wasPublic = false,
+  defaultValue = false
 }: PublishInputProps) {
-  const [isPublic, setPublic] = useState<boolean>(isPublicDefault);
+  const [isPublic, setPublic] = useState<boolean>(defaultValue);
   const { togglePopup } = usePopupState();
 
   const onPopupToggle = () => {
@@ -21,7 +23,7 @@ export default function PublishInput({
   };
 
   const onPrivacyChange = (isProfilePublic: boolean) => {
-    if (isProfilePublic === isPublicDefault) {
+    if (isProfilePublic === wasPublic) {
       setPublic(isProfilePublic);
     } else {
       onPopupToggle();
@@ -47,7 +49,7 @@ export default function PublishInput({
 
       <PublishPopup
         name={PUBLISH_FORM_POPUP_NAME}
-        isPublic={isPublicDefault}
+        isPublic={wasPublic}
         onConfirm={onConfirm}
         onCancel={onPopupToggle}
       />

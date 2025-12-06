@@ -40,4 +40,5 @@ export type ConfirmationBaseAction = (
 export type ConfirmationFormProps = {
   baseAction: ConfirmationBaseAction;
   addendum?: ReactNode;
+  path?: string;
 };

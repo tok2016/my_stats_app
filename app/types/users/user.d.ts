@@ -2,6 +2,8 @@ import { Types } from 'mongoose';
 
 import Credentials from './credentials';
 import Dashboard from './dashboard';
+import { ServicesLogins } from './service';
+import { AvatarState } from './avatar';
 
 export interface UserAccess {
   access: string;
@@ -28,6 +30,12 @@ export interface UserLogin {
 export type UserUpdate = Partial<
   Omit<UserInfo, 'id' | 'dashboards' | 'avatarUrl'> & Pick<Credentials, 'email'>
 >;
+
+export type UserClientUpdate = UserUpdate
+  & ServicesLogins & {
+    avatar?: File;
+    avatarState?: AvatarState;
+  };
 
 export type BasicUser = UserInfo
   & Omit<Credentials, 'password' | 'userId' | 'id'>;

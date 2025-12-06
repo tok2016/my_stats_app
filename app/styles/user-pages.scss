@@ -126,16 +126,54 @@ $frame-start-width: 200px;
 }
 
 .avatar-field {
+  position: relative;
   align-self: center;
   width: 13rem;
   height: 13rem;
-
-  cursor: pointer;
 
   .avatar {
     width: 100%;
     height: 100%;
   }
+}
+
+.avatar-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+
+  opacity: 0;
+  background-color: utils.$black-alpha;
+  font-size: utils.$regular-size;
+  transition: opacity utils.$hover-time;
+  cursor: pointer;
+
+  svg {
+    width: 3rem;
+    height: 3rem;
+
+    * {
+      stroke-width: 2px;
+    }
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.avatar-delete {
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
 
 .avatar-editor {
@@ -144,23 +182,17 @@ $frame-start-width: 200px;
   left: 0;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  padding: 4rem 8rem;
+  box-sizing: border-box;
 
-  background-color: utils.$black-alpha;
+  background-color: unset;
   z-index: 10;
-}
 
-.avatar-controlls {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 2rem;
-
-  width: 100%;
-  height: 100%;
-  padding: 4rem 8rem;
-  box-sizing: border-box;
 
   .skeleton {
     flex-grow: 1;
@@ -168,6 +200,7 @@ $frame-start-width: 200px;
 
   .buttons-flex-box {
     width: 22rem;
+    z-index: 12;
   }
 }
 
@@ -224,11 +257,36 @@ $frame-start-width: 200px;
 }
 
 .avatar-origin {
-  min-width: 200px;
-  min-height: 200px;
-  width: unset;
-  height: unset;
+  align-self: stretch;
+  flex-grow: 1;
+  min-width: $frame-start-width;
+  min-height: $frame-start-width;
 
-  border-radius: utils.$large-radius;
-  pointer-events: none;
+  img {
+    min-width: $frame-start-width;
+    min-height: $frame-start-width;
+    max-width: 100%;
+    max-height: 100%;
+    width: unset;
+    height: unset;
+
+    border-radius: utils.$large-radius;
+    pointer-events: none;
+    cursor: none;
+    margin: auto;
+  }
+}
+
+.service-auth-info {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.625rem;
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-align: left;
+  }
 }

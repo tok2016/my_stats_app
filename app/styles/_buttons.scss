@@ -1,7 +1,9 @@
+@use 'sass:map';
 @use 'utils';
 
 $button-icon-size: 1.25rem;
 $icon-button-width: 2rem;
+$statuses: 'error', 'warning', 'success';
 
 button {
   @include utils.font(utils.$large-size, utils.$bold-font, utils.$tight-font);
@@ -10,11 +12,15 @@ button {
   align-items: flex-end;
   flex-direction: row;
   gap: 1rem;
+
   padding: 0.75rem;
   min-height: $button-icon-size;
   min-width: 6.25rem;
+
   border-radius: utils.$regular-radius;
   border: none;
+  box-sizing: border-box;
+
   cursor: pointer;
 
   svg {
@@ -85,7 +91,8 @@ button {
 }
 
 @mixin button-filled(
-  $class,
+  $variant,
+  $selector,
   $main-color,
   $hover-color,
   $active-color,
@@ -95,7 +102,7 @@ button {
   $text-color-active,
   $text-color-disabled
 ) {
-  button.#{$class} {
+  button.#{$variant}#{$selector} {
     @include button-filled-base(
       $main-color,
       $hover-color,
@@ -110,6 +117,7 @@ button {
 }
 
 @mixin button-outlined(
+  $selector,
   $main-color,
   $hover-color,
   $active-color,
@@ -119,7 +127,7 @@ button {
   $text-color-active,
   $text-color-disabled
 ) {
-  button.outlined {
+  button.outlined#{$selector} {
     @include button(
       $text-color,
       $text-color-hover,
@@ -154,8 +162,14 @@ button {
   }
 }
 
-@mixin button-link($main-color, $hover-color, $active-color, $disabled-color) {
-  button.link {
+@mixin button-link(
+  $selector,
+  $main-color,
+  $hover-color,
+  $active-color,
+  $disabled-color
+) {
+  button.link#{$selector} {
     @include button($main-color, $hover-color, $active-color, $disabled-color);
 
     background-color: transparent;
@@ -179,61 +193,39 @@ button {
   }
 }
 
-@mixin button-text($main-color, $hover-color, $active-color, $disabled-color) {
-  button.text {
+@mixin button-text(
+  $selector,
+  $main-color,
+  $hover-color,
+  $active-color,
+  $disabled-color
+) {
+  button.text#{$selector} {
     @include button($main-color, $hover-color, $active-color, $disabled-color);
     background-color: transparent;
   }
 }
 
-@mixin link($simple-hover, $simple-active, $colored-hover, $colored-active) {
-  a {
-    transition: color utils.$hover-time;
-
+@mixin link($color-selector, $hover-color, $active-color) {
+  a#{$color-selector} {
     &:hover,
     &:focus-visible {
-      color: $simple-hover;
+      color: $hover-color;
     }
 
     &:active {
-      color: $simple-active;
-      transition: color utils.$active-time;
+      color: $active-color;
     }
   }
 
-  a.colored {
+  a.underlined#{$color-selector} {
     &:hover,
     &:focus-visible {
-      color: $colored-hover;
+      text-decoration-color: $hover-color;
     }
 
     &:active {
-      color: $colored-active;
-    }
-  }
-
-  a.underline {
-    transition: text-decoration-color utils.$hover-time;
-
-    &:hover,
-    &:focus-visible {
-      text-decoration-color: $simple-hover;
-    }
-
-    &:active {
-      transition: text-decoration-color utils.$active-time;
-      text-decoration-color: $simple-active;
-    }
-  }
-
-  a.colored.underline {
-    &:hover,
-    &:focus-visible {
-      text-decoration-color: $colored-hover;
-    }
-
-    &:active {
-      text-decoration-color: $colored-active;
+      text-decoration-color: $active-color;
     }
   }
 }
@@ -255,7 +247,7 @@ a button {
   align-items: flex-start;
   gap: 1.5rem;
 
-  button {
+  > * {
     flex-grow: 1;
   }
 }
@@ -266,4 +258,96 @@ button.icon {
   border-radius: utils.$max-radius;
   font-size: $button-icon-size;
   padding: ($icon-button-width - $button-icon-size) * 0.5;
+}
+
+@each $status in $statuses {
+  @include button-filled(
+    'primary',
+    '.#{$status}',
+    map.get(utils.$active-colors, $status),
+    map.get(utils.$hover-colors, $status),
+    map.get(utils.$active-colors, $status),
+    map.get(utils.$disabled-colors, $status),
+    utils.$white,
+    utils.$white,
+    utils.$white,
+    map.get(utils.$text-colors, $status)
+  );
+
+  @include button-filled(
+    'secondary',
+    '.#{$status}',
+    map.get(utils.$text-colors, $status),
+    utils.$text-darker,
+    utils.$white,
+    utils.$placeholder-color,
+    map.get(utils.$hover-colors, $status),
+    map.get(utils.$hover-colors, $status),
+    map.get(utils.$active-colors, $status),
+    utils.$placeholder-darker
+  );
+
+  @include button-outlined(
+    '.#{$status}',
+    map.get(utils.$active-colors, $status),
+    map.get(utils.$hover-colors, $status),
+    map.get(utils.$highlight-colors, $status),
+    map.get(utils.$disabled-colors, $status),
+    map.get(utils.$text-colors, $status),
+    map.get(utils.$active-colors, $status),
+    utils.$white,
+    utils.$text-darker
+  );
+
+  @include button-link(
+    '.#{$status}',
+    map.get(utils.$active-colors, $status),
+    map.get(utils.$hover-colors, $status),
+    map.get(utils.$highlight-colors, $status),
+    map.get(utils.$disabled-colors, $status)
+  );
+
+  @include button-text(
+    '.#{$status}',
+    map.get(utils.$text-colors, $status),
+    utils.$text-darker,
+    utils.$white,
+    utils.$placeholder-color
+  );
+
+  @include link(
+    '.#{$status}',
+    map.get(utils.$hover-colors, $status) !important,
+    map.get(utils.$highlight-colors, $status) !important
+  );
+
+  .light {
+    @include button-outlined(
+      '.#{$status}',
+      map.get(utils.$active-colors, $status),
+      map.get(utils.$hover-colors, $status),
+      map.get(utils.$highlight-colors, $status),
+      map.get(utils.$disabled-colors, $status),
+      map.get(utils.$bg-2-colors, $status),
+      map.get(utils.$hover-colors, $status),
+      map.get(utils.$active-colors, $status),
+      map.get(utils.$disabled-colors, $status)
+    );
+
+    @include button-link(
+      '.#{$status}',
+      map.get(utils.$hover-colors, $status),
+      map.get(utils.$active-colors, $status),
+      map.get(utils.$highlight-colors, $status),
+      map.get(utils.$disabled-colors, $status)
+    );
+
+    @include button-text(
+      '.#{$status}',
+      map.get(utils.$bg-2-colors, $status),
+      utils.$placeholder-darker,
+      utils.$text-darker,
+      utils.$placeholder-color
+    );
+  }
 }

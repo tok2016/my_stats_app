@@ -59,7 +59,7 @@ export const useConfirm = () => useContext(ConfirmationContext);
 
 export const useRedirectActionForm = <DataType>(
   baseAction: FormAction<DataType>,
-  path: string,
+  path: string = '',
   initialState: FormState<DataType> = defaultFormState()
 ) => {
   const { replace } = useRouter();
@@ -67,7 +67,7 @@ export const useRedirectActionForm = <DataType>(
   const redirectAction: FormAction<DataType> = async (prev, data) => {
     const next = await baseAction(prev, data);
 
-    if (!next.error) {
+    if (path && !next.error) {
       replace(path);
     }
 

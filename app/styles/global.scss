@@ -78,6 +78,23 @@ a {
   margin: 0;
 }
 
+a {
+  cursor: pointer;
+  transition: color utils.$hover-time;
+
+  &:active {
+    transition: color utils.$active-time;
+  }
+}
+
+a.underline {
+  transition: text-decoration-color utils.$hover-time;
+
+  &:active {
+    transition: text-decoration-color utils.$active-time;
+  }
+}
+
 label {
   @include utils.font(
     utils.$regular-size,
@@ -123,15 +140,15 @@ ul {
 }
 
 .error {
-  color: utils.$error-color !important;
+  color: map.get(utils.$active-colors, 'error') !important;
 }
 
 .warning {
-  color: utils.$warning-color !important;
+  color: map.get(utils.$active-colors, 'warning') !important;
 }
 
 .success {
-  color: utils.$success-color !important;
+  color: map.get(utils.$active-colors, 'success') !important;
 }
 
 .hidden {

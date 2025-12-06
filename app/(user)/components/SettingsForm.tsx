@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
-
+import Link from 'next/link';
 import { Option } from '@ts/ui/components-props';
 
 import Input from '@components/Input';
@@ -9,29 +8,53 @@ import Select from '@components/Select';
 import Tab from '@components/Tab';
 import { useUserState } from '@store/user-store';
 import Button from '@components/Button';
-import PublishInput from './PublishInput';
+import PublishInput from './publish-controlls/PublishInput';
 import SubmitButton from '@components/SubmitButton';
-import SteamAuthInfo from './SteamAuthInfo';
-import { useAction } from '@lib/hooks';
-import { getServices } from '@lib/serverActions';
-import AvatarInput from './AvatarInput';
+import AvatarInput from './avatar-editor/AvatarInput';
+import ServicesSettings from './service-settings/ServicesSettings';
+import { usePopupState } from '@store/popup-store';
+import { useRedirectActionForm } from '@lib/hooks';
+import { updateProfile } from '../actions';
+import { getFormDataValue } from '@lib/utils';
 
 type SettingsFormProps = {
   countriesOptions: Option[];
+  passwordPopupName: string;
+  deletePopupName: string;
 };
 
-export default function SettingsForm({ countriesOptions }: SettingsFormProps) {
-  const { user } = useUserState();
-  const [services, getUserServices, isPending] = useAction(getServices, {});
+const parseBooleanString = (value: string) =>
+  !!value && value.toLowerCase() !== 'false';
 
-  useEffect(() => {
-    getUserServices();
-  }, [getUserServices]);
+export default function SettingsForm({
+  countriesOptions,
+  passwordPopupName,
+  deletePopupName
+}: SettingsFormProps) {
+  const { user } = useUserState();
+  const { togglePopup } = usePopupState();
+  const [state, action, isPending] = useRedirectActionForm(
+    updateProfile(user.id),
+    '/iam'
+  );
+
+  const publicValue = getFormDataValue('isPublic');
+
+  const onPasswordChangeOpen = () => {
+    togglePopup(passwordPopupName);
+  };
+
+  const onDeleteOpen = () => {
+    togglePopup(deletePopupName);
+  };
 
   return (
-    <form className='card settings'>
+    <form className='card settings' action={action} noValidate>
       <h2>{user.username}</h2>
-      <AvatarInput avatarId={user.avatarUrl} />
+      <AvatarInput
+        avatarId={user.avatarUrl}
+        defaultFile={state.data?.get('avatar') as Blob}
+      />
 
       <Input
         type='email'
@@ -40,6 +63,8 @@ export default function SettingsForm({ countriesOptions }: SettingsFormProps) {
         label='Email'
         placeholder='example@email.com'
         required
+        defaultValue={getFormDataValue('email', state.data) ?? user.email}
+        errorHint={state.issues?.email}
       />
 
       <Input
@@ -48,6 +73,11 @@ export default function SettingsForm({ countriesOptions }: SettingsFormProps) {
         name='birthdate'
         label='Birthdate'
         placeholder='01/01/2000'
+        defaultValue={
+          getFormDataValue('birthdate', state.data)
+          ?? user.birthdate?.toString()
+        }
+        errorHint={state.issues?.birthdate}
       />
 
       <Select
@@ -56,27 +86,50 @@ export default function SettingsForm({ countriesOptions }: SettingsFormProps) {
         label='Country'
         variant='plain'
         options={countriesOptions}
+        defaultValue={
+          getFormDataValue('country', state.data) ?? (user.country || undefined)
+        }
+        errorHint={state.issues?.country}
       />
 
       <Tab label='Privacy'>
-        <PublishInput isPublicDefault={user.isPublic} />
+        <PublishInput
+          wasPublic={user.isPublic}
+          defaultValue={
+            typeof publicValue === 'string'
+              ? parseBooleanString(publicValue)
+              : user.isPublic
+          }
+        />
 
-        <a href={undefined} className='colored bold'>
+        <a
+          href={undefined}
+          className='colored bold'
+          onClick={onPasswordChangeOpen}
+        >
           Change password
         </a>
 
-        <a href={undefined} className='error bold'>
+        <a href={undefined} className='error bold' onClick={onDeleteOpen}>
           Delete account
         </a>
       </Tab>
 
-      <Tab label='Service Authentication'>
-        <SteamAuthInfo serviceData={services.steam} />
-      </Tab>
+      <ServicesSettings state={state} />
 
       <div className='buttons-flex-box'>
-        <SubmitButton>Save</SubmitButton>
-        <Button type='reset'>Cancel</Button>
+        <SubmitButton
+          loading={isPending}
+          reset={
+            <Link href='/iam'>
+              <Button type='reset' variant='outlined' disabled={isPending}>
+                Cancel
+              </Button>
+            </Link>
+          }
+        >
+          Save
+        </SubmitButton>
       </div>
     </form>
   );

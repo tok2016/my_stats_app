@@ -10,8 +10,7 @@ import {
   ConfirmationActions,
   DashboardTypes,
   generateErrorResponse,
-  ServiceNames,
-  ServiceStatuses
+  ServiceNames
 } from './utils';
 import { ConfirmationCode, NewConfirmation } from '@ts/users/confirmation';
 
@@ -83,8 +82,7 @@ export const UserLoginValidator: z.ZodType<UserLogin> = z.object({
 
 export const ServiceValidator: z.ZodType<NewService> = z.object({
   name: z.enum(ServiceNames).default('spotify'),
-  login: z.string().nonempty(),
-  status: z.enum(ServiceStatuses).default('unknown')
+  login: z.string().nonempty()
 });
 
 export const PasswordUpdateValidator: z.ZodType<PasswordUpdate> =

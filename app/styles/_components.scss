@@ -121,15 +121,12 @@ $skeleton-icon-min-width: 2rem;
   }
 }
 
-.card,
-.card-flex-content {
+.card {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 1.5rem;
-}
 
-.card {
   position: relative;
   width: 22em;
   padding: 1rem;
@@ -156,6 +153,16 @@ $skeleton-icon-min-width: 2rem;
     position: absolute;
     top: 0;
     right: 0;
+  }
+
+  > .card {
+    width: unset;
+    padding: 0;
+    border-radius: 0;
+    background-color: transparent !important;
+    > * {
+      margin: 0;
+    }
   }
 }
 
@@ -326,10 +333,15 @@ $skeleton-icon-min-width: 2rem;
   svg * {
     stroke-width: 3px;
   }
+
+  .spinner {
+    width: 1.5rem;
+  }
 }
 
 .drawer-expand {
-  font-size: utils.$large-size;
+  width: 1.5rem;
+  height: 1.5rem;
   transition: rotate utils.$active-time;
 }
 
@@ -368,5 +380,117 @@ form .drawer-submenu {
 @mixin tab($border-color) {
   .tab {
     border-color: $border-color;
+  }
+}
+
+.spinner {
+  border: solid 3px utils.$white;
+  border-radius: 50%;
+  box-sizing: border-box;
+
+  animation:
+    spinning 0.8s infinite linear alternate,
+    rotation 1.6s infinite linear;
+
+  width: 1rem;
+  aspect-ratio: 1;
+}
+
+@keyframes rotation {
+  0% {
+    transform: scaleY(1) rotate(0deg);
+  }
+  49.99% {
+    transform: scaleY(1) rotate(135deg);
+  }
+  50% {
+    transform: scaleY(-1) rotate(0deg);
+  }
+  100% {
+    transform: scaleY(-1) rotate(-135deg);
+  }
+}
+
+@keyframes spinning {
+  0% {
+    clip-path: polygon(50% 50%, 0 0, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%);
+  }
+
+  12.5% {
+    clip-path: polygon(
+      50% 50%,
+      0 0,
+      50% 0%,
+      100% 0%,
+      100% 0%,
+      100% 0%,
+      100% 0%
+    );
+  }
+
+  25% {
+    clip-path: polygon(
+      50% 50%,
+      0 0,
+      50% 0%,
+      100% 0%,
+      100% 100%,
+      100% 100%,
+      100% 100%
+    );
+  }
+
+  50% {
+    clip-path: polygon(
+      50% 50%,
+      0 0,
+      50% 0%,
+      100% 0%,
+      100% 100%,
+      50% 100%,
+      0% 100%
+    );
+  }
+
+  62.5% {
+    clip-path: polygon(
+      50% 50%,
+      100% 0,
+      100% 0%,
+      100% 0%,
+      100% 100%,
+      50% 100%,
+      0% 100%
+    );
+  }
+
+  75% {
+    clip-path: polygon(
+      50% 50%,
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      50% 100%,
+      0% 100%
+    );
+  }
+
+  100% {
+    clip-path: polygon(
+      50% 50%,
+      50% 100%,
+      50% 100%,
+      50% 100%,
+      50% 100%,
+      50% 100%,
+      0% 100%
+    );
+  }
+}
+
+@mixin spinner($color) {
+  .spinner {
+    border-color: $color;
   }
 }
