@@ -8,6 +8,7 @@ import { ServiceValidator, validateData } from '@lib/validationSchemas';
 
 const getServicesByUserId = async (userId: string): Promise<ServicesMap> => {
   const services = await ServiceCredentialsModel.find({ userId }).lean();
+  console.log(services);
 
   const entries = services.map((service) => [
     service.name,
@@ -63,12 +64,12 @@ export async function POST(
         break;
     }
 
-    try {
-      await ServiceCredentialsModel.updateOne(
-        { userId, name: serviceCredentials.name },
-        { login: serviceCredentials.login }
-      );
-    } catch {
+    const updatedService = await ServiceCredentialsModel.findOneAndUpdate(
+      { userId, name: serviceCredentials.name },
+      { login: serviceCredentials.login }
+    ).lean();
+
+    if (!updatedService) {
       await ServiceCredentialsModel.create({
         ...serviceCredentials,
         userId
@@ -76,6 +77,7 @@ export async function POST(
     }
 
     const services = await getServicesByUserId(userId);
+    console.log(services);
 
     return NextResponse.json(services, {
       status: 201,

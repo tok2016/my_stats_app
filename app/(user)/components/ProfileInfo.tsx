@@ -80,7 +80,12 @@ export default function ProfileInfo({
           <div className='profile-controlls'>
             <PublishButton isPublic={user.isPublic} loading={loading} />
 
-            <IconButton icon={<Share />} loading={loading} onClick={onShare} />
+            <IconButton
+              icon={<Share />}
+              loading={loading}
+              disabled={!user.isPublic}
+              onClick={onShare}
+            />
 
             <Link href='/iam/settings'>
               <IconButton icon={<Wrench />} />

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+
 import { Option } from '@ts/ui/components-props';
 
 import Input from '@components/Input';
@@ -15,7 +16,11 @@ import ServicesSettings from './service-settings/ServicesSettings';
 import { usePopupState } from '@store/popup-store';
 import { useRedirectActionForm } from '@lib/hooks';
 import { updateProfile } from '../actions';
-import { getFormDataValue } from '@lib/utils';
+import {
+  defaultFormState,
+  getFormDataValue,
+  parseBooleanString
+} from '@lib/utils';
 
 type SettingsFormProps = {
   countriesOptions: Option[];
@@ -23,8 +28,16 @@ type SettingsFormProps = {
   deletePopupName: string;
 };
 
-const parseBooleanString = (value: string) =>
-  !!value && value.toLowerCase() !== 'false';
+const getDataValue = (date?: string | Date) => {
+  if (!date) return '';
+
+  const dateObject = new Date(date);
+  const year = dateObject.getFullYear().toString();
+  const month = (dateObject.getMonth() + 1).toString().padStart(2, '0');
+  const day = dateObject.getDate().toString().padStart(2, '0');
+
+  return [year, month, day].join('-');
+};
 
 export default function SettingsForm({
   countriesOptions,
@@ -35,10 +48,12 @@ export default function SettingsForm({
   const { togglePopup } = usePopupState();
   const [state, action, isPending] = useRedirectActionForm(
     updateProfile(user.id),
-    '/iam'
+    '/iam',
+    defaultFormState(),
+    true
   );
 
-  const publicValue = getFormDataValue('isPublic');
+  const publicValue = getFormDataValue('isPublic', state.data);
 
   const onPasswordChangeOpen = () => {
     togglePopup(passwordPopupName);
@@ -73,10 +88,10 @@ export default function SettingsForm({
         name='birthdate'
         label='Birthdate'
         placeholder='01/01/2000'
-        defaultValue={
+        defaultValue={getDataValue(
           getFormDataValue('birthdate', state.data)
-          ?? user.birthdate?.toString()
-        }
+            ?? user.birthdate?.toString()
+        )}
         errorHint={state.issues?.birthdate}
       />
 
@@ -87,7 +102,7 @@ export default function SettingsForm({
         variant='plain'
         options={countriesOptions}
         defaultValue={
-          getFormDataValue('country', state.data) ?? (user.country || undefined)
+          getFormDataValue('country', state.data) ?? user.country?.toString()
         }
         errorHint={state.issues?.country}
       />
@@ -115,7 +130,7 @@ export default function SettingsForm({
         </a>
       </Tab>
 
-      <ServicesSettings state={state} />
+      <ServicesSettings state={state} userId={user.id} />
 
       <div className='buttons-flex-box'>
         <SubmitButton

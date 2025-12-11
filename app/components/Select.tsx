@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { ChevronDown } from '@mynaui/icons-react';
 
 import { SelectVariant } from '@ts/ui/components-variants';
@@ -32,7 +32,7 @@ const SelectTypes: Record<SelectVariant, SelectVariantProps> = {
   }
 };
 
-export default function Select({
+function SelectRaw({
   label,
   id,
   name,
@@ -44,7 +44,12 @@ export default function Select({
   errorHint,
   onSelect
 }: SelectProps) {
-  const [option, setOption] = useState<Option>(options[0]);
+  const defaultOption = useMemo(
+    () => options.find((option) => option.value === defaultValue) ?? options[0],
+    [options, defaultValue]
+  );
+
+  const [option, setOption] = useState<Option>(defaultOption);
   const [isExpanded, setExpanded] = useState<boolean>(false);
   const [pickerPosition, setPickerPosition] = useState<'upper' | ''>('');
 
@@ -77,15 +82,9 @@ export default function Select({
       </label>
 
       <div className={SelectTypes[variant].selectGroupClass}>
-        <select
-          id={id}
-          name={name}
-          defaultValue={defaultValue}
-          value={option.value}
-          onChange={() => {}}
-        >
+        <select id={id} name={name} value={option.value} onChange={() => {}}>
           {options.map((option) => (
-            <option disabled hidden key={option.value} value={option.value}>
+            <option hidden key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
@@ -119,3 +118,6 @@ export default function Select({
     </div>
   );
 }
+
+const Select = memo(SelectRaw);
+export default Select;

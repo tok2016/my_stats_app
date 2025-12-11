@@ -60,16 +60,16 @@ export const useConfirm = () => useContext(ConfirmationContext);
 export const useRedirectActionForm = <DataType>(
   baseAction: FormAction<DataType>,
   path: string = '',
-  initialState: FormState<DataType> = defaultFormState()
+  initialState: FormState<DataType> = defaultFormState(),
+  needsRefresh: boolean = false
 ) => {
-  const { replace } = useRouter();
+  const { replace, refresh } = useRouter();
 
   const redirectAction: FormAction<DataType> = async (prev, data) => {
     const next = await baseAction(prev, data);
 
-    if (path && !next.error) {
-      replace(path);
-    }
+    if (path && !next.error) replace(path);
+    if (needsRefresh) refresh();
 
     return next;
   };

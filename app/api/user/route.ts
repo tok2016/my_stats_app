@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 import { unlink } from 'fs/promises';
 import path from 'path';
 
@@ -118,8 +118,6 @@ export async function PUT(req: NextRequest) {
 
     const dashboards = await getDashboards(credentials.userId);
 
-    revalidatePath('/(user)/(profile)', 'layout');
-
     return NextResponse.json(uniteUserData(credentials, userInfo, dashboards), {
       status: 200,
       statusText: 'User data was updated successfully'
@@ -156,6 +154,11 @@ export async function DELETE(req: NextRequest) {
     if (!credentials) {
       return responseWithError(404, 'User was not found');
     }
+
+    const cookieStore = await cookies();
+    cookieStore.delete('refreshToken');
+    cookieStore.delete('accessToken');
+    cookieStore.delete('operation');
 
     const userInfo = await UsersModel.findByIdAndDelete(credentials.userId);
     await ServiceCredentialsModel.deleteMany({ userId: credentials.userId });

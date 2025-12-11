@@ -263,6 +263,8 @@ $frame-start-width: 200px;
   min-height: $frame-start-width;
 
   img {
+    display: block;
+
     min-width: $frame-start-width;
     min-height: $frame-start-width;
     max-width: 100%;

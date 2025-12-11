@@ -75,7 +75,7 @@ export default function AvatarInputRaw({
   }, [avatarId]);
 
   useEffect(() => {
-    if (fileInputRef.current && defaultFile) {
+    if (fileInputRef.current && !!defaultFile && defaultFile.size) {
       const file = new File([defaultFile], Date.now().toString(), {
         type: 'image/png'
       });

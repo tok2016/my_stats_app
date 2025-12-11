@@ -1,12 +1,17 @@
 import FormState, { FormAction } from '@ts/ui/form-state';
 import { User, UserClientUpdate, UserUpdate } from '@ts/users/user';
 import { ConfirmationBaseAction } from '@ts/users/confirmation';
-
-import AxiosInstanse from '@lib/axios-instanse';
-import { getErrorFormState, getFormDataValue, ServiceNames } from '@lib/utils';
-import { confirmByCode } from '@lib/actions';
 import { AvatarState } from '@ts/users/avatar';
 import { NewService, ServiceName } from '@ts/users/service';
+
+import AxiosInstanse from '@lib/axios-instanse';
+import {
+  getErrorFormState,
+  getFormDataValue,
+  parseBooleanString,
+  ServiceNames
+} from '@lib/utils';
+import { confirmByCode } from '@lib/actions';
 
 export const changeProfilePrivacy =
   (closePopup: () => void) =>
@@ -61,11 +66,11 @@ const updateAvatar = (userId: string, formData: FormData) => {
     const avatarData = new FormData();
     avatarData.append('avatar', avatar);
 
-    return AxiosInstanse.post(`/api/user/avatar/${userId}`, avatarData, {
+    return AxiosInstanse.post(`/api/user/${userId}/avatar`, avatarData, {
       responseType: 'formdata'
     });
   } else if (avatarState === 'delete') {
-    return AxiosInstanse.delete(`/api/user/avatar/${userId}`);
+    return AxiosInstanse.delete(`/api/user/${userId}/avatar`);
   }
 
   return;
@@ -80,7 +85,7 @@ const updateService = async (
     const searchParams = new URLSearchParams();
     searchParams.append('service', service);
     return AxiosInstanse.delete(
-      `/api/user/service/${userId}?${searchParams.toString()}`
+      `/api/user/${userId}/service?${searchParams.toString()}`
     );
   }
 
@@ -89,7 +94,7 @@ const updateService = async (
     login
   };
 
-  return AxiosInstanse.post(`/api/user/service/${userId}`, newService);
+  return AxiosInstanse.post(`/api/user/${userId}/service`, newService);
 };
 
 export const updateProfile =
@@ -101,7 +106,7 @@ export const updateProfile =
         const currentLogin = getFormDataValue(service, formData) ?? '';
         return prevLogin !== currentLogin;
       }).map((service) =>
-        updateService(userId, service, getFormDataValue(service))
+        updateService(userId, service, getFormDataValue(service, formData))
       );
 
       const userJsonUpdate = new FormData();
@@ -110,7 +115,13 @@ export const updateProfile =
         userJsonUpdate.append(key, value);
       });
 
-      const userUpdate = Object.fromEntries(userJsonUpdate.entries());
+      const userUpdate = Object.fromEntries(
+        userJsonUpdate.entries()
+      ) as UserUpdate;
+
+      userUpdate.isPublic = parseBooleanString(
+        userJsonUpdate.get('isPublic')?.toString() ?? ''
+      );
 
       await Promise.all([
         updateAvatar(userId, formData),

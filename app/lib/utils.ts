@@ -183,3 +183,8 @@ export const getFormDataValue = (
   name: string,
   formData?: FormData
 ): string | undefined => formData?.get(name)?.toString() ?? undefined;
+
+export const parseBooleanString = (value: string) => {
+  const lowercase = value.toLowerCase();
+  return !!value && lowercase !== 'false' && lowercase !== 'off';
+};
