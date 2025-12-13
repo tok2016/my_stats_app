@@ -5,19 +5,23 @@
 @use 'binary-inputs';
 @use 'number-inputs';
 @use 'components';
+@use 'sidebar';
 
 $bg-1-color-length: 28%;
 $modules: 'user', 'music', 'games';
 
 @each $module in $modules {
-  body:has(.#{$module}) {
-    display: flex;
+  body > .#{$module} {
+    box-sizing: border-box;
+    padding: utils.$layout-padding;
+    min-height: 100vh;
     flex-direction: column;
     background: linear-gradient(
       map.get(utils.$bg-1-colors, $module) $bg-1-color-length,
       map.get(utils.$bg-2-colors, $module)
     );
   }
+
   .#{$module} {
     flex-grow: 1;
     color: map.get(utils.$text-colors, $module);
@@ -45,15 +49,17 @@ $modules: 'user', 'music', 'games';
       text-decoration-color: map.get(utils.$active-colors, $module);
     }
 
+    @include buttons.link('', utils.$text-darker, utils.$white);
+
     @include buttons.link(
-      utils.$text-darker,
-      utils.$white,
+      '.colored',
       map.get(utils.$hover-colors, $module),
       map.get(utils.$highlight-colors, $module)
     );
 
     @include buttons.button-filled(
       'primary',
+      '',
       map.get(utils.$active-colors, $module),
       map.get(utils.$hover-colors, $module),
       map.get(utils.$highlight-colors, $module),
@@ -66,6 +72,7 @@ $modules: 'user', 'music', 'games';
 
     @include buttons.button-filled(
       'secondary',
+      '',
       map.get(utils.$text-colors, $module),
       utils.$text-darker,
       utils.$white,
@@ -77,6 +84,7 @@ $modules: 'user', 'music', 'games';
     );
 
     @include buttons.button-outlined(
+      '',
       map.get(utils.$active-colors, $module),
       map.get(utils.$hover-colors, $module),
       map.get(utils.$highlight-colors, $module),
@@ -85,6 +93,22 @@ $modules: 'user', 'music', 'games';
       map.get(utils.$active-colors, $module),
       utils.$white,
       utils.$text-darker
+    );
+
+    @include buttons.button-link(
+      '',
+      map.get(utils.$active-colors, $module),
+      map.get(utils.$hover-colors, $module),
+      map.get(utils.$highlight-colors, $module),
+      map.get(utils.$disabled-colors, $module)
+    );
+
+    @include buttons.button-text(
+      '',
+      map.get(utils.$text-colors, $module),
+      utils.$text-darker,
+      utils.$white,
+      utils.$placeholder-color
     );
 
     @include text-inputs.input-select-textarea(
@@ -137,7 +161,28 @@ $modules: 'user', 'music', 'games';
 
     @include components.pagination-current($module);
 
+    @include components.skeleton(
+      utils.$skeleton-color,
+      utils.$skeleton-light-color
+    );
+
+    @include components.card(map.get(utils.$bg-1-colors, $module));
+
+    @include components.tab(map.get(utils.$hover-colors, $module));
+
+    @include components.spinner(map.get(utils.$text-colors, $module));
+
+    @include sidebar.sidebar(
+      map.get(utils.$bg-1-colors, $module),
+      map.get(utils.$bg-2-colors, $module),
+      map.get(utils.$text-colors, $module),
+      utils.$text-darker,
+      map.get(utils.$active-colors, $module)
+    );
+
     .light {
+      @include utils.light-scrollbar();
+
       background-color: map.get(utils.$text-colors, $module);
       box-shadow: 0
         0
@@ -169,13 +214,19 @@ $modules: 'user', 'music', 'games';
       }
 
       @include buttons.link(
+        '',
         map.get(utils.$hover-colors, $module),
-        map.get(utils.$active-colors, $module),
+        map.get(utils.$active-colors, $module)
+      );
+
+      @include buttons.link(
+        '.colored',
         map.get(utils.$active-colors, $module),
         map.get(utils.$highlight-colors, $module)
       );
 
       @include buttons.button-outlined(
+        '',
         map.get(utils.$active-colors, $module),
         map.get(utils.$hover-colors, $module),
         map.get(utils.$highlight-colors, $module),
@@ -184,6 +235,22 @@ $modules: 'user', 'music', 'games';
         map.get(utils.$hover-colors, $module),
         map.get(utils.$active-colors, $module),
         map.get(utils.$disabled-colors, $module)
+      );
+
+      @include buttons.button-link(
+        '',
+        map.get(utils.$hover-colors, $module),
+        map.get(utils.$active-colors, $module),
+        map.get(utils.$highlight-colors, $module),
+        map.get(utils.$disabled-colors, $module)
+      );
+
+      @include buttons.button-text(
+        '',
+        map.get(utils.$bg-2-colors, $module),
+        utils.$placeholder-darker,
+        utils.$text-darker,
+        utils.$placeholder-color
       );
 
       @include text-inputs.input-select-textarea(
@@ -233,6 +300,13 @@ $modules: 'user', 'music', 'games';
         map.get(utils.$active-colors, $module),
         utils.$text-darker
       );
+
+      @include components.skeleton(
+        utils.$skeleton-light-color,
+        utils.$skeleton-color
+      );
+
+      @include components.spinner(map.get(utils.$bg-2-colors, $module));
     }
   }
 }

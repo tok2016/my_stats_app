@@ -1,0 +1,200 @@
+@use 'utils';
+
+$sidebar-padding-x: 1rem;
+$sidebar-padding-y: 1.75rem;
+$sidebar-icon-width: 2.5rem;
+$sidebar-button-gap: 0.625rem;
+$sidebar-expanded-width: 16rem;
+
+.sidebar,
+.sidebar-upper {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.sidebar {
+  padding: $sidebar-padding-y $sidebar-padding-x;
+  border-right: solid 0.25rem;
+
+  position: fixed;
+  height: calc(100vh - $sidebar-padding-y * 2);
+  width: $sidebar-icon-width;
+  top: 0;
+  left: 0;
+
+  transition: width 100ms;
+  z-index: 3;
+
+  .input-wrapper {
+    min-width: unset;
+
+    .input-icon {
+      right: 0.75rem;
+    }
+  }
+
+  input {
+    min-width: 0;
+    min-height: $sidebar-icon-width;
+    padding: 0 ($sidebar-icon-width * 0.5) !important;
+  }
+}
+
+.sidebar:not(:hover) {
+  .drawer-submenu {
+    display: none !important;
+    max-height: 0px !important;
+  }
+}
+
+.sidebar-submenu {
+  padding-left: $sidebar-icon-width + $sidebar-button-gap;
+}
+
+.sidebar-button,
+.sidebar-subbutton {
+  @include utils.font(utils.$large-size, utils.$bold-font, utils.$fit-font);
+  font-family: utils.$ibm-plex;
+  color: utils.$white;
+}
+
+.sidebar-label,
+.sidebar-subbutton {
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none; //thanks to safari)))
+}
+
+.sidebar-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: $sidebar-button-gap;
+
+  position: relative;
+  cursor: pointer;
+
+  .sidebar-label {
+    flex-grow: 1;
+    display: none;
+  }
+
+  .sidebar-icon {
+    min-width: $sidebar-icon-width;
+    min-height: $sidebar-icon-width;
+    width: $sidebar-icon-width;
+    height: $sidebar-icon-width;
+
+    .skeletons {
+      height: 100%;
+    }
+  }
+
+  .sidebar-icon {
+    .avatar,
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  svg * {
+    stroke-width: 3px;
+  }
+}
+
+.sidebar-link {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.sidebar:hover,
+.sidebar.expanded {
+  width: $sidebar-expanded-width;
+
+  .input-wrapper {
+    .input-icon {
+      right: 1rem;
+    }
+  }
+
+  .sidebar-button {
+    .sidebar-label {
+      display: initial;
+    }
+  }
+}
+
+@mixin sidebar(
+  $bg-color,
+  $border-color,
+  $text-color,
+  $text-hover-color,
+  $text-active-color
+) {
+  .sidebar {
+    background-color: $bg-color;
+    border-color: $border-color;
+  }
+
+  .sidebar-button,
+  .sidebar-subbutton {
+    span,
+    svg {
+      color: $text-color;
+    }
+
+    .sidebar-icon.loaded {
+      .avatar,
+      svg {
+        filter: drop-shadow(0 0 2 * utils.$spread $text-color);
+      }
+    }
+
+    &:hover {
+      span,
+      svg {
+        color: $text-hover-color;
+      }
+
+      img {
+        filter: brightness(0.75);
+      }
+    }
+  }
+
+  .choosen {
+    span,
+    svg {
+      color: $text-active-color;
+    }
+
+    .sidebar-icon.loaded {
+      .avatar,
+      svg {
+        filter: drop-shadow(0 0 2 * utils.$spread $text-active-color);
+      }
+    }
+  }
+
+  input.choosen {
+    background-color: $text-active-color;
+  }
+
+  .sidebar:hover,
+  .sidebar:has(input:focus) {
+    input.choosen {
+      background-color: $text-color;
+    }
+  }
+}
+
+.profile {
+  padding-left: $sidebar-icon-width + $sidebar-padding-x * 2;
+}

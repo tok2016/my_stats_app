@@ -38,7 +38,7 @@ export default function RegisterPage() {
       />
 
       <Input
-        id='password'
+        id='apassword'
         name='password'
         label='Password'
         type='password'

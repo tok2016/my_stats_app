@@ -1,29 +1,13 @@
 'use client';
 
-import { Icon } from '@iconify/react';
-import { MouseEvent, ReactNode } from 'react';
-
-import { ButtonVariant } from '@ts/ui/components-variants';
-
-import { getIconCode } from '@lib/utils';
-
-type ButtonProps = {
-  children?: ReactNode;
-  variant?: ButtonVariant;
-  beforeIconCode?: string;
-  afterIconCode?: string;
-  className?: string;
-  disabled?: boolean;
-  loading?: boolean;
-  type?: HTMLButtonElement['type'];
-  onClick?: (evt: MouseEvent) => void;
-};
+import { ButtonProps } from '@ts/ui/components-props';
 
 export default function Button({
   children,
   variant = 'primary',
-  beforeIconCode,
-  afterIconCode,
+  status = '',
+  beforeIcon,
+  afterIcon,
   className = '',
   disabled,
   loading,
@@ -34,13 +18,13 @@ export default function Button({
     <button
       type={type}
       disabled={disabled || loading}
-      className={`${variant} ${className}`}
+      className={`${variant} ${status} ${className}`}
       onClick={onClick}
     >
-      {!beforeIconCode || <Icon icon={getIconCode(beforeIconCode)} />}
+      {beforeIcon}
       {children}
       {loading ? '...' : ''}
-      {!afterIconCode || <Icon icon={getIconCode(afterIconCode)} />}
+      {afterIcon}
     </button>
   );
 }

@@ -23,6 +23,7 @@ export default function BinaryInput({
   isSwitch,
   className = '',
   defaultValue,
+  disabled = false,
   value,
   errorHint,
   hint,
@@ -43,6 +44,7 @@ export default function BinaryInput({
           checked={value}
           className={isSwitch ? 'switch' : ''}
           onChange={onSwitch}
+          disabled={disabled}
         />
         <label htmlFor={id}>{label}</label>
       </div>

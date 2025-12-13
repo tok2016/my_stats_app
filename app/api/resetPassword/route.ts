@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { cookies } from 'next/headers';
 
 import { NewPassword } from '@ts/users/password';
 
@@ -47,6 +48,9 @@ export async function POST(req: NextRequest) {
     }
 
     await ConfirmationsModel.findByIdAndDelete(newPassword.operationId);
+
+    const cookieStore = await cookies();
+    cookieStore.delete('operation');
 
     return generateAccessResponse(
       updatedCredentials._id.toString(),

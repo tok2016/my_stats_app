@@ -15,14 +15,6 @@ type CircleSliderProps = SliderProps & {
   onChange?: (value: number) => void;
 };
 
-type CircleSliderState = {
-  isDown: boolean;
-  startPosX: number;
-  startPosY: number;
-  endPosX: number;
-  endPosY: number;
-};
-
 export default function CircleSlider({
   label,
   id,
@@ -38,20 +30,14 @@ export default function CircleSlider({
   const [value, setValue] = useState<number>(defaultValue ?? min);
 
   const sliderRef = useRef<HTMLDivElement>(null);
-  const sliderState = useRef<CircleSliderState>({
-    isDown: false,
-    startPosX: 0,
-    startPosY: 0,
-    endPosX: 0,
-    endPosY: 0
-  });
+  const isMouseDown = useRef<boolean>(false);
 
   const onMouseDown = () => {
-    sliderState.current.isDown = true;
+    isMouseDown.current = true;
   };
 
   const onMouseMove = (evt: MouseEvent<HTMLDivElement>) => {
-    if (sliderRef.current && sliderState.current.isDown) {
+    if (sliderRef.current && isMouseDown.current) {
       const closeCathetus =
         evt.pageX
         - sliderRef.current.offsetLeft
@@ -75,7 +61,7 @@ export default function CircleSlider({
   };
 
   const onMouseRelease = () => {
-    sliderState.current.isDown = false;
+    isMouseDown.current = false;
   };
 
   return (

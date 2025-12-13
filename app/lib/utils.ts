@@ -1,4 +1,3 @@
-import path from 'path';
 import { NextResponse } from 'next/server';
 
 import { CredentialsInSchema } from '@ts/users/credentials';
@@ -8,10 +7,10 @@ import ErrorResponse, { ValidationIssue } from '@ts/requests';
 import FormState from '@ts/ui/form-state';
 import { ConfirmationInfo } from '@ts/users/confirmation';
 import { NewPassword } from '@ts/users/password';
+import Country, { Countries } from '@ts/users/country';
+import { Option } from '@ts/ui/components-props';
 
 import { isAxiosError } from './axios-instanse';
-
-export const AVATAR_DIRECTORY = path.join(process.cwd(), 'avatars');
 
 export const MILLISECONDS = 1000;
 
@@ -38,12 +37,6 @@ export const ServiceStatuses = [
   'unknown'
 ] as const;
 
-export const ButtonVariants = ['primary', 'secondary', 'outlined'] as const;
-
-export const InputThemes = ['light', 'dark'] as const;
-
-export const SelectVariants = ['plain', 'text'] as const;
-
 export const Modules = ['user', 'music', 'games'] as const;
 
 export const defaultFormState = <FormDataType>(): FormState<FormDataType> => ({
@@ -65,8 +58,37 @@ export const defaultNewPassword: NewPassword = {
   repeatPassword: ''
 };
 
+export const defaultUser: User = {
+  id: '',
+  username: '',
+  email: '',
+  createdAt: new Date(),
+  dashboards: [],
+  isPublic: false
+};
+
+export const defaultCountry: Country = {
+  error: false,
+  data: {
+    name: '',
+    flag: '',
+    iso2: ''
+  }
+};
+
+export const defaultCountries: Countries = {
+  error: false,
+  data: []
+};
+
+export const emptyOption: Option = {
+  value: '',
+  label: '',
+  key: ''
+};
+
 export const isErrorResponse = (value: unknown): value is ErrorResponse =>
-  (value as ErrorResponse).message !== undefined;
+  (value as ErrorResponse)?.message !== undefined;
 
 export const isExpired = (date: Date | string | number) =>
   new Date(date) < new Date();
@@ -116,8 +138,6 @@ export const responseWithError = (
     status,
     statusText: message
   });
-
-export const getIconCode = (iconName: string) => `mynaui:${iconName}`;
 
 export const clamp = (value: number, min: number, max: number) => {
   if (value < min) {
@@ -174,3 +194,8 @@ export const getFormDataValue = (
   name: string,
   formData?: FormData
 ): string | undefined => formData?.get(name)?.toString() ?? undefined;
+
+export const parseBooleanString = (value: string) => {
+  const lowercase = value.toLowerCase();
+  return !!value && lowercase !== 'false' && lowercase !== 'off';
+};

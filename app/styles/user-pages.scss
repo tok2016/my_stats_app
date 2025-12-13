@@ -1,4 +1,10 @@
+@use 'sass:map';
 @use 'utils';
+@use 'sidebar';
+
+$avatar-width: 10rem;
+$frame-border-width: 0.75rem;
+$frame-start-width: 200px;
 
 .user {
   position: relative;
@@ -7,7 +13,7 @@
 }
 
 .guest-page {
-  margin: 9rem 7.5rem;
+  margin: 5rem 3.5rem;
 
   .title {
     width: 37.5rem;
@@ -34,6 +40,255 @@
 
 .auth-header {
   position: absolute;
+  top: utils.$layout-padding;
+  left: utils.$layout-padding;
+}
+
+.avatar img {
+  border-radius: utils.$regular-radius;
+  object-fit: cover;
+}
+
+.profile-info {
+  position: absolute;
   top: 0;
   left: 0;
+
+  box-sizing: border-box;
+  width: 100vw;
+  padding: utils.$layout-padding;
+  padding-left: utils.$layout-padding + sidebar.$sidebar-icon-width +
+    sidebar.$sidebar-padding-x * 2;
+
+  display: grid;
+  grid-template-columns: $avatar-width 1fr min-content;
+  gap: 1rem;
+
+  background-color: map.get(utils.$bg-1-colors, 'user');
+  border-bottom: solid 4px map.get(utils.$bg-2-colors, 'user');
+
+  .avatar {
+    width: $avatar-width;
+    height: $avatar-width;
+  }
+}
+
+.profile-credits {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  font-family: utils.$ibm-plex;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.profile-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: right;
+  justify-content: space-between;
+}
+
+.profile-controlls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.country {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+
+  .flag {
+    min-width: 1rem;
+    height: 1rem;
+
+    img,
+    .skeleton {
+      border-radius: 2px;
+
+      svg {
+        display: none;
+      }
+    }
+  }
+}
+
+.avatar-field {
+  position: relative;
+  align-self: center;
+  width: 13rem;
+  height: 13rem;
+
+  .avatar {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.avatar-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+
+  opacity: 0;
+  background-color: utils.$black-alpha;
+  font-size: utils.$regular-size;
+  transition: opacity utils.$hover-time;
+  cursor: pointer;
+
+  svg {
+    width: 3rem;
+    height: 3rem;
+
+    * {
+      stroke-width: 2px;
+    }
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.avatar-delete {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.avatar-editor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  padding: 4rem 8rem;
+  box-sizing: border-box;
+
+  background-color: unset;
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+
+  .skeleton {
+    flex-grow: 1;
+  }
+
+  .buttons-flex-box {
+    width: 22rem;
+    z-index: 12;
+  }
+}
+
+.frame {
+  position: absolute;
+  top: calc(50vh - $frame-start-width / 2);
+  left: calc(50vw - $frame-start-width / 2);
+  min-width: $frame-start-width;
+  min-height: $frame-start-width;
+  flex-grow: 0;
+
+  border: solid 2px utils.$white;
+  box-sizing: border-box;
+  box-shadow: 0 0 0 99999px utils.$black-alpha;
+
+  cursor: move;
+  user-select: none;
+
+  > div {
+    position: absolute;
+    width: $frame-border-width;
+    height: $frame-border-width;
+    box-sizing: border-box;
+
+    border-radius: utils.$max-radius;
+    background-color: utils.$white;
+
+    user-select: none;
+  }
+
+  #ne {
+    top: -$frame-border-width * 0.5;
+    right: -$frame-border-width * 0.5;
+    cursor: nesw-resize;
+  }
+
+  #nw {
+    top: -$frame-border-width * 0.5;
+    left: -$frame-border-width * 0.5;
+    cursor: nwse-resize;
+  }
+
+  #se {
+    bottom: -$frame-border-width * 0.5;
+    right: -$frame-border-width * 0.5;
+    cursor: nwse-resize;
+  }
+
+  #sw {
+    bottom: -$frame-border-width * 0.5;
+    left: -$frame-border-width * 0.5;
+    cursor: nesw-resize;
+  }
+}
+
+.avatar-origin {
+  align-self: stretch;
+  flex-grow: 1;
+  min-width: $frame-start-width;
+  min-height: $frame-start-width;
+
+  img {
+    display: block;
+
+    min-width: $frame-start-width;
+    min-height: $frame-start-width;
+    max-width: 100%;
+    max-height: 100%;
+    width: unset;
+    height: unset;
+
+    border-radius: utils.$large-radius;
+    pointer-events: none;
+    cursor: none;
+    margin: auto;
+  }
+}
+
+.service-auth-info {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.625rem;
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-align: left;
+  }
 }

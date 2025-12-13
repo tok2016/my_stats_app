@@ -1,7 +1,7 @@
 'use client';
 
 import { ConfirmationFormProps } from '@ts/users/confirmation';
-import Password from '@ts/users/password';
+import { PasswordUpdate } from '@ts/users/password';
 
 import { useConfirm, useRedirectActionForm } from '@lib/hooks';
 import { getFormDataValue } from '@lib/utils';
@@ -11,21 +11,35 @@ import SubmitButton from '@components/SubmitButton';
 
 export default function NewPasswordForm({
   baseAction,
-  addendum
-}: ConfirmationFormProps) {
+  addendum,
+  path = '/iam',
+  requireOld = false
+}: ConfirmationFormProps & { requireOld?: boolean }) {
   const { getFormAction } = useConfirm();
   const [state, action, isPending] = useRedirectActionForm(
-    getFormAction<Password>(baseAction),
-    '/iam'
+    getFormAction<PasswordUpdate>(baseAction),
+    path
   );
 
   return (
     <form className='card light' action={action} noValidate>
       <h1>Change password</h1>
 
+      {!requireOld || (
+        <Input
+          label='Old password'
+          id='oldPassword'
+          name='oldPassword'
+          type='password'
+          required
+          defaultValue={getFormDataValue('oldPassword', state.data)}
+          errorHint={state.issues?.oldPassword}
+        />
+      )}
+
       <Input
         label='New password'
-        id='password'
+        id='newPassword'
         name='password'
         type='password'
         required

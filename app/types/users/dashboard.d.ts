@@ -2,7 +2,6 @@ import { Types } from 'mongoose';
 
 import { ServiceName } from './service';
 
-import { DashboardValidator } from '@lib/validationSchemas';
 import { DashboardTypes } from '@lib/utils';
 
 export type DashboardType = (typeof DashboardTypes)[number];

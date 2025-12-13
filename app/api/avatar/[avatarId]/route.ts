@@ -2,7 +2,8 @@ import { readFile } from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { AVATAR_DIRECTORY, responseWithError } from '@lib/utils';
+import { responseWithError } from '@lib/utils';
+import { AVATAR_DIRECTORY } from '@lib/auth';
 
 export async function GET(
   _req: NextRequest,

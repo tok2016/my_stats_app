@@ -4,6 +4,7 @@ import { mainFont, secondaryFont } from '@lib/fonts';
 
 import '@styles/global.scss';
 import '@styles/modules.scss';
+import '@styles/statuses.scss';
 
 export const metadata: Metadata = {
   title: 'My_Stats',

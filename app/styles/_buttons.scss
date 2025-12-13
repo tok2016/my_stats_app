@@ -1,6 +1,8 @@
+@use 'sass:map';
 @use 'utils';
 
 $button-icon-size: 1.25rem;
+$icon-button-width: 2rem;
 
 button {
   @include utils.font(utils.$large-size, utils.$bold-font, utils.$tight-font);
@@ -9,11 +11,15 @@ button {
   align-items: flex-end;
   flex-direction: row;
   gap: 1rem;
+
   padding: 0.75rem;
   min-height: $button-icon-size;
   min-width: 6.25rem;
+
   border-radius: utils.$regular-radius;
   border: none;
+  box-sizing: border-box;
+
   cursor: pointer;
 
   svg {
@@ -84,7 +90,8 @@ button {
 }
 
 @mixin button-filled(
-  $class,
+  $variant,
+  $selector,
   $main-color,
   $hover-color,
   $active-color,
@@ -94,7 +101,7 @@ button {
   $text-color-active,
   $text-color-disabled
 ) {
-  button.#{$class} {
+  button.#{$variant}#{$selector} {
     @include button-filled-base(
       $main-color,
       $hover-color,
@@ -109,6 +116,7 @@ button {
 }
 
 @mixin button-outlined(
+  $selector,
   $main-color,
   $hover-color,
   $active-color,
@@ -118,7 +126,7 @@ button {
   $text-color-active,
   $text-color-disabled
 ) {
-  button.outlined {
+  button.outlined#{$selector} {
     @include button(
       $text-color,
       $text-color-hover,
@@ -153,54 +161,70 @@ button {
   }
 }
 
-@mixin link($simple-hover, $simple-active, $colored-hover, $colored-active) {
-  a {
-    transition: color utils.$hover-time;
+@mixin button-link(
+  $selector,
+  $main-color,
+  $hover-color,
+  $active-color,
+  $disabled-color
+) {
+  button.link#{$selector} {
+    @include button($main-color, $hover-color, $active-color, $disabled-color);
+
+    background-color: transparent;
+
+    * {
+      filter: drop-shadow(0 0 utils.$spread $main-color);
+    }
 
     &:hover,
+    &:focus-visible * {
+      filter: drop-shadow(0 0 2 * utils.$spread $hover-color);
+    }
+
+    &:active * {
+      filter: drop-shadow(0 0 2 * utils.$spread $active-color);
+    }
+
+    &:disabled * {
+      filter: none;
+    }
+  }
+}
+
+@mixin button-text(
+  $selector,
+  $main-color,
+  $hover-color,
+  $active-color,
+  $disabled-color
+) {
+  button.text#{$selector} {
+    @include button($main-color, $hover-color, $active-color, $disabled-color);
+    background-color: transparent;
+  }
+}
+
+@mixin link($color-selector, $hover-color, $active-color) {
+  a#{$color-selector} {
+    &:hover,
     &:focus-visible {
-      color: $simple-hover;
+      color: $hover-color;
     }
 
     &:active {
-      color: $simple-active;
-      transition: color utils.$active-time;
+      color: $active-color;
     }
   }
 
-  a.colored {
+  a.underlined#{$color-selector} {
     &:hover,
     &:focus-visible {
-      color: $colored-hover;
+      text-decoration-color: $hover-color;
     }
 
     &:active {
-      color: $colored-active;
-    }
-  }
-
-  a.underline {
-    transition: text-decoration-color utils.$hover-time;
-
-    &:hover,
-    &:focus-visible {
-      text-decoration-color: $simple-hover;
-    }
-
-    &:active {
-      transition: text-decoration-color utils.$active-time;
-      text-decoration-color: $simple-active;
-    }
-  }
-
-  a.colored.underline {
-    &:hover,
-    &:focus-visible {
-      text-decoration-color: $colored-hover;
-    }
-
-    &:active {
-      text-decoration-color: $colored-active;
+      text-decoration-color: $active-color;
     }
   }
 }
@@ -213,4 +237,27 @@ a button {
   display: flex;
   flex-direction: column;
   gap: utils.$input-label-gap;
+}
+
+.buttons-flex-box {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: flex-start;
+  gap: 1.5rem;
+
+  > * {
+    flex: 1 1;
+    > * {
+      width: 100%;
+    }
+  }
+}
+
+button.icon {
+  min-width: unset;
+  min-height: unset;
+  border-radius: utils.$max-radius;
+  font-size: $button-icon-size;
+  padding: ($icon-button-width - $button-icon-size) * 0.5;
 }

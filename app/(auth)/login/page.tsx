@@ -27,7 +27,7 @@ export default function LoginPage() {
 
       <Input
         type='password'
-        id='password'
+        id='apassword'
         name='password'
         label='Password'
         errorHint={state.issues?.password}

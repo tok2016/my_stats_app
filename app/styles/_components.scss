@@ -4,6 +4,8 @@
 
 $border-style: 2px solid;
 $border-radius: 6px;
+$gloss-width: 2rem;
+$skeleton-icon-min-width: 2rem;
 
 .divider {
   @include utils.font(utils.$min-size, utils.$regular-font, utils.$tight-font);
@@ -124,11 +126,21 @@ $border-radius: 6px;
   flex-direction: column;
   align-items: stretch;
   gap: 1.5rem;
-  width: 22rem;
-  padding: 1.25rem;
+
+  position: relative;
+  width: 22em;
+  padding: 1rem;
   border-radius: utils.$regular-radius;
+  box-sizing: border-box;
+
+  > * {
+    margin: 0.25rem;
+  }
 
   h1,
+  h2,
+  h3,
+  h4,
   span {
     text-align: center;
   }
@@ -136,6 +148,43 @@ $border-radius: 6px;
   .button-group {
     text-align: center;
   }
+
+  .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  > .card {
+    width: unset;
+    padding: 0;
+    border-radius: 0;
+    background-color: transparent !important;
+    > * {
+      margin: 0;
+    }
+  }
+}
+
+@mixin card($bg-color) {
+  .card {
+    background-color: $bg-color;
+  }
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: utils.$black-alpha;
+  text-align: left;
 }
 
 .send-again-timer {
@@ -143,4 +192,305 @@ $border-radius: 6px;
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
+}
+
+.skeletons {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.skeleton {
+  --font-size: #{utils.$regular-size};
+  --line-height: #{utils.$fit-font};
+
+  display: block;
+  border-radius: utils.$small-radius;
+  height: var(--font-size);
+  margin: calc((var(--font-size) * var(--line-height) - var(--font-size)) / 2) 0;
+
+  background-repeat: no-repeat;
+  background-size: $gloss-width;
+  background-position: -$gloss-width 0%;
+  background-image: linear-gradient(
+    90deg,
+    utils.$skeleton-gloss-transparent,
+    utils.$skeleton-gloss-brigt,
+    utils.$skeleton-gloss-transparent
+  );
+
+  animation: gloss 1s ease-in-out infinite;
+
+  svg {
+    min-width: $skeleton-icon-min-width;
+    min-height: $skeleton-icon-min-width;
+    width: 50%;
+    height: 50%;
+    stroke-width: 3px;
+  }
+}
+
+.skeleton.min {
+  --font-size: #{utils.$min-size};
+}
+
+.skeleton.small {
+  --font-size: #{utils.$small-size};
+}
+
+.skeleton.regular {
+  --font-size: #{utils.$regular-size};
+}
+
+.skeleton.large {
+  --font-size: #{utils.$large-size};
+}
+
+.skeleton.tight {
+  --line-height: #{utils.$tight-font};
+}
+
+.skeleton.fit {
+  --line-height: #{utils.$fit-font};
+}
+
+.skeleton.wide {
+  --line-height: #{utils.$wide-font};
+}
+
+.skeleton.h1 {
+  --font-size: #{utils.$h1-size};
+  --line-height: #{utils.$wide-font};
+}
+
+.skeleton.h2 {
+  --font-size: #{utils.$h2-size};
+  --line-height: #{utils.$wide-font};
+}
+
+.skeleton.h3 {
+  --font-size: #{utils.$h3-size};
+  --line-height: #{utils.$fit-font};
+}
+
+.skeleton.h4 {
+  --font-size: #{utils.$h4-size};
+  --line-height: #{utils.$fit-font};
+}
+
+.skeleton.image,
+.skeleton.graph {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: utils.$regular-radius;
+  margin: 0;
+}
+
+@keyframes gloss {
+  to {
+    background-position: calc(100% + $gloss-width) 0%;
+  }
+}
+
+@mixin skeleton($bg-color, $icon-color) {
+  .skeleton {
+    background-color: $bg-color;
+
+    svg {
+      color: $icon-color !important;
+    }
+  }
+}
+
+.fetch-image {
+  position: relative;
+
+  .skeletons {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  img,
+  .skeletons {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.drawer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+
+  svg * {
+    stroke-width: 3px;
+  }
+
+  .spinner {
+    width: 1.5rem;
+  }
+}
+
+.drawer-expand {
+  width: 1.5rem;
+  height: 1.5rem;
+  transition: rotate utils.$active-time;
+}
+
+.drawer.expanded {
+  .drawer-expand {
+    rotate: 180deg;
+  }
+}
+
+.drawer-submenu {
+  --expand-time: 100ms;
+
+  width: 100%;
+  overflow-y: hidden;
+
+  display: none;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: inherit;
+
+  max-height: 0px;
+  transition: max-height var(--expand-time);
+}
+
+form .drawer-submenu {
+  padding: 0.25rem;
+  margin: 0;
+}
+
+.tab {
+  padding: 0.25rem 0;
+  border-top: solid 2px;
+}
+
+@mixin tab($border-color) {
+  .tab {
+    border-color: $border-color;
+  }
+}
+
+.spinner {
+  border: solid 3px utils.$white;
+  border-radius: 50%;
+  box-sizing: border-box;
+
+  animation:
+    spinning 0.8s infinite linear alternate,
+    rotation 1.6s infinite linear;
+
+  width: 1rem;
+  aspect-ratio: 1;
+}
+
+@keyframes rotation {
+  0% {
+    transform: scaleY(1) rotate(0deg);
+  }
+  49.99% {
+    transform: scaleY(1) rotate(135deg);
+  }
+  50% {
+    transform: scaleY(-1) rotate(0deg);
+  }
+  100% {
+    transform: scaleY(-1) rotate(-135deg);
+  }
+}
+
+@keyframes spinning {
+  0% {
+    clip-path: polygon(50% 50%, 0 0, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%);
+  }
+
+  12.5% {
+    clip-path: polygon(
+      50% 50%,
+      0 0,
+      50% 0%,
+      100% 0%,
+      100% 0%,
+      100% 0%,
+      100% 0%
+    );
+  }
+
+  25% {
+    clip-path: polygon(
+      50% 50%,
+      0 0,
+      50% 0%,
+      100% 0%,
+      100% 100%,
+      100% 100%,
+      100% 100%
+    );
+  }
+
+  50% {
+    clip-path: polygon(
+      50% 50%,
+      0 0,
+      50% 0%,
+      100% 0%,
+      100% 100%,
+      50% 100%,
+      0% 100%
+    );
+  }
+
+  62.5% {
+    clip-path: polygon(
+      50% 50%,
+      100% 0,
+      100% 0%,
+      100% 0%,
+      100% 100%,
+      50% 100%,
+      0% 100%
+    );
+  }
+
+  75% {
+    clip-path: polygon(
+      50% 50%,
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      50% 100%,
+      0% 100%
+    );
+  }
+
+  100% {
+    clip-path: polygon(
+      50% 50%,
+      50% 100%,
+      50% 100%,
+      50% 100%,
+      50% 100%,
+      50% 100%,
+      0% 100%
+    );
+  }
+}
+
+@mixin spinner($color) {
+  .spinner {
+    border-color: $color;
+  }
 }

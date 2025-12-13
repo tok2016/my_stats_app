@@ -167,7 +167,7 @@
   gap: utils.$input-label-gap;
 }
 
-.input-binary-group:has(.switch) {
+.input-binary-group:has(> .switch) {
   width: 100%;
   justify-content: space-between;
 

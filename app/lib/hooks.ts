@@ -30,8 +30,10 @@ export const useURLSearchParams = () => {
 
 export const useAction = <DataType, ParameterType = undefined>(
   action: (newData?: ParameterType) => Promise<DataType>,
-  initialData: DataType
+  initialData: DataType,
+  refreshPath: boolean = false
 ) => {
+  const { refresh } = useRouter();
   const [data, setData] = useState<DataType>(initialData);
   const [isPending, setPending] = useState<boolean>(false);
 
@@ -39,10 +41,15 @@ export const useAction = <DataType, ParameterType = undefined>(
     async (newData?: ParameterType) => {
       setPending(true);
       const data = await action(newData);
+
       setData(data);
       setPending(false);
+
+      if (refreshPath) {
+        refresh();
+      }
     },
-    [action]
+    [action, refresh, refreshPath]
   );
 
   return [data, startAction, isPending, setData] as const;
@@ -52,17 +59,17 @@ export const useConfirm = () => useContext(ConfirmationContext);
 
 export const useRedirectActionForm = <DataType>(
   baseAction: FormAction<DataType>,
-  path: string,
-  initialState: FormState<DataType> = defaultFormState()
+  path: string = '',
+  initialState: FormState<DataType> = defaultFormState(),
+  needsRefresh: boolean = false
 ) => {
-  const { replace } = useRouter();
+  const { replace, refresh } = useRouter();
 
   const redirectAction: FormAction<DataType> = async (prev, data) => {
     const next = await baseAction(prev, data);
 
-    if (!next.error) {
-      replace(path);
-    }
+    if (path && !next.error) replace(path);
+    if (needsRefresh) refresh();
 
     return next;
   };

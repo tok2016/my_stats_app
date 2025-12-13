@@ -3,10 +3,31 @@ import {
   ConfirmationCode,
   ConfirmationInfo
 } from '@ts/users/confirmation';
+import FormState from '@ts/ui/form-state';
+import { BasicUser } from '@ts/users/user';
 
 import AxiosInstanse from './axios-instanse';
 import { defaultConfirmation, getErrorFormState } from './utils';
-import FormState from '@ts/ui/form-state';
+
+export const getUsers = async (
+  credential?: string,
+  limit?: number
+): Promise<BasicUser[]> => {
+  try {
+    const searchParams = new URLSearchParams();
+
+    if (credential) searchParams.append('credential', credential);
+
+    if (limit) searchParams.append('limit', limit.toString());
+
+    const response = await AxiosInstanse.get<BasicUser[]>(
+      `/api/users?${searchParams.toString()}`
+    );
+    return response.data;
+  } catch {
+    return [];
+  }
+};
 
 export const getOperation = async (): Promise<ConfirmationInfo> => {
   try {
@@ -17,18 +38,18 @@ export const getOperation = async (): Promise<ConfirmationInfo> => {
   }
 };
 
-export const requestConfimation: ConfirmationBaseAction = async (
-  _prev,
-  formData
-) => {
-  const body = Object.fromEntries(formData.entries());
-  const response = await AxiosInstanse.post<ConfirmationInfo>(
-    '/api/confirm',
-    body
-  );
+export const requestConfimation =
+  (signal?: AbortSignal): ConfirmationBaseAction =>
+  async (_prev, formData) => {
+    const body = Object.fromEntries(formData.entries());
+    const response = await AxiosInstanse.post<ConfirmationInfo>(
+      '/api/confirm',
+      body,
+      { signal }
+    );
 
-  return response.data;
-};
+    return response.data;
+  };
 
 export const confirmByCode: ConfirmationBaseAction = async (prev, formData) => {
   const data = Object.fromEntries(
@@ -57,4 +78,19 @@ export const sendCodeAgain = async (
   } catch (err) {
     return getErrorFormState(err);
   }
+};
+
+export const deleteConfirmation = async (operationId: string) => {
+  if (!operationId) return;
+
+  try {
+    await AxiosInstanse.delete(`/api/confirm/${operationId}`);
+  } catch {
+    return;
+  }
+};
+
+export const getUser = async () => {
+  const user = await AxiosInstanse.get('/api/user');
+  return user;
 };

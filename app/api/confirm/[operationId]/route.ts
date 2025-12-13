@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ConfirmationsModel } from '@lib/models';
 import { generateCode, responseWithError } from '@lib/utils';
 import { generateConfirmationResponse } from '@lib/auth';
+import { cookies } from 'next/headers';
 
 export async function PUT(
   _req: NextRequest,
@@ -36,6 +37,9 @@ export async function DELETE(
 ) {
   const { operationId } = await params;
   await ConfirmationsModel.findByIdAndDelete(operationId);
+
+  const cookiesStore = await cookies();
+  cookiesStore.delete('operation');
 
   return new NextResponse('Confirmation operation was cancelled', {
     status: 200,

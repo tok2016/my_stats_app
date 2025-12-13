@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Icon } from '@iconify/react';
+import { memo, useMemo, useRef, useState } from 'react';
+import { ChevronDown } from '@mynaui/icons-react';
 
 import { SelectVariant } from '@ts/ui/components-variants';
 import { TextInputProps, Option } from '@ts/ui/components-props';
 
-import { getIconCode } from '@lib/utils';
 import Hint from './Hint';
+import Picker from './Picker';
+import { emptyOption } from '@lib/utils';
 
 type SelectProps = TextInputProps & {
   options: Option[];
@@ -20,6 +21,8 @@ type SelectVariantProps = {
   selectGroupClass: string;
 };
 
+const EXPAND_ICON_CLASS_NAME = 'picker-icon';
+
 const SelectTypes: Record<SelectVariant, SelectVariantProps> = {
   plain: {
     labelGroupClass: 'input-select-group',
@@ -31,36 +34,39 @@ const SelectTypes: Record<SelectVariant, SelectVariantProps> = {
   }
 };
 
-export default function Select({
+function SelectRaw({
   label,
   id,
   name,
   options,
   variant = 'plain',
   className = '',
+  disabled = false,
   defaultValue,
   hint,
   errorHint,
   onSelect
 }: SelectProps) {
-  const [value, setValue] = useState<string>(options[0].value);
-  const [isExpanded, setExpanded] = useState<boolean>(false);
+  const defaultOption = useMemo(
+    () =>
+      options.find((option) => option.value === defaultValue)
+      ?? options[0]
+      ?? emptyOption,
+    [options, defaultValue]
+  );
 
-  const onOptionClick = (value: string) => {
-    setValue(value);
-    setExpanded(false);
-    onSelect?.(value);
+  const [option, setOption] = useState<Option>(defaultOption);
+  const expandIconRef = useRef<SVGSVGElement>(null);
+
+  const onOptionSelect = (newOption: Option) => {
+    setOption(newOption);
+    onSelect?.(newOption.value);
   };
 
-  useEffect(() => {
-    const onClose = (evt: MouseEvent) => {
-      const { target } = evt;
-      setExpanded(target instanceof Element && target.id?.includes(id));
-    };
-    window.addEventListener('click', onClose);
-
-    return () => window.removeEventListener('click', onClose);
-  }, [id]);
+  const onExpand = (isExpanded: boolean) => {
+    if (expandIconRef.current)
+      expandIconRef.current.classList = `${EXPAND_ICON_CLASS_NAME} ${isExpanded ? 'expanded' : ''}`;
+  };
 
   return (
     <div className={`${SelectTypes[variant].labelGroupClass} ${className}`}>
@@ -72,37 +78,34 @@ export default function Select({
         <select
           id={id}
           name={name}
-          defaultValue={defaultValue}
-          value={value}
+          value={option.value}
+          disabled={disabled}
           onChange={() => {}}
         >
           {options.map((option) => (
-            <option disabled hidden key={option.value} value={option.value}>
+            <option hidden key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
         </select>
 
         <div id={`${id}-label`} className='select'>
-          <span id={`${id}-label`}>{value}</span>
-          <Icon
+          <span id={`${id}-label`}>{option.label}</span>
+          <ChevronDown
+            ref={expandIconRef}
             id={`${id}-label`}
-            icon={getIconCode('chevron-down')}
-            className={`picker-icon ${isExpanded ? 'expanded' : ''}`}
+            className={EXPAND_ICON_CLASS_NAME}
           />
         </div>
 
-        <ul className={`picker ${isExpanded ? '' : 'hidden'}`}>
-          {options.map((option) => (
-            <li
-              key={option.value}
-              className={`option ${option.value === value ? 'selected' : ''}`}
-              onClick={() => onOptionClick(option.value)}
-            >
-              {option.label}
-            </li>
-          ))}
-        </ul>
+        <Picker
+          options={options}
+          isCurrent={(opt) => opt.value === option.value}
+          inputId={id}
+          onSelect={onOptionSelect}
+          onExpand={onExpand}
+          renderOption={(option) => option.label}
+        />
       </div>
 
       <Hint variant='error'>{errorHint}</Hint>
@@ -110,3 +113,6 @@ export default function Select({
     </div>
   );
 }
+
+const Select = memo(SelectRaw);
+export default Select;

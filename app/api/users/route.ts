@@ -8,18 +8,20 @@ import { CredentialsModel, UsersModel } from '@lib/models';
 import { uniteBasicUserData } from '@lib/utils';
 
 export async function GET(req: NextRequest) {
-  const usernameSearch = req.nextUrl.searchParams.get('username');
+  const credentialSearch = req.nextUrl.searchParams.get('credential');
   const limit = parseInt(req.nextUrl.searchParams.get('limit') ?? '0');
 
-  if (!usernameSearch) {
+  if (!credentialSearch) {
     return NextResponse.json([], {
       status: 200,
       statusText: 'No users were found'
     });
   }
 
-  const regex = new RegExp(usernameSearch.trim(), 'i');
-  const credentials = await CredentialsModel.find({ username: regex }).lean();
+  const regex = new RegExp(credentialSearch.trim(), 'i');
+  const credentials = await CredentialsModel.find({
+    $or: [{ username: regex }, { email: regex }]
+  }).lean();
 
   const credentialsMap: { [key: string]: CredentialsInSchema } =
     Object.fromEntries(

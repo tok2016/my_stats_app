@@ -1,76 +1,73 @@
-$user-active-color: #1fbba4;
-$user-hover-color: #0b7a72;
-$user-disabled-color: #5c807d;
-$user-highlight-color: #69dfce;
-$user-autofill-color: #8fecde;
-$user-text-color: #dee6e5;
-$user-bg-1-color: #050907;
-$user-bg-2-color: #0f2721;
-
-$music-active-color: #1fbb70;
-$music-hover-color: #0b7a34;
-$music-disabled-color: #5c806c;
-$music-highlight-color: #7aebb4;
-$music-autofill-color: #8fecbf;
-$music-text-color: #dee6e2;
-$music-bg-1-color: #050906;
-$music-bg-2-color: #0f2717;
-
-$games-active-color: #2eacc8;
-$games-hover-color: #146086;
-$games-disabled-color: #5c7780;
-$games-highlight-color: #a5eeff;
-$games-autofill-color: #8fdbec;
-$games-text-color: #dee4e6;
-$games-bg-1-color: #050709;
-$games-bg-2-color: #0f1b27;
-
 $active-colors: (
   'user': #1fbba4,
   'music': #1fbb70,
-  'games': #2eacc8
+  'games': #2eacc8,
+  'error': #c33333,
+  'warning': #d5c534,
+  'success': #1fbb70
 );
 
 $hover-colors: (
   'user': #0b7a72,
   'music': #0b7a34,
-  'games': #146086
+  'games': #146086,
+  'error': #831515,
+  'warning': #9c8f17,
+  'success': #0b7a34
 );
 
 $disabled-colors: (
   'user': #5c807d,
   'music': #5c806c,
-  'games': #5c7780
+  'games': #5c7780,
+  'error': #805f5f,
+  'warning': #716e52,
+  'success': #5c806c
 );
 
 $highlight-colors: (
   'user': #69dfce,
   'music': #7aebb4,
-  'games': #a5eeff
+  'games': #a5eeff,
+  'error': #e67d7d,
+  'warning': #fff280,
+  'success': #7aebb4
 );
 
 $autofill-colors: (
   'user': #8fecde,
   'music': #8fecbf,
-  'games': #8fdbec
+  'games': #8fdbec,
+  'error': #e09090,
+  'warning': #e0d78a,
+  'success': #8fecbf
 );
 
 $text-colors: (
   'user': #dee6e5,
   'music': #dee6e2,
-  'games': #dee4e6
+  'games': #dee4e6,
+  'error': #e6dfde,
+  'warning': #e6e5df,
+  'success': #dfe6e2
 );
 
 $bg-1-colors: (
   'user': #050907,
   'music': #050906,
-  'games': #050709
+  'games': #050709,
+  'error': #0a0606,
+  'warning': #0c0c07,
+  'success': #060c09
 );
 
 $bg-2-colors: (
   'user': #0f2721,
   'music': #0f2717,
-  'games': #0f1b27
+  'games': #0f1b27,
+  'error': #270e0e,
+  'warning': #27270c,
+  'success': #0f2717
 );
 
 $diagram-color-1: #1fbb70;
@@ -87,14 +84,16 @@ $diagram-color-11: #cdcdcd;
 
 $white: #ffffff;
 $black: #000000;
+$black-alpha: #0000004d;
 $text-darker: #b8bfbe;
 $input-disabled: #b8bfbe;
 $placeholder-color: #919191;
 $placeholder-darker: #4d4d4d;
 
-$error-color: #c33333;
-$warning-color: #d5c534;
-$success-color: #1fbb70;
+$skeleton-color: #6c6c6c;
+$skeleton-light-color: #a4a4a4;
+$skeleton-gloss-transparent: #ffffff00;
+$skeleton-gloss-brigt: #ffffff60;
 
 $shadow-length: 0.25rem;
 $blur: 0.25rem; //4px
@@ -131,6 +130,7 @@ $fit-font: 1.2;
 $wide-font: 1.4;
 
 $input-label-gap: 0.5rem; //8px
+$layout-padding: 3rem;
 
 @mixin font($font-size, $font-weight, $line-height) {
   font-size: $font-size;
@@ -154,4 +154,15 @@ $input-label-gap: 0.5rem; //8px
 @mixin underline($color) {
   text-decoration: underline dotted $color 2px;
   text-underline-offset: 2px;
+}
+
+@mixin light-scrollbar() {
+  &::-webkit-scrollbar-track {
+    background-color: $text-darker;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $white;
+    border-color: $text-darker;
+  }
 }

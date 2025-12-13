@@ -1,37 +1,62 @@
 'use client';
 
-import { KeyboardEvent, useRef } from 'react';
-import { Icon } from '@iconify/react';
+import {
+  type ChangeEvent,
+  type KeyboardEvent,
+  useEffect,
+  useState
+} from 'react';
+import { Search as SearchIcon } from '@mynaui/icons-react';
 
-import { InputBaseProps } from '@ts/ui/components-props';
+import { SearchBaseProps } from '@ts/ui/components-props';
 
-import { getIconCode } from '@lib/utils';
+import Picker from './Picker';
+import { useAction } from '@lib/hooks';
 
-type SearchProps = Omit<InputBaseProps, 'label' | 'errorHint' | 'hint'> & {
-  placeholder?: string;
-  onSearch: (query: string) => void;
+const SEARCH_COOLDOWN = 1500;
+
+type SearchProps<T> = SearchBaseProps & {
+  defaultQuery?: string;
+  renderOption?: (option: T) => React.ReactNode;
+  action: (query?: string) => Promise<(T & { key: string })[]>;
+  onOptionSelect?: (option: T) => void;
+  onSearchSubmit: (query: string) => void;
 };
 
-export default function Search({
+export default function Search<T>({
   id,
   name,
   placeholder,
+  defaultQuery = '',
   className = '',
-  onSearch
-}: SearchProps) {
-  const searchRef = useRef<HTMLInputElement>(null);
+  renderOption,
+  action,
+  onOptionSelect,
+  onSearchSubmit,
+  onFocus,
+  onBlur
+}: SearchProps<T>) {
+  const [options, search] = useAction(action, []);
+  const [query, setQuery] = useState<string>(defaultQuery);
 
-  const onSearchSubmit = () => {
-    if (searchRef.current?.value) {
-      onSearch(searchRef.current.value);
-    }
+  const onSubmit = () => {
+    onSearchSubmit(query);
   };
 
   const onEnterDown = (evt: KeyboardEvent) => {
     if (evt.key === 'Enter') {
-      onSearchSubmit();
+      onSubmit();
     }
   };
+
+  const onChange = (evt: ChangeEvent<HTMLInputElement>) => {
+    setQuery(evt.target.value);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => search(query), SEARCH_COOLDOWN);
+    return () => clearTimeout(timer);
+  }, [query, search]);
 
   return (
     <div className={`input-select-group ${className}`}>
@@ -39,18 +64,26 @@ export default function Search({
         <input
           id={id}
           name={name}
-          ref={searchRef}
+          value={query}
           type='search'
           placeholder={placeholder}
+          onChange={onChange}
           onKeyDown={onEnterDown}
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
 
-        <Icon
-          className='input-icon'
-          icon={getIconCode('search')}
-          onClick={onSearchSubmit}
-        />
+        <SearchIcon className='input-icon' onClick={onSubmit} />
       </div>
+
+      {!renderOption || (
+        <Picker
+          inputId={id}
+          options={options}
+          renderOption={renderOption}
+          onSelect={onOptionSelect}
+        />
+      )}
     </div>
   );
 }
