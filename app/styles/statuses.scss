@@ -1,0 +1,101 @@
+@use 'sass:map';
+@use 'utils';
+@use 'buttons';
+
+$statuses: 'error', 'warning', 'success';
+
+@each $status in $statuses {
+  .#{$status} {
+    color: map.get(utils.$active-colors, $status) !important;
+  }
+
+  @include buttons.button-filled(
+    'primary',
+    '.#{$status}',
+    map.get(utils.$active-colors, $status),
+    map.get(utils.$hover-colors, $status),
+    map.get(utils.$active-colors, $status),
+    map.get(utils.$disabled-colors, $status),
+    utils.$white !important,
+    utils.$white !important,
+    utils.$white !important,
+    map.get(utils.$text-colors, $status) !important
+  );
+
+  @include buttons.button-filled(
+    'secondary',
+    '.#{$status}',
+    map.get(utils.$text-colors, $status),
+    utils.$text-darker,
+    utils.$white,
+    utils.$placeholder-color,
+    map.get(utils.$hover-colors, $status) !important,
+    map.get(utils.$hover-colors, $status) !important,
+    map.get(utils.$active-colors, $status) !important,
+    utils.$placeholder-darker !important
+  );
+
+  @include buttons.button-outlined(
+    '.#{$status}',
+    map.get(utils.$active-colors, $status),
+    map.get(utils.$hover-colors, $status),
+    map.get(utils.$highlight-colors, $status),
+    map.get(utils.$disabled-colors, $status),
+    map.get(utils.$text-colors, $status) !important,
+    map.get(utils.$active-colors, $status) !important,
+    utils.$white !important,
+    utils.$text-darker !important
+  );
+
+  @include buttons.button-link(
+    '.#{$status}',
+    map.get(utils.$active-colors, $status) !important,
+    map.get(utils.$hover-colors, $status) !important,
+    map.get(utils.$highlight-colors, $status) !important,
+    map.get(utils.$disabled-colors, $status) !important
+  );
+
+  @include buttons.button-text(
+    '.#{$status}',
+    map.get(utils.$text-colors, $status) !important,
+    utils.$text-darker !important,
+    utils.$white !important,
+    utils.$placeholder-color !important
+  );
+
+  @include buttons.link(
+    '.#{$status}',
+    map.get(utils.$hover-colors, $status) !important,
+    map.get(utils.$highlight-colors, $status) !important
+  );
+
+  .light {
+    @include buttons.button-outlined(
+      '.#{$status}',
+      map.get(utils.$active-colors, $status),
+      map.get(utils.$hover-colors, $status),
+      map.get(utils.$highlight-colors, $status),
+      map.get(utils.$disabled-colors, $status),
+      map.get(utils.$bg-2-colors, $status) !important,
+      map.get(utils.$hover-colors, $status) !important,
+      map.get(utils.$active-colors, $status) !important,
+      map.get(utils.$disabled-colors, $status) !important
+    );
+
+    @include buttons.button-link(
+      '.#{$status}',
+      map.get(utils.$hover-colors, $status) !important,
+      map.get(utils.$active-colors, $status) !important,
+      map.get(utils.$highlight-colors, $status) !important,
+      map.get(utils.$disabled-colors, $status) !important
+    );
+
+    @include buttons.button-text(
+      '.#{$status}',
+      map.get(utils.$bg-2-colors, $status) !important,
+      utils.$placeholder-darker !important,
+      utils.$text-darker !important,
+      utils.$placeholder-color !important
+    );
+  }
+}

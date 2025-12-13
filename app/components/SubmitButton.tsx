@@ -27,16 +27,18 @@ export default function SubmitButton({
   return (
     <div className='button-group'>
       <div className='buttons-flex-box'>
-        <Button
-          type='submit'
-          loading={loading}
-          onClick={onSubmit}
-          {...buttonStyle}
-        >
-          {children}
-        </Button>
+        <div>
+          <Button
+            type='submit'
+            loading={loading}
+            onClick={onSubmit}
+            {...buttonStyle}
+          >
+            {children}
+          </Button>
+        </div>
 
-        {reset}
+        <div>{reset}</div>
       </div>
       {error || <Hint variant='error'>{errorHint}</Hint>}
     </div>

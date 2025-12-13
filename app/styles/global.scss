@@ -139,18 +139,6 @@ ul {
   font-size: utils.$min-size !important;
 }
 
-.error {
-  color: map.get(utils.$active-colors, 'error') !important;
-}
-
-.warning {
-  color: map.get(utils.$active-colors, 'warning') !important;
-}
-
-.success {
-  color: map.get(utils.$active-colors, 'success') !important;
-}
-
 .hidden {
   display: none !important;
 }

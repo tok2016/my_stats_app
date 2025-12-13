@@ -57,22 +57,21 @@ export const DashboardValidator: z.ZodType<NewDashboard> = z.object({
   y: z.number().default(0),
   width: z.number().default(0),
   height: z.number().default(0),
-  service: z.enum(ServiceNames).default('spotify')
+  service: z.enum(ServiceNames).default('steam')
 });
 
 export const UserUpdateValidator: z.ZodType<UserUpdate> = z
   .object({
     email: z.email().optional(),
-    avatarUrl: z.url().optional().nullable(),
-    birthdate: z.string().optional().nullable(),
-    country: z.string().optional().nullable(),
+    birthdate: z.string().nullish().default(null),
+    country: z.string().nullish().default(null),
     isPublic: z.boolean().default(false),
-    unblockDate: z.string().optional().nullable()
+    unblockDate: z.string().nullish().default(null)
   })
   .transform((input) => ({
     ...input,
-    birthdate: input.birthdate ? new Date(input.birthdate) : undefined,
-    unblockDate: input.unblockDate ? new Date(input.unblockDate) : undefined
+    birthdate: input.birthdate ? new Date(input.birthdate) : null,
+    unblockDate: input.unblockDate ? new Date(input.unblockDate) : null
   }));
 
 export const UserLoginValidator: z.ZodType<UserLogin> = z.object({
@@ -81,7 +80,7 @@ export const UserLoginValidator: z.ZodType<UserLogin> = z.object({
 });
 
 export const ServiceValidator: z.ZodType<NewService> = z.object({
-  name: z.enum(ServiceNames).default('spotify'),
+  name: z.enum(ServiceNames).default('steam'),
   login: z.string().nonempty()
 });
 

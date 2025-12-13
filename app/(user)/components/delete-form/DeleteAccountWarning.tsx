@@ -6,7 +6,6 @@ import Button from '@components/Button';
 import SubmitButton from '@components/SubmitButton';
 import { useConfirm, useRedirectActionForm } from '@lib/hooks';
 import { defaultFormState } from '@lib/utils';
-import { usePopupState } from '@store/popup-store';
 import { useUserState } from '@store/user-store';
 
 export default function DeleteAccountWarning({
@@ -23,13 +22,6 @@ export default function DeleteAccountWarning({
     defaultFormState()
   );
 
-  const { togglePopup } = usePopupState();
-
-  const onCancelClick = async () => {
-    await onCancel();
-    togglePopup('');
-  };
-
   return (
     <form className='card light' action={startDelete} noValidate>
       <p>{`Do you really want to delete your account? You won't be able to restore all your account's data`}</p>
@@ -43,7 +35,7 @@ export default function DeleteAccountWarning({
         errorHint={state.message}
         buttonStyle={{ status: 'error' }}
         reset={
-          <Button variant='outlined' onClick={onCancelClick}>
+          <Button variant='outlined' onClick={onCancel}>
             Cancel
           </Button>
         }

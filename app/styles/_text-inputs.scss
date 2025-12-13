@@ -21,6 +21,7 @@ $code-input-padding-x: 0.75rem;
   min-height: $input-min-height;
   min-width: $input-min-width;
   padding: 0 $input-padding-x;
+  font-family: utils.$inter;
 
   &::placeholder {
     color: utils.$placeholder-color;
@@ -138,7 +139,8 @@ $code-input-padding-x: 0.75rem;
   &:has(> .input-icon) {
     input[type='search'],
     input[type='password'],
-    input[type='text'] {
+    input[type='text'],
+    input[type='email'] {
       padding-right: 2 * $input-padding-x;
     }
   }
@@ -270,6 +272,19 @@ select {
 
 .picker.hidden {
   display: none;
+}
+
+.select-search {
+  .picker {
+    width: 100%;
+    top: $input-min-height + 0.5rem;
+    left: 0;
+  }
+
+  .picker.upper {
+    top: unset;
+    bottom: $input-min-height + 0.5rem;
+  }
 }
 
 .option {

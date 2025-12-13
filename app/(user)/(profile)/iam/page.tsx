@@ -1,6 +1,6 @@
 'use client';
 
-import ProfileInfo from '@app/(user)/components/ProfileInfo';
+import ProfileInfo from '@app/(user)/components/profile-info/ProfileInfo';
 import { useUserState } from '@store/user-store';
 
 export default function IamPage() {

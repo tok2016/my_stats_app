@@ -65,10 +65,7 @@ const updateAvatar = (userId: string, formData: FormData) => {
   if (avatar && avatarState === 'update') {
     const avatarData = new FormData();
     avatarData.append('avatar', avatar);
-
-    return AxiosInstanse.post(`/api/user/${userId}/avatar`, avatarData, {
-      responseType: 'formdata'
-    });
+    return AxiosInstanse.post(`/api/user/${userId}/avatar`, avatarData);
   } else if (avatarState === 'delete') {
     return AxiosInstanse.delete(`/api/user/${userId}/avatar`);
   }
@@ -104,7 +101,7 @@ export const updateProfile =
       const servicesRequests = ServiceNames.filter((service) => {
         const prevLogin = getFormDataValue(service, prev.data) ?? '';
         const currentLogin = getFormDataValue(service, formData) ?? '';
-        return prevLogin !== currentLogin;
+        return prevLogin !== currentLogin || !prevLogin;
       }).map((service) =>
         updateService(userId, service, getFormDataValue(service, formData))
       );
@@ -112,7 +109,7 @@ export const updateProfile =
       const userJsonUpdate = new FormData();
       formData.forEach((value, key) => {
         if (value instanceof Blob) return;
-        userJsonUpdate.append(key, value);
+        userJsonUpdate.append(key, value ?? '');
       });
 
       const userUpdate = Object.fromEntries(

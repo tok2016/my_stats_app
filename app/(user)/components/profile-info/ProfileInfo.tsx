@@ -6,10 +6,10 @@ import { Share, Wrench } from '@mynaui/icons-react';
 import { User } from '@ts/users/user';
 
 import Avatar from '@components/profile-layout/Avatar';
-import CountryData from './CountryData';
+import CountryData from '../country/CountryData';
 import IconButton from '@components/IconButton';
-import ProfileInfoSkeleton from './ProfileInfoSkeleton';
-import PublishButton from './publish-controlls/PublishButton';
+import PublishButton from '../publish-controlls/PublishButton';
+import ProfileCreditsSkeleton from './ProfileCreditsSkeleton';
 
 type ProfileInfoProps = {
   user: User;
@@ -48,14 +48,18 @@ export default function ProfileInfo({
       <Avatar avatarId={user.avatarUrl} loading={loading} />
 
       {loading ? (
-        <ProfileInfoSkeleton />
+        <ProfileCreditsSkeleton />
       ) : (
         <div className='profile-credits'>
           <h2>{user.username}</h2>
 
           <div className='profile-details'>
-            <a href={`mailto:${user.email}`} target='_blank'>
-              <h3 className='colored'>{user.email}</h3>
+            <a
+              className='colored'
+              href={`mailto:${user.email}`}
+              target='_blank'
+            >
+              <h3>{user.email}</h3>
             </a>
 
             {user.birthdate ? (
@@ -64,7 +68,7 @@ export default function ProfileInfo({
               <p>Unknown date of birth</p>
             )}
 
-            {user.country ? (
+            {user.country && user.country !== '-' ? (
               <CountryData country={user.country} />
             ) : (
               <p>Unknown country</p>

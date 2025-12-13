@@ -5,22 +5,23 @@ import Link from 'next/link';
 import { Option } from '@ts/ui/components-props';
 
 import Input from '@components/Input';
-import Select from '@components/Select';
 import Tab from '@components/Tab';
 import { useUserState } from '@store/user-store';
 import Button from '@components/Button';
-import PublishInput from './publish-controlls/PublishInput';
+import PublishInput from '../publish-controlls/PublishInput';
 import SubmitButton from '@components/SubmitButton';
-import AvatarInput from './avatar-editor/AvatarInput';
-import ServicesSettings from './service-settings/ServicesSettings';
+import AvatarInput from '../avatar-editor/AvatarInput';
+import ServicesSettings from '../service-settings/ServicesSettings';
 import { usePopupState } from '@store/popup-store';
 import { useRedirectActionForm } from '@lib/hooks';
-import { updateProfile } from '../actions';
+import { updateProfile } from '../../actions';
 import {
   defaultFormState,
   getFormDataValue,
   parseBooleanString
 } from '@lib/utils';
+import SearchSelect from '@components/SearchSelect';
+import SettingsFormSkeleton from './SettingsFormSkeleton';
 
 type SettingsFormProps = {
   countriesOptions: Option[];
@@ -44,7 +45,7 @@ export default function SettingsForm({
   passwordPopupName,
   deletePopupName
 }: SettingsFormProps) {
-  const { user } = useUserState();
+  const { user, status } = useUserState();
   const { togglePopup } = usePopupState();
   const [state, action, isPending] = useRedirectActionForm(
     updateProfile(user.id),
@@ -62,6 +63,8 @@ export default function SettingsForm({
   const onDeleteOpen = () => {
     togglePopup(deletePopupName);
   };
+
+  if (status === 'pending') return <SettingsFormSkeleton />;
 
   return (
     <form className='card settings' action={action} noValidate>
@@ -95,11 +98,10 @@ export default function SettingsForm({
         errorHint={state.issues?.birthdate}
       />
 
-      <Select
+      <SearchSelect
         id='country'
         name='country'
         label='Country'
-        variant='plain'
         options={countriesOptions}
         defaultValue={
           getFormDataValue('country', state.data) ?? user.country?.toString()
@@ -132,20 +134,18 @@ export default function SettingsForm({
 
       <ServicesSettings state={state} userId={user.id} />
 
-      <div className='buttons-flex-box'>
-        <SubmitButton
-          loading={isPending}
-          reset={
-            <Link href='/iam'>
-              <Button type='reset' variant='outlined' disabled={isPending}>
-                Cancel
-              </Button>
-            </Link>
-          }
-        >
-          Save
-        </SubmitButton>
-      </div>
+      <SubmitButton
+        loading={isPending}
+        reset={
+          <Link href='/iam'>
+            <Button type='reset' variant='outlined' disabled={isPending}>
+              Cancel
+            </Button>
+          </Link>
+        }
+      >
+        Save
+      </SubmitButton>
     </form>
   );
 }

@@ -3,7 +3,6 @@
 
 $button-icon-size: 1.25rem;
 $icon-button-width: 2rem;
-$statuses: 'error', 'warning', 'success';
 
 button {
   @include utils.font(utils.$large-size, utils.$bold-font, utils.$tight-font);
@@ -248,7 +247,10 @@ a button {
   gap: 1.5rem;
 
   > * {
-    flex-grow: 1;
+    flex: 1 1;
+    > * {
+      width: 100%;
+    }
   }
 }
 
@@ -258,96 +260,4 @@ button.icon {
   border-radius: utils.$max-radius;
   font-size: $button-icon-size;
   padding: ($icon-button-width - $button-icon-size) * 0.5;
-}
-
-@each $status in $statuses {
-  @include button-filled(
-    'primary',
-    '.#{$status}',
-    map.get(utils.$active-colors, $status),
-    map.get(utils.$hover-colors, $status),
-    map.get(utils.$active-colors, $status),
-    map.get(utils.$disabled-colors, $status),
-    utils.$white,
-    utils.$white,
-    utils.$white,
-    map.get(utils.$text-colors, $status)
-  );
-
-  @include button-filled(
-    'secondary',
-    '.#{$status}',
-    map.get(utils.$text-colors, $status),
-    utils.$text-darker,
-    utils.$white,
-    utils.$placeholder-color,
-    map.get(utils.$hover-colors, $status),
-    map.get(utils.$hover-colors, $status),
-    map.get(utils.$active-colors, $status),
-    utils.$placeholder-darker
-  );
-
-  @include button-outlined(
-    '.#{$status}',
-    map.get(utils.$active-colors, $status),
-    map.get(utils.$hover-colors, $status),
-    map.get(utils.$highlight-colors, $status),
-    map.get(utils.$disabled-colors, $status),
-    map.get(utils.$text-colors, $status),
-    map.get(utils.$active-colors, $status),
-    utils.$white,
-    utils.$text-darker
-  );
-
-  @include button-link(
-    '.#{$status}',
-    map.get(utils.$active-colors, $status),
-    map.get(utils.$hover-colors, $status),
-    map.get(utils.$highlight-colors, $status),
-    map.get(utils.$disabled-colors, $status)
-  );
-
-  @include button-text(
-    '.#{$status}',
-    map.get(utils.$text-colors, $status),
-    utils.$text-darker,
-    utils.$white,
-    utils.$placeholder-color
-  );
-
-  @include link(
-    '.#{$status}',
-    map.get(utils.$hover-colors, $status) !important,
-    map.get(utils.$highlight-colors, $status) !important
-  );
-
-  .light {
-    @include button-outlined(
-      '.#{$status}',
-      map.get(utils.$active-colors, $status),
-      map.get(utils.$hover-colors, $status),
-      map.get(utils.$highlight-colors, $status),
-      map.get(utils.$disabled-colors, $status),
-      map.get(utils.$bg-2-colors, $status),
-      map.get(utils.$hover-colors, $status),
-      map.get(utils.$active-colors, $status),
-      map.get(utils.$disabled-colors, $status)
-    );
-
-    @include button-link(
-      '.#{$status}',
-      map.get(utils.$hover-colors, $status),
-      map.get(utils.$active-colors, $status),
-      map.get(utils.$highlight-colors, $status),
-      map.get(utils.$disabled-colors, $status)
-    );
-
-    @include button-text(
-      '.#{$status}',
-      map.get(utils.$bg-2-colors, $status),
-      utils.$placeholder-darker,
-      utils.$text-darker,
-      utils.$placeholder-color
-    );
-  }
 }

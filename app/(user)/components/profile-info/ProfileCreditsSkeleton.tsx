@@ -1,9 +1,9 @@
 import Skeleton from '@components/Skeleton';
-import CountryDataSkeleton from './CountryDataSkeleton';
+import CountryDataSkeleton from '../country/CountryDataSkeleton';
 
 const SKELETON_WIDTH = '10rem';
 
-export default function ProfileInfoSkeleton() {
+export default function ProfileCreditsSkeleton() {
   return (
     <div className='profile-credits'>
       <Skeleton type='h2' width={SKELETON_WIDTH} />

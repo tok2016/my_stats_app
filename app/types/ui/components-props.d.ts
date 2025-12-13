@@ -9,6 +9,7 @@ export interface InputBaseProps {
   className?: string;
   hint?: ReactNode;
   errorHint?: ReactNode;
+  disabled?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
 }
@@ -21,12 +22,11 @@ export interface TextInputProps extends InputBaseProps, InputHintProps {
   onChange?: (value: string) => void;
 }
 
-export type SearchProps = Omit<
+export type SearchBaseProps = Omit<
   InputBaseProps,
   'label' | 'errorHint' | 'hint'
 > & {
   placeholder?: string;
-  onSearch: (query: string) => void;
 };
 
 export type ButtonProps = {
@@ -47,6 +47,7 @@ export type ButtonStyle = Omit<ButtonProps, 'type' | 'children' | 'loading'>;
 export type Option = {
   value: string;
   label: string;
+  key: string;
 };
 
 export interface SliderProps extends InputBaseProps {

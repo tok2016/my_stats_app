@@ -7,7 +7,7 @@ import { MusicSolid, ControllerSolid } from '@mynaui/icons-react';
 import { SidebarOptionProps } from '@ts/ui/components-props';
 import { User } from '@ts/users/user';
 
-import UserSearch from '@components/UserSearch';
+import UserSearch from '@components/profile-layout/UserSearch';
 import LogoutButton from './LogoutButton';
 import { useUserState } from '@store/user-store';
 import Avatar from './Avatar';

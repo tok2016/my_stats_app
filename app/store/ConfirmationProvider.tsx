@@ -7,6 +7,7 @@ import {
   ConfirmationInfo,
   ConfirmationState
 } from '@ts/users/confirmation';
+import { FormAction } from '@ts/ui/form-state';
 
 import { useAction } from '@lib/hooks';
 import {
@@ -14,8 +15,7 @@ import {
   defaultFormState,
   getErrorFormState
 } from '@lib/utils';
-import { getOperation } from '@lib/actions';
-import { FormAction } from '@ts/ui/form-state';
+import { deleteConfirmation, getOperation } from '@lib/actions';
 
 type ConfirmationFormAction = <DataType>(
   baseAction: ConfirmationBaseAction
@@ -30,6 +30,7 @@ type ConfirmationContextProps = {
   confirmation: ConfirmationInfo;
   isPending: boolean;
   getFormAction: ConfirmationFormAction;
+  cancelConfirm: () => void;
 };
 
 export const ConfirmationContext = createContext<ConfirmationContextProps>({
@@ -37,7 +38,8 @@ export const ConfirmationContext = createContext<ConfirmationContextProps>({
   confirmation: defaultConfirmation,
   isPending: false,
   getFormAction: () => () =>
-    new Promise((resolve) => resolve(defaultFormState()))
+    new Promise((resolve) => resolve(defaultFormState())),
+  cancelConfirm: () => {}
 });
 
 export default function ConfirmationProvider({
@@ -65,13 +67,19 @@ export default function ConfirmationProvider({
       }
     };
 
+  const cancelConfirm = async () => {
+    await deleteConfirmation(confirmation.id);
+    setConfirmation(defaultConfirmation);
+    setState('void');
+  };
+
   useEffect(() => {
     getConfirmation();
   }, [getConfirmation]);
 
   return (
     <ConfirmationContext.Provider
-      value={{ state, getFormAction, confirmation, isPending }}
+      value={{ state, getFormAction, confirmation, isPending, cancelConfirm }}
     >
       {children}
     </ConfirmationContext.Provider>

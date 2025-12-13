@@ -8,8 +8,7 @@ import Avatar from '@ts/users/avatar';
 import {
   AVATAR_DIRECTORY,
   checkUserAuthorRights,
-  generateAccessError,
-  getUserById
+  generateAccessError
 } from '@lib/auth';
 import { UsersModel } from '@lib/models';
 import { responseWithError } from '@lib/utils';
@@ -34,9 +33,11 @@ export async function POST(
       return responseWithError(400, 'Invalid file format');
     }
 
-    if (user.avatarUrl) {
-      await unlink(path.join(AVATAR_DIRECTORY, user.avatarUrl));
-    }
+    try {
+      if (user.avatarUrl) {
+        await unlink(path.join(AVATAR_DIRECTORY, user.avatarUrl));
+      }
+    } catch {}
 
     const fileName = `${v4()}.${avatarRaw.type.split('/').at(-1) ?? 'png'}`;
     const avatar = new File([avatarRaw], fileName, { type: avatarRaw.type });
@@ -71,7 +72,11 @@ export async function DELETE(
 
   try {
     await checkUserAuthorRights(userId, bearer);
-    const user = await getUserById(userId);
+    const user = await UsersModel.findById(userId).lean();
+
+    if (!user) {
+      return responseWithError(404, 'User was not found');
+    }
 
     if (!user.avatarUrl) {
       return new NextResponse(`Avatar doesn't exist`, {
@@ -81,6 +86,7 @@ export async function DELETE(
     }
 
     await unlink(path.join(AVATAR_DIRECTORY, user.avatarUrl));
+    await UsersModel.findByIdAndUpdate(userId, { $unset: { avatarUrl: null } });
 
     return new NextResponse('Avatar was deleted successfully', {
       status: 200,

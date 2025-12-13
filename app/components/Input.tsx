@@ -1,7 +1,12 @@
 'use client';
 
 import { EyeSlash, Eye } from '@mynaui/icons-react';
-import { ChangeEvent, HTMLInputTypeAttribute, useReducer } from 'react';
+import {
+  type ChangeEvent,
+  type HTMLInputTypeAttribute,
+  type Ref,
+  useReducer
+} from 'react';
 
 import { TextInputProps } from '@ts/ui/components-props';
 
@@ -13,7 +18,9 @@ type InputType = Extract<
 >;
 
 type InputProps = TextInputProps & {
+  ref?: Ref<HTMLInputElement>;
   type?: InputType;
+  icon?: React.ReactNode;
 };
 
 export default function Input({
@@ -25,12 +32,19 @@ export default function Input({
   type = 'text',
   className = '',
   required = false,
+  disabled = false,
+  icon,
   hint,
   errorHint,
   defaultValue,
-  onChange
+  ref,
+  onChange,
+  onBlur,
+  onFocus
 }: InputProps) {
   const [isShown, show] = useReducer((value) => !value, false);
+
+  const isPassword = type === 'password';
 
   const onValueChange = (
     evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -47,15 +61,21 @@ export default function Input({
         <input
           id={id}
           name={name}
+          ref={ref}
           type={isShown ? 'text' : type}
           placeholder={placeholder}
           defaultValue={defaultValue}
           value={value}
+          disabled={disabled}
           autoComplete={type === 'password' ? 'off' : 'on'}
           onChange={onValueChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
 
-        {type !== 'password'
+        {isPassword || icon}
+
+        {!isPassword
           || (isShown ? (
             <EyeSlash className='input-icon' onClick={show} />
           ) : (

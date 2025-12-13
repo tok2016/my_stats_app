@@ -3,6 +3,7 @@ export default interface Country {
   data: {
     name: string;
     flag: string;
+    iso2: string;
   };
 }
 

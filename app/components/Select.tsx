@@ -1,12 +1,14 @@
 'use client';
 
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from '@mynaui/icons-react';
 
 import { SelectVariant } from '@ts/ui/components-variants';
 import { TextInputProps, Option } from '@ts/ui/components-props';
 
 import Hint from './Hint';
+import Picker from './Picker';
+import { emptyOption } from '@lib/utils';
 
 type SelectProps = TextInputProps & {
   options: Option[];
@@ -19,7 +21,7 @@ type SelectVariantProps = {
   selectGroupClass: string;
 };
 
-const PERCENT_TO_CHANGE_POSITION = 0.67;
+const EXPAND_ICON_CLASS_NAME = 'picker-icon';
 
 const SelectTypes: Record<SelectVariant, SelectVariantProps> = {
   plain: {
@@ -39,41 +41,32 @@ function SelectRaw({
   options,
   variant = 'plain',
   className = '',
+  disabled = false,
   defaultValue,
   hint,
   errorHint,
   onSelect
 }: SelectProps) {
   const defaultOption = useMemo(
-    () => options.find((option) => option.value === defaultValue) ?? options[0],
+    () =>
+      options.find((option) => option.value === defaultValue)
+      ?? options[0]
+      ?? emptyOption,
     [options, defaultValue]
   );
 
   const [option, setOption] = useState<Option>(defaultOption);
-  const [isExpanded, setExpanded] = useState<boolean>(false);
-  const [pickerPosition, setPickerPosition] = useState<'upper' | ''>('');
+  const expandIconRef = useRef<SVGSVGElement>(null);
 
-  const onOptionClick = (newOption: Option) => {
+  const onOptionSelect = (newOption: Option) => {
     setOption(newOption);
-    setExpanded(false);
     onSelect?.(newOption.value);
   };
 
-  useEffect(() => {
-    const onExpand = (evt: MouseEvent) => {
-      const { target } = evt;
-      setExpanded(target instanceof Element && target.id?.includes(id));
-
-      setPickerPosition(
-        evt.clientY > window.innerHeight * PERCENT_TO_CHANGE_POSITION
-          ? 'upper'
-          : ''
-      );
-    };
-    window.addEventListener('click', onExpand);
-
-    return () => window.removeEventListener('click', onExpand);
-  }, [id]);
+  const onExpand = (isExpanded: boolean) => {
+    if (expandIconRef.current)
+      expandIconRef.current.classList = `${EXPAND_ICON_CLASS_NAME} ${isExpanded ? 'expanded' : ''}`;
+  };
 
   return (
     <div className={`${SelectTypes[variant].labelGroupClass} ${className}`}>
@@ -82,7 +75,13 @@ function SelectRaw({
       </label>
 
       <div className={SelectTypes[variant].selectGroupClass}>
-        <select id={id} name={name} value={option.value} onChange={() => {}}>
+        <select
+          id={id}
+          name={name}
+          value={option.value}
+          disabled={disabled}
+          onChange={() => {}}
+        >
           {options.map((option) => (
             <option hidden key={option.value} value={option.value}>
               {option.label}
@@ -93,24 +92,20 @@ function SelectRaw({
         <div id={`${id}-label`} className='select'>
           <span id={`${id}-label`}>{option.label}</span>
           <ChevronDown
+            ref={expandIconRef}
             id={`${id}-label`}
-            className={`picker-icon ${isExpanded ? 'expanded' : ''}`}
+            className={EXPAND_ICON_CLASS_NAME}
           />
         </div>
 
-        <ul
-          className={`picker ${isExpanded ? '' : 'hidden'} ${pickerPosition}`}
-        >
-          {options.map((opt) => (
-            <li
-              key={opt.value}
-              className={`option ${opt.value === option.value ? 'selected' : ''}`}
-              onClick={() => onOptionClick(opt)}
-            >
-              {opt.label}
-            </li>
-          ))}
-        </ul>
+        <Picker
+          options={options}
+          isCurrent={(opt) => opt.value === option.value}
+          inputId={id}
+          onSelect={onOptionSelect}
+          onExpand={onExpand}
+          renderOption={(option) => option.label}
+        />
       </div>
 
       <Hint variant='error'>{errorHint}</Hint>

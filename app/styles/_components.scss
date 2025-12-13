@@ -230,26 +230,6 @@ $skeleton-icon-min-width: 2rem;
   }
 }
 
-.skeleton.h1 {
-  --font-size: #{utils.$h1-size};
-  --line-height: #{utils.$wide-font};
-}
-
-.skeleton.h2 {
-  --font-size: #{utils.$h2-size};
-  --line-height: #{utils.$wide-font};
-}
-
-.skeleton.h3 {
-  --font-size: #{utils.$h3-size};
-  --line-height: #{utils.$fit-font};
-}
-
-.skeleton.h4 {
-  --font-size: #{utils.$h4-size};
-  --line-height: #{utils.$fit-font};
-}
-
 .skeleton.min {
   --font-size: #{utils.$min-size};
 }
@@ -276,6 +256,26 @@ $skeleton-icon-min-width: 2rem;
 
 .skeleton.wide {
   --line-height: #{utils.$wide-font};
+}
+
+.skeleton.h1 {
+  --font-size: #{utils.$h1-size};
+  --line-height: #{utils.$wide-font};
+}
+
+.skeleton.h2 {
+  --font-size: #{utils.$h2-size};
+  --line-height: #{utils.$wide-font};
+}
+
+.skeleton.h3 {
+  --font-size: #{utils.$h3-size};
+  --line-height: #{utils.$fit-font};
+}
+
+.skeleton.h4 {
+  --font-size: #{utils.$h4-size};
+  --line-height: #{utils.$fit-font};
 }
 
 .skeleton.image,

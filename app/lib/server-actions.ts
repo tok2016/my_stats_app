@@ -45,12 +45,16 @@ export const getServices = async (userId?: string): Promise<ServicesMap> => {
     return {};
   }
 
-  const response = await AxiosServerInstanse.get<ServicesMap>(
-    `/api/user/${userId}/service`,
-    await getAuthConfig()
-  );
+  try {
+    const response = await AxiosServerInstanse.get<ServicesMap>(
+      `/api/user/${userId}/service`,
+      await getAuthConfig()
+    );
 
-  return response.data;
+    return response.data;
+  } catch {
+    return {};
+  }
 };
 
 export const getCountyData = async (country?: string): Promise<Country> => {

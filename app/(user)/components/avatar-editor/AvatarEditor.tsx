@@ -3,6 +3,7 @@
 import NextImage from 'next/image';
 import {
   type MouseEvent as ReactMouseEvent,
+  SyntheticEvent,
   useCallback,
   useEffect,
   useRef
@@ -141,9 +142,6 @@ export default function AvatarEditor({
   const onMouseDown = (evt: ReactMouseEvent) => {
     resizeStateRef.current.isMouseDown = true;
     if (frameRef.current && imageRef.current) {
-      frameRef.current.style.minHeight = `${MIN_FRAME_SIZE}px`;
-      frameRef.current.style.minWidth = `${MIN_FRAME_SIZE}px`;
-
       resizeStateRef.current.mouseX = evt.pageX;
       resizeStateRef.current.mouseY = evt.pageY;
 
@@ -151,13 +149,6 @@ export default function AvatarEditor({
       resizeStateRef.current.y = frameRef.current.offsetTop;
       resizeStateRef.current.width = frameRef.current.offsetWidth;
       resizeStateRef.current.height = frameRef.current.offsetHeight;
-
-      const { top, bottom, left, right } =
-        imageRef.current.getBoundingClientRect();
-      resizeStateRef.current.topBorder = Math.ceil(top);
-      resizeStateRef.current.bottomBorder = Math.ceil(bottom);
-      resizeStateRef.current.leftBorder = Math.ceil(left);
-      resizeStateRef.current.rightBorder = Math.ceil(right);
 
       const direction = (evt.target as HTMLElement)?.id as Direction;
 
@@ -214,10 +205,69 @@ export default function AvatarEditor({
     }
   };
 
+  const onLoad = (evt: SyntheticEvent) => {
+    const imageSize = (evt.target as HTMLImageElement)?.getBoundingClientRect();
+
+    if (imageSize && frameRef.current && imageRef.current) {
+      const { top, bottom, left, right, height, width } = imageSize;
+
+      resizeStateRef.current.topBorder = Math.ceil(top);
+      resizeStateRef.current.bottomBorder = Math.ceil(bottom);
+      resizeStateRef.current.leftBorder = Math.ceil(left);
+      resizeStateRef.current.rightBorder = Math.ceil(right);
+
+      frameRef.current.style.minHeight = `${MIN_FRAME_SIZE}px`;
+      frameRef.current.style.minWidth = `${MIN_FRAME_SIZE}px`;
+      frameRef.current.style.top = `${top + height / 2 - MIN_FRAME_SIZE / 2}px`;
+      frameRef.current.style.left = `${left + width / 2 - MIN_FRAME_SIZE / 2}px`;
+
+      frameRef.current.style.display = 'block';
+
+      //for keeping aspect ratio the same when min size is reached
+      // imageRef.current.style.minWidth = `${Math.max((MIN_FRAME_SIZE * width) / height, MIN_FRAME_SIZE)}px`;
+      // imageRef.current.style.minHeight = `${Math.max((MIN_FRAME_SIZE * height) / width, MIN_FRAME_SIZE)}px`;
+    }
+  };
+
   useEffect(() => {
+    const onResize = () => {
+      if (imageRef.current && frameRef.current) {
+        const {
+          top: frmTop,
+          bottom: frmBottom,
+          left: frmLeft,
+          right: frmRight
+        } = frameRef.current.getBoundingClientRect();
+
+        const {
+          top: imgTop,
+          bottom: imgBottom,
+          left: imgLeft,
+          right: imgRight
+        } = imageRef.current.getBoundingClientRect();
+
+        const frameDiffX = imgRight - frmRight;
+        const frameDiffY = imgBottom - frmBottom;
+
+        const diffX = imgLeft - resizeStateRef.current.leftBorder;
+        const diffY = imgTop - resizeStateRef.current.topBorder;
+
+        frameRef.current.style.top = `${frameDiffY < 0 ? imgTop : frmTop + diffY}px`;
+        frameRef.current.style.left = `${frameDiffX < 0 ? imgLeft : frmLeft + diffX}px`;
+
+        resizeStateRef.current.topBorder = imgTop;
+        resizeStateRef.current.bottomBorder = imgBottom;
+        resizeStateRef.current.leftBorder = imgLeft;
+        resizeStateRef.current.rightBorder = imgRight;
+      }
+    };
+
+    window.addEventListener('resize', onResize);
+
     return () => {
       document.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('mouseleave', onMouseUp);
+      window.removeEventListener('resize', onResize);
     };
   }, [avatarUrl, onMouseUp]);
 
@@ -231,6 +281,7 @@ export default function AvatarEditor({
           width={1000}
           height={1000}
           priority
+          onLoad={onLoad}
         />
 
         <div

@@ -3,10 +3,31 @@ import {
   ConfirmationCode,
   ConfirmationInfo
 } from '@ts/users/confirmation';
+import FormState from '@ts/ui/form-state';
+import { BasicUser } from '@ts/users/user';
 
 import AxiosInstanse from './axios-instanse';
 import { defaultConfirmation, getErrorFormState } from './utils';
-import FormState from '@ts/ui/form-state';
+
+export const getUsers = async (
+  credential?: string,
+  limit?: number
+): Promise<BasicUser[]> => {
+  try {
+    const searchParams = new URLSearchParams();
+
+    if (credential) searchParams.append('credential', credential);
+
+    if (limit) searchParams.append('limit', limit.toString());
+
+    const response = await AxiosInstanse.get<BasicUser[]>(
+      `/api/users?${searchParams.toString()}`
+    );
+    return response.data;
+  } catch {
+    return [];
+  }
+};
 
 export const getOperation = async (): Promise<ConfirmationInfo> => {
   try {

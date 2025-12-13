@@ -5,11 +5,12 @@ import { useRef } from 'react';
 import { ConfirmationState } from '@ts/users/confirmation';
 
 import DeleteAccountWarning from './DeleteAccountWarning';
-import { deleteConfirmation, requestConfimation } from '@lib/actions';
+import { requestConfimation } from '@lib/actions';
 import { deleteAccount } from '@app/(user)/actions';
 import Popup from '@components/Popup';
 import { useConfirm } from '@lib/hooks';
 import DeleteAccountCodeForm from './DeleteAccountCodeForm';
+import { usePopupState } from '@store/popup-store';
 
 type DeleteAccountFormProps = {
   popupName: string;
@@ -39,12 +40,14 @@ const DeleteForms: Record<ConfirmationState, DeleteFormFunc> = {
 export default function DeleteAccountForm({
   popupName
 }: DeleteAccountFormProps) {
-  const { state, confirmation } = useConfirm();
+  const { togglePopup } = usePopupState();
+  const { state, cancelConfirm } = useConfirm();
   const abortRef = useRef(new AbortController());
 
   const onClose = async () => {
     abortRef.current.abort();
-    await deleteConfirmation(confirmation.id);
+    await cancelConfirm();
+    togglePopup(popupName);
   };
 
   return (

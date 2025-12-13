@@ -24,7 +24,7 @@ export default function CountryData({ country }: CountryDataProps) {
     findCountry(country);
   }, [country, findCountry]);
 
-  if (isPending) {
+  if (isPending || country !== countryData.data.iso2) {
     return <CountryDataSkeleton />;
   } else if (!countryData.data.name) {
     return <p>Unknown country</p>;

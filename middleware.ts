@@ -63,9 +63,6 @@ export default async function middleware(req: NextRequest) {
         ? NextResponse.next()
         : NextResponse.redirect(new URL('/login', req.url));
 
-    console.log(pathnames[1]);
-    console.log(AUTH_PATHS_REGEX.test(pathnames[1]));
-
     response.cookies.delete('refreshToken');
     response.cookies.delete('accessToken');
 

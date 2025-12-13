@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import Button from '@components/Button';
 import Divider from '@components/Divider';
-import UserSearch from '@components/UserSearch';
+import UserSearch from '@components/profile-layout/UserSearch';
 
 export default function Guest() {
   return (

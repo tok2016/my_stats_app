@@ -1,12 +1,17 @@
 type SpinnerProps = {
+  className?: string;
   size?: string | number;
   strokeWidth?: string | number;
 };
 
-export default function Spinner({ size, strokeWidth }: SpinnerProps) {
+export default function Spinner({
+  className,
+  size,
+  strokeWidth
+}: SpinnerProps) {
   return (
     <div
-      className='spinner'
+      className={`spinner ${className}`}
       style={{
         width: typeof size === 'number' ? `${size}rem` : size,
         borderWidth:
