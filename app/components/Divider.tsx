@@ -6,9 +6,9 @@ type DividerProps = {
 export default function Divider({ children, rounded }: DividerProps) {
   return (
     <div className={`divider ${rounded ? 'rounded' : ''}`}>
-      <div className='left'></div>
+      <div className='left-hand'></div>
       {children}
-      <div className='right'></div>
+      <div className='right-hand'></div>
     </div>
   );
 }

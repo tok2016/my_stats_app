@@ -7,7 +7,7 @@ import ErrorResponse, { ValidationIssue } from '@ts/requests';
 import FormState from '@ts/ui/form-state';
 import { ConfirmationInfo } from '@ts/users/confirmation';
 import { NewPassword } from '@ts/users/password';
-import Country, { Countries } from '@ts/users/country';
+import Country from '@ts/users/country';
 import { Option } from '@ts/ui/components-props';
 
 import { isAxiosError } from './axios-instanse';
@@ -68,17 +68,9 @@ export const defaultUser: User = {
 };
 
 export const defaultCountry: Country = {
-  error: false,
-  data: {
-    name: '',
-    flag: '',
-    iso2: ''
-  }
-};
-
-export const defaultCountries: Countries = {
-  error: false,
-  data: []
+  name: '',
+  flag: '',
+  iso2: ''
 };
 
 export const emptyOption: Option = {

@@ -69,3 +69,8 @@ export type SidebarOptionProps = Omit<SidebarSubButtonProps, 'href'> & {
   subButtons?: SidebarSubButtonProps[];
   onClick?: () => void;
 };
+
+export type SidebarModuleProps = {
+  path: string;
+  expand?: () => void;
+};

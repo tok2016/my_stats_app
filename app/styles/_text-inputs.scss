@@ -106,6 +106,10 @@ $code-input-padding-x: 0.75rem;
   .input-icon {
     color: $text-color;
   }
+
+  .input-icon.spinner {
+    border-color: $text-color;
+  }
 }
 
 .input-wrapper {
@@ -275,6 +279,8 @@ select {
 }
 
 .select-search {
+  position: relative;
+
   .picker {
     width: 100%;
     top: $input-min-height + 0.5rem;

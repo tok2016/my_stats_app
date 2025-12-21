@@ -1,9 +1,9 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { clamp } from '@lib/utils';
+import Button from './Button';
 type PaginationProps = {
   pages: number;
   current: number;
@@ -37,30 +37,34 @@ const getPages = (count: number, current: number) => {
 
 export default function Pagination({ pages, current }: PaginationProps) {
   const pathname = usePathname();
+  const { push } = useRouter();
+  const searchParams = useSearchParams();
 
   const currentPage = clamp(current, 1, pages);
   const pagesWithDots = getPages(pages, currentPage);
 
+  const onPageClick = (page: number, index: number) => () => {
+    const params = new URLSearchParams(searchParams);
+    const linkedPage =
+      page > 0
+        ? page
+        : Math.floor((pagesWithDots[index - 1] + pagesWithDots[index + 1]) / 2);
+
+    params.set('page', linkedPage.toString());
+    push(`${pathname}?${params.toString()}`);
+  };
+
   return (
     <div className='pagination'>
-      {pagesWithDots.map((page, i) => {
-        const params = new URLSearchParams();
-        const linkedPage =
-          page > 0
-            ? page
-            : Math.floor((pagesWithDots[i - 1] + pagesWithDots[i + 1]) / 2);
-        params.set('page', linkedPage.toString());
-
-        return (
-          <Link
-            key={page}
-            href={`${pathname}?${params.toString()}`}
-            className={page === currentPage ? 'current' : ''}
-          >
-            {page < 0 ? '...' : page}
-          </Link>
-        );
-      })}
+      {pagesWithDots.map((page, i) => (
+        <Button
+          key={page}
+          variant={page === currentPage ? 'primary' : 'text'}
+          onClick={onPageClick(page, i)}
+        >
+          {page < 0 ? '...' : page}
+        </Button>
+      ))}
     </div>
   );
 }

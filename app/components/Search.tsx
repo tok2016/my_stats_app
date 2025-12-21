@@ -12,8 +12,9 @@ import { SearchBaseProps } from '@ts/ui/components-props';
 
 import Picker from './Picker';
 import { useAction } from '@lib/hooks';
+import Spinner from './Spinner';
 
-const SEARCH_COOLDOWN = 1500;
+const SEARCH_COOLDOWN = 1000;
 
 type SearchProps<T> = SearchBaseProps & {
   defaultQuery?: string;
@@ -36,7 +37,7 @@ export default function Search<T>({
   onFocus,
   onBlur
 }: SearchProps<T>) {
-  const [options, search] = useAction(action, []);
+  const [options, search, isPending] = useAction(action, []);
   const [query, setQuery] = useState<string>(defaultQuery);
 
   const onSubmit = () => {
@@ -54,12 +55,15 @@ export default function Search<T>({
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => search(query), SEARCH_COOLDOWN);
+    const timer = setTimeout(() => {
+      if (query) search(query);
+    }, SEARCH_COOLDOWN);
+
     return () => clearTimeout(timer);
   }, [query, search]);
 
   return (
-    <div className={`input-select-group ${className}`}>
+    <div className={`input-select-group select-search ${className}`}>
       <div className='input-wrapper'>
         <input
           id={id}
@@ -73,11 +77,16 @@ export default function Search<T>({
           onBlur={onBlur}
         />
 
-        <SearchIcon className='input-icon' onClick={onSubmit} />
+        {isPending ? (
+          <Spinner className='input-icon' />
+        ) : (
+          <SearchIcon className='input-icon' onClick={onSubmit} />
+        )}
       </div>
 
       {!renderOption || (
         <Picker
+          focusId={id}
           inputId={id}
           options={options}
           renderOption={renderOption}

@@ -15,7 +15,7 @@ type SearchSelectProps = TextInputProps & {
   onSelect?: (value: string) => void;
 };
 
-const SEARCH_COOLDOWN = 1500;
+const SEARCH_COOLDOWN = 1000;
 
 export default function SearchSelect({
   id,
@@ -46,7 +46,7 @@ export default function SearchSelect({
   const filterOptions = (query: string) =>
     new Promise<Option[]>((resolve) => {
       const filtered = options.filter((opt) =>
-        opt.label.toLowerCase().includes(query)
+        opt.label.toLowerCase().startsWith(query)
       );
       resolve(filtered);
     });

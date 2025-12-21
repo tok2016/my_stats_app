@@ -1,3 +1,4 @@
+import Logo from '@components/Logo';
 import ProfileControlsSkeleton from './ProfileControlsSkeleton';
 import ProfileCreditsSkeleton from './ProfileCreditsSkeleton';
 import Avatar from '@components/profile-layout/Avatar';
@@ -15,7 +16,7 @@ export default function ProfileInfoSkeleton({
       <ProfileCreditsSkeleton />
 
       <div className='profile-meta'>
-        <h1>My_Stats</h1>
+        <Logo />
         {!authorized || <ProfileControlsSkeleton />}
       </div>
     </div>

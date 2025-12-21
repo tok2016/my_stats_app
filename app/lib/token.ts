@@ -1,7 +1,7 @@
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 
-import Token from '@ts/users/token';
+import Token, { TokenPack } from '@ts/users/token';
 
 import { generateErrorResponse, isExpired, MILLISECONDS } from './utils';
 
@@ -76,4 +76,35 @@ export const deleteTokens = async () => {
   const cookiesStorage = await cookies();
   cookiesStorage.delete('accessToken');
   cookiesStorage.delete('refreshToken');
+};
+
+const isAccessLegit = async (accessToken: Token, refreshToken: Token) => {
+  if (!(await compareTokens(accessToken, refreshToken))) {
+    throw new Error('Forbidden');
+  }
+
+  return isExpired(accessToken.expiresAt);
+};
+
+export const refreshAccessTokens = async (
+  defaultRefresh?: string,
+  defaultAccess?: string
+): Promise<TokenPack> => {
+  let accessValue = defaultAccess ?? '';
+  let update = false;
+
+  const refreshToken = await decodeToken(defaultRefresh ?? '');
+  if (isExpired(refreshToken.expiresAt)) {
+    throw new Error('Session is expired');
+  }
+
+  if (
+    !accessValue
+    || (await isAccessLegit(await decodeToken(accessValue), refreshToken))
+  ) {
+    accessValue = await generateToken(refreshToken.id);
+    update = true;
+  }
+
+  return { refresh: defaultRefresh ?? '', access: accessValue, update };
 };

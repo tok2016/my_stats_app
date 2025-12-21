@@ -1,13 +1,17 @@
 import axios, { isAxiosError as originalAxiosError } from 'axios';
 
-const REQUEST_TIMEOUT = 5000;
+const REQUEST_TIMEOUT = 10000;
+const COUNTRIES_API_TIMEOUT = 10000;
 
-const AxiosInstanse = axios.create({ timeout: REQUEST_TIMEOUT });
+const AxiosInstanse = axios.create({
+  baseURL: process.env.API,
+  timeout: REQUEST_TIMEOUT
+});
 export default AxiosInstanse;
 
-export const AxiosServerInstanse = axios.create({
-  timeout: REQUEST_TIMEOUT,
-  baseURL: process.env.API
+export const AxiosCountriesInstanse = axios.create({
+  timeout: COUNTRIES_API_TIMEOUT,
+  baseURL: process.env.COUNTRIES_API
 });
 
 export const isAxiosError = originalAxiosError;
