@@ -23,17 +23,13 @@ $modules: 'user', 'music', 'games';
   }
 
   .#{$module} {
-    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+
+    flex: 1;
     color: map.get(utils.$text-colors, $module);
 
-    h1,
-    h2,
-    h3,
-    h4,
-    p,
-    a,
-    span,
-    label {
+    a {
       color: map.get(utils.$text-colors, $module);
     }
 
@@ -150,17 +146,6 @@ $modules: 'user', 'music', 'games';
 
     @include components.divider(map.get(utils.$text-colors, $module));
 
-    @include components.pagination(
-      map.get(utils.$text-colors, $module),
-      utils.$white,
-      map.get(utils.$text-colors, $module),
-      map.get(utils.$hover-colors, $module),
-      map.get(utils.$active-colors, $module),
-      utils.$text-darker
-    );
-
-    @include components.pagination-current($module);
-
     @include components.skeleton(
       utils.$skeleton-color,
       utils.$skeleton-light-color
@@ -184,21 +169,15 @@ $modules: 'user', 'music', 'games';
       @include utils.light-scrollbar();
 
       background-color: map.get(utils.$text-colors, $module);
+      color: map.get(utils.$bg-2-colors, $module);
       box-shadow: 0
         0
         utils.$blur
         utils.$spread
         map.get(utils.$text-colors, $module);
 
-      h1,
-      h2,
-      h3,
-      h4,
-      p,
-      a,
-      span,
-      label {
-        color: map.get(utils.$bg-2-colors, $module);
+      a {
+        color: map.get(utils.$text-colors, $module);
       }
 
       .colored {
@@ -291,15 +270,6 @@ $modules: 'user', 'music', 'games';
       );
 
       @include components.divider(map.get(utils.$bg-2-colors, $module));
-
-      @include components.pagination(
-        utils.$text-darker,
-        utils.$white,
-        map.get(utils.$bg-2-colors, $module),
-        map.get(utils.$bg-2-colors, $module),
-        map.get(utils.$active-colors, $module),
-        utils.$text-darker
-      );
 
       @include components.skeleton(
         utils.$skeleton-light-color,

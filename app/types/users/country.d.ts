@@ -1,16 +1,15 @@
 export default interface Country {
-  error: boolean;
-  data: {
-    name: string;
-    flag: string;
-    iso2: string;
-  };
+  name: string;
+  flag: string;
+  iso2: string;
 }
 
-export interface Countries {
+export interface CountryIso {
+  name: string;
+  Iso2: string;
+}
+
+export interface CountryResponse<CountryData> {
   error: boolean;
-  data: {
-    name: string;
-    Iso2: string;
-  }[];
+  data: CountryData;
 }

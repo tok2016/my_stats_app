@@ -1,48 +1,56 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { SearchBaseProps } from '@ts/ui/components-props';
 import { BasicUser } from '@ts/users/user';
 
 import Search from '@components/Search';
 import { getUsers } from '@lib/actions';
+import UserOption from './UserOption';
 
-type UserSearchProps = Omit<SearchBaseProps, 'id' | 'name'>;
+type UserSearchProps = Omit<SearchBaseProps, 'name'>;
 
 const MAX_USERS_OPTIONS = 4;
 
-const getUsersWithKeys = async (
-  credential?: string
-): Promise<(BasicUser & { key: string })[]> => {
-  const users = await getUsers(credential, MAX_USERS_OPTIONS);
-  return users.map((user) => ({ ...user, key: user.username }));
-};
+const getUsersWithKeys =
+  (signal: AbortSignal) =>
+  async (credential?: string): Promise<(BasicUser & { key: string })[]> => {
+    const users = await getUsers(credential, MAX_USERS_OPTIONS, signal);
+    return users.map((user) => ({ ...user, key: user.username }));
+  };
 
 export default function UserSearch({
+  id,
   className,
   placeholder = 'Find a user by username',
   onFocus,
   onBlur
 }: UserSearchProps) {
   const { push } = useRouter();
+  const searchParams = useSearchParams();
+  const abort = useRef(new AbortController());
 
   const onUserSearch = (query: string) => {
+    abort.current.abort();
     const params = new URLSearchParams();
     params.set('query', query);
-    push(`/search?${params.toString()}`);
+    push(`/users?${params.toString()}`);
   };
 
   return (
     <Search
       className={className}
-      id='userSearch'
+      id={id}
       name='userSearch'
       placeholder={placeholder}
-      action={getUsersWithKeys}
+      action={getUsersWithKeys(abort.current.signal)}
       onSearchSubmit={onUserSearch}
       onFocus={onFocus}
       onBlur={onBlur}
+      defaultQuery={searchParams.get('query') ?? undefined}
+      renderOption={(user) => <UserOption user={user} />}
     />
   );
 }

@@ -18,7 +18,7 @@ export default function Guest() {
 
         <Divider>or</Divider>
 
-        <UserSearch />
+        <UserSearch id='guestSearch' />
       </div>
     </div>
   );

@@ -1,17 +1,15 @@
 'use server';
 
-import axios, { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import Country, { Countries } from '@ts/users/country';
+import Country, { CountryIso, CountryResponse } from '@ts/users/country';
 import { ServicesMap } from '@ts/users/service';
-import { User } from '@ts/users/user';
+import { BasicUser, User } from '@ts/users/user';
 
-import { defaultCountries, defaultCountry } from './utils';
-import { AxiosServerInstanse } from './axios-instanse';
-
-const COUNTRY_REGUEST_TIMEOUT = 10000;
+import { defaultCountry } from './utils';
+import AxiosInstanse, { AxiosCountriesInstanse } from './axios-instanse';
 
 export const logout = async () => {
   const cookiesStorage = await cookies();
@@ -21,18 +19,22 @@ export const logout = async () => {
   redirect('/login');
 };
 
-const getAuthConfig = async (): Promise<AxiosRequestConfig> => {
+const getAuthConfig = async (): Promise<AxiosRequestConfig | undefined> => {
   const cookiesStore = await cookies();
+
+  const access = cookiesStore.get('accessToken')?.value;
+  const refresh = cookiesStore.get('refreshToken')?.value ?? '';
 
   return {
     headers: {
-      Authorization: cookiesStore.get('accessToken')?.value ?? ''
+      Authorization: access ? `Bearer ${access}` : '',
+      'MyS-Refresh': refresh
     }
   };
 };
 
 export const getUser = async (): Promise<User> => {
-  const response = await AxiosServerInstanse.get<User>(
+  const response = await AxiosInstanse.get<User>(
     '/api/user',
     await getAuthConfig()
   );
@@ -46,7 +48,7 @@ export const getServices = async (userId?: string): Promise<ServicesMap> => {
   }
 
   try {
-    const response = await AxiosServerInstanse.get<ServicesMap>(
+    const response = await AxiosInstanse.get<ServicesMap>(
       `/api/user/${userId}/service`,
       await getAuthConfig()
     );
@@ -59,27 +61,47 @@ export const getServices = async (userId?: string): Promise<ServicesMap> => {
 
 export const getCountyData = async (country?: string): Promise<Country> => {
   try {
-    const countryData = await axios.post<Country>(
-      `${process.env.COUNTRIES_API}/flag/images`,
-      { iso2: country },
-      { timeout: COUNTRY_REGUEST_TIMEOUT }
-    );
+    const countryData = await AxiosCountriesInstanse.post<
+      CountryResponse<Country>
+    >('/flag/images', { iso2: country });
 
-    return countryData.data;
+    return countryData.data.data;
   } catch {
-    return { ...defaultCountry, error: true };
+    return defaultCountry;
   }
 };
 
-export const getCountries = async (): Promise<Countries> => {
+export const getCountries = async (): Promise<CountryIso[]> => {
   if (!process.env.COUNTRIES_API) {
-    return { ...defaultCountries, error: true };
+    return [];
   }
 
-  const response = await axios.get<Countries>(
-    `${process.env.COUNTRIES_API}/iso`,
-    { timeout: COUNTRY_REGUEST_TIMEOUT }
+  const response =
+    await AxiosCountriesInstanse.get<CountryResponse<CountryIso[]>>('/iso');
+
+  return response.data.data;
+};
+
+export const getUserCountries = async (
+  users: BasicUser[]
+): Promise<Record<string, Country | undefined>> => {
+  if (!process.env.COUNTRIES_API) {
+    return {};
+  }
+
+  const response =
+    await AxiosCountriesInstanse.get<CountryResponse<Country[]>>(
+      '/flag/images'
+    );
+
+  const countriesMap: Record<string, Country> = Object.fromEntries(
+    response.data.data.map((country) => [country.iso2, country])
   );
 
-  return response.data;
+  return Object.fromEntries(
+    users.map((user) => [
+      user.id,
+      user.country ? countriesMap[user.country] : undefined
+    ])
+  );
 };

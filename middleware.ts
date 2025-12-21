@@ -1,24 +1,8 @@
 import { MiddlewareConfig, NextRequest, NextResponse } from 'next/server';
 
-import Token from '@ts/users/token';
-
-import {
-  ACCESS_TTL,
-  compareTokens,
-  decodeToken,
-  generateToken
-} from '@lib/token';
-import { isExpired } from '@lib/utils';
+import { ACCESS_TTL, refreshAccessTokens } from '@lib/token';
 
 const AUTH_PATHS_REGEX = /(register|login|reset-password)/g;
-
-const isAccessLegit = async (accessToken: Token, refreshToken: Token) => {
-  if (!(await compareTokens(accessToken, refreshToken))) {
-    throw new Error('Forbidden');
-  }
-
-  return isExpired(accessToken.expiresAt);
-};
 
 export default async function middleware(req: NextRequest) {
   const pathnames = req.nextUrl.pathname
@@ -26,42 +10,47 @@ export default async function middleware(req: NextRequest) {
     .map((endpoint) => endpoint.trim());
 
   const isApi = pathnames[1] === 'api';
+  //const availableForBoth = pathnames[1] === 'users';
   const isAuth = AUTH_PATHS_REGEX.test(pathnames[1]);
-  const refresh = req.cookies.get('refreshToken');
-  const access = req.cookies.get('accessToken');
-  let accessValue = access?.value;
+
+  const defaultRefresh =
+    req.cookies.get('refreshToken')?.value
+    ?? req.headers.get('MyS-Refresh')
+    ?? undefined;
+
+  const defaultAccess =
+    req.cookies.get('accessToken')?.value
+    ?? req.headers.get('Authorization')?.split(' ').at(-1);
 
   try {
-    const refreshToken = await decodeToken(refresh?.value ?? '');
-    if (isExpired(refreshToken.expiresAt)) {
-      throw new Error('Session is expired');
-    }
+    const { access, update } = await refreshAccessTokens(
+      defaultRefresh,
+      defaultAccess
+    );
 
     const response = isAuth
       ? NextResponse.redirect(new URL('/iam', req.url))
       : NextResponse.next();
 
-    if (
-      !accessValue
-      || (await isAccessLegit(await decodeToken(accessValue), refreshToken))
-    ) {
-      accessValue = await generateToken(refreshToken.id);
-      response.cookies.set('accessToken', accessValue, {
+    if (update) {
+      response.cookies.set('accessToken', access, {
         httpOnly: true,
         maxAge: ACCESS_TTL
       });
     }
 
-    if (isApi) {
-      response.headers.set('Authorization', `bearer ${accessValue}`);
-    }
+    if (isApi) response.headers.set('Authorization', `bearer ${access}`);
+    response.headers.delete('MyS-Refresh');
 
     return response;
   } catch {
-    const response =
-      isApi || !pathnames[1] || isAuth
-        ? NextResponse.next()
-        : NextResponse.redirect(new URL('/login', req.url));
+    console.log(req.nextUrl.pathname);
+    console.log(isAuth);
+    if (isApi || !pathnames[1] || isAuth) {
+      return NextResponse.next();
+    }
+
+    const response = NextResponse.redirect(new URL('/login', req.url));
 
     response.cookies.delete('refreshToken');
     response.cookies.delete('accessToken');
@@ -77,6 +66,7 @@ export const config: MiddlewareConfig = {
     '/login',
     '/reset-password',
     '/iam/:path*',
+
     '/music/:path*',
     '/games/:path*',
     '/admin/:path*'

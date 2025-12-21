@@ -38,9 +38,9 @@ export default function SubmitButton({
           </Button>
         </div>
 
-        <div>{reset}</div>
+        {!reset || <div>{reset}</div>}
       </div>
-      {error || <Hint variant='error'>{errorHint}</Hint>}
+      {!error || <Hint variant='error'>{errorHint}</Hint>}
     </div>
   );
 }

@@ -22,8 +22,8 @@ $skeleton-icon-min-width: 2rem;
     text-align: center;
   }
 
-  .left,
-  .right {
+  .left-hand,
+  .right-hand {
     box-sizing: border-box;
     flex-grow: 1;
     height: utils.$min-size * 0.5;
@@ -32,12 +32,12 @@ $skeleton-icon-min-width: 2rem;
 }
 
 .divider.rounded {
-  .left {
+  .left-hand {
     border-left: $border-style;
     border-bottom-left-radius: $border-radius;
   }
 
-  .right {
+  .right-hand {
     border-right: $border-style;
     border-bottom-right-radius: $border-radius;
   }
@@ -46,8 +46,8 @@ $skeleton-icon-min-width: 2rem;
 @mixin divider($color) {
   color: $color;
 
-  .left,
-  .right {
+  .left-hand,
+  .right-hand {
     border-color: $color;
   }
 }
@@ -58,66 +58,17 @@ $skeleton-icon-min-width: 2rem;
   align-items: flex-start;
   gap: 0.5rem;
 
-  a {
+  button {
     @include utils.font(
       utils.$regular-size,
       utils.$regular-font,
       utils.$tight-font
     );
     width: fit-content;
-    min-width: 1rem;
+    min-width: 2rem;
     padding: 0.5rem;
     text-align: center;
     border-radius: utils.$regular-radius;
-  }
-}
-
-@mixin pagination(
-  $hover-color,
-  $active-color,
-  $text-color,
-  $text-color-hover,
-  $text-color-active,
-  $text-color-disabled
-) {
-  .pagination {
-    a {
-      color: $text-color;
-      background-color: transparent;
-
-      &:hover,
-      &:focus-visible {
-        background-color: $hover-color;
-        color: $text-color-hover;
-      }
-
-      &:active {
-        background-color: $active-color;
-        color: $text-color-active;
-      }
-
-      &:disabled {
-        background-color: transparent;
-        color: $text-color-disabled;
-      }
-    }
-  }
-}
-
-@mixin pagination-current($module) {
-  .pagination {
-    a.current {
-      @include buttons.button-filled-base(
-        map.get(utils.$active-colors, $module) !important,
-        map.get(utils.$hover-colors, $module) !important,
-        map.get(utils.$highlight-colors, $module) !important,
-        map.get(utils.$disabled-colors, $module) !important,
-        utils.$white !important,
-        utils.$white !important,
-        utils.$white !important,
-        map.get(utils.$text-colors, $module) !important
-      );
-    }
   }
 }
 
@@ -126,6 +77,8 @@ $skeleton-icon-min-width: 2rem;
   flex-direction: column;
   align-items: stretch;
   gap: 1.5rem;
+
+  margin: auto;
 
   position: relative;
   width: 22em;
@@ -380,6 +333,28 @@ form .drawer-submenu {
 @mixin tab($border-color) {
   .tab {
     border-color: $border-color;
+  }
+}
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+
+  flex: 1;
+  margin: auto;
+
+  @include utils.font(utils.$h2-size, utils.$regular-font, utils.$fit-font);
+
+  svg {
+    width: 7rem;
+    height: 7rem;
+
+    * {
+      stroke-width: 2px;
+    }
   }
 }
 

@@ -17,7 +17,7 @@ const EmptyCountry: Option = {
 
 export default async function SettingsPage() {
   const countries = await getCountries();
-  const options: Option[] = countries.data.map((country) => ({
+  const options: Option[] = countries.map((country) => ({
     label: country.name,
     value: country.Iso2,
     key: country.Iso2
@@ -25,13 +25,11 @@ export default async function SettingsPage() {
 
   return (
     <>
-      <div className='auth-layout'>
-        <SettingsForm
-          countriesOptions={[EmptyCountry, ...options]}
-          passwordPopupName={PASSWORD_POPUP_NAME}
-          deletePopupName={DELETE_POPUP_NAME}
-        />
-      </div>
+      <SettingsForm
+        countriesOptions={[EmptyCountry, ...options]}
+        passwordPopupName={PASSWORD_POPUP_NAME}
+        deletePopupName={DELETE_POPUP_NAME}
+      />
 
       <ConfirmationProvider>
         <PasswordChangeForm popupName={PASSWORD_POPUP_NAME} />

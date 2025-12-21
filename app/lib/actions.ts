@@ -4,14 +4,15 @@ import {
   ConfirmationInfo
 } from '@ts/users/confirmation';
 import FormState from '@ts/ui/form-state';
-import { BasicUser } from '@ts/users/user';
+import { BasicUser, User } from '@ts/users/user';
 
 import AxiosInstanse from './axios-instanse';
 import { defaultConfirmation, getErrorFormState } from './utils';
 
 export const getUsers = async (
   credential?: string,
-  limit?: number
+  limit?: number,
+  signal?: AbortSignal
 ): Promise<BasicUser[]> => {
   try {
     const searchParams = new URLSearchParams();
@@ -21,12 +22,18 @@ export const getUsers = async (
     if (limit) searchParams.append('limit', limit.toString());
 
     const response = await AxiosInstanse.get<BasicUser[]>(
-      `/api/users?${searchParams.toString()}`
+      `/api/users?${searchParams.toString()}`,
+      { signal }
     );
     return response.data;
   } catch {
     return [];
   }
+};
+
+export const getOtherUser = async (userId: string): Promise<User> => {
+  const response = await AxiosInstanse.get<User>(`/api/user/${userId}`);
+  return response.data;
 };
 
 export const getOperation = async (): Promise<ConfirmationInfo> => {
@@ -88,9 +95,4 @@ export const deleteConfirmation = async (operationId: string) => {
   } catch {
     return;
   }
-};
-
-export const getUser = async () => {
-  const user = await AxiosInstanse.get('/api/user');
-  return user;
 };

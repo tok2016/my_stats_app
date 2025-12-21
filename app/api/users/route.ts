@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const regex = new RegExp(credentialSearch.trim(), 'i');
+  const regex = new RegExp(credentialSearch.toLowerCase().trim(), 'i');
   const credentials = await CredentialsModel.find({
     $or: [{ username: regex }, { email: regex }]
   }).lean();
@@ -29,13 +29,13 @@ export async function GET(req: NextRequest) {
     );
 
   const usersQuery: RootFilterQuery<UserInfo> = {
-    _id: { $in: Object.keys(credentialsMap) }
+    _id: { $in: Object.keys(credentialsMap) },
+    isPublic: true
   };
-  const publicQuery: RootFilterQuery<UserInfo> = { isPublic: true };
 
   const usersInfo = limit
-    ? await UsersModel.find(usersQuery, publicQuery).limit(limit).lean()
-    : await UsersModel.find(usersQuery, publicQuery).lean();
+    ? await UsersModel.find(usersQuery).limit(limit).lean()
+    : await UsersModel.find(usersQuery).lean();
 
   const unitedUsers: BasicUser[] = usersInfo.map((userInfo) =>
     uniteBasicUserData(credentialsMap[userInfo._id.toString()], userInfo)

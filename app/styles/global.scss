@@ -1,6 +1,8 @@
 @use 'sass:map';
 @use 'utils';
 
+$directions: 'top', 'bottom', 'left', 'right';
+
 :root {
   font-size: utils.$regular-size;
   font-family: utils.$inter;
@@ -39,7 +41,8 @@ body {
   background-color: map.get(utils.$bg-2-colors, 'user');
 }
 
-h1 {
+h1,
+.h1 {
   @include utils.header(1);
 }
 
@@ -47,15 +50,18 @@ h1 {
   @include utils.font(utils.$title-size, utils.$regular-font, utils.$fit-font);
 }
 
-h2 {
+h2,
+.h2 {
   @include utils.header(2);
 }
 
-h3 {
+h3,
+.h3 {
   @include utils.header(3);
 }
 
-h4 {
+h4,
+.h4 {
   @include utils.header(4);
 }
 
@@ -105,6 +111,10 @@ label {
   text-align: left;
 }
 
+.logo {
+  font-family: utils.$ibm-plex;
+}
+
 .tight {
   line-height: utils.$tight-font;
 }
@@ -145,4 +155,12 @@ ul {
 
 .invisible {
   visibility: hidden;
+}
+
+@each $direction in $directions {
+  .#{$direction} {
+    position: absolute;
+    width: fit-content;
+    #{$direction}: utils.$layout-padding;
+  }
 }
