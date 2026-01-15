@@ -33,11 +33,12 @@ export default function AvatarInputRaw({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const avatarState: AvatarState = !avatar
-    ? 'delete'
-    : avatar !== avatarId
-      ? 'update'
-      : 'same';
+  const avatarState: AvatarState =
+    !avatar && !!defaultFile
+      ? 'delete'
+      : avatar !== avatarId
+        ? 'update'
+        : 'same';
 
   const onFileUpload = (evt: ChangeEvent<HTMLInputElement>) => {
     const file = evt.target.files?.[0];

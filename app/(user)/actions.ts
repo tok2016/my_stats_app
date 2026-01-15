@@ -13,6 +13,8 @@ import {
 } from '@lib/utils';
 import { confirmByCode } from '@lib/actions';
 
+const STEAM_ID_REGEX = /(?<=\/profiles\/)[a-zA-Z0-9]+/;
+
 export const changeProfilePrivacy =
   (closePopup: () => void) =>
   async (isPublic?: boolean): Promise<FormState<undefined>> => {
@@ -73,6 +75,18 @@ const updateAvatar = (userId: string, formData: FormData) => {
   return;
 };
 
+const extractCredential: Record<ServiceName, (raw: string) => string> = {
+  spotify: (raw) => raw,
+  steam: (raw) => {
+    try {
+      const profileUrl = new URL(raw);
+      return profileUrl.pathname.match(STEAM_ID_REGEX)?.[0] ?? raw;
+    } catch {
+      return raw;
+    }
+  }
+};
+
 const updateService = async (
   userId: string,
   service: ServiceName,
@@ -88,7 +102,7 @@ const updateService = async (
 
   const newService: NewService = {
     name: service,
-    login
+    login: extractCredential[service](login)
   };
 
   return AxiosInstanse.post(`/api/user/${userId}/service`, newService);

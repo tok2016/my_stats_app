@@ -30,10 +30,15 @@ export default function SteamAuthInfo({
       <Input
         id='steam'
         name='steam'
-        label='Account name'
-        placeholder='steam1234'
+        label='Steam ID or Profile URL'
+        placeholder='XXXXXXXXXXXXXXXXX'
         defaultValue={defaultValue}
         errorHint={errorHint}
+        hint={
+          <span className='warning'>
+            {`We collect your video games data. We can't pull it from Steam unless your Profile and Game details are set Public.`}
+          </span>
+        }
       />
     </div>
   );
