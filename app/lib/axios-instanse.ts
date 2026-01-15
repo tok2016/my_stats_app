@@ -14,4 +14,9 @@ export const AxiosCountriesInstanse = axios.create({
   baseURL: process.env.COUNTRIES_API
 });
 
+export const AxiosSteamInstanse = axios.create({
+  timeout: REQUEST_TIMEOUT,
+  baseURL: process.env.STEAM_API
+});
+
 export const isAxiosError = originalAxiosError;

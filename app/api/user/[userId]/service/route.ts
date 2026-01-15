@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { NewService, ServicesMap } from '@ts/users/service';
+import {
+  NewService,
+  ServiceName,
+  ServicesMap,
+  ServiceStatus
+} from '@ts/users/service';
+import { SteamGamesList } from '@ts/games/game';
 
 import { checkUserAuthorRights, generateAccessError } from '@lib/auth';
 import { ServiceCredentialsModel } from '@lib/models';
 import { ServiceValidator, validateData } from '@lib/validationSchemas';
+import { AxiosSteamInstanse } from '@lib/axios-instanse';
+import { SteamApiResponse } from '@ts/games/api-response';
+
+const isSteamGameObject = (value: unknown): value is SteamGamesList =>
+  (value as SteamGamesList).games !== undefined;
 
 const getServicesByUserId = async (userId: string): Promise<ServicesMap> => {
   const services = await ServiceCredentialsModel.find({ userId }).lean();
@@ -18,6 +29,34 @@ const getServicesByUserId = async (userId: string): Promise<ServicesMap> => {
   ]);
 
   return Object.fromEntries(entries);
+};
+
+const checkProfile: Record<
+  ServiceName,
+  (credentials: NewService) => Promise<ServiceStatus>
+> = {
+  spotify: () => new Promise((resolve) => resolve('unknown')),
+  steam: async (credentials) => {
+    const params = new URLSearchParams();
+    params.set('key', process.env.STEAM_KEY ?? '');
+    params.set('steamid', credentials.login);
+    params.set('format', 'json');
+    params.set('include_appinfo', 'true');
+    params.set('include_played_free_games', 'true');
+
+    try {
+      const response = await AxiosSteamInstanse.get<
+        SteamApiResponse<SteamGamesList | object>
+      >(`/IPlayerService/GetOwnedGames/v0001/?${params.toString()}`);
+      console.log(response.data);
+
+      return isSteamGameObject(response.data.response)
+        ? 'authorized'
+        : 'unauthorized';
+    } catch {
+      return 'error';
+    }
+  }
 };
 
 export async function GET(
@@ -54,18 +93,12 @@ export async function POST(
       await req.json()
     );
 
-    switch (serviceCredentials.name) {
-      case 'spotify':
-        //decode token and extract email and status
-        break;
-      case 'steam':
-        //find steam id by steam username and define status
-        break;
-    }
-
     const updatedService = await ServiceCredentialsModel.findOneAndUpdate(
       { userId, name: serviceCredentials.name },
-      { login: serviceCredentials.login }
+      {
+        login: serviceCredentials.login,
+        status: await checkProfile[serviceCredentials.name](serviceCredentials)
+      }
     ).lean();
 
     if (!updatedService) {
