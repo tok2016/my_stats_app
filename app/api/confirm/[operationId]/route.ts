@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { ConfirmationsModel } from '@lib/models';
-import { generateCode, responseWithError } from '@lib/utils';
-import { generateConfirmationResponse } from '@lib/auth';
+import { generateCode, generateErrorResponse } from '@lib/utils';
 import { cookies } from 'next/headers';
+import { ConfirmationRouteParams } from '@ts/users/confirmation';
+import {
+  confirmationEndpoint,
+  generalEndpoint
+} from '@lib/endpoint-generators';
 
-export async function PUT(
+const putConfirmationChange = async (
   _req: NextRequest,
-  { params }: { params: Promise<{ operationId: string }> }
-) {
+  params?: ConfirmationRouteParams
+) => {
+  if (!params) throw generateErrorResponse(400, 'Operation id was not given');
   const { operationId } = await params;
 
   const newCode = generateCode();
@@ -18,24 +23,26 @@ export async function PUT(
   ).lean();
 
   if (!updatedConfirmation) {
-    return responseWithError(404, 'Operation was not found');
+    throw generateErrorResponse(404, 'Operation was not found');
   }
 
   //send email with new code
   console.log(newCode);
 
-  return generateConfirmationResponse({
+  return {
     ...updatedConfirmation,
     id: updatedConfirmation._id.toString(),
     isConfirmed: false
-  });
-}
+  };
+};
 
-export async function DELETE(
+const deleteConfirmation = async (
   _req: NextRequest,
-  { params }: { params: Promise<{ operationId: string }> }
-) {
+  params?: ConfirmationRouteParams
+) => {
+  if (!params) throw generateErrorResponse(400, 'Operation id was not given');
   const { operationId } = await params;
+
   await ConfirmationsModel.findByIdAndDelete(operationId);
 
   const cookiesStore = await cookies();
@@ -45,4 +52,9 @@ export async function DELETE(
     status: 200,
     statusText: 'Confirmation operation was cancelled'
   });
-}
+};
+
+export const PUT = confirmationEndpoint(putConfirmationChange);
+
+export const DELETE =
+  generalEndpoint<ConfirmationRouteParams>(deleteConfirmation);

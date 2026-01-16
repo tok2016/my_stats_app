@@ -7,12 +7,13 @@ import {
   ServiceStatus
 } from '@ts/users/service';
 import { SteamGamesList } from '@ts/games/game';
-
-import { checkUserAuthorRights, generateAccessError } from '@lib/auth';
-import { ServiceCredentialsModel } from '@lib/models';
-import { ServiceValidator, validateData } from '@lib/validationSchemas';
-import { AxiosSteamInstanse } from '@lib/axios-instanse';
 import { SteamApiResponse } from '@ts/games/api-response';
+import { UserRouteParams } from '@ts/users/user';
+
+import { ServiceCredentialsModel } from '@lib/models';
+import { ServiceValidator, validateData } from '@lib/validation-schemas';
+import { AxiosSteamInstanse } from '@lib/axios-instanse';
+import { commonUserEndpoint } from '@lib/endpoint-generators';
 
 const isSteamGameObject = (value: unknown): value is SteamGamesList =>
   (value as SteamGamesList).games !== undefined;
@@ -48,7 +49,6 @@ const checkProfile: Record<
       const response = await AxiosSteamInstanse.get<
         SteamApiResponse<SteamGamesList | object>
       >(`/IPlayerService/GetOwnedGames/v0001/?${params.toString()}`);
-      console.log(response.data);
 
       return isSteamGameObject(response.data.response)
         ? 'authorized'
@@ -59,99 +59,79 @@ const checkProfile: Record<
   }
 };
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
+const getServiceCredentials = async (params: UserRouteParams) => {
   const { userId } = await params;
-  const bearer = req.headers.get('Authorization');
+  const services = await getServicesByUserId(userId);
 
-  try {
-    await checkUserAuthorRights(userId, bearer);
-    const services = await getServicesByUserId(userId);
+  return NextResponse.json(services, {
+    status: 200,
+    statusText: 'Services credentials were found'
+  });
+};
 
-    return NextResponse.json(services, {
-      status: 200,
-      statusText: 'Services credentials were found'
-    });
-  } catch (err) {
-    return generateAccessError(err);
-  }
-}
-
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
+const postServiceCredentials = async (
+  params: UserRouteParams,
+  req: NextRequest
+) => {
   const { userId } = await params;
-  const bearer = req.headers.get('Authorization');
+  const serviceCredentials = await validateData<NewService>(
+    ServiceValidator,
+    await req.json()
+  );
 
-  try {
-    await checkUserAuthorRights(userId, bearer);
-    const serviceCredentials = await validateData<NewService>(
-      ServiceValidator,
-      await req.json()
-    );
-
-    const updatedService = await ServiceCredentialsModel.findOneAndUpdate(
-      { userId, name: serviceCredentials.name },
-      {
-        login: serviceCredentials.login,
-        status: await checkProfile[serviceCredentials.name](serviceCredentials)
-      }
-    ).lean();
-
-    if (!updatedService) {
-      await ServiceCredentialsModel.create({
-        ...serviceCredentials,
-        userId
-      });
+  const updatedService = await ServiceCredentialsModel.findOneAndUpdate(
+    { userId, name: serviceCredentials.name },
+    {
+      login: serviceCredentials.login,
+      status: await checkProfile[serviceCredentials.name](serviceCredentials)
     }
+  ).lean();
 
-    const services = await getServicesByUserId(userId);
-
-    return NextResponse.json(services, {
-      status: 201,
-      statusText: 'Service credentials were saved successfully'
+  if (!updatedService) {
+    await ServiceCredentialsModel.create({
+      ...serviceCredentials,
+      userId
     });
-  } catch (err) {
-    return generateAccessError(err);
   }
-}
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
+  const services = await getServicesByUserId(userId);
+
+  return NextResponse.json(services, {
+    status: 201,
+    statusText: 'Service credentials were saved successfully'
+  });
+};
+
+const deleteServiceCredentials = async (
+  params: UserRouteParams,
+  req: NextRequest
+) => {
   const { userId } = await params;
   const serviceName = req.nextUrl.searchParams.get('service');
-  const bearer = req.headers.get('Authorization');
 
-  try {
-    await checkUserAuthorRights(userId, bearer);
-
-    if (!serviceName) {
-      await ServiceCredentialsModel.deleteMany({ userId });
-
-      return new NextResponse(
-        'All services credentials were deleted successfully',
-        {
-          status: 200,
-          statusText: 'All services credentials were deleted successfully'
-        }
-      );
-    }
-
-    await ServiceCredentialsModel.deleteOne({ userId, name: serviceName });
+  if (!serviceName) {
+    await ServiceCredentialsModel.deleteMany({ userId });
 
     return new NextResponse(
-      `Your ${serviceName} credentials were deleted successfully`,
+      'All services credentials were deleted successfully',
       {
         status: 200,
-        statusText: `Your ${serviceName} credentials were deleted successfully`
+        statusText: 'All services credentials were deleted successfully'
       }
     );
-  } catch (err) {
-    return generateAccessError(err);
   }
-}
+
+  await ServiceCredentialsModel.deleteOne({ userId, name: serviceName });
+
+  return new NextResponse(
+    `Your ${serviceName} credentials were deleted successfully`,
+    {
+      status: 200,
+      statusText: `Your ${serviceName} credentials were deleted successfully`
+    }
+  );
+};
+
+export const GET = commonUserEndpoint(getServiceCredentials);
+export const POST = commonUserEndpoint(postServiceCredentials);
+export const DELETE = commonUserEndpoint(deleteServiceCredentials);

@@ -42,3 +42,5 @@ export type ConfirmationFormProps = {
   addendum?: ReactNode;
   path?: string;
 };
+
+export type ConfirmationRouteParams = { operationId: string };

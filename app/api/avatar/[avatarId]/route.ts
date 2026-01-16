@@ -2,13 +2,14 @@ import { readFile } from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { responseWithError } from '@lib/utils';
+import { generateErrorResponse } from '@lib/utils';
 import { AVATAR_DIRECTORY } from '@lib/auth';
+import { generalEndpoint } from '@lib/endpoint-generators';
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ avatarId: string }> }
-) {
+type AvatarRouteParams = { avatarId: string };
+
+const getAvatarById = async (_req: NextRequest, params?: AvatarRouteParams) => {
+  if (!params) throw generateErrorResponse(400, 'Avatar id was not given');
   const { avatarId } = await params;
 
   try {
@@ -27,6 +28,8 @@ export async function GET(
       }
     });
   } catch {
-    return responseWithError(404, 'Avatar was not found');
+    throw generateErrorResponse(404, 'Avatar was not found');
   }
-}
+};
+
+export const GET = generalEndpoint<AvatarRouteParams>(getAvatarById);

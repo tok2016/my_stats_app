@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server';
-
 import { CredentialsInSchema } from '@ts/users/credentials';
 import { BasicUser, User, UserInfoInSchema } from '@ts/users/user';
 import Dashboard from '@ts/users/dashboard';
@@ -120,16 +118,6 @@ export const generateErrorResponse = (
   message: string,
   issues: ValidationIssue[] = []
 ): ErrorResponse => ({ status, message, issues });
-
-export const responseWithError = (
-  status: number,
-  message: string,
-  issues: ValidationIssue[] = []
-): NextResponse<ErrorResponse> =>
-  NextResponse.json(generateErrorResponse(status, message, issues), {
-    status,
-    statusText: message
-  });
 
 export const clamp = (value: number, min: number, max: number) => {
   if (value < min) {

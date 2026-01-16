@@ -6,8 +6,9 @@ import { BasicUser, UserInfo } from '@ts/users/user';
 
 import { CredentialsModel, UsersModel } from '@lib/models';
 import { uniteBasicUserData } from '@lib/utils';
+import { generalEndpoint } from '@lib/endpoint-generators';
 
-export async function GET(req: NextRequest) {
+const getUsers = async (req: NextRequest) => {
   const credentialSearch = req.nextUrl.searchParams.get('credential');
   const limit = parseInt(req.nextUrl.searchParams.get('limit') ?? '0');
 
@@ -45,4 +46,6 @@ export async function GET(req: NextRequest) {
     status: 200,
     statusText: 'Users were found'
   });
-}
+};
+
+export const GET = generalEndpoint(getUsers);

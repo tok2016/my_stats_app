@@ -10,12 +10,7 @@ import Dashboard from '@ts/users/dashboard';
 import Confirmation, { ConfirmationInfo } from '@ts/users/confirmation';
 
 import { CredentialsModel, DashboardsModel, UsersModel } from './models';
-import {
-  responseWithError,
-  isErrorResponse,
-  uniteUserData,
-  generateErrorResponse
-} from './utils';
+import { uniteUserData, generateErrorResponse } from './utils';
 import { ACCESS_TTL, extractToken, generateToken, REFRESH_TTL } from './token';
 
 export const AVATAR_DIRECTORY = path.join(process.cwd(), 'avatars');
@@ -45,17 +40,6 @@ export const generateAccessResponse = async (
     status: 201,
     statusText
   });
-};
-
-export const generateAccessError = (error: unknown) => {
-  if (isErrorResponse(error)) {
-    return responseWithError(error.status, error.message, error.issues);
-  }
-
-  return responseWithError(
-    500,
-    typeof error === 'string' ? error : 'Internal server error'
-  );
 };
 
 export const hashPassword = async (password: string): Promise<string> => {
