@@ -2,119 +2,82 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ZodOptional, ZodType } from 'zod';
 
 import { NewDashboard } from '@ts/users/dashboard';
+import { UserRouteParams } from '@ts/users/user';
 
-import {
-  checkUserAuthorRights,
-  generateAccessError,
-  getDashboards
-} from '@lib/auth';
-import { DashboardValidator, validateData } from '@lib/validationSchemas';
+import { getDashboards } from '@lib/auth';
+import { DashboardValidator, validateData } from '@lib/validation-schemas';
 import { DashboardsModel } from '@lib/models';
-import { responseWithError } from '@lib/utils';
+import { generateErrorResponse } from '@lib/utils';
+import { commonUserEndpoint } from '@lib/endpoint-generators';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
+const getUserDashboards = async (params: UserRouteParams) => {
   const { userId } = await params;
-  const bearer = req.headers.get('Authorization');
+  const dashboards = await getDashboards(userId);
+  return NextResponse.json(dashboards, {
+    status: 200,
+    statusText: 'Dashboards were found'
+  });
+};
 
-  try {
-    await checkUserAuthorRights(userId, bearer);
-
-    const dashboards = await getDashboards(userId);
-    return NextResponse.json(dashboards, {
-      status: 200,
-      statusText: 'Dashboards were found'
-    });
-  } catch (err) {
-    return generateAccessError(err);
-  }
-}
-
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
+const postUserDashboard = async (params: UserRouteParams, req: NextRequest) => {
   const { userId } = await params;
-  const bearer = req.headers.get('Authorization');
+  const dashboard = await validateData<NewDashboard>(
+    DashboardValidator,
+    await req.json()
+  );
+  await DashboardsModel.create({ ...dashboard, userId });
 
-  try {
-    await checkUserAuthorRights(userId, bearer);
+  const dashboards = await getDashboards(userId);
+  return NextResponse.json(dashboards, {
+    status: 201,
+    statusText: 'Dashboard was created successfully'
+  });
+};
 
-    const dashboard = await validateData<NewDashboard>(
-      DashboardValidator,
-      await req.json()
-    );
-    await DashboardsModel.create({ ...dashboard, userId });
-
-    const dashboards = await getDashboards(userId);
-    return NextResponse.json(dashboards, {
-      status: 201,
-      statusText: 'Dashboard was created successfully'
-    });
-  } catch (err) {
-    return generateAccessError(err);
-  }
-}
-
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
+const putUserDashbord = async (params: UserRouteParams, req: NextRequest) => {
   const { userId } = await params;
-  const bearer = req.headers.get('Authorization');
+  const dashboardId = req.nextUrl.searchParams.get('dashboardId');
+
+  if (!dashboardId)
+    throw generateErrorResponse(400, 'Dashboard id was not given');
+
+  const dashboard = await validateData<
+    NewDashboard,
+    ZodOptional<ZodType<NewDashboard>>
+  >(DashboardValidator.optional(), await req.json());
+
+  await DashboardsModel.findByIdAndUpdate(dashboardId, dashboard);
+
+  const dashboards = await getDashboards(userId);
+  return NextResponse.json(dashboards, {
+    status: 200,
+    statusText: 'Dashboard was updated successfully'
+  });
+};
+
+const deleteUserDashboard = async (
+  params: UserRouteParams,
+  req: NextRequest
+) => {
+  const { userId } = await params;
   const dashboardId = req.nextUrl.searchParams.get('dashboardId');
 
   if (!dashboardId) {
-    return responseWithError(400, 'Dashboard id was not given');
-  }
-
-  try {
-    await checkUserAuthorRights(userId, bearer);
-
-    const dashboard = await validateData<
-      NewDashboard,
-      ZodOptional<ZodType<NewDashboard>>
-    >(DashboardValidator.optional(), await req.json());
-
-    await DashboardsModel.findByIdAndUpdate(dashboardId, dashboard);
-
-    const dashboards = await getDashboards(userId);
-    return NextResponse.json(dashboards, {
-      status: 200,
-      statusText: 'Dashboard was updated successfully'
-    });
-  } catch (err) {
-    return generateAccessError(err);
-  }
-}
-
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
-  const { userId } = await params;
-  const bearer = req.headers.get('Authorization');
-  const dashboardId = req.nextUrl.searchParams.get('dashboardId');
-
-  try {
-    await checkUserAuthorRights(userId, bearer);
-
-    if (!dashboardId) {
-      await DashboardsModel.deleteMany({ userId });
-      return new NextResponse('All user dashboards were deleted', {
-        status: 200,
-        statusText: 'All user dashboards were deleted successfully'
-      });
-    }
-
     await DashboardsModel.deleteMany({ userId });
-    return new NextResponse('', {
+    return new NextResponse('All user dashboards were deleted', {
       status: 200,
-      statusText: 'Dashboard was deleted successfully'
+      statusText: 'All user dashboards were deleted successfully'
     });
-  } catch (err) {
-    return generateAccessError(err);
   }
-}
+
+  await DashboardsModel.findByIdAndDelete(dashboardId);
+  return new NextResponse('', {
+    status: 200,
+    statusText: 'Dashboard was deleted successfully'
+  });
+};
+
+export const GET = commonUserEndpoint(getUserDashboards);
+export const POST = commonUserEndpoint(postUserDashboard);
+export const PUT = commonUserEndpoint(putUserDashbord);
+export const DELETE = commonUserEndpoint(deleteUserDashboard);

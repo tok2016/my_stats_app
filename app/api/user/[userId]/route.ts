@@ -1,25 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { CredentialsModel, UsersModel } from '@lib/models';
-import { responseWithError, uniteUserData } from '@lib/utils';
-import { getDashboards } from '@lib/auth';
+import { UserRouteParams } from '@ts/users/user';
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
+import { CredentialsModel, UsersModel } from '@lib/models';
+import { generateErrorResponse, uniteUserData } from '@lib/utils';
+import { getDashboards } from '@lib/auth';
+import { generalEndpoint } from '@lib/endpoint-generators';
+
+const getUser = async (_req: NextRequest, params?: UserRouteParams) => {
+  if (!params) throw generateErrorResponse(400, 'User id was not given');
   const { userId } = await params;
 
   const credentials = await CredentialsModel.findOne({ userId }).lean();
   const userInfo = await UsersModel.findById(userId).lean();
 
-  if (!credentials || !userInfo) {
-    return responseWithError(404, 'User was not found');
-  }
+  if (!credentials || !userInfo)
+    throw generateErrorResponse(404, 'User was not found');
 
-  if (!userInfo.isPublic) {
-    return responseWithError(403, 'Forbidden');
-  }
+  if (!userInfo.isPublic) throw generateErrorResponse(403, 'Forbidden');
 
   const dashboards = await getDashboards(userId);
 
@@ -27,4 +25,6 @@ export async function GET(
     status: 200,
     statusText: `User ${credentials.username} was found`
   });
-}
+};
+
+export const GET = generalEndpoint<UserRouteParams>(getUser);

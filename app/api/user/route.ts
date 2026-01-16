@@ -3,10 +3,13 @@ import { cookies } from 'next/headers';
 import { unlink } from 'fs/promises';
 import path from 'path';
 
+import { NewCredentials } from '@ts/users/credentials';
+import { UserUpdate } from '@ts/users/user';
+import Token from '@ts/users/token';
+
 import {
   AVATAR_DIRECTORY,
   checkUserExistance,
-  generateAccessError,
   generateAccessResponse,
   getDashboards,
   getUserById,
@@ -16,7 +19,7 @@ import {
   CredentialsValidator,
   UserUpdateValidator,
   validateData
-} from '@lib/validationSchemas';
+} from '@lib/validation-schemas';
 import {
   ConfirmationsModel,
   CredentialsModel,
@@ -24,156 +27,120 @@ import {
   ServiceCredentialsModel,
   UsersModel
 } from '@lib/models';
-import { responseWithError, uniteUserData } from '@lib/utils';
-import { NewCredentials } from '@ts/users/credentials';
-import { UserUpdate } from '@ts/users/user';
-import { extractToken } from '@lib/token';
+import { generateErrorResponse, uniteUserData } from '@lib/utils';
+import { generalEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
 
-export async function GET(req: NextRequest) {
-  const bearer = req.headers.get('Authorization');
+const getCurrentUser = async (token: Token) => {
+  const user = await getUserById(token.id);
 
-  try {
-    const token = await extractToken(bearer);
-    const user = await getUserById(token.id);
+  return NextResponse.json(user, {
+    status: 200,
+    statusText: 'User was found'
+  });
+};
 
-    return NextResponse.json(user, {
-      status: 200,
-      statusText: 'User was found'
-    });
-  } catch (err) {
-    return generateAccessError(err);
-  }
-}
+const postNewUser = async (req: NextRequest) => {
+  const newCredentials = await validateData<NewCredentials>(
+    CredentialsValidator,
+    await req.json()
+  );
 
-export async function POST(req: NextRequest) {
-  try {
-    const newCredentials = await validateData<NewCredentials>(
-      CredentialsValidator,
-      await req.json()
-    );
+  const userExistance = await checkUserExistance(
+    newCredentials.username,
+    newCredentials.email
+  );
 
-    const userExistance = await checkUserExistance(
-      newCredentials.username,
-      newCredentials.email
-    );
+  if (userExistance) throw generateErrorResponse(400, userExistance);
 
-    if (userExistance) {
-      return responseWithError(400, userExistance);
-    }
+  const hashedPassword = await hashPassword(newCredentials.password);
+  const user = await UsersModel.create({
+    isPublic: false
+  });
 
-    const hashedPassword = await hashPassword(newCredentials.password);
-    const user = await UsersModel.create({
-      isPublic: false
-    });
+  const credentials = await CredentialsModel.create({
+    ...newCredentials,
+    password: hashedPassword,
+    createdAt: new Date(),
+    userId: user._id.toString()
+  });
 
-    const credentials = await CredentialsModel.create({
-      ...newCredentials,
-      password: hashedPassword,
-      createdAt: new Date(),
-      userId: user._id.toString()
-    });
+  return await generateAccessResponse(
+    credentials.id,
+    credentials.username,
+    'User account was created successfully'
+  );
+};
 
-    return await generateAccessResponse(
-      credentials.id,
-      credentials.username,
-      'User account was created successfully'
-    );
-  } catch (err) {
-    return generateAccessError(err);
-  }
-}
+const putCurrentUser = async (token: Token, req: NextRequest) => {
+  const userUpdate = await validateData<UserUpdate>(
+    UserUpdateValidator,
+    await req.json()
+  );
 
-export async function PUT(req: NextRequest) {
-  const bearer = req.headers.get('Authorization');
+  const credentials = userUpdate.email
+    ? await CredentialsModel.findByIdAndUpdate(
+        token.id,
+        { email: userUpdate.email },
+        { new: true }
+      ).lean()
+    : await CredentialsModel.findById(token.id).lean();
 
-  try {
-    const token = await extractToken(bearer);
-    const userUpdate = await validateData<UserUpdate>(
-      UserUpdateValidator,
-      await req.json()
-    );
+  if (!credentials) throw generateErrorResponse(404, 'User was not found');
 
-    const credentials = userUpdate.email
-      ? await CredentialsModel.findByIdAndUpdate(
-          token.id,
-          { email: userUpdate.email },
-          { new: true }
-        ).lean()
-      : await CredentialsModel.findById(token.id).lean();
+  delete userUpdate.email;
+  const userInfo = await UsersModel.findByIdAndUpdate(
+    credentials.userId,
+    userUpdate,
+    { new: true }
+  ).lean();
 
-    if (!credentials) {
-      return responseWithError(404, 'User was not found');
-    }
+  if (!userInfo) throw generateErrorResponse(404, 'User data was not found');
 
-    delete userUpdate.email;
-    const userInfo = await UsersModel.findByIdAndUpdate(
-      credentials.userId,
-      userUpdate,
-      { new: true }
-    ).lean();
+  const dashboards = await getDashboards(credentials.userId);
 
-    if (!userInfo) {
-      return responseWithError(404, 'User data was not found');
-    }
+  return NextResponse.json(uniteUserData(credentials, userInfo, dashboards), {
+    status: 200,
+    statusText: 'User data was updated successfully'
+  });
+};
 
-    const dashboards = await getDashboards(credentials.userId);
-
-    return NextResponse.json(uniteUserData(credentials, userInfo, dashboards), {
-      status: 200,
-      statusText: 'User data was updated successfully'
-    });
-  } catch (err) {
-    return generateAccessError(err);
-  }
-}
-
-export async function DELETE(req: NextRequest) {
-  const bearer = req.headers.get('Authorization');
+const deleteCurrentUser = async (token: Token, req: NextRequest) => {
   const operationId = req.nextUrl.searchParams.get('operationId');
-
-  if (!operationId) {
-    return responseWithError(401, 'Operation was not confirmed');
-  }
+  if (!operationId)
+    throw generateErrorResponse(401, 'Operation was not confirmed');
 
   const confirmation = await ConfirmationsModel.findById(operationId).lean();
-
   if (
     !confirmation
     || !confirmation.isConfirmed
     || confirmation.action !== 'delete'
-  ) {
-    return responseWithError(401, 'Operation was not confirmed');
+  )
+    throw generateErrorResponse(401, 'Operation was not confirmed');
+
+  const credentials = await CredentialsModel.findByIdAndDelete(token.id).lean();
+  if (!credentials) throw generateErrorResponse(404, 'User was not found');
+
+  const cookieStore = await cookies();
+  cookieStore.delete('refreshToken');
+  cookieStore.delete('accessToken');
+  cookieStore.delete('operation');
+
+  const userInfo = await UsersModel.findByIdAndDelete(credentials.userId);
+  await ServiceCredentialsModel.deleteMany({ userId: credentials.userId });
+  await DashboardsModel.deleteMany({ userId: credentials.userId });
+  await ConfirmationsModel.findByIdAndDelete(operationId);
+
+  if (userInfo && userInfo.avatarUrl) {
+    await unlink(path.join(AVATAR_DIRECTORY, userInfo.avatarUrl));
   }
 
-  try {
-    const token = await extractToken(bearer);
-    const credentials = await CredentialsModel.findByIdAndDelete(
-      token.id
-    ).lean();
+  return new NextResponse('User was deleted successfully', {
+    status: 200,
+    statusText: 'User was deleted successfully'
+  });
+};
 
-    if (!credentials) {
-      return responseWithError(404, 'User was not found');
-    }
-
-    const cookieStore = await cookies();
-    cookieStore.delete('refreshToken');
-    cookieStore.delete('accessToken');
-    cookieStore.delete('operation');
-
-    const userInfo = await UsersModel.findByIdAndDelete(credentials.userId);
-    await ServiceCredentialsModel.deleteMany({ userId: credentials.userId });
-    await DashboardsModel.deleteMany({ userId: credentials.userId });
-    await ConfirmationsModel.findByIdAndDelete(operationId);
-
-    if (userInfo && userInfo.avatarUrl) {
-      await unlink(path.join(AVATAR_DIRECTORY, userInfo.avatarUrl));
-    }
-
-    return new NextResponse('User was deleted successfully', {
-      status: 200,
-      statusText: 'User was deleted successfully'
-    });
-  } catch (err) {
-    return generateAccessError(err);
-  }
-}
+export const GET = protectedEndpoint(getCurrentUser);
+export const POST = generalEndpoint(postNewUser);
+export const PUT = protectedEndpoint(putCurrentUser);
+export const DELETE = protectedEndpoint(deleteCurrentUser);

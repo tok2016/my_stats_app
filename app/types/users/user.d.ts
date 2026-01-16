@@ -43,3 +43,5 @@ export type BasicUser = UserInfo
 export type User = BasicUser & {
   dashboards: Dashboard[];
 };
+
+export type UserRouteParams = Pick<Credentials, 'userId'>;
