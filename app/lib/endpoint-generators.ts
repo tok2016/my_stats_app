@@ -6,10 +6,33 @@ import Confirmation, {
   ConfirmationInfo,
   ConfirmationRouteParams
 } from '@ts/users/confirmation';
+import Service, { ServicesMap } from '@ts/users/service';
 
 import { extractToken } from './token';
 import { checkUserAuthorRights } from './auth';
 import { generateErrorResponse, isErrorResponse } from './utils';
+import { CredentialsModel, ServiceCredentialsModel } from './models';
+
+const getServicesByCredentialsId = async (id: string): Promise<ServicesMap> => {
+  const credentials = await CredentialsModel.findById(id).lean();
+
+  if (!credentials)
+    throw generateErrorResponse(404, 'Credentials were not found');
+
+  const services = await ServiceCredentialsModel.find({
+    userId: credentials.userId
+  }).lean();
+
+  const entries = services.map((service) => [
+    service.name,
+    {
+      ...service,
+      id: service._id.toString()
+    }
+  ]);
+
+  return Object.fromEntries(entries);
+};
 
 const generateAccessError = (error: unknown) => {
   if (isErrorResponse(error)) {
@@ -44,11 +67,19 @@ export const generalEndpoint =
   };
 
 export const protectedEndpoint =
-  (action: (token: Token, req: NextRequest) => Promise<NextResponse>) =>
-  async (req: NextRequest) => {
+  <ParamsType = undefined>(
+    action: (
+      token: Token,
+      req: NextRequest,
+      params?: ParamsType
+    ) => Promise<NextResponse>
+  ) =>
+  async (req: NextRequest, context?: { params: Promise<ParamsType> }) => {
     try {
+      const params = await context?.params;
       const token = await req.headers.get('Authorization');
-      return action(await extractToken(token), req);
+
+      return action(await extractToken(token), req, params);
     } catch (err) {
       return generateAccessError(err);
     }
@@ -92,6 +123,28 @@ export const confirmationEndpoint =
         status: 202,
         statusText: 'Confirmation operation was accepted'
       });
+    } catch (err) {
+      return generateAccessError(err);
+    }
+  };
+
+export const gameEndpoint =
+  <ParamsType = undefined>(
+    action: (
+      req: NextRequest,
+      service?: Service,
+      params?: ParamsType
+    ) => Promise<NextResponse>
+  ) =>
+  async (req: NextRequest, context?: { params: Promise<ParamsType> }) => {
+    try {
+      const params = await context?.params;
+      const tokenRaw = await req.headers.get('Authorization');
+
+      const token = await extractToken(tokenRaw);
+      const services = await getServicesByCredentialsId(token.id);
+
+      return action(req, services?.steam, params);
     } catch (err) {
       return generateAccessError(err);
     }

@@ -9,9 +9,15 @@ import Credentials, { CredentialsInSchema } from '@ts/users/credentials';
 import Dashboard from '@ts/users/dashboard';
 import Confirmation, { ConfirmationInfo } from '@ts/users/confirmation';
 
-import { CredentialsModel, DashboardsModel, UsersModel } from './models';
+import {
+  CredentialsModel,
+  DashboardsModel,
+  GamesModel,
+  UsersModel
+} from './models';
 import { uniteUserData, generateErrorResponse } from './utils';
 import { ACCESS_TTL, extractToken, generateToken, REFRESH_TTL } from './token';
+import { GameCore } from '@ts/games/game';
 
 export const AVATAR_DIRECTORY = path.join(process.cwd(), 'avatars');
 
@@ -149,4 +155,12 @@ export const generateConfirmationResponse = (operation: Confirmation) => {
     status: 202,
     statusText: 'Confirmation operation was accepted'
   });
+};
+
+export const getGamesByUserId = async (userId: string): Promise<GameCore[]> => {
+  const games = await GamesModel.find({ userId }).lean();
+  return games.map((game) => ({
+    ...game,
+    id: game._id.toString()
+  }));
 };

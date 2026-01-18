@@ -14,9 +14,7 @@ import { ServiceCredentialsModel } from '@lib/models';
 import { ServiceValidator, validateData } from '@lib/validation-schemas';
 import { AxiosSteamInstanse } from '@lib/axios-instanse';
 import { commonUserEndpoint } from '@lib/endpoint-generators';
-
-const isSteamGameObject = (value: unknown): value is SteamGamesList =>
-  (value as SteamGamesList).games !== undefined;
+import { isSteamGameObject } from '@lib/utils';
 
 const getServicesByUserId = async (userId: string): Promise<ServicesMap> => {
   const services = await ServiceCredentialsModel.find({ userId }).lean();

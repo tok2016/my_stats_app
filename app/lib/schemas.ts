@@ -5,6 +5,7 @@ import { DashboardInSchema } from '@ts/users/dashboard';
 import { ServiceInSchema } from '@ts/users/service';
 import { UserInfoInSchema } from '@ts/users/user';
 import { ConfirmationInSchema } from '@ts/users/confirmation';
+import { GameInSchema } from '@ts/games/game';
 
 export const CredentialsSchema = new Schema<CredentialsInSchema>({
   userId: {
@@ -121,13 +122,36 @@ export const TracksSchema = new Schema({
   streams: Number
 });
 
-export const GamesSchema = new Schema({
-  userId: String,
-  serviceId: String,
-  dataService: String,
+export const GamesSchema = new Schema<GameInSchema>({
+  userId: {
+    type: String,
+    required: true
+  },
+  apiId: {
+    type: Number,
+    required: true
+  },
+  platformId: {
+    type: String,
+    required: true
+  },
+  genresIds: Array<string>,
+  tagsIds: Array<string>,
+  developersIds: Array<string>,
+  publishersIds: Array<string>,
+  esrbRatingId: Number,
+  releasedAt: Date,
+  image: String,
+  name: {
+    type: String,
+    required: true
+  },
+  minutes: {
+    type: Number,
+    default: 0
+  },
+  metascore: Number,
   rating: Number,
   rank: Number,
-  minutes: Number,
-  playDate: Date,
-  platform: String
+  playDate: Date
 });

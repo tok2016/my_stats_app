@@ -2,6 +2,7 @@ import axios, { isAxiosError as originalAxiosError } from 'axios';
 
 const REQUEST_TIMEOUT = 10000;
 const COUNTRIES_API_TIMEOUT = 10000;
+const RAWG_REQUEST_TIMEOUT = 100000;
 
 const AxiosInstanse = axios.create({
   baseURL: process.env.API,
@@ -17,6 +18,11 @@ export const AxiosCountriesInstanse = axios.create({
 export const AxiosSteamInstanse = axios.create({
   timeout: REQUEST_TIMEOUT,
   baseURL: process.env.STEAM_API
+});
+
+export const AxiosRawgInstanse = axios.create({
+  timeout: RAWG_REQUEST_TIMEOUT,
+  baseURL: process.env.RAWG_API
 });
 
 export const isAxiosError = originalAxiosError;

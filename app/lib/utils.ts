@@ -7,6 +7,7 @@ import { ConfirmationInfo } from '@ts/users/confirmation';
 import { NewPassword } from '@ts/users/password';
 import Country from '@ts/users/country';
 import { Option } from '@ts/ui/components-props';
+import { SteamGamesList } from '@ts/games/game';
 
 import { isAxiosError } from './axios-instanse';
 
@@ -79,6 +80,9 @@ export const emptyOption: Option = {
 
 export const isErrorResponse = (value: unknown): value is ErrorResponse =>
   (value as ErrorResponse)?.message !== undefined;
+
+export const isSteamGameObject = (value: unknown): value is SteamGamesList =>
+  (value as SteamGamesList).games !== undefined;
 
 export const isExpired = (date: Date | string | number) =>
   new Date(date) < new Date();
