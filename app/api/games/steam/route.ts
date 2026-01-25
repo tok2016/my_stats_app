@@ -18,7 +18,7 @@ import {
 } from '@lib/utils';
 import { getGamesByUserId } from '@lib/auth';
 import { GamesModel } from '@lib/models';
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { serviceEndpoint } from '@lib/endpoint-generators';
 
 type SteamGameWithId = SteamGame & { id: string };
 
@@ -148,4 +148,4 @@ const pullGamesFromSteam = async (_req: NextRequest, service?: Service) => {
   });
 };
 
-export const POST = gameEndpoint(pullGamesFromSteam);
+export const POST = serviceEndpoint(pullGamesFromSteam);

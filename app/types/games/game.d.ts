@@ -1,8 +1,8 @@
-import { RawgStudio } from './studio';
 import { RawgGenre } from './genre';
 import { PlatformRelease } from './platform';
-import { RawgTag } from './tag';
 import { EsrbRating } from './rating';
+import { RawgStudio } from './studio';
+import { RawgTag } from './tag';
 
 export interface SteamGame {
   appid: number;
@@ -28,16 +28,16 @@ export interface RawgGameShort {
   slug: string;
   name: string;
   playtime: number;
+  background_image: string;
+  genres: RawgGenre[];
 }
 
 export interface RawgGame extends RawgGameShort {
   metacritic: number;
   released: string;
-  background_image: string;
   game_series_count: number;
   platforms: PlatformRelease[];
   developers: RawgStudio[];
-  genres: RawgGenre[];
   tags: RawgTag[];
   publishers: RawgStudio[];
   esrb_rating: EsrbRating;
@@ -65,3 +65,8 @@ export interface GameInSchema {
 export interface GameCore extends GameInSchema {
   id: string;
 }
+
+export type GameShort = Pick<
+  GameCore,
+  'id' | 'apiId' | 'minutes' | 'name' | 'image' | 'rating'
+>;

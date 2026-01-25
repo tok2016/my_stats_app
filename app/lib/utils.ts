@@ -8,10 +8,13 @@ import { NewPassword } from '@ts/users/password';
 import Country from '@ts/users/country';
 import { Option } from '@ts/ui/components-props';
 import { SteamGamesList } from '@ts/games/game';
+import { PrecisePeriod } from '@ts/games/metric';
 
 import { isAxiosError } from './axios-instanse';
 
 export const MILLISECONDS = 1000;
+export const MINUTES = 60;
+export const MONTH_IN_QUARTER = 3;
 
 export const FOUND_USERS_LIMIT = 5;
 
@@ -183,3 +186,13 @@ export const parseBooleanString = (value: string) => {
   const lowercase = value.toLowerCase();
   return !!value && lowercase !== 'false' && lowercase !== 'off';
 };
+
+export const getPeriodDate: Record<PrecisePeriod, (date: Date) => string> = {
+  year: (date) => date.getFullYear().toString(),
+  quarter: (date) =>
+    `${date.getFullYear()}-${Math.floor(date.getMonth() / MONTH_IN_QUARTER)}`,
+  month: (date) => `${date.getFullYear()}-${date.getMonth()}`
+};
+
+export const mean = (values: number[]) =>
+  values.reduce((prev, curr) => prev + curr, 0) / values.length;

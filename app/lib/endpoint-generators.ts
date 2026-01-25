@@ -1,17 +1,21 @@
+import { checkUserAuthorRights } from './auth';
+import {
+  CredentialsModel,
+  GamesModel,
+  ServiceCredentialsModel
+} from './models';
+import { extractToken } from './token';
+import { generateErrorResponse, isErrorResponse } from './utils';
 import { NextRequest, NextResponse } from 'next/server';
 
-import Token from '@ts/users/token';
-import { UserRouteParams } from '@ts/users/user';
+import { GameCore } from '@ts/games/game';
 import Confirmation, {
   ConfirmationInfo,
   ConfirmationRouteParams
 } from '@ts/users/confirmation';
 import Service, { ServicesMap } from '@ts/users/service';
-
-import { extractToken } from './token';
-import { checkUserAuthorRights } from './auth';
-import { generateErrorResponse, isErrorResponse } from './utils';
-import { CredentialsModel, ServiceCredentialsModel } from './models';
+import Token from '@ts/users/token';
+import { UserRouteParams } from '@ts/users/user';
 
 const getServicesByCredentialsId = async (id: string): Promise<ServicesMap> => {
   const credentials = await CredentialsModel.findById(id).lean();
@@ -32,6 +36,19 @@ const getServicesByCredentialsId = async (id: string): Promise<ServicesMap> => {
   ]);
 
   return Object.fromEntries(entries);
+};
+
+const getGamesByCredentialsId = async (id: string): Promise<GameCore[]> => {
+  const credentials = await CredentialsModel.findById(id).lean();
+
+  if (!credentials)
+    throw generateErrorResponse(404, 'Credentials were not found');
+
+  const games = await GamesModel.find({ userId: credentials.userId }).lean();
+  return games.map((game) => ({
+    ...game,
+    id: game._id.toString()
+  }));
 };
 
 const generateAccessError = (error: unknown) => {
@@ -128,7 +145,7 @@ export const confirmationEndpoint =
     }
   };
 
-export const gameEndpoint =
+export const serviceEndpoint =
   <ParamsType = undefined>(
     action: (
       req: NextRequest,
@@ -145,6 +162,28 @@ export const gameEndpoint =
       const services = await getServicesByCredentialsId(token.id);
 
       return action(req, services?.steam, params);
+    } catch (err) {
+      return generateAccessError(err);
+    }
+  };
+
+export const gameEndpoint =
+  <ParamsType = undefined>(
+    action: (
+      games: GameCore[],
+      req: NextRequest,
+      params?: ParamsType
+    ) => Promise<NextResponse>
+  ) =>
+  async (req: NextRequest, context?: { params: Promise<ParamsType> }) => {
+    try {
+      const params = await context?.params;
+      const tokenRaw = await req.headers.get('Authorization');
+
+      const token = await extractToken(tokenRaw);
+      const games = await getGamesByCredentialsId(token.id);
+
+      return action(games, req, params);
     } catch (err) {
       return generateAccessError(err);
     }

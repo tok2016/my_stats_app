@@ -6,7 +6,20 @@ const config = {
   tabWidth: 2,
   trailingComma: 'none',
   endOfLine: 'auto',
-  experimentalOperatorPosition: 'start'
+  experimentalOperatorPosition: 'start',
+  plugins: ['@trivago/prettier-plugin-sort-imports'],
+  importOrder: [
+    '^@ts/(.*)$',
+    '^@lib/(.*)$',
+    '^@api/(.*)$',
+    '^@store/(.*)$',
+    '^@components/(.*)$',
+    '^@app/(.*)$',
+    '^@public/(.*)$',
+    '^@styles/(.*)$'
+  ],
+  importOrderSeparation: true,
+  importOrderSortSpecifiers: true
 };
 
 export default config;
