@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { RawgApiListResponse } from '@ts/games/api-response';
 import { GameCore, RawgGameShort } from '@ts/games/game';
-import { Metric, RecommendedMetric } from '@ts/games/metric';
+import { MetricMap, RecommendedMetric } from '@ts/games/metric';
 
 import { AxiosRawgInstanse } from '@lib/axios-instanse';
 import { gameEndpoint } from '@lib/endpoint-generators';
@@ -58,8 +58,8 @@ const getGamesByGenres = async (
 };
 
 const getRecommnededGames = async (games: GameCore[]) => {
-  const genres: Metric<number> = {};
-  const tags: Metric<number> = {};
+  const genres: MetricMap<number> = {};
+  const tags: MetricMap<number> = {};
   const gamesMap: GamesStatusMap = {};
 
   games.forEach((game) => {
@@ -76,7 +76,7 @@ const getRecommnededGames = async (games: GameCore[]) => {
 
   const sortedGenres = Object.entries(genres).sort((a, b) => a[1] - b[1]);
   const favoriteTags = Object.entries(tags)
-    .sort((a, b) => a[1] - b[1])
+    .sort((a, b) => b[1] - a[1])
     .slice(0, MAX_TAGS)
     .join(',');
   const platforms = games.map((game) => game.platformId);

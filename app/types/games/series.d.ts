@@ -1,6 +1,7 @@
 type SeriesShort = {
   title: string;
   count: number;
+  hours: number;
 };
 
 type SeriesInverted = {

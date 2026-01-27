@@ -7,21 +7,24 @@ export type PrecisePeriodParams = { period?: PrecisePeriod };
 export type GreatPeriodParams = { period?: GreatPeriod };
 
 export type CountData = {
+  id: number;
   count: number;
   topSeries: SeriesShort;
 };
 
 export type PlaytimeData = {
+  id: number;
   hours: number;
   topGame: GameShort;
 };
 
 export type RatingData = {
+  id: number;
   rating: number;
   topGames: GameShort[];
 };
 
-export type Metric<MetricData> = Record<number | string, MetricData>;
+export type MetricMap<MetricData> = Record<number | string, MetricData>;
 
 export type PeriodTops<MetricType> = Record<number | string, MetricType>;
 

@@ -5,7 +5,7 @@ import { RawgApiListResponse } from '@ts/games/api-response';
 import { GameCore, RawgGame } from '@ts/games/game';
 import {
   CountData,
-  Metric,
+  MetricMap,
   PeriodTops,
   PeriodTopsMetric,
   PlaytimeData,
@@ -31,68 +31,85 @@ const isUnacceptableField = (
 
 export const getMetric = <MetricData>(
   games: GameCore[],
-  iterator: (game: GameCore, initialMap: Metric<MetricData>) => void,
+  iterator: (game: GameCore, initialMap: MetricMap<MetricData>) => void,
   comparor: (a: MetricData, b: MetricData) => number,
-  sort?: (entries: Entries<MetricData>) => Entries<MetricData>
-): Metric<MetricData> => {
-  const itemsMap: Metric<MetricData> = {};
+  sort?: (entries: Entries<MetricData>) => MetricData[]
+): MetricData[] => {
+  const itemsMap: MetricMap<MetricData> = {};
   const bindIterator = (game: GameCore) => iterator(game, itemsMap);
   games.forEach(bindIterator);
 
-  const sortedEntries =
+  const sortedItems =
     sort?.(Object.entries(itemsMap))
-    ?? Object.entries(itemsMap).sort((a, b) => comparor(a[1], b[1]));
+    ?? Object.entries(itemsMap)
+      .map((entry) => entry[1])
+      .sort(comparor);
 
-  return Object.fromEntries(sortedEntries);
+  return sortedItems;
 };
 
 export const getCountMetric = async (
   games: GameCore[],
   dataField: keyof GameCore
-): Promise<Metric<CountData>> => {
+): Promise<CountData[]> => {
   if (isUnacceptableField(games[0], dataField))
     throw generateErrorResponse(500, 'Internal server error');
 
   const seriesByGame = await getGamesSeries(games);
 
-  const iterator = (game: GameCore, map: Metric<CountData>) => {
+  const iterator = (game: GameCore, map: MetricMap<CountData>) => {
     if (!(game[dataField] instanceof Array)) return;
     const series = seriesByGame[game.apiId];
 
     game[dataField].forEach((item) => {
-      map[item] = {
-        count: (map[item]?.count ?? 0) + 1,
-        topSeries:
-          series.count > (map[item]?.count ?? 0) ? series : map[item].topSeries
-      };
+      if (!map[item]) {
+        map[item] = {
+          id: item,
+          count: 1,
+          topSeries: series
+        };
+      } else {
+        map[item].count++;
+        map[item].topSeries =
+          series.count > map[item].topSeries.count
+          || (series.count === map[item].topSeries.count
+            && series.hours >= map[item].topSeries.hours)
+            ? series
+            : map[item].topSeries;
+      }
     });
   };
 
-  return getMetric(games, iterator, (a, b) => a.count - b.count);
+  return getMetric(games, iterator, (a, b) => b.count - a.count);
 };
 
 export const getPlaytimeMetric = (
   games: GameCore[],
   dataField: keyof GameCore
-): Metric<PlaytimeData> => {
+): PlaytimeData[] => {
   if (isUnacceptableField(games[0], dataField))
     throw generateErrorResponse(500, 'Internal server error');
 
-  const iterator = (game: GameCore, map: Metric<PlaytimeData>) => {
+  const iterator = (game: GameCore, map: MetricMap<PlaytimeData>) => {
     if (!(game[dataField] instanceof Array)) return;
 
     game[dataField].forEach((item) => {
-      map[item] = {
-        hours: (map[item]?.hours ?? 0) + Math.round(game.minutes / MINUTES),
-        topGame:
-          game.minutes >= (map[item]?.topGame.minutes ?? 0)
-            ? game
-            : map[item].topGame
-      };
+      const hours = Math.round(game.minutes / MINUTES);
+      if (!map[item]) {
+        map[item] = {
+          id: item,
+          hours,
+          topGame: game
+        };
+      } else {
+        map[item].hours += hours;
+        map[item].topGame =
+          game.minutes >= map[item].topGame.minutes ? game : map[item].topGame;
+      }
     });
   };
 
-  return getMetric(games, iterator, (a, b) => a.hours - b.hours);
+  return getMetric(games, iterator, (a, b) => b.hours - a.hours);
 };
 
 export const getPeriodMetric = <MetricType>(
@@ -114,8 +131,43 @@ export const getPeriodMetric = <MetricType>(
   };
 };
 
-//fix this!!!
-const getGameSeriesList = async (game: GameCore): Promise<SeriesInverted> => {
+const getRegExpFromTitle = (title: string) => {
+  const charsToRemove = /[({\['"`].*?[)}\]'"`]/g;
+  const semicolons = /[:;].+/g;
+  const whiteSpaces = /\s/g;
+  const regexStr = title
+    .replace(charsToRemove, '')
+    .replace(semicolons, '')
+    .trim()
+    .replace(whiteSpaces, '|');
+  return `(${regexStr})`;
+};
+
+const getSeriesTitle = (games: RawgGame[]) => {
+  const first = games
+    .slice()
+    .sort(
+      (a, b) => new Date(a.released).getTime() - new Date(b.released).getTime()
+    )[0];
+
+  const parts: Record<string, number> = {};
+  const regex = new RegExp(getRegExpFromTitle(first.name), 'g');
+
+  games.forEach((game) => {
+    const match = game.name.match(regex)?.join(' ') ?? '';
+    parts[match] = (parts[match] ?? 0) + 1;
+  });
+
+  return Object.entries(parts).reduce(
+    (prev, curr) => (curr[1] > prev[1] ? curr : prev),
+    ['', 0]
+  )[0];
+};
+
+const getSeriesOfOneGame = async (
+  game: GameCore,
+  ownedGamesMap: Record<number, number>
+): Promise<SeriesInverted> => {
   const searchParams = new URLSearchParams();
   searchParams.set('key', process.env.RAWG_KEY ?? '');
 
@@ -123,33 +175,47 @@ const getGameSeriesList = async (game: GameCore): Promise<SeriesInverted> => {
     `/games/${game.apiId}/game-series?${searchParams.toString()}`
   );
 
-  console.log(response.data.results);
+  const allGames = [
+    ...response.data.results,
+    {
+      id: game.apiId,
+      name: game.name,
+      esrb_rating: { id: game.esrbRatingId ?? 0, name: '', slug: '' },
+      released: game.releasedAt?.toDateString() ?? '',
+      metacritic: game.metascore ?? 0,
+      slug: game.name,
+      game_series_count: 0,
+      platforms: [],
+      developers: [],
+      tags: [],
+      publishers: [],
+      playtime: 0,
+      background_image: '',
+      genres: []
+    }
+  ];
 
-  const title =
-    response.data.results
-      .slice()
-      .sort(
-        (a, b) =>
-          new Date(a.released).getTime() - new Date(b.released).getTime()
-      )[0]?.name ?? game.name;
+  const gamesMap = Object.fromEntries(
+    allGames
+      .filter((g) => typeof ownedGamesMap[g.id] !== 'undefined')
+      .map((g) => [g.id, ownedGamesMap[g.id] ?? g.playtime])
+  );
 
-  return {
-    title,
-    gamesMap: { [game.apiId]: 1 }
-  };
+  return { title: getSeriesTitle(allGames), gamesMap };
 };
 
 export const getGamesSeries = async (
   games: GameCore[]
 ): Promise<Record<number, SeriesShort>> => {
   const allSeries: SeriesInverted[] = [];
+  const ownedGamesMap: Record<number, number> = Object.fromEntries(
+    games.map((game) => [game.apiId, Math.round(game.minutes / MINUTES)])
+  );
 
   const promises = games
     .map((game) => {
       const series = allSeries.find((s) => !!s.gamesMap[game.apiId]);
-
-      if (!series) return getGameSeriesList(game);
-      series.gamesMap[game.apiId] = 1;
+      if (!series) return getSeriesOfOneGame(game, ownedGamesMap);
     })
     .filter((promise) => !!promise);
 
@@ -157,11 +223,17 @@ export const getGamesSeries = async (
 
   const seriesByGame: Record<number, SeriesShort> = {};
   allSeries.forEach((series) => {
-    Object.keys(series.gamesMap).forEach((gameApiId, _, arr) => {
+    const seriesPlaytime = Object.values(series.gamesMap).reduce(
+      (prev, curr) => prev + curr,
+      0
+    );
+
+    Object.entries(series.gamesMap).forEach(([gameApiId], _, arr) => {
       const parsedId = parseInt(gameApiId) ?? 0;
       seriesByGame[parsedId] = {
         title: series.title,
-        count: arr.length
+        count: arr.length,
+        hours: seriesPlaytime
       };
     });
   });

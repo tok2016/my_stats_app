@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { GameCore } from '@ts/games/game';
 import {
-  Metric,
+  MetricMap,
   PeriodTops,
   PeriodTopsMetric,
   PrecisePeriodParams
@@ -18,10 +18,10 @@ const getTopGenresByPeriod = async (
   params?: PrecisePeriodParams
 ) => {
   const periodType = params?.period ?? 'year';
-  const periodLists: PeriodTops<Metric<number>> = {};
+  const periodLists: PeriodTops<MetricMap<number>> = {};
 
   games.forEach((game) => {
-    if (game.playDate) {
+    if (game.playDate && game.playDate.getTime()) {
       const period = getPeriodDate[periodType](game.playDate);
 
       game.genresIds.forEach((genre) => {
@@ -34,20 +34,21 @@ const getTopGenresByPeriod = async (
     }
   });
 
-  const periodEntries = Object.entries(periodLists).map(([year, list]) => {
+  const periodTops = Object.entries(periodLists).map(([year, list]) => {
     const top = Object.entries(list)
-      .sort((a, b) => a[1] - b[1])
+      .sort((a, b) => b[1] - a[1])
+      .map((entry) => entry[0])
       .slice(0, TOP_ENTRIES);
 
-    return [year, Object.fromEntries(top)];
+    return [year, top];
   });
 
-  const periodTops: PeriodTopsMetric<Metric<number>> = {
+  const periodTopsMetric: PeriodTopsMetric<MetricMap<number>> = {
     period: periodType,
-    tops: Object.fromEntries(periodEntries)
+    tops: Object.fromEntries(periodTops)
   };
 
-  return NextResponse.json(periodTops, {
+  return NextResponse.json(periodTopsMetric, {
     status: 200,
     statusText: `Genres tops were calculated by ${periodType}`
   });
