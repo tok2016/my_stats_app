@@ -1,17 +1,10 @@
-import { AxiosRawgInstanse } from './axios-instanse';
-import { MINUTES, generateErrorResponse } from './utils';
-
-import { RawgApiListResponse } from '@ts/games/api-response';
-import { GameCore, RawgGame } from '@ts/games/game';
-import {
-  CountData,
-  MetricMap,
-  PeriodTops,
-  PeriodTopsMetric,
-  PlaytimeData,
-  PrecisePeriod
-} from '@ts/games/metric';
+import { GameCore } from '@ts/games/game';
+import { CountData, MetricMap, PlaytimeData } from '@ts/games/metric';
+import { IgdbSeries, ItemSeries, SeriesCompareData } from '@ts/games/series';
 import { Entries } from '@ts/util-types';
+
+import { igdbRequest } from './igdb';
+import { MINUTES, generateErrorResponse } from './utils';
 
 export const TOP_ENTRIES = 3;
 export const GAMES_IN_METRIC = 5;
@@ -55,32 +48,34 @@ export const getCountMetric = async (
   if (isUnacceptableField(games[0], dataField))
     throw generateErrorResponse(500, 'Internal server error');
 
-  const seriesByGame = await getGamesSeries(games);
+  const allSeries = await getSeries(games, dataField);
+  const itemsCount = new Map<number, CountData>();
 
-  const iterator = (game: GameCore, map: MetricMap<CountData>) => {
-    if (!(game[dataField] instanceof Array)) return;
-    const series = seriesByGame[game.apiId];
+  allSeries.forEach((series) => {
+    series.itemsMap.forEach((countData, item) => {
+      const currentItem = itemsCount.get(item);
+      const currentItemCount =
+        currentItem?.topSeries?.itemsMap.get(item)?.count ?? 0;
+      const currentItemMinutes =
+        currentItem?.topSeries?.itemsMap.get(item)?.minutes ?? 0;
 
-    game[dataField].forEach((item) => {
-      if (!map[item]) {
-        map[item] = {
-          id: item,
-          count: 1,
-          topSeries: series
-        };
-      } else {
-        map[item].count++;
-        map[item].topSeries =
-          series.count > map[item].topSeries.count
-          || (series.count === map[item].topSeries.count
-            && series.hours >= map[item].topSeries.hours)
+      itemsCount.set(item, {
+        id: item,
+        count: (currentItem?.count ?? 0) + countData.count,
+        topSeries:
+          countData.count > currentItemCount
+          || (countData.count === currentItemCount
+            && countData.minutes >= currentItemMinutes)
             ? series
-            : map[item].topSeries;
-      }
+            : currentItem?.topSeries
+      });
     });
-  };
+  });
 
-  return getMetric(games, iterator, (a, b) => b.count - a.count);
+  return itemsCount
+    .values()
+    .toArray()
+    .sort((a, b) => b.count - a.count);
 };
 
 export const getPlaytimeMetric = (
@@ -112,131 +107,49 @@ export const getPlaytimeMetric = (
   return getMetric(games, iterator, (a, b) => b.hours - a.hours);
 };
 
-export const getPeriodMetric = <MetricType>(
+const getSeries = async (
   games: GameCore[],
-  periodType: PrecisePeriod,
-  iterator: (game: GameCore, periodLists: PeriodTops<MetricType>) => void,
-  topGenerator: ([year, list]: [string, MetricType]) => [string, MetricType]
-): PeriodTopsMetric<MetricType> => {
-  const periodLists: PeriodTops<MetricType> = {};
-  const bindIterator = (game: GameCore) => iterator(game, periodLists);
-
-  games.forEach(bindIterator);
-
-  const periodEntries = Object.entries(periodLists).map(topGenerator);
-
-  return {
-    period: periodType,
-    tops: Object.fromEntries(periodEntries)
-  };
-};
-
-const getRegExpFromTitle = (title: string) => {
-  const charsToRemove = /[({\['"`].*?[)}\]'"`]/g;
-  const semicolons = /[:;].+/g;
-  const whiteSpaces = /\s/g;
-  const regexStr = title
-    .replace(charsToRemove, '')
-    .replace(semicolons, '')
-    .trim()
-    .replace(whiteSpaces, '|');
-  return `(${regexStr})`;
-};
-
-const getSeriesTitle = (games: RawgGame[]) => {
-  const first = games
-    .slice()
-    .sort(
-      (a, b) => new Date(a.released).getTime() - new Date(b.released).getTime()
-    )[0];
-
-  const parts: Record<string, number> = {};
-  const regex = new RegExp(getRegExpFromTitle(first.name), 'g');
+  dataField: keyof GameCore
+): Promise<ItemSeries[]> => {
+  const seriesIds: number[] = [];
+  const gamesMap: Record<number, GameCore> = {};
 
   games.forEach((game) => {
-    const match = game.name.match(regex)?.join(' ') ?? '';
-    parts[match] = (parts[match] ?? 0) + 1;
+    if (game.seriesId) seriesIds.push(game.seriesId);
+    gamesMap[game.apiId] = game;
   });
 
-  return Object.entries(parts).reduce(
-    (prev, curr) => (curr[1] > prev[1] ? curr : prev),
-    ['', 0]
-  )[0];
-};
+  const allIgdbSeries = await igdbRequest<IgdbSeries>('/collections', {
+    fields: ['games', 'name'],
+    where: `id = (${seriesIds.join(',')})`,
+    limit: seriesIds.length
+  });
 
-const getSeriesOfOneGame = async (
-  game: GameCore,
-  ownedGamesMap: Record<number, number>
-): Promise<SeriesInverted> => {
-  const searchParams = new URLSearchParams();
-  searchParams.set('key', process.env.RAWG_KEY ?? '');
+  const series: ItemSeries[] = allIgdbSeries.map((igdbSeries) => {
+    const itemsCountMap = new Map<number, SeriesCompareData>();
 
-  const response = await AxiosRawgInstanse.get<RawgApiListResponse<RawgGame>>(
-    `/games/${game.apiId}/game-series?${searchParams.toString()}`
-  );
+    igdbSeries.games.forEach((gameApiId) => {
+      if (
+        gamesMap[gameApiId]
+        && gamesMap[gameApiId][dataField] instanceof Array
+      ) {
+        gamesMap[gameApiId][dataField].forEach((item) => {
+          const currentItem = itemsCountMap.get(item);
 
-  const allGames = [
-    ...response.data.results,
-    {
-      id: game.apiId,
-      name: game.name,
-      esrb_rating: { id: game.esrbRatingId ?? 0, name: '', slug: '' },
-      released: game.releasedAt?.toDateString() ?? '',
-      metacritic: game.metascore ?? 0,
-      slug: game.name,
-      game_series_count: 0,
-      platforms: [],
-      developers: [],
-      tags: [],
-      publishers: [],
-      playtime: 0,
-      background_image: '',
-      genres: []
-    }
-  ];
-
-  const gamesMap = Object.fromEntries(
-    allGames
-      .filter((g) => typeof ownedGamesMap[g.id] !== 'undefined')
-      .map((g) => [g.id, ownedGamesMap[g.id] ?? g.playtime])
-  );
-
-  return { title: getSeriesTitle(allGames), gamesMap };
-};
-
-export const getGamesSeries = async (
-  games: GameCore[]
-): Promise<Record<number, SeriesShort>> => {
-  const allSeries: SeriesInverted[] = [];
-  const ownedGamesMap: Record<number, number> = Object.fromEntries(
-    games.map((game) => [game.apiId, Math.round(game.minutes / MINUTES)])
-  );
-
-  const promises = games
-    .map((game) => {
-      const series = allSeries.find((s) => !!s.gamesMap[game.apiId]);
-      if (!series) return getSeriesOfOneGame(game, ownedGamesMap);
-    })
-    .filter((promise) => !!promise);
-
-  (await Promise.all(promises)).forEach((s) => allSeries.push(s));
-
-  const seriesByGame: Record<number, SeriesShort> = {};
-  allSeries.forEach((series) => {
-    const seriesPlaytime = Object.values(series.gamesMap).reduce(
-      (prev, curr) => prev + curr,
-      0
-    );
-
-    Object.entries(series.gamesMap).forEach(([gameApiId], _, arr) => {
-      const parsedId = parseInt(gameApiId) ?? 0;
-      seriesByGame[parsedId] = {
-        title: series.title,
-        count: arr.length,
-        hours: seriesPlaytime
-      };
+          itemsCountMap.set(item, {
+            count: (currentItem?.count ?? 0) + 1,
+            minutes: (currentItem?.minutes ?? 0) + gamesMap[gameApiId].minutes
+          });
+        });
+      }
     });
+
+    return {
+      id: igdbSeries.id,
+      name: igdbSeries.name,
+      itemsMap: itemsCountMap
+    };
   });
 
-  return seriesByGame;
+  return series;
 };

@@ -1,7 +1,6 @@
 import { RawgGenre } from './genre';
 import { PlatformRelease } from './platform';
-import { EsrbRating } from './rating';
-import { RawgStudio } from './studio';
+import { IgdbInvolvedStudio, RawgStudio } from './studio';
 import { RawgTag } from './tag';
 
 export interface SteamGame {
@@ -40,25 +39,43 @@ export interface RawgGame extends RawgGameShort {
   developers: RawgStudio[];
   tags: RawgTag[];
   publishers: RawgStudio[];
-  esrb_rating: EsrbRating;
+}
+
+export interface IgdbGame {
+  id: number;
+  name: string;
+  slug: string;
+  tags: number[];
+  genres: number[];
+  platforms: number[];
+  themes: number[];
+  collections?: IgdbSeries[];
+  first_release_date?: number;
+  involved_companies?: IgdbInvolvedStudio[];
+  cover?: number;
+  external_games?: {
+    id: number;
+    uid: string;
+    external_game_source: number;
+  }[];
 }
 
 export interface GameInSchema {
   userId: string;
   apiId: number;
-  platformId: string;
+  storeId?: number;
+  name: string;
+  platformId: number;
   genresIds: number[];
-  tagsIds: number[];
+  themesId: number[];
   developersIds: number[];
   publishersIds: number[];
-  name: string;
+  seriesId?: number;
   minutes: number;
-  esrbRatingId?: number;
   releasedAt?: Date;
-  image?: string;
+  cover?: number;
   metascore?: number;
   rating?: number;
-  rank?: number;
   playDate?: Date;
 }
 
@@ -68,5 +85,5 @@ export interface GameCore extends GameInSchema {
 
 export type GameShort = Pick<
   GameCore,
-  'id' | 'apiId' | 'minutes' | 'name' | 'image' | 'rating'
+  'id' | 'apiId' | 'minutes' | 'name' | 'cover' | 'rating'
 >;

@@ -1,4 +1,5 @@
 import { GameShort, RawgGameShort } from './game';
+import { ItemSeries } from './series';
 
 export type PrecisePeriod = 'year' | 'quarter' | 'month';
 export type GreatPeriod = 'allTime' | 'year';
@@ -9,7 +10,7 @@ export type GreatPeriodParams = { period?: GreatPeriod };
 export type CountData = {
   id: number;
   count: number;
-  topSeries: SeriesShort;
+  topSeries?: ItemSeries;
 };
 
 export type PlaytimeData = {

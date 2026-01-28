@@ -69,9 +69,9 @@ const getRecommnededGames = async (games: GameCore[]) => {
       genres[genre] = (genres[genre] ?? 0) + 1;
     });
 
-    game.tagsIds.forEach((tag) => {
-      tags[tag] = (tags[tag] ?? 0) + 1;
-    });
+    // game.tagsIds.forEach((tag) => {
+    //   tags[tag] = (tags[tag] ?? 0) + 1;
+    // });
   });
 
   const sortedGenres = Object.entries(genres).sort((a, b) => a[1] - b[1]);

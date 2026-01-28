@@ -1,26 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { RawgApiListResponse, SteamApiResponse } from '@ts/games/api-response';
+import { SteamApiResponse } from '@ts/games/api-response';
+import { GameCore, GameInSchema, IgdbGame, SteamGame } from '@ts/games/game';
 import Service from '@ts/users/service';
-import {
-  GameCore,
-  GameInSchema,
-  RawgGame,
-  RawgGameShort,
-  SteamGame
-} from '@ts/games/game';
 
-import { AxiosRawgInstanse, AxiosSteamInstanse } from '@lib/axios-instanse';
-import {
-  generateErrorResponse,
-  isSteamGameObject,
-  MILLISECONDS
-} from '@lib/utils';
 import { getGamesByUserId } from '@lib/auth';
-import { GamesModel } from '@lib/models';
+import { AxiosSteamInstanse } from '@lib/axios-instanse';
 import { serviceEndpoint } from '@lib/endpoint-generators';
+import { igdbRequest } from '@lib/igdb';
+import { GamesModel } from '@lib/models';
+import {
+  MILLISECONDS,
+  generateErrorResponse,
+  isSteamGameObject
+} from '@lib/utils';
 
 type SteamGameWithId = SteamGame & { id: string };
+
+const STEAM_IGDB_ID = 1;
+const PC_ID = 6;
 
 const updateGamesFromSteam = async (gamesFromSteam: SteamGameWithId[]) => {
   const updatePromises = gamesFromSteam.map((game) =>
@@ -33,72 +31,83 @@ const updateGamesFromSteam = async (gamesFromSteam: SteamGameWithId[]) => {
   await Promise.all(updatePromises);
 };
 
-const uniteSteamAndRawg = (
-  userId: string,
-  steamGame?: SteamGame,
-  rawgGame?: RawgGame
-): GameInSchema | undefined =>
-  !rawgGame
-    ? undefined
-    : {
-        userId,
-        name: rawgGame.name,
-        apiId: rawgGame.id,
-        platformId: '4',
-        genresIds: rawgGame.genres.map((genre) => genre.id),
-        tagsIds: rawgGame.tags
-          .filter((tag) => tag.language === 'eng')
-          .map((tag) => tag.id),
-        developersIds: rawgGame.developers.map((developer) => developer.id),
-        publishersIds: rawgGame.publishers.map((publisher) => publisher.id),
-        esrbRatingId: rawgGame.esrb_rating?.id,
-        releasedAt: rawgGame.released ? new Date(rawgGame.released) : undefined,
-        image: rawgGame.background_image,
-        metascore: rawgGame.metacritic,
-        minutes: steamGame?.playtime_forever ?? 0,
-        playDate: steamGame
-          ? new Date(steamGame.rtime_last_played * MILLISECONDS)
-          : undefined
-      };
-
-const searchGameFromRawg = async (userId: string, steamGame: SteamGame) => {
-  const searchParams = new URLSearchParams();
-  searchParams.set('key', process.env.RAWG_KEY ?? '');
-  searchParams.set('search_exact', 'true');
-  searchParams.set('platforms', '4');
-  searchParams.set('exclude_collection', 'true');
-  searchParams.set('exclude_additions', 'true');
-  searchParams.set('stores', '1');
-  searchParams.set('page_size', '10');
-  searchParams.set('search', steamGame.name);
-
-  const searchResult = await AxiosRawgInstanse.get<
-    RawgApiListResponse<RawgGameShort>
-  >(`/games?${searchParams.toString()}`);
-
-  const rawgGameShort = searchResult.data.results.find(
-    (search) => search.name === steamGame.name
-  );
-
-  if (!rawgGameShort) return undefined;
-  const rawgGame = await AxiosRawgInstanse.get<RawgGame>(
-    `/games/${rawgGameShort.id}?${searchParams.toString()}`
-  );
-
-  return uniteSteamAndRawg(userId, steamGame, rawgGame.data);
+const uniteSteamAndIgdb = (
+  steamGame: SteamGame,
+  igdbGame: IgdbGame,
+  userId: string
+): GameInSchema => {
+  return {
+    userId,
+    apiId: igdbGame.id,
+    storeId: steamGame?.appid,
+    name: igdbGame.name,
+    platformId: PC_ID,
+    genresIds: igdbGame.genres,
+    themesId: igdbGame.themes,
+    developersIds:
+      igdbGame.involved_companies
+        ?.filter((company) => company.developer)
+        .map((company) => company.company) ?? [],
+    publishersIds:
+      igdbGame.involved_companies
+        ?.filter((company) => company.publisher)
+        .map((company) => company.company) ?? [],
+    releasedAt: igdbGame.first_release_date
+      ? new Date(igdbGame.first_release_date * MILLISECONDS)
+      : undefined,
+    seriesId: igdbGame.collections?.reduce((prev, curr) =>
+      curr.games.length > prev.games.length ? curr : prev
+    ).id,
+    cover: igdbGame?.cover,
+    minutes: steamGame?.playtime_forever ?? 0,
+    playDate: steamGame
+      ? new Date(steamGame.rtime_last_played * MILLISECONDS)
+      : undefined
+  };
 };
 
-const addGameFromSteam = async (
-  gamesFromSteam: SteamGame[],
-  userId: string
-) => {
-  const searchResults = gamesFromSteam.map((game) => {
-    return searchGameFromRawg(userId, game);
+const searchGamesFromIgdb = async (
+  steamGamesIds: string[]
+): Promise<IgdbGame[]> => {
+  const igdbGames = await igdbRequest<IgdbGame>('/games', {
+    fields: [
+      'name',
+      'platforms',
+      'involved_companies.company',
+      'involved_companies.developer',
+      'involved_companies.publisher',
+      'first_release_date',
+      'collections.games',
+      'collections.name',
+      'external_games.external_game_source',
+      'external_games.uid',
+      'genres',
+      'slug',
+      'themes',
+      'cover'
+    ],
+    where: `external_games.uid = (${steamGamesIds.join(',')}) & external_games.external_game_source = (${STEAM_IGDB_ID})`,
+    limit: steamGamesIds.length
   });
 
-  const gamesToAdd = (await Promise.all(searchResults)).filter(
-    (game) => !!game
+  return igdbGames.map((igdbGame) => ({
+    ...igdbGame,
+    external_games: igdbGame.external_games?.filter(
+      (game) => game.external_game_source === STEAM_IGDB_ID
+    )
+  }));
+};
+
+const addGameFromSteam = async (steamGames: SteamGame[], userId: string) => {
+  const steamGamesMap: Record<number, SteamGame> = Object.fromEntries(
+    steamGames.map((steamGame) => [steamGame.appid, steamGame])
   );
+
+  const igdbGames = await searchGamesFromIgdb(Object.keys(steamGamesMap));
+  const gamesToAdd = igdbGames.map((igdbGame) => {
+    const steamAppId = parseInt(igdbGame.external_games?.[0].uid ?? '0');
+    return uniteSteamAndIgdb(steamGamesMap[steamAppId], igdbGame, userId);
+  });
 
   await GamesModel.create(gamesToAdd);
 };
@@ -106,12 +115,13 @@ const addGameFromSteam = async (
 const pullGamesFromSteam = async (_req: NextRequest, service?: Service) => {
   if (!service) throw generateErrorResponse(401, `Steam ID wasn't provided`);
 
-  const searchParams = new URLSearchParams();
-  searchParams.set('key', process.env.STEAM_KEY ?? '');
-  searchParams.set('steamid', service?.login ?? '');
-  searchParams.set('include_appinfo', 'true');
-  searchParams.set('include_played_free_games', 'true');
-  searchParams.set('format', 'json');
+  const searchParams = new URLSearchParams({
+    key: process.env.STEAM_KEY ?? '',
+    steamid: service?.login ?? '',
+    include_appinfo: 'true',
+    include_played_free_games: 'true',
+    format: 'json'
+  });
 
   const steamResponse = await AxiosSteamInstanse.get<SteamApiResponse<unknown>>(
     `/IPlayerService/GetOwnedGames/v0001?${searchParams.toString()}`
@@ -120,20 +130,18 @@ const pullGamesFromSteam = async (_req: NextRequest, service?: Service) => {
   if (!isSteamGameObject(steamResponse.data.response))
     throw generateErrorResponse(401, 'Profile is private');
 
-  const gamesList = steamResponse.data.response.games
-    .slice()
-    .sort((a, b) => a.appid - b.appid);
-
   const savedGames = await getGamesByUserId(service.userId);
-  const savedGamesEntries = savedGames.map((game) => [game.name, game]);
+  const savedGamesEntries = savedGames
+    .filter((game) => !!game.storeId)
+    .map((game) => [game.storeId, game]);
   const gamesMap: Record<string, GameCore> =
     Object.fromEntries(savedGamesEntries);
 
   const gamesToUpdate: SteamGameWithId[] = [];
   const gamesToAdd: SteamGame[] = [];
 
-  gamesList.forEach((game) => {
-    const gameCore = gamesMap[game.name];
+  steamResponse.data.response.games.forEach((game) => {
+    const gameCore = gamesMap[game.appid];
     if (!gameCore) gamesToAdd.push(game);
     else if (gameCore.minutes !== game.playtime_forever)
       gamesToUpdate.push({ ...game, id: gameCore.id });
@@ -149,3 +157,10 @@ const pullGamesFromSteam = async (_req: NextRequest, service?: Service) => {
 };
 
 export const POST = serviceEndpoint(pullGamesFromSteam);
+export const DELETE = async () => {
+  await GamesModel.deleteMany();
+
+  return new NextResponse('All games data was deleted', {
+    status: 200
+  });
+};
