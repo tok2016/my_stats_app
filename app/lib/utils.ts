@@ -1,16 +1,16 @@
-import { CredentialsInSchema } from '@ts/users/credentials';
-import { BasicUser, User, UserInfoInSchema } from '@ts/users/user';
-import Dashboard from '@ts/users/dashboard';
-import ErrorResponse, { ValidationIssue } from '@ts/requests';
-import FormState from '@ts/ui/form-state';
-import { ConfirmationInfo } from '@ts/users/confirmation';
-import { NewPassword } from '@ts/users/password';
-import Country from '@ts/users/country';
-import { Option } from '@ts/ui/components-props';
+import { isAxiosError } from './axios-instanse';
+
 import { SteamGamesList } from '@ts/games/game';
 import { PrecisePeriod } from '@ts/games/metric';
-
-import { isAxiosError } from './axios-instanse';
+import ErrorResponse, { ValidationIssue } from '@ts/requests';
+import { Option } from '@ts/ui/components-props';
+import FormState from '@ts/ui/form-state';
+import { ConfirmationInfo } from '@ts/users/confirmation';
+import Country from '@ts/users/country';
+import { CredentialsInSchema } from '@ts/users/credentials';
+import Dashboard from '@ts/users/dashboard';
+import { NewPassword } from '@ts/users/password';
+import { BasicUser, User, UserInfoInSchema } from '@ts/users/user';
 
 export const MILLISECONDS = 1000;
 export const MINUTES = 60;
@@ -195,4 +195,6 @@ export const getPeriodDate: Record<PrecisePeriod, (date: Date) => string> = {
 };
 
 export const mean = (values: number[]) =>
-  values.reduce((prev, curr) => prev + curr, 0) / values.length;
+  values.length > 0
+    ? values.reduce((prev, curr) => prev + curr, 0) / values.length
+    : undefined;

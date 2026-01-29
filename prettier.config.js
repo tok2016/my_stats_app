@@ -9,6 +9,8 @@ const config = {
   experimentalOperatorPosition: 'start',
   plugins: ['@trivago/prettier-plugin-sort-imports'],
   importOrder: [
+    '<THIRD_PARTY_MODULES>',
+    '^next/(.*)$',
     '^@ts/(.*)$',
     '^@lib/(.*)$',
     '^@api/(.*)$',
@@ -16,7 +18,8 @@ const config = {
     '^@components/(.*)$',
     '^@app/(.*)$',
     '^@public/(.*)$',
-    '^@styles/(.*)$'
+    '^@styles/(.*)$',
+    '^[./]'
   ],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true

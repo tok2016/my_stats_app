@@ -1,4 +1,5 @@
-import { GameShort, RawgGameShort } from './game';
+import { GameShort, IgdbRecommendedGame } from './game';
+import { ItemSeries } from './series';
 
 export type PrecisePeriod = 'year' | 'quarter' | 'month';
 export type GreatPeriod = 'allTime' | 'year';
@@ -7,21 +8,24 @@ export type PrecisePeriodParams = { period?: PrecisePeriod };
 export type GreatPeriodParams = { period?: GreatPeriod };
 
 export type CountData = {
+  id: number;
   count: number;
-  topSeries: SeriesShort;
+  topSeries?: ItemSeries;
 };
 
 export type PlaytimeData = {
+  id: number;
   hours: number;
   topGame: GameShort;
 };
 
 export type RatingData = {
+  id: number;
   rating: number;
   topGames: GameShort[];
 };
 
-export type Metric<MetricData> = Record<number | string, MetricData>;
+export type MetricMap<MetricData> = Record<number | string, MetricData>;
 
 export type PeriodTops<MetricType> = Record<number | string, MetricType>;
 
@@ -31,6 +35,6 @@ export type PeriodTopsMetric<MetricType> = {
 };
 
 export type RecommendedMetric = {
-  favorite: RawgGameShort[];
-  other: RawgGameShort[];
+  favorite: IgdbRecommendedGame[];
+  other: IgdbRecommendedGame[];
 };

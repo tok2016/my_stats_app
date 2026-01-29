@@ -1,6 +1,6 @@
-export interface RawgStudio {
+export interface IgdbInvolvedStudio {
   id: number;
-  name: string;
-  slug: string;
-  games_count: number;
+  developer: boolean;
+  publisher: boolean;
+  company: number;
 }

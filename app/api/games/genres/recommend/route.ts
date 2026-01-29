@@ -1,115 +1,108 @@
 import { NextResponse } from 'next/server';
 
-import { RawgApiListResponse } from '@ts/games/api-response';
-import { GameCore, RawgGameShort } from '@ts/games/game';
-import { Metric, RecommendedMetric } from '@ts/games/metric';
+import { GameCore, IgdbGameTag, IgdbRecommendedGame } from '@ts/games/game';
+import { MetricMap, RecommendedMetric } from '@ts/games/metric';
 
-import { AxiosRawgInstanse } from '@lib/axios-instanse';
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { GAMES_IN_METRIC, TOP_ENTRIES } from '@lib/games-utils';
+import { TOP_ENTRIES } from '@lib/games-utils';
+import { igdbRequest } from '@lib/igdb';
 
 type GamesStatusMap = Record<number, 'new' | 'old'>;
 
 const MAX_TAGS = 5;
-const MAX_SEARCH_ATTEMPTS = 10;
+const RECOMMENDED_GAMES = 10;
+const MIN_RATING = 75;
 
-const getGamesByGenres = async (
-  games: GamesStatusMap,
-  nextUrl: string,
-  gamesCount: number = 0,
-  attempts: number = 0
-) => {
-  const response =
-    await AxiosRawgInstanse.get<RawgApiListResponse<RawgGameShort>>(nextUrl);
+const getGamesByGenres1 = async (
+  gamesApiIds: string[],
+  genres: string[],
+  tags: string,
+  platforms: string
+): Promise<IgdbRecommendedGame[]> => {
+  return await igdbRequest<IgdbRecommendedGame>('/games', {
+    fields: [
+      'name',
+      'slug',
+      'cover',
+      'platforms.name',
+      'genres.name',
+      'rating'
+    ],
+    where: `genres = (${genres.join(',')}) & tags = (${tags}) & rating >= ${MIN_RATING} & platforms = (${platforms}) & game_type.type = "Main Game" & id != (${gamesApiIds.join(',')})`,
+    sort: {
+      field: 'rating',
+      direction: 'desc'
+    },
+    limit: RECOMMENDED_GAMES
+  });
+};
 
-  const newGames = response.data.results
-    .map(
-      (game): RawgGameShort => ({
-        id: game.id,
-        genres: game.genres,
-        background_image: game.background_image,
-        playtime: game.playtime,
-        slug: game.slug,
-        name: game.name
-      })
-    )
-    .filter((game) => !games[game.id])
-    .slice(0, GAMES_IN_METRIC);
+const getGamesTags = async (
+  gamesApiIds: number[]
+): Promise<Record<number, number[]>> => {
+  const tags = await igdbRequest<IgdbGameTag>('/games', {
+    fields: ['tags'],
+    where: `id = (${gamesApiIds.join(',')})`,
+    limit: gamesApiIds.length
+  });
 
-  if (
-    newGames.length < GAMES_IN_METRIC
-    && attempts < MAX_SEARCH_ATTEMPTS
-    && response.data.next
-  ) {
-    const nextGames = await getGamesByGenres(
-      games,
-      response.data.next,
-      gamesCount + newGames.length,
-      attempts + 1
-    );
-    newGames.concat(nextGames);
-  } else {
-    newGames.forEach((game) => {
-      games[game.id] = 'new';
-    });
-  }
+  console.log(tags);
 
-  return newGames;
+  return Object.fromEntries(tags.map((tag) => [tag.id, tag.tags]));
 };
 
 const getRecommnededGames = async (games: GameCore[]) => {
-  const genres: Metric<number> = {};
-  const tags: Metric<number> = {};
+  const genresCount: MetricMap<number> = {};
+  const tagsCount: MetricMap<number> = {};
   const gamesMap: GamesStatusMap = {};
+  const tags = await getGamesTags(games.map((game) => game.apiId));
 
   games.forEach((game) => {
     gamesMap[game.apiId] = 'old';
 
     game.genresIds.forEach((genre) => {
-      genres[genre] = (genres[genre] ?? 0) + 1;
+      genresCount[genre] = (genresCount[genre] ?? 0) + 1;
     });
 
-    game.tagsIds.forEach((tag) => {
-      tags[tag] = (tags[tag] ?? 0) + 1;
+    tags[game.apiId]?.forEach((tag) => {
+      tagsCount[tag] = (tagsCount[tag] ?? 0) + 1;
     });
   });
 
-  const sortedGenres = Object.entries(genres).sort((a, b) => a[1] - b[1]);
-  const favoriteTags = Object.entries(tags)
-    .sort((a, b) => a[1] - b[1])
-    .slice(0, MAX_TAGS)
+  const platforms = new Set(games.map((game) => game.platformId))
+    .keys()
+    .toArray()
     .join(',');
-  const platforms = games.map((game) => game.platformId);
 
-  const searchParams = new URLSearchParams({
-    key: process.env.RAWG_KEY ?? '',
-    page_size: '20',
-    genres: sortedGenres.slice(0, TOP_ENTRIES).join(','),
-    tags: favoriteTags,
-    metacritic: '80,100',
-    exclude_additions: 'true',
-    exclude_game_series: 'true',
-    ordering: '-metacritic',
-    platforms: platforms.join(',')
-  });
+  const sortedGenres = Object.entries(genresCount)
+    .sort((a, b) => b[1] - a[1])
+    .map(([genre]) => genre);
 
-  const recommendedFavorite = await getGamesByGenres(
-    gamesMap,
-    `/games?${searchParams.toString()}`
+  const favoriteTags = Object.entries(tagsCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, MAX_TAGS)
+    .map(([tag]) => tag)
+    .join(',');
+
+  const recommendedFavorite = await getGamesByGenres1(
+    Object.keys(gamesMap),
+    sortedGenres.slice(0, TOP_ENTRIES),
+    favoriteTags,
+    platforms
   );
 
   recommendedFavorite.forEach((game) => {
     gamesMap[game.id] = 'new';
   });
 
-  searchParams.set(
-    'genres',
-    sortedGenres.slice(sortedGenres.length - TOP_ENTRIES - 1).join(',')
-  );
-
   const recommendations: RecommendedMetric = {
     favorite: recommendedFavorite,
-    other: await getGamesByGenres(gamesMap, `/games?${searchParams.toString()}`)
+    other: await getGamesByGenres1(
+      Object.keys(gamesMap),
+      sortedGenres.slice(-TOP_ENTRIES),
+      favoriteTags,
+      platforms
+    )
   };
 
   return NextResponse.json(recommendations, {

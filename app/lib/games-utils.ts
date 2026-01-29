@@ -1,17 +1,10 @@
-import { AxiosRawgInstanse } from './axios-instanse';
-import { MINUTES, generateErrorResponse } from './utils';
-
-import { RawgApiListResponse } from '@ts/games/api-response';
-import { GameCore, RawgGame } from '@ts/games/game';
-import {
-  CountData,
-  Metric,
-  PeriodTops,
-  PeriodTopsMetric,
-  PlaytimeData,
-  PrecisePeriod
-} from '@ts/games/metric';
+import { GameCore } from '@ts/games/game';
+import { CountData, MetricMap, PlaytimeData } from '@ts/games/metric';
+import { IgdbSeries, ItemSeries, SeriesCompareData } from '@ts/games/series';
 import { Entries } from '@ts/util-types';
+
+import { igdbRequest } from './igdb';
+import { MINUTES, generateErrorResponse } from './utils';
 
 export const TOP_ENTRIES = 3;
 export const GAMES_IN_METRIC = 5;
@@ -31,140 +24,145 @@ const isUnacceptableField = (
 
 export const getMetric = <MetricData>(
   games: GameCore[],
-  iterator: (game: GameCore, initialMap: Metric<MetricData>) => void,
+  iterator: (game: GameCore, initialMap: MetricMap<MetricData>) => void,
   comparor: (a: MetricData, b: MetricData) => number,
-  sort?: (entries: Entries<MetricData>) => Entries<MetricData>
-): Metric<MetricData> => {
-  const itemsMap: Metric<MetricData> = {};
+  sort?: (entries: Entries<MetricData>) => MetricData[]
+): MetricData[] => {
+  const itemsMap: MetricMap<MetricData> = {};
   const bindIterator = (game: GameCore) => iterator(game, itemsMap);
   games.forEach(bindIterator);
 
-  const sortedEntries =
+  const sortedItems =
     sort?.(Object.entries(itemsMap))
-    ?? Object.entries(itemsMap).sort((a, b) => comparor(a[1], b[1]));
+    ?? Object.entries(itemsMap)
+      .map((entry) => entry[1])
+      .sort(comparor);
 
-  return Object.fromEntries(sortedEntries);
+  return sortedItems;
 };
 
 export const getCountMetric = async (
   games: GameCore[],
   dataField: keyof GameCore
-): Promise<Metric<CountData>> => {
+): Promise<CountData[]> => {
   if (isUnacceptableField(games[0], dataField))
     throw generateErrorResponse(500, 'Internal server error');
 
-  const seriesByGame = await getGamesSeries(games);
+  const allSeries = await getSeries(games, dataField);
+  const itemsCount = new Map<number, CountData>();
 
-  const iterator = (game: GameCore, map: Metric<CountData>) => {
-    if (!(game[dataField] instanceof Array)) return;
-    const series = seriesByGame[game.apiId];
+  allSeries.forEach((series) => {
+    series.itemsMap.forEach((countData, item) => {
+      const currentItem = itemsCount.get(item);
+      const currentItemCount =
+        currentItem?.topSeries?.itemsMap.get(item)?.count ?? 0;
+      const currentItemMinutes =
+        currentItem?.topSeries?.itemsMap.get(item)?.minutes ?? 0;
 
-    game[dataField].forEach((item) => {
-      map[item] = {
-        count: (map[item]?.count ?? 0) + 1,
+      itemsCount.set(item, {
+        id: item,
+        count: (currentItem?.count ?? 0) + countData.count,
         topSeries:
-          series.count > (map[item]?.count ?? 0) ? series : map[item].topSeries
-      };
+          countData.count > currentItemCount
+          || (countData.count === currentItemCount
+            && countData.minutes >= currentItemMinutes)
+            ? series
+            : currentItem?.topSeries
+      });
     });
-  };
+  });
 
-  return getMetric(games, iterator, (a, b) => a.count - b.count);
+  return itemsCount
+    .values()
+    .toArray()
+    .sort((a, b) => b.count - a.count);
 };
 
 export const getPlaytimeMetric = (
   games: GameCore[],
   dataField: keyof GameCore
-): Metric<PlaytimeData> => {
+): PlaytimeData[] => {
   if (isUnacceptableField(games[0], dataField))
     throw generateErrorResponse(500, 'Internal server error');
 
-  const iterator = (game: GameCore, map: Metric<PlaytimeData>) => {
+  const iterator = (game: GameCore, map: MetricMap<PlaytimeData>) => {
     if (!(game[dataField] instanceof Array)) return;
 
     game[dataField].forEach((item) => {
-      map[item] = {
-        hours: (map[item]?.hours ?? 0) + Math.round(game.minutes / MINUTES),
-        topGame:
-          game.minutes >= (map[item]?.topGame.minutes ?? 0)
-            ? game
-            : map[item].topGame
-      };
+      const hours = Math.round(game.minutes / MINUTES);
+      if (!map[item]) {
+        map[item] = {
+          id: item,
+          hours,
+          topGame: game
+        };
+      } else {
+        map[item].hours += hours;
+        map[item].topGame =
+          game.minutes >= map[item].topGame.minutes ? game : map[item].topGame;
+      }
     });
   };
 
-  return getMetric(games, iterator, (a, b) => a.hours - b.hours);
+  return getMetric(games, iterator, (a, b) => b.hours - a.hours);
 };
 
-export const getPeriodMetric = <MetricType>(
+const getSeries = async (
   games: GameCore[],
-  periodType: PrecisePeriod,
-  iterator: (game: GameCore, periodLists: PeriodTops<MetricType>) => void,
-  topGenerator: ([year, list]: [string, MetricType]) => [string, MetricType]
-): PeriodTopsMetric<MetricType> => {
-  const periodLists: PeriodTops<MetricType> = {};
-  const bindIterator = (game: GameCore) => iterator(game, periodLists);
+  dataField: keyof GameCore
+): Promise<ItemSeries[]> => {
+  const seriesIds: number[] = [];
+  const gamesMap = new Map<number, GameCore>();
 
-  games.forEach(bindIterator);
-
-  const periodEntries = Object.entries(periodLists).map(topGenerator);
-
-  return {
-    period: periodType,
-    tops: Object.fromEntries(periodEntries)
-  };
-};
-
-//fix this!!!
-const getGameSeriesList = async (game: GameCore): Promise<SeriesInverted> => {
-  const searchParams = new URLSearchParams();
-  searchParams.set('key', process.env.RAWG_KEY ?? '');
-
-  const response = await AxiosRawgInstanse.get<RawgApiListResponse<RawgGame>>(
-    `/games/${game.apiId}/game-series?${searchParams.toString()}`
-  );
-
-  console.log(response.data.results);
-
-  const title =
-    response.data.results
-      .slice()
-      .sort(
-        (a, b) =>
-          new Date(a.released).getTime() - new Date(b.released).getTime()
-      )[0]?.name ?? game.name;
-
-  return {
-    title,
-    gamesMap: { [game.apiId]: 1 }
-  };
-};
-
-export const getGamesSeries = async (
-  games: GameCore[]
-): Promise<Record<number, SeriesShort>> => {
-  const allSeries: SeriesInverted[] = [];
-
-  const promises = games
-    .map((game) => {
-      const series = allSeries.find((s) => !!s.gamesMap[game.apiId]);
-
-      if (!series) return getGameSeriesList(game);
-      series.gamesMap[game.apiId] = 1;
-    })
-    .filter((promise) => !!promise);
-
-  (await Promise.all(promises)).forEach((s) => allSeries.push(s));
-
-  const seriesByGame: Record<number, SeriesShort> = {};
-  allSeries.forEach((series) => {
-    Object.keys(series.gamesMap).forEach((gameApiId, _, arr) => {
-      const parsedId = parseInt(gameApiId) ?? 0;
-      seriesByGame[parsedId] = {
-        title: series.title,
-        count: arr.length
-      };
-    });
+  games.forEach((game) => {
+    if (game.seriesId) seriesIds.push(game.seriesId);
+    gamesMap.set(game.apiId, game);
   });
 
-  return seriesByGame;
+  const allIgdbSeries = await igdbRequest<IgdbSeries>('/collections', {
+    fields: ['games', 'name'],
+    where: `id = (${seriesIds.join(',')})`,
+    limit: seriesIds.length
+  });
+
+  const series: ItemSeries[] = allIgdbSeries.map((igdbSeries) => {
+    const itemsCountMap = new Map<number, SeriesCompareData>();
+
+    igdbSeries.games.forEach((gameApiId) => {
+      const game = gamesMap.get(gameApiId);
+      if (game && game[dataField] instanceof Array) {
+        game[dataField].forEach((item) => {
+          const currentItem = itemsCountMap.get(item);
+
+          itemsCountMap.set(item, {
+            count: (currentItem?.count ?? 0) + 1,
+            minutes: (currentItem?.minutes ?? 0) + game.minutes
+          });
+        });
+      }
+
+      gamesMap.delete(gameApiId);
+    });
+
+    return {
+      id: igdbSeries.id,
+      name: igdbSeries.name,
+      itemsMap: itemsCountMap
+    };
+  });
+
+  gamesMap.forEach((game) => {
+    if (game[dataField] instanceof Array) {
+      const itemsMap = new Map<number, SeriesCompareData>(
+        game[dataField].map((item) => [
+          item,
+          { count: 1, minutes: game.minutes }
+        ])
+      );
+
+      series.push({ id: 0, name: game.name, itemsMap });
+    }
+  });
+
+  return series;
 };
