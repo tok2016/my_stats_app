@@ -112,11 +112,11 @@ const getSeries = async (
   dataField: keyof GameCore
 ): Promise<ItemSeries[]> => {
   const seriesIds: number[] = [];
-  const gamesMap: Record<number, GameCore> = {};
+  const gamesMap = new Map<number, GameCore>();
 
   games.forEach((game) => {
     if (game.seriesId) seriesIds.push(game.seriesId);
-    gamesMap[game.apiId] = game;
+    gamesMap.set(game.apiId, game);
   });
 
   const allIgdbSeries = await igdbRequest<IgdbSeries>('/collections', {
@@ -129,19 +129,19 @@ const getSeries = async (
     const itemsCountMap = new Map<number, SeriesCompareData>();
 
     igdbSeries.games.forEach((gameApiId) => {
-      if (
-        gamesMap[gameApiId]
-        && gamesMap[gameApiId][dataField] instanceof Array
-      ) {
-        gamesMap[gameApiId][dataField].forEach((item) => {
+      const game = gamesMap.get(gameApiId);
+      if (game && game[dataField] instanceof Array) {
+        game[dataField].forEach((item) => {
           const currentItem = itemsCountMap.get(item);
 
           itemsCountMap.set(item, {
             count: (currentItem?.count ?? 0) + 1,
-            minutes: (currentItem?.minutes ?? 0) + gamesMap[gameApiId].minutes
+            minutes: (currentItem?.minutes ?? 0) + game.minutes
           });
         });
       }
+
+      gamesMap.delete(gameApiId);
     });
 
     return {
@@ -149,6 +149,19 @@ const getSeries = async (
       name: igdbSeries.name,
       itemsMap: itemsCountMap
     };
+  });
+
+  gamesMap.forEach((game) => {
+    if (game[dataField] instanceof Array) {
+      const itemsMap = new Map<number, SeriesCompareData>(
+        game[dataField].map((item) => [
+          item,
+          { count: 1, minutes: game.minutes }
+        ])
+      );
+
+      series.push({ id: 0, name: game.name, itemsMap });
+    }
   });
 
   return series;

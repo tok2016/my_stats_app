@@ -16,7 +16,8 @@ const getGenres = async (games: GameCore[]) => {
 
   const genres = await igdbRequest<IgdbGenre>('/genres', {
     fields: ['name', 'slug'],
-    where: `id = (${Object.keys(genresIds).join(',')})`
+    where: `id = (${Object.keys(genresIds).join(',')})`,
+    limit: Object.keys(genresIds).length
   });
 
   const genresMap: Record<number, IgdbGenre> = Object.fromEntries(

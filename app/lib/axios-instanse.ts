@@ -2,7 +2,6 @@ import axios, { isAxiosError as originalAxiosError } from 'axios';
 
 const REQUEST_TIMEOUT = 10000;
 const COUNTRIES_API_TIMEOUT = 10000;
-const RAWG_REQUEST_TIMEOUT = 100000;
 const IGDB_REQUEST_TIMEOUT = 100000;
 
 const AxiosInstanse = axios.create({
@@ -21,17 +20,9 @@ export const AxiosSteamInstanse = axios.create({
   baseURL: process.env.STEAM_API
 });
 
-export const AxiosRawgInstanse = axios.create({
-  timeout: RAWG_REQUEST_TIMEOUT,
-  baseURL: process.env.RAWG_API
-});
-
 export const AxiosIgdbInstance = axios.create({
   timeout: IGDB_REQUEST_TIMEOUT,
-  baseURL: process.env.IGDB_API,
-  headers: {
-    'Client-ID': process.env.TWITCH_CLIENT_ID
-  }
+  baseURL: process.env.IGDB_API
 });
 
 export const isAxiosError = originalAxiosError;

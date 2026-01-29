@@ -1,4 +1,4 @@
-import { GameShort, RawgGameShort } from './game';
+import { GameShort, IgdbRecommendedGame } from './game';
 import { ItemSeries } from './series';
 
 export type PrecisePeriod = 'year' | 'quarter' | 'month';
@@ -35,6 +35,6 @@ export type PeriodTopsMetric<MetricType> = {
 };
 
 export type RecommendedMetric = {
-  favorite: RawgGameShort[];
-  other: RawgGameShort[];
+  favorite: IgdbRecommendedGame[];
+  other: IgdbRecommendedGame[];
 };

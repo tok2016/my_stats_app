@@ -1,7 +1,4 @@
-import { RawgGenre } from './genre';
-import { PlatformRelease } from './platform';
-import { IgdbInvolvedStudio, RawgStudio } from './studio';
-import { RawgTag } from './tag';
+import { IgdbInvolvedStudio } from './studio';
 
 export interface SteamGame {
   appid: number;
@@ -22,25 +19,6 @@ export interface SteamGamesList {
   games: SteamGame[];
 }
 
-export interface RawgGameShort {
-  id: number;
-  slug: string;
-  name: string;
-  playtime: number;
-  background_image: string;
-  genres: RawgGenre[];
-}
-
-export interface RawgGame extends RawgGameShort {
-  metacritic: number;
-  released: string;
-  game_series_count: number;
-  platforms: PlatformRelease[];
-  developers: RawgStudio[];
-  tags: RawgTag[];
-  publishers: RawgStudio[];
-}
-
 export interface IgdbGame {
   id: number;
   name: string;
@@ -58,6 +36,26 @@ export interface IgdbGame {
     uid: string;
     external_game_source: number;
   }[];
+}
+
+export type IgdbRecommendedGame = Pick<
+  IgdbGame,
+  'id' | 'name' | 'slug' | 'cover'
+> & {
+  platforms: {
+    id: number;
+    name: string;
+  }[];
+  genres: {
+    id: number;
+    name: string;
+  }[];
+  rating?: number;
+};
+
+export interface IgdbGameTag {
+  id: number;
+  tags: number[];
 }
 
 export interface GameInSchema {
