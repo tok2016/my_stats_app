@@ -1,10 +1,19 @@
-import { GameCore } from '@ts/games/game';
-import { CountData, MetricMap, PlaytimeData } from '@ts/games/metric';
-import { IgdbSeries, ItemSeries, SeriesCompareData } from '@ts/games/series';
-import { Entries } from '@ts/util-types';
+import { GameCore, GameShort } from '@ts/games/game';
+import {
+  CountCompareData,
+  CountData,
+  MetricMap,
+  PeriodTops,
+  PeriodTopsMetric,
+  PlaytimeData,
+  PrecisePeriod,
+  RatingData
+} from '@ts/games/metric';
+import { IgdbSeries, ItemSeries } from '@ts/games/series';
+import { Entries, RequiredFields } from '@ts/util-types';
 
 import { igdbRequest } from './igdb';
-import { MINUTES, generateErrorResponse } from './utils';
+import { MINUTES, generateErrorResponse, getPeriodDate, mean } from './utils';
 
 export const TOP_ENTRIES = 3;
 export const GAMES_IN_METRIC = 5;
@@ -126,7 +135,7 @@ const getSeries = async (
   });
 
   const series: ItemSeries[] = allIgdbSeries.map((igdbSeries) => {
-    const itemsCountMap = new Map<number, SeriesCompareData>();
+    const itemsCountMap = new Map<number, CountCompareData>();
 
     igdbSeries.games.forEach((gameApiId) => {
       const game = gamesMap.get(gameApiId);
@@ -153,7 +162,7 @@ const getSeries = async (
 
   gamesMap.forEach((game) => {
     if (game[dataField] instanceof Array) {
-      const itemsMap = new Map<number, SeriesCompareData>(
+      const itemsMap = new Map<number, CountCompareData>(
         game[dataField].map((item) => [
           item,
           { count: 1, minutes: game.minutes }
@@ -165,4 +174,105 @@ const getSeries = async (
   });
 
   return series;
+};
+
+export const getPeriodMetric = (
+  games: GameCore[],
+  periodType: PrecisePeriod,
+  dataField: keyof GameCore,
+  maxTopEntries: number
+): PeriodTopsMetric<string> => {
+  if (isUnacceptableField(games[0], dataField))
+    throw generateErrorResponse(500, 'Internal server error');
+
+  const periodLists = new Map<string, MetricMap<number>>();
+
+  games.forEach((game) => {
+    if (
+      game.playDate
+      && game.playDate.getTime()
+      && game[dataField] instanceof Array
+    ) {
+      const period = getPeriodDate[periodType](game.playDate);
+
+      game[dataField].forEach((item) => {
+        const periodList = periodLists.get(period);
+        const currentGameTime = Math.round(game.minutes / MINUTES);
+
+        periodLists.set(period, {
+          ...periodLists.get(period),
+          [item]: (periodList?.[item] ?? 0) + currentGameTime
+        });
+      });
+    }
+  });
+
+  const periodTops = periodLists
+    .entries()
+    .map(([period, list]) => {
+      const top = Object.entries(list)
+        .sort((a, b) => b[1] - a[1])
+        .map((entry) => entry[0])
+        .slice(0, maxTopEntries);
+
+      const periodTop: PeriodTops<string> = { period, top };
+      return periodTop;
+    })
+    .toArray()
+    .sort((a, b) => (a.period >= b.period ? 1 : -1));
+
+  return {
+    periodType: periodType,
+    tops: periodTops
+  };
+};
+
+export const getRatingMetric = (
+  games: GameCore[],
+  dataField: keyof GameCore
+): RatingData[] => {
+  if (isUnacceptableField(games[0], dataField))
+    throw generateErrorResponse(500, 'Internal server error');
+
+  const itemsMap = new Map<number, RatingData>();
+
+  games.forEach((game) => {
+    if (!(game[dataField] instanceof Array)) return;
+
+    game[dataField].forEach((item) => {
+      const currentItemRating = itemsMap.get(item);
+      if (!currentItemRating)
+        itemsMap.set(item, {
+          id: item,
+          rating: 0,
+          topGames: [game]
+        });
+      else currentItemRating.topGames.push(game);
+    });
+  });
+
+  const ratingDataMetric = itemsMap
+    .entries()
+    .map(([item, ratingData]): RatingData | undefined => {
+      const gamesWithRating = ratingData.topGames.filter(
+        (game) => typeof game.rating === 'number'
+      ) as RequiredFields<GameShort, 'rating'>[];
+
+      const rating = mean(gamesWithRating.map((game) => game.rating));
+
+      if (!rating) return;
+      return {
+        id: item,
+        rating,
+        topGames: gamesWithRating
+          .sort((a, b) => b.rating - a.rating)
+          .slice(0, GAMES_IN_METRIC)
+      };
+    })
+    .filter((ratingData) => !!ratingData)
+    .toArray()
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, ITEMS_IN_RATING);
+
+  return ratingDataMetric;
 };

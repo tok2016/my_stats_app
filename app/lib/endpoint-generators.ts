@@ -1,11 +1,3 @@
-import { checkUserAuthorRights } from './auth';
-import {
-  CredentialsModel,
-  GamesModel,
-  ServiceCredentialsModel
-} from './models';
-import { extractToken } from './token';
-import { generateErrorResponse, isErrorResponse } from './utils';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { GameCore } from '@ts/games/game';
@@ -16,6 +8,15 @@ import Confirmation, {
 import Service, { ServicesMap } from '@ts/users/service';
 import Token from '@ts/users/token';
 import { UserRouteParams } from '@ts/users/user';
+
+import { checkUserAuthorRights } from './auth';
+import {
+  CredentialsModel,
+  GamesModel,
+  ServiceCredentialsModel
+} from './models';
+import { extractToken } from './token';
+import { generateErrorResponse, isErrorResponse } from './utils';
 
 const getServicesByCredentialsId = async (id: string): Promise<ServicesMap> => {
   const credentials = await CredentialsModel.findById(id).lean();

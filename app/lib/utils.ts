@@ -1,5 +1,3 @@
-import { isAxiosError } from './axios-instanse';
-
 import { SteamGamesList } from '@ts/games/game';
 import { PrecisePeriod } from '@ts/games/metric';
 import ErrorResponse, { ValidationIssue } from '@ts/requests';
@@ -12,9 +10,12 @@ import Dashboard from '@ts/users/dashboard';
 import { NewPassword } from '@ts/users/password';
 import { BasicUser, User, UserInfoInSchema } from '@ts/users/user';
 
+import { isAxiosError } from './axios-instanse';
+
 export const MILLISECONDS = 1000;
 export const MINUTES = 60;
 export const MONTH_IN_QUARTER = 3;
+const MONTH_SHIFT = 11;
 
 export const FOUND_USERS_LIMIT = 5;
 
@@ -189,8 +190,12 @@ export const parseBooleanString = (value: string) => {
 
 export const getPeriodDate: Record<PrecisePeriod, (date: Date) => string> = {
   year: (date) => date.getFullYear().toString(),
-  quarter: (date) =>
-    `${date.getFullYear()}-${Math.floor(date.getMonth() / MONTH_IN_QUARTER)}`,
+  season: (date) => {
+    const seasonNumber = Math.floor(
+      ((date.getMonth() % MONTH_SHIFT) + 1) / MONTH_IN_QUARTER
+    );
+    return `${date.getFullYear()}-${seasonNumber}`;
+  },
   month: (date) => `${date.getFullYear()}-${date.getMonth()}`
 };
 

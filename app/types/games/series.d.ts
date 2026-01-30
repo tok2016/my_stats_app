@@ -15,13 +15,8 @@ export interface IgdbSeries {
   name: string;
 }
 
-export interface SeriesCompareData {
-  count: number;
-  minutes: number;
-}
-
 export interface ItemSeries {
   id: number;
   name: string;
-  itemsMap: Map<number, SeriesCompareData>;
+  itemsMap: Map<number, CountCompareData>;
 }
