@@ -19,6 +19,10 @@ export interface CountCompareData {
   minutes: number;
 }
 
+export interface ItemCompareData extends CountCompareData {
+  id: number;
+}
+
 export type CountData = {
   id: number;
   count: number;

@@ -6,23 +6,23 @@ import { PrecisePeriod } from '@ts/games/metric';
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { getPeriodMetric } from '@lib/periods-metric';
 
-const GENRES_IN_PERIOD = 3;
+const PLATFORMS_IN_PERIOD = 1;
 
-const getTopGenresByPeriod = async (games: GameCore[], req: NextRequest) => {
+const getPlatformsPeriods = async (games: GameCore[], req: NextRequest) => {
   const periodType =
     (req.nextUrl.searchParams.get('period') as PrecisePeriod) ?? 'year';
 
-  const periodTops = getPeriodMetric(
+  const platformPeriods = getPeriodMetric(
     games,
     periodType,
-    'genresIds',
-    GENRES_IN_PERIOD
+    'platformId',
+    PLATFORMS_IN_PERIOD
   );
 
-  return NextResponse.json(periodTops, {
+  return NextResponse.json(platformPeriods, {
     status: 200,
-    statusText: `Genres tops were calculated by ${periodType}`
+    statusText: `Platforms tops were calculated by ${periodType}`
   });
 };
 
-export const GET = gameEndpoint(getTopGenresByPeriod);
+export const GET = gameEndpoint(getPlatformsPeriods);

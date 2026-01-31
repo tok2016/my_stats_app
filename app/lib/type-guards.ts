@@ -1,0 +1,22 @@
+import { isAxiosError as originalAxiosError } from 'axios';
+
+import { SteamGamesList } from '@ts/games/game';
+import ErrorResponse from '@ts/requests';
+
+const AcceptableMetricTypes = ['number', 'string'];
+
+export const isNumberOrString = (value: unknown): value is number | string =>
+  AcceptableMetricTypes.includes(typeof value);
+
+export const isNumberOrStringArray = (
+  value: unknown
+): value is Array<number | string> =>
+  Array.isArray(value) && value.every((v) => isNumberOrString(v));
+
+export const isErrorResponse = (value: unknown): value is ErrorResponse =>
+  (value as ErrorResponse)?.message !== undefined;
+
+export const isSteamGameObject = (value: unknown): value is SteamGamesList =>
+  (value as SteamGamesList).games !== undefined;
+
+export const isAxiosError = originalAxiosError;

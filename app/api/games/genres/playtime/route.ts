@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { GameCore } from '@ts/games/game';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { getPlaytimeMetric } from '@lib/games-utils';
+import { getPlaytimeMetric } from '@lib/playtime-metric';
 
 const getGenresHours = async (games: GameCore[]) => {
   const genresHoursMetric = getPlaytimeMetric(games, 'genresIds');

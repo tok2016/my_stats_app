@@ -16,7 +16,8 @@ import {
   ServiceCredentialsModel
 } from './models';
 import { extractToken } from './token';
-import { generateErrorResponse, isErrorResponse } from './utils';
+import { isErrorResponse } from './type-guards';
+import { generateErrorResponse } from './utils';
 
 const getServicesByCredentialsId = async (id: string): Promise<ServicesMap> => {
   const credentials = await CredentialsModel.findById(id).lean();

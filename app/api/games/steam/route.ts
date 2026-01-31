@@ -9,11 +9,8 @@ import { AxiosSteamInstanse } from '@lib/axios-instanse';
 import { serviceEndpoint } from '@lib/endpoint-generators';
 import { igdbRequest } from '@lib/igdb';
 import { GamesModel } from '@lib/models';
-import {
-  MILLISECONDS,
-  generateErrorResponse,
-  isSteamGameObject
-} from '@lib/utils';
+import { isSteamGameObject } from '@lib/type-guards';
+import { MILLISECONDS, generateErrorResponse } from '@lib/utils';
 
 type SteamGameWithId = SteamGame & { id: string };
 

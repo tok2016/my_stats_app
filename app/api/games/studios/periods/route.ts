@@ -5,7 +5,7 @@ import { PeriodTops, PrecisePeriod } from '@ts/games/metric';
 import { StudiosPeriodMetric, StudiosPeriodTop } from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { getPeriodMetric } from '@lib/games-utils';
+import { getPeriodMetric } from '@lib/periods-metric';
 
 const STUDIOS_IN_PERIOD = 1;
 

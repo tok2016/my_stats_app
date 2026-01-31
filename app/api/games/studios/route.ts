@@ -7,18 +7,18 @@ import { gameEndpoint } from '@lib/endpoint-generators';
 import { igdbRequest } from '@lib/igdb';
 
 const getStudios = async (games: GameCore[]) => {
-  const studiosIds: number[] = [];
+  const studiosIds = new Set<number>();
 
   games.forEach((game) => {
     const gameStudios = [...game.developersIds, ...game.publishersIds];
     gameStudios.forEach((studio) => {
-      studiosIds.push(studio);
+      studiosIds.add(studio);
     });
   });
 
   const studios = await igdbRequest<IgdbStudio>('/companies', {
     fields: ['name', 'slug', 'country', 'developed', 'published', 'logo'],
-    where: `id = (${studiosIds.join(',')})`
+    where: `id = (${studiosIds.values().toArray().join(',')})`
   });
 
   const studiosMap: Record<number, Studio> = Object.fromEntries(

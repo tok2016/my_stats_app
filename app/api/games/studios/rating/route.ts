@@ -4,7 +4,7 @@ import { GameCore } from '@ts/games/game';
 import { StudioField } from '@ts/games/metric';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { getRatingMetric } from '@lib/games-utils';
+import { getRatingMetric } from '@lib/rating-metric';
 
 const getStudiosRating = async (games: GameCore[], req: NextRequest) => {
   const studioType =

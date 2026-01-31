@@ -1,4 +1,4 @@
-import { CountCompareData, PeriodTopsMetric } from './metric';
+import { ItemCompareData, PeriodTopsMetric } from './metric';
 
 export interface IgdbInvolvedStudio {
   id: number;
@@ -36,6 +36,6 @@ export type StudiosPeriodMetric = Pick<PeriodTopsMetric<void>, 'periodType'> & {
 
 export interface StudioCountryMetric {
   country: number;
-  developer?: CountCompareData & { id: number };
-  publisher?: CountCompareData & { id: number };
+  developer?: ItemCompareData;
+  publisher?: ItemCompareData;
 }
