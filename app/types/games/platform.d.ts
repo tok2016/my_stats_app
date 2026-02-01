@@ -1,3 +1,4 @@
+import { IgdbImage } from './image';
 import { RatingData } from './metric';
 
 export interface IgdbPlatformFamily {
@@ -11,7 +12,7 @@ export interface IgdbPlatform {
   name: string;
   slug: string;
   platform_family?: IgdbPlatformFamily;
-  platform_logo?: number;
+  platform_logo?: IgdbImage;
 }
 
 export interface PlatformRatingData extends RatingData {

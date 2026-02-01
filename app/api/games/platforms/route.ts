@@ -16,7 +16,8 @@ const getPlatforms = async (games: GameCore[]) => {
       'platform_family.slug',
       'platform_logo'
     ],
-    where: `id = (${platfromsIds.values().toArray().join(',')})`
+    where: `id = (${platfromsIds.values().toArray().join(',')})`,
+    limit: platfromsIds.size
   });
 
   const platformsMap = Object.fromEntries(

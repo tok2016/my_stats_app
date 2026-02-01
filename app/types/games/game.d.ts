@@ -1,4 +1,11 @@
-import { IgdbInvolvedStudio } from './studio';
+import { IgdbGenre } from './genre';
+import { IgdbPlatform } from './platform';
+import { IgdbSeries } from './series';
+import {
+  IgdbInvolvedStudio,
+  IgdbInvolvedStuioExtended,
+  IgdbStudioBase
+} from './studio';
 
 export interface SteamGame {
   appid: number;
@@ -23,7 +30,6 @@ export interface IgdbGame {
   id: number;
   name: string;
   slug: string;
-  tags: number[];
   genres: number[];
   platforms: number[];
   themes: number[];
@@ -85,3 +91,39 @@ export type GameShort = Pick<
   GameCore,
   'id' | 'apiId' | 'minutes' | 'name' | 'cover' | 'rating'
 >;
+
+export interface IgdbGameFull {
+  id: number;
+  name: string;
+  slug: string;
+  first_release_date?: number;
+  cover?: string;
+  genres: IgdbGenre[];
+  platforms: IgdbPlatform[];
+  collections?: IgdbSeries[];
+  involved_companies?: IgdbInvolvedStuioExtended[];
+}
+
+export default interface Game {
+  id: string;
+  name: string;
+  apiId: number;
+  genres: IgdbGenre[];
+  platform?: IgdbPlatform;
+  developers: IgdbStudioBase[];
+  publishers: IgdbStudioBase[];
+  series?: IgdbSeries;
+  cover?: string;
+  hours: number;
+  releasedAt?: Date;
+  metascore?: number;
+  rating?: number;
+  playDate?: Date;
+}
+
+export interface GameCountryMetric {
+  country: number;
+  count: number;
+  minutes: number;
+  topGames: GameShort[];
+}

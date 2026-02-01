@@ -10,7 +10,8 @@ import { igdbRequest } from '@lib/igdb';
 const getStudiosStudios = async (studiosIds: number[]) => {
   const studiosCountries = await igdbRequest<IgdbStudioCountry>('/companies', {
     fields: ['country'],
-    where: `id = (${studiosIds.join(',')})`
+    where: `id = (${studiosIds.join(',')})`,
+    limit: studiosIds.length
   });
 
   const studiosCountriesMap = new Map<number, number>();

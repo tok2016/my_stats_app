@@ -7,14 +7,24 @@ export interface IgdbInvolvedStudio {
   company: number;
 }
 
+export interface IgdbInvolvedStuioExtended {
+  id: number;
+  developer: boolean;
+  publisher: boolean;
+  company: IgdbStudioBase;
+}
+
 export interface IgdbStudioCountry {
   id: number;
   country?: number;
 }
 
-export interface IgdbStudio extends IgdbStudioCountry {
+export interface IgdbStudioBase extends IgdbStudioCountry {
   name: string;
   slug: string;
+}
+
+export interface IgdbStudio extends IgdbStudioBase {
   logo?: number;
   developed?: number[];
   published?: number[];

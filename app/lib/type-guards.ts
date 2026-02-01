@@ -20,3 +20,14 @@ export const isSteamGameObject = (value: unknown): value is SteamGamesList =>
   (value as SteamGamesList).games !== undefined;
 
 export const isAxiosError = originalAxiosError;
+
+export const isDateSource = (
+  value: unknown
+): value is ConstructorParameters<typeof Date>[0] => {
+  try {
+    new Date(value as ConstructorParameters<typeof Date>[0]);
+    return true;
+  } catch {
+    return false;
+  }
+};

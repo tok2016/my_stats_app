@@ -64,3 +64,9 @@ export type RecommendedMetric = {
   favorite: IgdbRecommendedGame[];
   other: IgdbRecommendedGame[];
 };
+
+export interface YearCountMetric {
+  year: number;
+  count: number;
+  topGames: GameShort[];
+}

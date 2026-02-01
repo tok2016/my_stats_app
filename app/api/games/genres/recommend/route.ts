@@ -26,6 +26,7 @@ const getGamesByGenres1 = async (
       'cover',
       'platforms.name',
       'genres.name',
+      'genres.slug',
       'rating'
     ],
     where: `genres = (${genres.join(',')}) & tags = (${tags}) & rating >= ${MIN_RATING} & platforms = (${platforms}) & game_type.type = "Main Game" & id != (${gamesApiIds.join(',')})`,

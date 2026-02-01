@@ -1,36 +1,12 @@
 import { NextResponse } from 'next/server';
 
 import { GameCore } from '@ts/games/game';
-import { IgdbStudio, Studio } from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { igdbRequest } from '@lib/igdb';
+import { getStudios } from '@lib/games-utils';
 
-const getStudios = async (games: GameCore[]) => {
-  const studiosIds = new Set<number>();
-
-  games.forEach((game) => {
-    const gameStudios = [...game.developersIds, ...game.publishersIds];
-    gameStudios.forEach((studio) => {
-      studiosIds.add(studio);
-    });
-  });
-
-  const studios = await igdbRequest<IgdbStudio>('/companies', {
-    fields: ['name', 'slug', 'country', 'developed', 'published', 'logo'],
-    where: `id = (${studiosIds.values().toArray().join(',')})`
-  });
-
-  const studiosMap: Record<number, Studio> = Object.fromEntries(
-    studios.map((studio) => [
-      studio.id,
-      {
-        ...studio,
-        developed: studio.developed?.length ?? 0,
-        published: studio.published?.length ?? 0
-      }
-    ])
-  );
+const getStudiosResponse = async (games: GameCore[]) => {
+  const studiosMap = await getStudios(games);
 
   return NextResponse.json(studiosMap, {
     status: 200,
@@ -38,4 +14,4 @@ const getStudios = async (games: GameCore[]) => {
   });
 };
 
-export const GET = gameEndpoint(getStudios);
+export const GET = gameEndpoint(getStudiosResponse);
