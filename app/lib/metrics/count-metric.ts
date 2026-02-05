@@ -2,8 +2,8 @@ import { GameCore } from '@ts/games/game';
 import { CountCompareData, CountData } from '@ts/games/metric';
 import { IgdbSeries, ItemSeries } from '@ts/games/series';
 
-import { igdbRequest } from './igdb';
-import { isNumberOrString, isNumberOrStringArray } from './type-guards';
+import { igdbRequest } from '../games/igdb';
+import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
 
 const setSeriesItemCount = async (
   item: number | string,

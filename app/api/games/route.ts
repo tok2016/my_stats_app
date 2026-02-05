@@ -7,7 +7,7 @@ import { LiteralType } from '@ts/util-types';
 
 import { getCredentialsById } from '@lib/auth';
 import { gameEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
-import { getFullGames } from '@lib/games-utils';
+import { getFullGames } from '@lib/games/games-utils';
 import { GamesModel } from '@lib/models';
 import { generateErrorResponse } from '@lib/utils';
 import { NewGameValidator, validateData } from '@lib/validation-schemas';

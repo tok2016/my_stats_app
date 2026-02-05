@@ -4,7 +4,7 @@ import { GameCore, IgdbGameTag, IgdbRecommendedGame } from '@ts/games/game';
 import { MetricMap, RecommendedMetric } from '@ts/games/metric';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { igdbRequest } from '@lib/igdb';
+import { igdbRequest } from '@lib/games/igdb';
 import { TOP_ENTRIES } from '@lib/utils';
 
 type GamesStatusMap = Record<number, 'new' | 'old'>;

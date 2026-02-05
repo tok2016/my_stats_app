@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { GameCore } from '@ts/games/game';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { getYearCountMetric } from '@lib/year-count-metric';
+import { getYearCountMetric } from '@lib/metrics/year-count-metric';
 
 const getPlayDatesPerYear = async (games: GameCore[]) => {
   const playDates = getYearCountMetric(games, 'playDate');

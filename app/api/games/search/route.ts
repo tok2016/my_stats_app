@@ -5,8 +5,8 @@ import Token from '@ts/users/token';
 
 import { getCredentialsById } from '@lib/auth';
 import { protectedEndpoint } from '@lib/endpoint-generators';
-import { FULL_GAME_FIELDS } from '@lib/games-utils';
-import { igdbRequest } from '@lib/igdb';
+import { FULL_GAME_FIELDS } from '@lib/games/games-utils';
+import { igdbRequest } from '@lib/games/igdb';
 import { MILLISECONDS } from '@lib/utils';
 
 const SEARCHED_GAMES_LIMIT = 10;

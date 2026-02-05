@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { GameCore } from '@ts/games/game';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { getRatingMetric } from '@lib/rating-metric';
+import { getRatingMetric } from '@lib/metrics/rating-metric';
 
 const getHighestRatedGenres = async (games: GameCore[]) => {
   const genresRatingMetric = getRatingMetric(games, 'genresIds');

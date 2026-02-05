@@ -7,7 +7,7 @@ import { IgdbStudio, Studio } from '@ts/games/studio';
 import Token from '@ts/users/token';
 
 import { protectedEndpoint } from '@lib/endpoint-generators';
-import { getItemById, getTopItem } from '@lib/games-utils';
+import { getItemById, getTopItem } from '@lib/games/games-utils';
 
 type StudioParam = {
   studioId?: string;

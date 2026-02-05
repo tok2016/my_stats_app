@@ -10,7 +10,7 @@ import {
   SERIES_EXPANDED_FIELDS,
   getAverageRating,
   getItemById
-} from '@lib/games-utils';
+} from '@lib/games/games-utils';
 
 type SeriesParams = {
   seriesId?: string;

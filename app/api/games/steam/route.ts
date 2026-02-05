@@ -7,7 +7,7 @@ import Service from '@ts/users/service';
 import { getGamesByUserId } from '@lib/auth';
 import { AxiosSteamInstanse } from '@lib/axios-instanse';
 import { serviceEndpoint } from '@lib/endpoint-generators';
-import { igdbRequest } from '@lib/igdb';
+import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
 import { isSteamGameObject } from '@lib/type-guards';
 import { MILLISECONDS, generateErrorResponse } from '@lib/utils';

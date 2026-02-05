@@ -4,8 +4,8 @@ import { GameCore, IgdbGameRatings } from '@ts/games/game';
 import { IgdbStudio, StudioShort } from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { getAverageRating } from '@lib/games-utils';
-import { igdbRequest } from '@lib/igdb';
+import { getAverageRating } from '@lib/games/games-utils';
+import { igdbRequest } from '@lib/games/igdb';
 
 const getStudiosResponse = async (games: GameCore[]) => {
   const studiosIds = new Set<number>();

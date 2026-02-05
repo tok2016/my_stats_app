@@ -4,7 +4,7 @@ import { GameCore, GameCountryMetric } from '@ts/games/game';
 import { IgdbStudioCountry } from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { igdbRequest } from '@lib/igdb';
+import { igdbRequest } from '@lib/games/igdb';
 
 const GAMES_IN_COUNTRIES = 3;
 

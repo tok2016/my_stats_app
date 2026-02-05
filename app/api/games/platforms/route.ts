@@ -4,7 +4,7 @@ import { GameCore } from '@ts/games/game';
 import { IgdbPlatform } from '@ts/games/platform';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { igdbRequest } from '@lib/igdb';
+import { igdbRequest } from '@lib/games/igdb';
 
 const getPlatforms = async (games: GameCore[]) => {
   const platfromsIds = new Set<number>(games.map((game) => game.platformId));

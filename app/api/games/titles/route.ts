@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import Game, { GameCore } from '@ts/games/game';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { getFullGames } from '@lib/games-utils';
+import { getFullGames } from '@lib/games/games-utils';
 
 const getTopGamesByPlaytime = async (games: GameCore[]) => {
   const gamesMap = new Map<number, GameCore>();

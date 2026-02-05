@@ -6,11 +6,11 @@ import { IgdbSeriesExpanded } from '@ts/games/series';
 import Token from '@ts/users/token';
 import { LiteralType } from '@ts/util-types';
 
-import { getCredentialsById } from './auth';
+import { getCredentialsById } from '../auth';
+import { GamesModel } from '../models';
+import { isIgdbItemArray, isIgdbItemBasic } from '../type-guards';
+import { MINUTES, generateErrorResponse, mean } from '../utils';
 import { igdbRequest } from './igdb';
-import { GamesModel } from './models';
-import { isIgdbItemArray, isIgdbItemBasic } from './type-guards';
-import { MINUTES, generateErrorResponse, mean } from './utils';
 
 type ItemsFields = keyof Omit<GameInSchema, 'userId' | 'storeId'>;
 

@@ -5,8 +5,11 @@ import { IgdbSeriesExpanded, SeriesCollapsed } from '@ts/games/series';
 import { IgdbStudioBase } from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { SERIES_EXPANDED_FIELDS, getAverageRating } from '@lib/games-utils';
-import { igdbRequest } from '@lib/igdb';
+import {
+  SERIES_EXPANDED_FIELDS,
+  getAverageRating
+} from '@lib/games/games-utils';
+import { igdbRequest } from '@lib/games/igdb';
 import { MINUTES } from '@lib/utils';
 
 const TOP_SERIES = 5;

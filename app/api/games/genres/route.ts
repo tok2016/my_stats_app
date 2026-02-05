@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { GameCore } from '@ts/games/game';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { getGenres } from '@lib/games-utils';
+import { getGenres } from '@lib/games/games-utils';
 
 const getGenresResponse = async (games: GameCore[]) => {
   const genresMap = await getGenres(games);

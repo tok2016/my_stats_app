@@ -5,7 +5,7 @@ import { IgdbSeries } from '@ts/games/series';
 import Token from '@ts/users/token';
 
 import { protectedEndpoint } from '@lib/endpoint-generators';
-import { getItemById, getTopItem } from '@lib/games-utils';
+import { getItemById, getTopItem } from '@lib/games/games-utils';
 
 type GenreParams = {
   genreId?: string;
