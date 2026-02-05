@@ -20,15 +20,7 @@ const getGamesByGenres = async (
   platforms: string
 ): Promise<IgdbRecommendedGame[]> => {
   return await igdbRequest<IgdbRecommendedGame>('/games', {
-    fields: [
-      'name',
-      'slug',
-      'cover.url',
-      'platforms.name',
-      'genres.name',
-      'genres.slug',
-      'rating'
-    ],
+    fields: ['name', 'cover.url', 'platforms.name', 'genres.name', 'rating'],
     where: `genres = (${genres.join(',')}) & tags = (${tags}) & rating >= ${MIN_RATING} & platforms = (${platforms}) & game_type.type = "Main Game" & id != (${gamesApiIds.join(',')})`,
     sort: {
       field: 'rating',
@@ -42,7 +34,7 @@ const getGamesTags = async (
   gamesApiIds: number[]
 ): Promise<Record<number, number[]>> => {
   const tags = await igdbRequest<IgdbGameTag>('/games', {
-    fields: ['tags', 'name', 'slug'],
+    fields: ['tags', 'name'],
     where: `id = (${gamesApiIds.join(',')})`,
     limit: gamesApiIds.length
   });

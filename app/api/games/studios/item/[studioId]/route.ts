@@ -27,7 +27,15 @@ const getStudioById = async (
   const [basicInfo, igdbStudio] = await getItemById<IgdbStudio>(
     token,
     ['developersIds', 'publishersIds'],
-    ['name', 'slug', 'logo.url', 'country', 'developed', 'published'],
+    [
+      'name',
+      'logo.url',
+      'country',
+      'developed.rating',
+      'developed.aggregated_rating',
+      'published.rating',
+      'published.aggregated_rating'
+    ],
     params?.studioId
   );
 
@@ -70,9 +78,10 @@ const getStudioById = async (
   const studio: Studio = {
     id: basicInfo.id,
     name: basicInfo.name,
-    slug: basicInfo.slug,
     hours: basicInfo.hours,
     averageRating: basicInfo.averageRating,
+    criticsRating: basicInfo.criticsRating,
+    usersRating: basicInfo.usersRating,
     developed,
     published,
     series,

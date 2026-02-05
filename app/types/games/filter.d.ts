@@ -15,8 +15,10 @@ export interface GamesFilter {
   playDateTo?: string;
   ratingFrom?: string;
   ratingTo?: string;
-  metascoreFrom?: string;
-  metascoreTo?: string;
+  criticsRatingFrom?: string;
+  criticsRatingTo?: string;
+  usersRatingFrom?: string;
+  usersRatingTo?: string;
   hoursFrom?: string;
   hoursTo?: string;
   sort?: keyof Game;

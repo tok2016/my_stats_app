@@ -7,7 +7,6 @@ import { IgdbSeries } from './series';
 export interface IgdbPlatformFamily {
   id: number;
   name: string;
-  slug: string;
 }
 
 export interface IgdbPlatform extends IgdbBasic {

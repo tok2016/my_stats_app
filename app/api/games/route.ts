@@ -40,10 +40,14 @@ const filterByField: Record<
     !!game.releasedAt && game.releasedAt.getTime() <= new Date(query).getTime(),
   ratingFrom: (game, query) => !!game.rating && game.rating >= Number(query),
   ratingTo: (game, query) => !!game.rating && game.rating <= Number(query),
-  metascoreFrom: (game, query) =>
-    !!game.metascore && game.metascore >= Number(query),
-  metascoreTo: (game, query) =>
-    !!game.metascore && game.metascore <= Number(query),
+  criticsRatingFrom: (game, query) =>
+    !!game.criticsRating && game.criticsRating >= Number(query),
+  criticsRatingTo: (game, query) =>
+    !!game.criticsRating && game.criticsRating <= Number(query),
+  usersRatingFrom: (game, query) =>
+    !!game.usersRating && game.usersRating >= Number(query),
+  usersRatingTo: (game, query) =>
+    !!game.usersRating && game.usersRating <= Number(query),
   playDateFrom: (game, query) =>
     !!game.playDate && game.playDate.getTime() >= new Date(query).getTime(),
   playDateTo: (game, query) =>
@@ -66,7 +70,8 @@ const sortByFilter: Record<keyof Game, (a: Game, b: Game) => number> = {
   platform: (a, b) =>
     a.platform?.name.localeCompare(b.platform?.name ?? '') ?? 0,
   rating: (a, b) => (a.rating ?? 0) - (b.rating ?? 0),
-  metascore: (a, b) => (a.metascore ?? 0) - (b.metascore ?? 0),
+  criticsRating: (a, b) => (a.criticsRating ?? 0) - (b.criticsRating ?? 0),
+  usersRating: (a, b) => (a.usersRating ?? 0) - (b.usersRating ?? 0),
   playDate: (a, b) =>
     (a.playDate?.getTime() ?? 0) - (b.playDate?.getTime() ?? 0),
   releasedAt: (a, b) =>
@@ -95,7 +100,7 @@ const getGames = async (games: GameCore[], req: NextRequest) => {
 
   if (filtersObj.sort) {
     const sort = filtersObj.sort;
-    const direction = filtersObj.direction === 'desc' ? 1 : -1;
+    const direction = filtersObj.direction === 'desc' ? -1 : 1;
     filteredGames
       .sort((a, b) => direction * sortByFilter.hours(a, b))
       .sort((a, b) => direction * (sortByFilter[sort]?.(a, b) ?? 1));

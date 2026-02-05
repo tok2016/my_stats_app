@@ -1,5 +1,5 @@
-import Game from './game';
-import { StudioShort } from './studio';
+import { IgdbItemInfo } from './api-response';
+import { IgdbGameRatingsStudios } from './game';
 
 type SeriesShort = {
   title: string;
@@ -15,7 +15,6 @@ type SeriesInverted = {
 export interface IgdbSeries {
   id: number;
   name: string;
-  slug: string;
   games: number[];
 }
 
@@ -25,21 +24,16 @@ export interface ItemSeries {
   itemsMap: Map<number, CountCompareData>;
 }
 
-export default interface Series {
-  id: number;
-  name: string;
-  slug: string;
-  games: string[];
+export type IgdbSeriesExpanded = Omit<IgdbSeries, 'games'> & {
+  games: IgdbGameRatingsStudios[];
+};
+
+export default interface Series extends IgdbItemInfo {
   allGames: number;
-  hours: number;
-  developers: number[];
-  publishers: number[];
-  rating?: number;
-  metascore?: number;
+  developers: IgdbStudioBase[];
+  publishers: IgdbStudioBase[];
 }
 
-export type SeriesFull = Omit<Series, 'games' | 'developers' | 'publishers'> & {
-  games: Game[];
-  developers: StudioShort;
-  publishers: StudioShort;
+export type SeriesCollapsed = Omit<Series, 'games'> & {
+  games: string[];
 };

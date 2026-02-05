@@ -1,21 +1,62 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
-import Series, { IgdbSeries } from '@ts/games/series';
+import { GameCore, IgdbGameRatingsStudios } from '@ts/games/game';
+import { IgdbSeriesExpanded, SeriesCollapsed } from '@ts/games/series';
+import { IgdbStudioBase } from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
+import { SERIES_EXPANDED_FIELDS, getAverageRating } from '@lib/games-utils';
 import { igdbRequest } from '@lib/igdb';
-import { MINUTES, mean } from '@lib/utils';
+import { MINUTES } from '@lib/utils';
 
 const TOP_SERIES = 5;
 
-const setGamesStudiosIds = (
-  gameStudiosIds: number[],
-  seriesStudiosIds: number[]
-) => {
-  gameStudiosIds.forEach((studioId) => {
-    seriesStudiosIds.push(studioId);
+const getSeriesInfo = (
+  igdbSeries: IgdbSeriesExpanded,
+  gamesMap: Map<number, GameCore>
+): SeriesCollapsed => {
+  const ownedGames = igdbSeries.games
+    .map((game) => gamesMap.get(game.id))
+    .filter((game) => !!game)
+    .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+
+  if (typeof ownedGames[0].rating !== 'number')
+    ownedGames.sort((a, b) => b.minutes - a.minutes);
+
+  const developers = new Set<IgdbStudioBase>();
+  const publishers = new Set<IgdbStudioBase>();
+
+  igdbSeries.games.forEach((game) => {
+    game.involved_companies?.forEach((involved) => {
+      if (involved.developer) developers.add(involved.company);
+      if (involved.publisher) publishers.add(involved.company);
+    });
   });
+
+  const fullSeries: SeriesCollapsed = {
+    id: igdbSeries.id,
+    name: igdbSeries.name,
+    games: ownedGames.map((game) => game.id),
+    allGames: igdbSeries.games.length,
+    developers: developers.values().toArray(),
+    publishers: publishers.values().toArray(),
+    hours: Math.round(
+      ownedGames
+        .map((game) => game.minutes)
+        .reduce((prev, curr) => prev + curr, 0) / MINUTES
+    ),
+    averageRating: getAverageRating<GameCore>(ownedGames, 'rating'),
+    criticsRating: getAverageRating<IgdbGameRatingsStudios>(
+      igdbSeries.games,
+      'aggregated_rating'
+    ),
+    usersRating: getAverageRating<IgdbGameRatingsStudios>(
+      igdbSeries.games,
+      'rating'
+    )
+  };
+
+  return fullSeries;
 };
 
 const getTopSeries = async (games: GameCore[]) => {
@@ -37,55 +78,14 @@ const getTopSeries = async (games: GameCore[]) => {
     .slice(0, TOP_SERIES)
     .map((entry) => entry[0]);
 
-  const allIgdbSeries = await igdbRequest<IgdbSeries>('/collections', {
-    fields: ['games', 'name', 'slug'],
+  const allIgdbSeries = await igdbRequest<IgdbSeriesExpanded>('/collections', {
+    fields: SERIES_EXPANDED_FIELDS,
     where: `id = (${topSeries.join(',')})`,
     limit: topSeries.length
   });
 
-  const series: Series[] = allIgdbSeries
-    .map((igdbSeries) => {
-      const ownedGames = igdbSeries.games
-        .map((gameApiId) => gamesMap.get(gameApiId))
-        .filter((game) => !!game)
-        .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-
-      if (typeof ownedGames[0].rating !== 'number')
-        ownedGames.sort((a, b) => b.minutes - a.minutes);
-
-      const developers: number[] = [];
-      const publishers: number[] = [];
-
-      ownedGames.forEach((game) => {
-        setGamesStudiosIds(game.developersIds, developers);
-        setGamesStudiosIds(game.publishersIds, publishers);
-      });
-
-      return {
-        id: igdbSeries.id,
-        name: igdbSeries.name,
-        slug: igdbSeries.slug,
-        games: ownedGames.map((game) => game.id),
-        allGames: igdbSeries.games.length,
-        developers,
-        publishers,
-        hours: Math.round(
-          ownedGames
-            .map((game) => game.minutes)
-            .reduce((prev, curr) => prev + curr, 0) / MINUTES
-        ),
-        metascore: mean(
-          ownedGames
-            .map((game) => game.metascore)
-            .filter((metascore) => typeof metascore === 'number')
-        ),
-        rating: mean(
-          ownedGames
-            .map((game) => game.rating)
-            .filter((rating) => typeof rating === 'number')
-        )
-      };
-    })
+  const series: SeriesCollapsed[] = allIgdbSeries
+    .map((igdbSeries) => getSeriesInfo(igdbSeries, gamesMap))
     .sort((a, b) => b.games.length - a.games.length);
 
   return NextResponse.json(series, {

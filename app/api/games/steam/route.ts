@@ -76,11 +76,9 @@ const searchGamesFromIgdb = async (
       'first_release_date',
       'collections.games',
       'collections.name',
-      'collections.slug',
       'external_games.external_game_source',
       'external_games.uid',
       'genres',
-      'slug',
       'themes',
       'cover.url'
     ],

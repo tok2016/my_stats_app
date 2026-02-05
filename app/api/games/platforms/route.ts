@@ -9,13 +9,7 @@ import { igdbRequest } from '@lib/igdb';
 const getPlatforms = async (games: GameCore[]) => {
   const platfromsIds = new Set<number>(games.map((game) => game.platformId));
   const platforms = await igdbRequest<IgdbPlatform>('/platforms', {
-    fields: [
-      'name',
-      'slug',
-      'platform_family.name',
-      'platform_family.slug',
-      'platform_logo'
-    ],
+    fields: ['name', 'platform_family.name', 'platform_logo'],
     where: `id = (${platfromsIds.values().toArray().join(',')})`,
     limit: platfromsIds.size
   });

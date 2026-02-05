@@ -42,7 +42,7 @@ const getSeries = async (
   });
 
   const allIgdbSeries = await igdbRequest<IgdbSeries>('/collections', {
-    fields: ['games', 'name', 'slug'],
+    fields: ['games', 'name'],
     where: `id = (${seriesIds.join(',')})`,
     limit: seriesIds.length
   });

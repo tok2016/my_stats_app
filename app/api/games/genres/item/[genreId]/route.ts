@@ -19,7 +19,7 @@ const getGenreByApiId = async (
   const [basicInfo] = await getItemById<IgdbGenre>(
     token,
     ['genresIds'],
-    ['name', 'slug'],
+    ['name'],
     params?.genreId
   );
 
