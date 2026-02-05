@@ -1,22 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { SteamApiResponse } from '@ts/games/api-response';
+import { SteamGamesList } from '@ts/games/game';
 import {
   NewService,
   ServiceName,
-  ServicesMap,
-  ServiceStatus
+  ServiceStatus,
+  ServicesMap
 } from '@ts/users/service';
-import { SteamGamesList } from '@ts/games/game';
-import { SteamApiResponse } from '@ts/games/api-response';
 import { UserRouteParams } from '@ts/users/user';
 
-import { ServiceCredentialsModel } from '@lib/models';
-import { ServiceValidator, validateData } from '@lib/validation-schemas';
 import { AxiosSteamInstanse } from '@lib/axios-instanse';
 import { commonUserEndpoint } from '@lib/endpoint-generators';
-
-const isSteamGameObject = (value: unknown): value is SteamGamesList =>
-  (value as SteamGamesList).games !== undefined;
+import { ServiceCredentialsModel } from '@lib/models';
+import { isSteamGameObject } from '@lib/type-guards';
+import { ServiceValidator, validateData } from '@lib/validation-schemas';
 
 const getServicesByUserId = async (userId: string): Promise<ServicesMap> => {
   const services = await ServiceCredentialsModel.find({ userId }).lean();

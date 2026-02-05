@@ -1,7 +1,8 @@
-import axios, { isAxiosError as originalAxiosError } from 'axios';
+import axios from 'axios';
 
 const REQUEST_TIMEOUT = 10000;
 const COUNTRIES_API_TIMEOUT = 10000;
+const IGDB_REQUEST_TIMEOUT = 100000;
 
 const AxiosInstanse = axios.create({
   baseURL: process.env.API,
@@ -19,4 +20,7 @@ export const AxiosSteamInstanse = axios.create({
   baseURL: process.env.STEAM_API
 });
 
-export const isAxiosError = originalAxiosError;
+export const AxiosIgdbInstance = axios.create({
+  timeout: IGDB_REQUEST_TIMEOUT,
+  baseURL: process.env.IGDB_API
+});

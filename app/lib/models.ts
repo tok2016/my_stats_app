@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
+
 import {
+  ApiSchema,
   ConfirmationsSchema,
   CredentialsSchema,
   DashboardsSchema,
@@ -26,3 +28,4 @@ export const ConfirmationsModel = mongo.model(
 );
 export const TracksModel = mongo.model('tracks', TracksSchema);
 export const GamesModel = mongo.model('games', GamesSchema);
+export const ApiModel = mongo.model('api', ApiSchema);

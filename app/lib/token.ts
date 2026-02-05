@@ -1,23 +1,43 @@
-import { jwtVerify, SignJWT } from 'jose';
-import { cookies } from 'next/headers';
+import { SignJWT, jwtVerify } from 'jose';
 
 import Token, { TokenPack } from '@ts/users/token';
 
-import { generateErrorResponse, isExpired, MILLISECONDS } from './utils';
+import { MILLISECONDS, generateErrorResponse, isExpired } from './utils';
+import { cookies } from 'next/headers';
 
 export const ACCESS_TTL = 5 * 60;
 export const REFRESH_TTL = 30 * 24 * 60 * 60;
 
 const encoder = new TextEncoder();
 
-export const generateToken = async (
-  credentialsId: string,
-  isRefresh: boolean = false
-): Promise<string> => {
+export const encodeJwt = async (data: object) => {
   if (!process.env.SECRET_KEY || !process.env.ALGORITHM) {
     throw generateErrorResponse(500, 'Internal server error');
   }
 
+  return await new SignJWT({ ...data })
+    .setProtectedHeader({ alg: process.env.ALGORITHM })
+    .sign(encoder.encode(process.env.SECRET_KEY));
+};
+
+export const decodeJwt = async <TokenType>(token: string) => {
+  if (!process.env.SECRET_KEY || !process.env.ALGORITHM) {
+    throw generateErrorResponse(500, 'Internal server error');
+  }
+
+  return await jwtVerify<TokenType>(
+    token,
+    encoder.encode(process.env.SECRET_KEY),
+    {
+      algorithms: [process.env.ALGORITHM]
+    }
+  );
+};
+
+export const generateToken = async (
+  credentialsId: string,
+  isRefresh: boolean = false
+): Promise<string> => {
   const expireDate = new Date(
     Date.now() + (isRefresh ? REFRESH_TTL : ACCESS_TTL) * MILLISECONDS
   );
@@ -27,25 +47,11 @@ export const generateToken = async (
     expiresAt: expireDate.toISOString()
   };
 
-  const encoded = await new SignJWT({ ...token })
-    .setProtectedHeader({ alg: process.env.ALGORITHM })
-    .sign(encoder.encode(process.env.SECRET_KEY));
-
-  return encoded;
+  return await encodeJwt(token);
 };
 
 export const decodeToken = async (token: string): Promise<Token> => {
-  if (!process.env.SECRET_KEY || !process.env.ALGORITHM) {
-    throw generateErrorResponse(500, 'Internal server error');
-  }
-
-  const decoded = await jwtVerify<Token>(
-    token,
-    encoder.encode(process.env.SECRET_KEY),
-    {
-      algorithms: [process.env.ALGORITHM]
-    }
-  );
+  const decoded = await decodeJwt<Token>(token);
 
   return {
     id: decoded.payload.id,

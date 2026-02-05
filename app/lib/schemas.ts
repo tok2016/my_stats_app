@@ -1,10 +1,12 @@
 import { Schema } from 'mongoose';
 
+import { ApiAccess } from '@ts/games/api-response';
+import { GameInSchema } from '@ts/games/game';
+import { ConfirmationInSchema } from '@ts/users/confirmation';
 import { CredentialsInSchema } from '@ts/users/credentials';
 import { DashboardInSchema } from '@ts/users/dashboard';
 import { ServiceInSchema } from '@ts/users/service';
 import { UserInfoInSchema } from '@ts/users/user';
-import { ConfirmationInSchema } from '@ts/users/confirmation';
 
 export const CredentialsSchema = new Schema<CredentialsInSchema>({
   userId: {
@@ -121,13 +123,47 @@ export const TracksSchema = new Schema({
   streams: Number
 });
 
-export const GamesSchema = new Schema({
-  userId: String,
-  serviceId: String,
-  dataService: String,
+export const GamesSchema = new Schema<GameInSchema>({
+  userId: {
+    type: String,
+    required: true
+  },
+  apiId: {
+    type: Number,
+    required: true
+  },
+  storeId: Number,
+  platformId: {
+    type: Number,
+    required: true
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  genresIds: Array<number>,
+  themesId: Array<number>,
+  developersIds: Array<number>,
+  publishersIds: Array<number>,
+  releasedAt: Date,
+  cover: String,
+  minutes: {
+    type: Number,
+    default: 0
+  },
+  seriesId: Number,
+  metascore: Number,
   rating: Number,
-  rank: Number,
-  minutes: Number,
-  playDate: Date,
-  platform: String
+  playDate: Date
+});
+
+export const ApiSchema = new Schema<ApiAccess>({
+  service: {
+    type: String,
+    required: true
+  },
+  token: {
+    type: String,
+    required: true
+  }
 });

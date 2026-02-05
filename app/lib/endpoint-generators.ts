@@ -1,15 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import Token from '@ts/users/token';
-import { UserRouteParams } from '@ts/users/user';
+import { GameCore } from '@ts/games/game';
 import Confirmation, {
   ConfirmationInfo,
   ConfirmationRouteParams
 } from '@ts/users/confirmation';
+import Service, { ServicesMap } from '@ts/users/service';
+import Token from '@ts/users/token';
+import { UserRouteParams } from '@ts/users/user';
 
-import { extractToken } from './token';
 import { checkUserAuthorRights } from './auth';
-import { generateErrorResponse, isErrorResponse } from './utils';
+import {
+  CredentialsModel,
+  GamesModel,
+  ServiceCredentialsModel
+} from './models';
+import { extractToken } from './token';
+import { isErrorResponse } from './type-guards';
+import { generateErrorResponse } from './utils';
+
+const getServicesByCredentialsId = async (id: string): Promise<ServicesMap> => {
+  const credentials = await CredentialsModel.findById(id).lean();
+
+  if (!credentials)
+    throw generateErrorResponse(404, 'Credentials were not found');
+
+  const services = await ServiceCredentialsModel.find({
+    userId: credentials.userId
+  }).lean();
+
+  const entries = services.map((service) => [
+    service.name,
+    {
+      ...service,
+      id: service._id.toString()
+    }
+  ]);
+
+  return Object.fromEntries(entries);
+};
+
+const getGamesByCredentialsId = async (id: string): Promise<GameCore[]> => {
+  const credentials = await CredentialsModel.findById(id).lean();
+
+  if (!credentials)
+    throw generateErrorResponse(404, 'Credentials were not found');
+
+  const games = await GamesModel.find({ userId: credentials.userId }).lean();
+  return games.map((game) => ({
+    ...game,
+    id: game._id.toString()
+  }));
+};
 
 const generateAccessError = (error: unknown) => {
   if (isErrorResponse(error)) {
@@ -44,11 +86,19 @@ export const generalEndpoint =
   };
 
 export const protectedEndpoint =
-  (action: (token: Token, req: NextRequest) => Promise<NextResponse>) =>
-  async (req: NextRequest) => {
+  <ParamsType = undefined>(
+    action: (
+      token: Token,
+      req: NextRequest,
+      params?: ParamsType
+    ) => Promise<NextResponse>
+  ) =>
+  async (req: NextRequest, context?: { params: Promise<ParamsType> }) => {
     try {
+      const params = await context?.params;
       const token = await req.headers.get('Authorization');
-      return action(await extractToken(token), req);
+
+      return action(await extractToken(token), req, params);
     } catch (err) {
       return generateAccessError(err);
     }
@@ -92,6 +142,50 @@ export const confirmationEndpoint =
         status: 202,
         statusText: 'Confirmation operation was accepted'
       });
+    } catch (err) {
+      return generateAccessError(err);
+    }
+  };
+
+export const serviceEndpoint =
+  <ParamsType = undefined>(
+    action: (
+      req: NextRequest,
+      service?: Service,
+      params?: ParamsType
+    ) => Promise<NextResponse>
+  ) =>
+  async (req: NextRequest, context?: { params: Promise<ParamsType> }) => {
+    try {
+      const params = await context?.params;
+      const tokenRaw = await req.headers.get('Authorization');
+
+      const token = await extractToken(tokenRaw);
+      const services = await getServicesByCredentialsId(token.id);
+
+      return action(req, services?.steam, params);
+    } catch (err) {
+      return generateAccessError(err);
+    }
+  };
+
+export const gameEndpoint =
+  <ParamsType = undefined>(
+    action: (
+      games: GameCore[],
+      req: NextRequest,
+      params?: ParamsType
+    ) => Promise<NextResponse>
+  ) =>
+  async (req: NextRequest, context?: { params: Promise<ParamsType> }) => {
+    try {
+      const params = await context?.params;
+      const tokenRaw = await req.headers.get('Authorization');
+
+      const token = await extractToken(tokenRaw);
+      const games = await getGamesByCredentialsId(token.id);
+
+      return action(games, req, params);
     } catch (err) {
       return generateAccessError(err);
     }

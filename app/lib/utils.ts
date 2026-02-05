@@ -1,22 +1,30 @@
-import { CredentialsInSchema } from '@ts/users/credentials';
-import { BasicUser, User, UserInfoInSchema } from '@ts/users/user';
-import Dashboard from '@ts/users/dashboard';
+import { PrecisePeriod } from '@ts/games/metric';
 import ErrorResponse, { ValidationIssue } from '@ts/requests';
+import { Option } from '@ts/ui/components-props';
 import FormState from '@ts/ui/form-state';
 import { ConfirmationInfo } from '@ts/users/confirmation';
-import { NewPassword } from '@ts/users/password';
 import Country from '@ts/users/country';
-import { Option } from '@ts/ui/components-props';
+import { CredentialsInSchema } from '@ts/users/credentials';
+import Dashboard from '@ts/users/dashboard';
+import { NewPassword } from '@ts/users/password';
+import { BasicUser, User, UserInfoInSchema } from '@ts/users/user';
 
-import { isAxiosError } from './axios-instanse';
+import { isAxiosError, isErrorResponse } from './type-guards';
 
 export const MILLISECONDS = 1000;
+export const MINUTES = 60;
+export const MONTH_IN_QUARTER = 3;
+const MONTH_SHIFT = 11;
 
 export const FOUND_USERS_LIMIT = 5;
 
 export const CODE_LENGTH = 6;
 
 export const CONFIRMATION_TTL = 30 * 60;
+
+export const TOP_ENTRIES = 3;
+export const GAMES_IN_METRIC = 5;
+export const ITEMS_IN_RATING = 5;
 
 const SUCCESS_CODE_START = 200;
 const SUCCESS_CODE_END = 300;
@@ -76,9 +84,6 @@ export const emptyOption: Option = {
   label: '',
   key: ''
 };
-
-export const isErrorResponse = (value: unknown): value is ErrorResponse =>
-  (value as ErrorResponse)?.message !== undefined;
 
 export const isExpired = (date: Date | string | number) =>
   new Date(date) < new Date();
@@ -179,3 +184,19 @@ export const parseBooleanString = (value: string) => {
   const lowercase = value.toLowerCase();
   return !!value && lowercase !== 'false' && lowercase !== 'off';
 };
+
+export const getPeriodDate: Record<PrecisePeriod, (date: Date) => string> = {
+  year: (date) => date.getFullYear().toString(),
+  season: (date) => {
+    const seasonNumber = Math.floor(
+      ((date.getMonth() % MONTH_SHIFT) + 1) / MONTH_IN_QUARTER
+    );
+    return `${date.getFullYear()}-${seasonNumber}`;
+  },
+  month: (date) => `${date.getFullYear()}-${date.getMonth()}`
+};
+
+export const mean = (values: number[]) =>
+  values.length > 0
+    ? values.reduce((prev, curr) => prev + curr, 0) / values.length
+    : undefined;
