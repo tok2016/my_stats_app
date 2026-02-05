@@ -5,7 +5,7 @@ import { CountCompareData } from '@ts/games/metric';
 import { IgdbStudioCountry, StudioCountryMetric } from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { igdbRequest } from '@lib/igdb';
+import { igdbRequest } from '@lib/games/igdb';
 
 const getStudiosStudios = async (studiosIds: number[]) => {
   const studiosCountries = await igdbRequest<IgdbStudioCountry>('/companies', {

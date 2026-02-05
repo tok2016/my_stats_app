@@ -152,7 +152,6 @@ export const GamesSchema = new Schema<GameInSchema>({
     default: 0
   },
   seriesId: Number,
-  metascore: Number,
   rating: Number,
   playDate: Date
 });

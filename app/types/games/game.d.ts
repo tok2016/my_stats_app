@@ -2,6 +2,7 @@ import { IgdbBasic } from './api-response';
 import { IgdbGenre } from './genre';
 import { IgdbImage } from './image';
 import { IgdbPlatform } from './platform';
+import { ExternalRatings } from './rating';
 import { IgdbSeries } from './series';
 import {
   IgdbInvolvedStudio,
@@ -50,10 +51,7 @@ export interface IgdbGame extends IgdbBasic {
   }[];
 }
 
-export type IgdbRecommendedGame = Pick<
-  IgdbGame,
-  'id' | 'name' | 'slug' | 'cover'
-> & {
+export type IgdbRecommendedGame = Pick<IgdbGame, 'id' | 'name' | 'cover'> & {
   platforms: {
     id: number;
     name: string;
@@ -91,7 +89,6 @@ export interface NewGame extends GameUpdate {
 
 export interface GameInSchema extends NewGame {
   userId: string;
-  metascore?: number;
 }
 
 export interface GameCore extends GameInSchema {
@@ -110,6 +107,8 @@ export interface IgdbGameFull extends IgdbBasic {
   platforms: IgdbPlatform[];
   collections?: IgdbSeries[];
   involved_companies?: IgdbInvolvedStuioExtended[];
+  aggregated_rating?: number;
+  rating?: number;
 }
 
 export interface SearchGame {
@@ -124,7 +123,7 @@ export interface SearchGame {
   series?: IgdbSeries;
 }
 
-export default interface Game {
+export default interface Game extends ExternalRatings {
   id: string;
   name: string;
   apiId: number;
@@ -136,7 +135,6 @@ export default interface Game {
   cover?: string;
   hours: number;
   releasedAt?: Date;
-  metascore?: number;
   rating?: number;
   playDate?: Date;
 }
@@ -147,3 +145,12 @@ export interface GameCountryMetric {
   minutes: number;
   topGames: GameShort[];
 }
+
+export type IgdbGameRatings = Pick<
+  IgdbGameFull,
+  'id' | 'aggregated_rating' | 'rating'
+>;
+
+export type IgdbGameRatingsStudios = IgdbGameRatings & {
+  involved_companies?: IgdbInvolvedStuioExtended[];
+};

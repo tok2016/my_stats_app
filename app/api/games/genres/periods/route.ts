@@ -4,7 +4,7 @@ import { GameCore } from '@ts/games/game';
 import { PrecisePeriod } from '@ts/games/metric';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { getPeriodMetric } from '@lib/periods-metric';
+import { getPeriodMetric } from '@lib/metrics/periods-metric';
 
 const GENRES_IN_PERIOD = 3;
 

@@ -1,39 +1,47 @@
-import { IgdbBasic, IgdbItemInfo } from '@ts/games/api-response';
+import { IgdbBasic, IgdbItemInfo, IgdbQuery } from '@ts/games/api-response';
 import Game, { GameCore, GameInSchema, IgdbGameFull } from '@ts/games/game';
 import { IgdbGenre } from '@ts/games/genre';
 import { ItemCompareData } from '@ts/games/metric';
-import { IgdbStudio, StudioShort } from '@ts/games/studio';
+import { IgdbSeriesExpanded } from '@ts/games/series';
 import Token from '@ts/users/token';
 import { LiteralType } from '@ts/util-types';
 
-import { getCredentialsById } from './auth';
+import { getCredentialsById } from '../auth';
+import { GamesModel } from '../models';
+import { isIgdbItemArray, isIgdbItemBasic } from '../type-guards';
+import { MINUTES, generateErrorResponse, mean } from '../utils';
 import { igdbRequest } from './igdb';
-import { GamesModel } from './models';
-import { isIgdbItemArray, isIgdbItemBasic } from './type-guards';
-import { MINUTES, generateErrorResponse, mean } from './utils';
 
 type ItemsFields = keyof Omit<GameInSchema, 'userId' | 'storeId'>;
 
-export const FULL_GAME_FIELDS = [
+export const FULL_GAME_FIELDS: Required<IgdbQuery<IgdbGameFull>>['fields'] = [
   'name',
-  'slug',
   'cover.url',
   'first_release_date',
   'platforms.name',
-  'platforms.slug',
   'platforms.platform_family.name',
-  'platforms.platform_family.slug',
   'platforms.platform_logo.url',
   'collections.games',
   'collections.name',
-  'collections.slug',
   'genres.name',
-  'genres.slug',
   'involved_companies.developer',
   'involved_companies.publisher',
   'involved_companies.company.name',
-  'involved_companies.company.slug',
-  'involved_companies.company.country'
+  'involved_companies.company.country',
+  'aggregated_rating',
+  'rating'
+];
+
+export const SERIES_EXPANDED_FIELDS: Required<
+  IgdbQuery<IgdbSeriesExpanded>
+>['fields'] = [
+  'games.aggregated_rating',
+  'games.rating',
+  'games.involved_companies.developer',
+  'games.involved_companies.publisher',
+  'games.involved_companies.company.name',
+  'games.involved_companies.company.country',
+  'name'
 ];
 
 export const getGenres = async (games: GameCore[]) => {
@@ -45,7 +53,7 @@ export const getGenres = async (games: GameCore[]) => {
   });
 
   const genres = await igdbRequest<IgdbGenre>('/genres', {
-    fields: ['name', 'slug'],
+    fields: ['name'],
     where: `id = (${genresIds.values().toArray().join(',')})`,
     limit: genresIds.size
   });
@@ -57,37 +65,6 @@ export const getGenres = async (games: GameCore[]) => {
   return genresMap;
 };
 
-export const getStudios = async (games: GameCore[]) => {
-  const studiosIds = new Set<number>();
-
-  games.forEach((game) => {
-    const gameStudios = [...game.developersIds, ...game.publishersIds];
-    gameStudios.forEach((studio) => {
-      studiosIds.add(studio);
-    });
-  });
-
-  const studios = await igdbRequest<IgdbStudio>('/companies', {
-    fields: ['name', 'slug', 'country', 'developed', 'published', 'logo.url'],
-    where: `id = (${studiosIds.values().toArray().join(',')})`,
-    limit: studiosIds.size
-  });
-
-  const studiosMap: Record<number, StudioShort> = Object.fromEntries(
-    studios.map((studio) => [
-      studio.id,
-      {
-        ...studio,
-        logo: studio.logo?.url,
-        developed: studio.developed?.length ?? 0,
-        published: studio.published?.length ?? 0
-      }
-    ])
-  );
-
-  return studiosMap;
-};
-
 export const uniteGameCoreAndIgdb = (
   gameCore: GameCore,
   igdbGame: IgdbGameFull
@@ -96,10 +73,13 @@ export const uniteGameCoreAndIgdb = (
   name: gameCore.name,
   apiId: gameCore.apiId,
   rating: gameCore.rating,
+  criticsRating: igdbGame.aggregated_rating
+    ? Math.round(igdbGame.aggregated_rating)
+    : undefined,
+  usersRating: igdbGame.rating ? Math.round(igdbGame.rating) : undefined,
   releasedAt: gameCore.releasedAt,
   hours: Math.round(gameCore.minutes / MINUTES),
   playDate: gameCore.playDate,
-  metascore: gameCore.metascore,
   developers:
     igdbGame.involved_companies
       ?.filter((studio) => studio.developer)
@@ -151,7 +131,6 @@ const fieldToEndpoint: Record<ItemsFields, string> = {
   playDate: '/games',
   minutes: '/games',
   releasedAt: '/release_dates',
-  metascore: '/games',
   cover: '/covers',
   rating: '/games'
 };
@@ -186,22 +165,27 @@ export const getItemById = async <IgdbDataType extends IgdbBasic>(
   const itemInfo: IgdbItemInfo = {
     id: igdbItem.id,
     name: igdbItem.name,
-    slug: igdbItem.slug,
     hours: getTotalPlaytime(gamesCore),
-    averageRating: getAverageRating(gamesCore),
+    averageRating: getAverageRating<Game>(fullGames, 'rating'),
+    criticsRating: getAverageRating<Game>(fullGames, 'criticsRating'),
+    usersRating: getAverageRating<Game>(fullGames, 'usersRating'),
     games: fullGames
   };
 
   return [itemInfo, igdbItem] as const;
 };
 
-export const getAverageRating = (games: GameCore[]): number | undefined => {
-  const ratings: number[] = [];
+export const getAverageRating = <GameType extends object>(
+  games: GameType[],
+  field: keyof GameType
+) => {
+  const values: number[] = [];
   games.forEach((game) => {
-    if (game.rating) ratings.push(game.rating);
+    if (typeof game[field] === 'number') values.push(game[field]);
   });
 
-  return mean(ratings);
+  const meanValue = mean(values);
+  return typeof meanValue === 'number' ? Math.round(meanValue) : undefined;
 };
 
 export const getTotalPlaytime = (games: GameCore[]): number =>

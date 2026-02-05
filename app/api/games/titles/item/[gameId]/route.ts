@@ -7,8 +7,8 @@ import Token from '@ts/users/token';
 
 import { getCredentialsById } from '@lib/auth';
 import { protectedEndpoint } from '@lib/endpoint-generators';
-import { FULL_GAME_FIELDS, uniteGameCoreAndIgdb } from '@lib/games-utils';
-import { igdbRequest } from '@lib/igdb';
+import { FULL_GAME_FIELDS, uniteGameCoreAndIgdb } from '@lib/games/games-utils';
+import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
 import { generateErrorResponse } from '@lib/utils';
 import { GameUpdateValidator, validateData } from '@lib/validation-schemas';

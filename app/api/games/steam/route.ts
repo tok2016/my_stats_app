@@ -7,7 +7,7 @@ import Service from '@ts/users/service';
 import { getGamesByUserId } from '@lib/auth';
 import { AxiosSteamInstanse } from '@lib/axios-instanse';
 import { serviceEndpoint } from '@lib/endpoint-generators';
-import { igdbRequest } from '@lib/igdb';
+import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
 import { isSteamGameObject } from '@lib/type-guards';
 import { MILLISECONDS, generateErrorResponse } from '@lib/utils';
@@ -76,11 +76,9 @@ const searchGamesFromIgdb = async (
       'first_release_date',
       'collections.games',
       'collections.name',
-      'collections.slug',
       'external_games.external_game_source',
       'external_games.uid',
       'genres',
-      'slug',
       'themes',
       'cover.url'
     ],

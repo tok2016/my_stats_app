@@ -1,6 +1,7 @@
 import { LiteralType } from '@ts/util-types';
 
 import { SortDirection } from './filter';
+import { ExternalRatings } from './rating';
 
 export interface SteamApiResponse<T> {
   response: T;
@@ -39,10 +40,9 @@ export interface IgdbQuery<DataType> {
 export interface IgdbBasic {
   id: number;
   name: string;
-  slug: string;
 }
 
-export interface IgdbItemInfo extends IgdbBasic {
+export interface IgdbItemInfo extends IgdbBasic, ExternalRatings {
   hours: number;
   games: Game[];
   averageRating?: number;

@@ -7,10 +7,10 @@ import {
   IgdbQuery
 } from '@ts/games/api-response';
 
-import { AxiosIgdbInstance } from './axios-instanse';
-import { ApiModel } from './models';
-import { decodeJwt, encodeJwt } from './token';
-import { isExpired } from './utils';
+import { AxiosIgdbInstance } from '../axios-instanse';
+import { ApiModel } from '../models';
+import { decodeJwt, encodeJwt } from '../token';
+import { isExpired } from '../utils';
 
 const updateIgdbAccess = async (): Promise<ApiToken> => {
   const searchParams = new URLSearchParams({

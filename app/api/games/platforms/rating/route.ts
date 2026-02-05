@@ -5,8 +5,8 @@ import { CountCompareData } from '@ts/games/metric';
 import { PlatformRatingData } from '@ts/games/platform';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { getGenres } from '@lib/games-utils';
-import { getRatingMetric } from '@lib/rating-metric';
+import { getGenres } from '@lib/games/games-utils';
+import { getRatingMetric } from '@lib/metrics/rating-metric';
 
 const getPlatformsRatings = async (games: GameCore[]) => {
   const genresMap = await getGenres(games);

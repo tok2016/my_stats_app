@@ -1,8 +1,9 @@
 import { IgdbItemInfo } from './api-response';
-import Game from './game';
+import Game, { IgdbGameRatings } from './game';
 import { IgdbGenre } from './genre';
 import { IgdbImage } from './image';
 import { ItemIdCompareData, PeriodTopsMetric } from './metric';
+import { ExternalRatings } from './rating';
 import { IgdbSeries } from './series';
 
 export interface IgdbInvolvedStudio {
@@ -26,23 +27,20 @@ export interface IgdbStudioCountry {
 
 export interface IgdbStudioBase extends IgdbStudioCountry {
   name: string;
-  slug: string;
 }
 
 export interface IgdbStudio extends IgdbStudioBase {
   logo?: IgdbImage;
-  developed?: number[];
-  published?: number[];
+  developed?: IgdbGameRatings[];
+  published?: IgdbGameRatings[];
 }
 
-export type StudioShort = Omit<
-  IgdbStudio,
-  'developed' | 'published' | 'logo'
-> & {
-  logo?: string;
-  developed: number;
-  published: number;
-};
+export type StudioShort = Omit<IgdbStudio, 'developed' | 'published' | 'logo'>
+  & ExternalRatings & {
+    logo?: string;
+    developed: number;
+    published: number;
+  };
 
 export interface StudiosPeriodTop {
   developers?: (string | number)[];
