@@ -1,5 +1,7 @@
 import { LiteralType } from '@ts/util-types';
 
+import { SortDirection } from './filter';
+
 export interface SteamApiResponse<T> {
   response: T;
 }
@@ -28,8 +30,20 @@ export interface IgdbQuery<DataType> {
   search?: string;
   sort?: {
     field: LiteralType<keyof DataType>;
-    direction: 'asc' | 'desc';
+    direction: SortDirection;
   };
   limit?: number;
   offset?: number;
+}
+
+export interface IgdbBasic {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface IgdbItemInfo extends IgdbBasic {
+  hours: number;
+  games: Game[];
+  averageRating?: number;
 }

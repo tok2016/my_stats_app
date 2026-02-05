@@ -146,7 +146,7 @@ export const GamesSchema = new Schema<GameInSchema>({
   developersIds: Array<number>,
   publishersIds: Array<number>,
   releasedAt: Date,
-  cover: Number,
+  cover: String,
   minutes: {
     type: Number,
     default: 0

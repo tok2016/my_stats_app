@@ -38,7 +38,7 @@ const getTopSeries = async (games: GameCore[]) => {
     .map((entry) => entry[0]);
 
   const allIgdbSeries = await igdbRequest<IgdbSeries>('/collections', {
-    fields: ['games', 'name'],
+    fields: ['games', 'name', 'slug'],
     where: `id = (${topSeries.join(',')})`,
     limit: topSeries.length
   });
@@ -64,7 +64,7 @@ const getTopSeries = async (games: GameCore[]) => {
       return {
         id: igdbSeries.id,
         name: igdbSeries.name,
-        slig: igdbSeries.slug,
+        slug: igdbSeries.slug,
         games: ownedGames.map((game) => game.id),
         allGames: igdbSeries.games.length,
         developers,

@@ -1,4 +1,9 @@
-import { ItemCompareData, PeriodTopsMetric } from './metric';
+import { IgdbItemInfo } from './api-response';
+import Game from './game';
+import { IgdbGenre } from './genre';
+import { IgdbImage } from './image';
+import { ItemIdCompareData, PeriodTopsMetric } from './metric';
+import { IgdbSeries } from './series';
 
 export interface IgdbInvolvedStudio {
   id: number;
@@ -25,12 +30,16 @@ export interface IgdbStudioBase extends IgdbStudioCountry {
 }
 
 export interface IgdbStudio extends IgdbStudioBase {
-  logo?: number;
+  logo?: IgdbImage;
   developed?: number[];
   published?: number[];
 }
 
-export type Studio = Omit<IgdbStudio, 'developed' | 'published'> & {
+export type StudioShort = Omit<
+  IgdbStudio,
+  'developed' | 'published' | 'logo'
+> & {
+  logo?: string;
   developed: number;
   published: number;
 };
@@ -46,6 +55,15 @@ export type StudiosPeriodMetric = Pick<PeriodTopsMetric<void>, 'periodType'> & {
 
 export interface StudioCountryMetric {
   country: number;
-  developer?: ItemCompareData;
-  publisher?: ItemCompareData;
+  developer?: ItemIdCompareData;
+  publisher?: ItemIdCompareData;
 }
+
+export type Studio = Omit<IgdbItemInfo, 'games'> & {
+  developed: Game[];
+  published: Game[];
+  series?: IgdbSeries[];
+  topGenre?: IgdbGenre;
+  country?: number;
+  logo?: string;
+};

@@ -1,4 +1,6 @@
+import { IgdbBasic } from './api-response';
 import { IgdbGenre } from './genre';
+import { IgdbImage } from './image';
 import { IgdbPlatform } from './platform';
 import { IgdbSeries } from './series';
 import {
@@ -26,17 +28,21 @@ export interface SteamGamesList {
   games: SteamGame[];
 }
 
-export interface IgdbGame {
-  id: number;
-  name: string;
-  slug: string;
+export interface IgdbGameSearch extends IgdbBasic {
+  cover?: IgdbImage;
+  platfroms: IgdbBasic[];
+  genres: IgdbGenre[];
+  first_release_date?: number;
+}
+
+export interface IgdbGame extends IgdbBasic {
   genres: number[];
   platforms: number[];
   themes: number[];
   collections?: IgdbSeries[];
   first_release_date?: number;
   involved_companies?: IgdbInvolvedStudio[];
-  cover?: number;
+  cover?: IgdbImage;
   external_games?: {
     id: number;
     uid: string;
@@ -59,13 +65,17 @@ export type IgdbRecommendedGame = Pick<
   rating?: number;
 };
 
-export interface IgdbGameTag {
-  id: number;
+export interface IgdbGameTag extends IgdbBasic {
   tags: number[];
 }
 
-export interface GameInSchema {
-  userId: string;
+export interface GameUpdate {
+  minutes: number;
+  rating?: number;
+  playDate?: Date;
+}
+
+export interface NewGame extends GameUpdate {
   apiId: number;
   storeId?: number;
   name: string;
@@ -75,12 +85,13 @@ export interface GameInSchema {
   developersIds: number[];
   publishersIds: number[];
   seriesId?: number;
-  minutes: number;
   releasedAt?: Date;
-  cover?: number;
+  cover?: string;
+}
+
+export interface GameInSchema extends NewGame {
+  userId: string;
   metascore?: number;
-  rating?: number;
-  playDate?: Date;
 }
 
 export interface GameCore extends GameInSchema {
@@ -92,16 +103,25 @@ export type GameShort = Pick<
   'id' | 'apiId' | 'minutes' | 'name' | 'cover' | 'rating'
 >;
 
-export interface IgdbGameFull {
-  id: number;
-  name: string;
-  slug: string;
+export interface IgdbGameFull extends IgdbBasic {
   first_release_date?: number;
-  cover?: string;
+  cover?: IgdbImage;
   genres: IgdbGenre[];
   platforms: IgdbPlatform[];
   collections?: IgdbSeries[];
   involved_companies?: IgdbInvolvedStuioExtended[];
+}
+
+export interface SearchGame {
+  apiId: number;
+  name: string;
+  genres: IgdbGenre[];
+  platforms: IgdbBasic[];
+  developers: IgdbInvolvedStuioExtended[];
+  publishers: IgdbInvolvedStuioExtended[];
+  releasedAt?: Date;
+  cover?: string;
+  series?: IgdbSeries;
 }
 
 export default interface Game {

@@ -1,18 +1,19 @@
 import z from 'zod';
 
-import { NewDashboard } from '@ts/users/dashboard';
-import { UserLogin, UserUpdate } from '@ts/users/user';
-import { NewService } from '@ts/users/service';
+import { GameUpdate, NewGame } from '@ts/games/game';
+import { ConfirmationCode, NewConfirmation } from '@ts/users/confirmation';
 import { NewCredentials } from '@ts/users/credentials';
+import { NewDashboard } from '@ts/users/dashboard';
 import Password, { NewPassword, PasswordUpdate } from '@ts/users/password';
+import { NewService } from '@ts/users/service';
+import { UserLogin, UserUpdate } from '@ts/users/user';
 
 import {
   ConfirmationActions,
   DashboardTypes,
-  generateErrorResponse,
-  ServiceNames
+  ServiceNames,
+  generateErrorResponse
 } from './utils';
-import { ConfirmationCode, NewConfirmation } from '@ts/users/confirmation';
 
 const MIN_USERNAME_LENGTH = 8;
 const MAX_USERNAME_LENGTH = 32;
@@ -111,6 +112,50 @@ export const NewPasswordValidatior: z.ZodType<NewPassword> =
       operationId: z.string().nonempty()
     })
   );
+
+export const NewGameValidator: z.ZodType<NewGame> = z
+  .object({
+    name: z.string().nonempty(),
+    apiId: z.number().nonnegative().nonoptional(),
+    storeId: z.number().nonnegative().optional(),
+    platformId: z.number().nonnegative().nonoptional(),
+    developersIds: z
+      .array(z.number().nonnegative().nonoptional())
+      .optional()
+      .default([]),
+    publishersIds: z
+      .array(z.number().nonnegative().nonoptional())
+      .optional()
+      .default([]),
+    genresIds: z
+      .array(z.number().nonnegative().nonoptional())
+      .optional()
+      .default([]),
+    themesId: z
+      .array(z.number().nonnegative().nonoptional())
+      .optional()
+      .default([]),
+    minutes: z.number().nonnegative().optional().default(0),
+    rating: z.number().nonnegative().optional(),
+    releasedAt: z.string().optional(),
+    playDate: z.string().optional()
+  })
+  .transform((input) => ({
+    ...input,
+    releasedAt: input.releasedAt ? new Date(input.releasedAt) : undefined,
+    playDate: input.playDate ? new Date(input.playDate) : undefined
+  }));
+
+export const GameUpdateValidator: z.ZodType<GameUpdate> = z
+  .object({
+    minutes: z.number().nonnegative().optional().default(0),
+    rating: z.number().nonnegative().optional(),
+    playDate: z.string().optional()
+  })
+  .transform((input) => ({
+    ...input,
+    playDate: input.playDate ? new Date(input.playDate) : undefined
+  }));
 
 export const validateData = async <
   DataType,

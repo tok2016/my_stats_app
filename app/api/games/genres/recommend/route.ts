@@ -13,7 +13,7 @@ const MAX_TAGS = 5;
 const RECOMMENDED_GAMES = 10;
 const MIN_RATING = 75;
 
-const getGamesByGenres1 = async (
+const getGamesByGenres = async (
   gamesApiIds: string[],
   genres: string[],
   tags: string,
@@ -23,7 +23,7 @@ const getGamesByGenres1 = async (
     fields: [
       'name',
       'slug',
-      'cover',
+      'cover.url',
       'platforms.name',
       'genres.name',
       'genres.slug',
@@ -42,7 +42,7 @@ const getGamesTags = async (
   gamesApiIds: number[]
 ): Promise<Record<number, number[]>> => {
   const tags = await igdbRequest<IgdbGameTag>('/games', {
-    fields: ['tags'],
+    fields: ['tags', 'name', 'slug'],
     where: `id = (${gamesApiIds.join(',')})`,
     limit: gamesApiIds.length
   });
@@ -85,7 +85,7 @@ const getRecommnededGames = async (games: GameCore[]) => {
     .map(([tag]) => tag)
     .join(',');
 
-  const recommendedFavorite = await getGamesByGenres1(
+  const recommendedFavorite = await getGamesByGenres(
     Object.keys(gamesMap),
     sortedGenres.slice(0, TOP_ENTRIES),
     favoriteTags,
@@ -98,7 +98,7 @@ const getRecommnededGames = async (games: GameCore[]) => {
 
   const recommendations: RecommendedMetric = {
     favorite: recommendedFavorite,
-    other: await getGamesByGenres1(
+    other: await getGamesByGenres(
       Object.keys(gamesMap),
       sortedGenres.slice(-TOP_ENTRIES),
       favoriteTags,

@@ -55,7 +55,7 @@ const uniteSteamAndIgdb = (
     seriesId: igdbGame.collections?.reduce((prev, curr) =>
       curr.games.length > prev.games.length ? curr : prev
     ).id,
-    cover: igdbGame?.cover,
+    cover: igdbGame?.cover?.url,
     minutes: steamGame?.playtime_forever ?? 0,
     playDate: steamGame
       ? new Date(steamGame.rtime_last_played * MILLISECONDS)
@@ -82,7 +82,7 @@ const searchGamesFromIgdb = async (
       'genres',
       'slug',
       'themes',
-      'cover'
+      'cover.url'
     ],
     where: `external_games.uid = (${steamGamesIds.join(',')}) & external_games.external_game_source = (${STEAM_IGDB_ID})`,
     limit: steamGamesIds.length

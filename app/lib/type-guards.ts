@@ -1,5 +1,6 @@
 import { isAxiosError as originalAxiosError } from 'axios';
 
+import { IgdbBasic } from '@ts/games/api-response';
 import { SteamGamesList } from '@ts/games/game';
 import ErrorResponse from '@ts/requests';
 
@@ -31,3 +32,10 @@ export const isDateSource = (
     return false;
   }
 };
+
+export const isIgdbItemBasic = (value: unknown): value is IgdbBasic =>
+  typeof (value as IgdbBasic)?.id === 'number'
+  && typeof (value as IgdbBasic)?.name === 'string';
+
+export const isIgdbItemArray = (value: unknown): value is Array<IgdbBasic> =>
+  Array.isArray(value) && value.every((v) => isIgdbItemBasic(v));

@@ -1,3 +1,6 @@
+import Game from './game';
+import { StudioShort } from './studio';
+
 type SeriesShort = {
   title: string;
   count: number;
@@ -11,9 +14,9 @@ type SeriesInverted = {
 
 export interface IgdbSeries {
   id: number;
-  games: number[];
   name: string;
   slug: string;
+  games: number[];
 }
 
 export interface ItemSeries {
@@ -25,7 +28,7 @@ export interface ItemSeries {
 export default interface Series {
   id: number;
   name: string;
-  slig: string;
+  slug: string;
   games: string[];
   allGames: number;
   hours: number;
@@ -34,3 +37,9 @@ export default interface Series {
   rating?: number;
   metascore?: number;
 }
+
+export type SeriesFull = Omit<Series, 'games' | 'developers' | 'publishers'> & {
+  games: Game[];
+  developers: StudioShort;
+  publishers: StudioShort;
+};

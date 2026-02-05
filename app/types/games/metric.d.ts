@@ -1,3 +1,4 @@
+import { IgdbBasic } from './api-response';
 import { GameCore, GameShort, IgdbRecommendedGame } from './game';
 import { ItemSeries } from './series';
 
@@ -19,8 +20,14 @@ export interface CountCompareData {
   minutes: number;
 }
 
-export interface ItemCompareData extends CountCompareData {
+export interface ItemIdCompareData extends CountCompareData {
   id: number;
+}
+
+export interface ItemCompareData<IgdbData extends IgdbBasic = IgdbBasic> {
+  item: IgdbData;
+  count: number;
+  hours: number;
 }
 
 export type CountData = {
