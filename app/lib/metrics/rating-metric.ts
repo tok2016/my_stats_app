@@ -2,9 +2,9 @@ import { GameCore, GameShort } from '@ts/games/game';
 import { RatingData } from '@ts/games/metric';
 import { RequiredFields } from '@ts/util-types';
 
-import { isNumberOrString, isNumberOrStringArray } from './type-guards';
-import { GAMES_IN_METRIC, ITEMS_IN_RATING } from './utils';
-import { mean } from './utils';
+import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
+import { GAMES_IN_METRIC } from '../utils';
+import { mean } from '../utils';
 
 const setRatingData = (
   item: number | string,
@@ -23,7 +23,8 @@ const setRatingData = (
 
 export const getRatingMetric = (
   games: GameCore[],
-  dataField: keyof GameCore
+  dataField: keyof GameCore,
+  topSize?: number
 ): RatingData[] => {
   const itemsMap = new Map<number, RatingData>();
 
@@ -55,7 +56,7 @@ export const getRatingMetric = (
     .filter((ratingData) => !!ratingData)
     .toArray()
     .sort((a, b) => b.rating - a.rating)
-    .slice(0, ITEMS_IN_RATING);
+    .slice(0, topSize);
 
   return ratingDataMetric;
 };

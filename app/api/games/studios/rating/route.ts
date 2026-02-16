@@ -1,18 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
+import { GameCore, IgdbGameRatings } from '@ts/games/game';
 import { StudioField } from '@ts/games/metric';
+import { StudioRatingMetric } from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
+import { getAverageRating } from '@lib/games/games-utils';
+import { igdbRequest } from '@lib/games/igdb';
 import { getRatingMetric } from '@lib/metrics/rating-metric';
+import { ITEMS_IN_RATING } from '@lib/utils';
 
 const getStudiosRating = async (games: GameCore[], req: NextRequest) => {
   const studioType =
     (req.nextUrl.searchParams.get('field') as StudioField) ?? 'developersIds';
 
-  const studiosRatingMetric = getRatingMetric(games, studioType);
+  const studiosRatings = getRatingMetric(games, studioType);
+  const topGamesIds: number[] = [];
 
-  return NextResponse.json(studiosRatingMetric, {
+  studiosRatings.forEach((studioRating) => {
+    studioRating.topGames.forEach((game) => {
+      topGamesIds.push(game.apiId);
+    });
+  });
+
+  const ratingGames = await igdbRequest<IgdbGameRatings>('/games', {
+    fields: ['aggregated_rating', 'rating'],
+    where: `id = (${topGamesIds.join(',')})`
+  });
+
+  const gamesRatingsMap = new Map(ratingGames.map((game) => [game.id, game]));
+  const studiosFullRatings: StudioRatingMetric[] = studiosRatings.map(
+    (studioRating) => {
+      const gamesRatings = studioRating.topGames
+        .map((game) => gamesRatingsMap.get(game.apiId))
+        .filter((game) => !!game);
+
+      return {
+        id: studioRating.id,
+        averageRating: studioRating.rating,
+        topGames: studioRating.topGames.slice(0, ITEMS_IN_RATING),
+        criticsRating: getAverageRating(gamesRatings, 'aggregated_rating'),
+        usersRating: getAverageRating(gamesRatings, 'rating')
+      };
+    }
+  );
+
+  return NextResponse.json(studiosFullRatings, {
     status: 200,
     statusText: 'Studios were calculated by mean rating'
   });

@@ -15,7 +15,7 @@ export interface IgdbPlatform extends IgdbBasic {
 }
 
 export interface PlatformRatingData extends RatingData {
-  topGenre: IgdbGenre;
+  topGenre: number;
 }
 
 export default interface Platform extends IgdbItemInfo {

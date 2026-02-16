@@ -5,11 +5,10 @@ import { CountCompareData } from '@ts/games/metric';
 import { PlatformRatingData } from '@ts/games/platform';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { getGenres } from '@lib/games/games-utils';
 import { getRatingMetric } from '@lib/metrics/rating-metric';
+import { ITEMS_IN_RATING } from '@lib/utils';
 
 const getPlatformsRatings = async (games: GameCore[]) => {
-  const genresMap = await getGenres(games);
   const genresByPlatforms = new Map<number, Record<number, CountCompareData>>();
 
   games.forEach((game) => {
@@ -17,7 +16,7 @@ const getPlatformsRatings = async (games: GameCore[]) => {
       const platformGenre = genresByPlatforms.get(game.platformId);
 
       genresByPlatforms.set(game.platformId, {
-        ...platformGenre?.[genre],
+        ...platformGenre,
         [genre]: {
           count: (platformGenre?.[genre]?.count ?? 0) + 1,
           minutes: (platformGenre?.[genre]?.minutes ?? 0) + game.minutes
@@ -26,7 +25,11 @@ const getPlatformsRatings = async (games: GameCore[]) => {
     });
   });
 
-  const platformsRatings = getRatingMetric(games, 'platformId');
+  const platformsRatings = getRatingMetric(
+    games,
+    'platformId',
+    ITEMS_IN_RATING
+  );
 
   const platfromsAndGenres: PlatformRatingData[] = platformsRatings.map(
     (ratingData) => {
@@ -39,7 +42,7 @@ const getPlatformsRatings = async (games: GameCore[]) => {
 
       return {
         ...ratingData,
-        topGenre: genresMap[parseInt(topGenre) ?? 0]
+        topGenre: Number(topGenre) ?? 0
       };
     }
   );

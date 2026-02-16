@@ -7,7 +7,7 @@ import { IgdbStudioCountry, StudioCountryMetric } from '@ts/games/studio';
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { igdbRequest } from '@lib/games/igdb';
 
-const getStudiosStudios = async (studiosIds: number[]) => {
+const getStudiosCountries = async (studiosIds: number[]) => {
   const studiosCountries = await igdbRequest<IgdbStudioCountry>('/companies', {
     fields: ['country'],
     where: `id = (${studiosIds.join(',')})`,
@@ -52,7 +52,7 @@ const setCountryData = (
   }
 };
 
-const getStudiosCountries = async (games: GameCore[]) => {
+const getStudiosByCountry = async (games: GameCore[]) => {
   const studiosMap = new Map<number, CountCompareData>();
 
   games.forEach((game) => {
@@ -66,7 +66,9 @@ const getStudiosCountries = async (games: GameCore[]) => {
     });
   });
 
-  const studiosCountries = await getStudiosStudios(studiosMap.keys().toArray());
+  const studiosCountries = await getStudiosCountries(
+    studiosMap.keys().toArray()
+  );
   const countriesMap = new Map<number, StudioCountryMetric>();
 
   games.forEach((game) => {
@@ -108,4 +110,4 @@ const getStudiosCountries = async (games: GameCore[]) => {
   });
 };
 
-export const GET = gameEndpoint(getStudiosCountries);
+export const GET = gameEndpoint(getStudiosByCountry);

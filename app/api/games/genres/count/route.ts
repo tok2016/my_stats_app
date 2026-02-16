@@ -6,7 +6,7 @@ import { gameEndpoint } from '@lib/endpoint-generators';
 import { getCountMetric } from '@lib/metrics/count-metric';
 
 const getGenresCount = async (games: GameCore[]) => {
-  const genresCountMetric = await getCountMetric(games, 'genresIds');
+  const genresCountMetric = getCountMetric(games, 'genresIds');
 
   return NextResponse.json(genresCountMetric, {
     status: 200,

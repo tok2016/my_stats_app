@@ -1,8 +1,8 @@
 import { GameCore } from '@ts/games/game';
 import { YearCountMetric } from '@ts/games/metric';
 
-import { isDateSource } from './type-guards';
-import { GAMES_IN_METRIC } from './utils';
+import { isDateSource } from '../type-guards';
+import { GAMES_IN_METRIC } from '../utils';
 
 export const getYearCountMetric = (
   games: GameCore[],

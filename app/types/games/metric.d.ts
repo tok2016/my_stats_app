@@ -1,6 +1,5 @@
 import { IgdbBasic } from './api-response';
 import { GameCore, GameShort, IgdbRecommendedGame } from './game';
-import { ItemSeries } from './series';
 
 export type PrecisePeriod = 'year' | 'season' | 'month';
 export type GreatPeriod = 'allTime' | 'year';
@@ -31,14 +30,15 @@ export interface ItemCompareData<IgdbData extends IgdbBasic = IgdbBasic> {
 }
 
 export type CountData = {
-  id: number;
+  id: number | string;
   count: number;
-  topSeries?: ItemSeries;
+  topSeries?: number;
 };
 
 export type PlaytimeData = {
   id: number;
   hours: number;
+  count: number;
   topGame: GameShort;
 };
 
@@ -46,13 +46,6 @@ export type RatingData = {
   id: number;
   rating: number;
   topGames: GameShort[];
-};
-
-export type CountPlaytimeData = {
-  id: number;
-  count: number;
-  hours: number;
-  topGame: GameShort;
 };
 
 export type MetricMap<MetricData> = Record<number | string, MetricData>;
