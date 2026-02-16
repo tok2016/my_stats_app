@@ -6,8 +6,8 @@ import {
   PrecisePeriod
 } from '@ts/games/metric';
 
-import { isNumberOrString, isNumberOrStringArray } from './type-guards';
-import { MINUTES, getPeriodDate } from './utils';
+import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
+import { MINUTES, getPeriodDate } from '../utils';
 
 const setPeriodList = (
   item: number | string,

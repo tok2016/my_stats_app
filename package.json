@@ -11,6 +11,7 @@
     "@mynaui/icons-react": "0.3.9",
     "axios": "^1.12.2",
     "bcrypt": "6.0.0",
+    "bottleneck": "^2.19.5",
     "jose": "^6.1.0",
     "mongoose": "8.18.1",
     "next": "15.5.3",

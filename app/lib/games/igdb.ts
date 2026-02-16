@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Bottleneck from 'bottleneck';
 
 import {
   ApiAccess,
@@ -12,6 +13,40 @@ import { ApiModel } from '../models';
 import { decodeJwt, encodeJwt } from '../token';
 import { isExpired } from '../utils';
 
+const IGDB_REQUEST_FREQUENCY = 250;
+const EXECUTABLE_PER_TIME = 2;
+
+const igdbRateLimiter = new Bottleneck({
+  minTime: IGDB_REQUEST_FREQUENCY,
+  maxConcurrent: EXECUTABLE_PER_TIME
+});
+
+igdbRateLimiter.on('scheduled', (info) => {
+  console.log('Scheduled');
+  console.log(info.options);
+});
+
+igdbRateLimiter.on('executing', (info) => {
+  console.log('Executing');
+  console.log(info.options);
+  console.log(info.retryCount);
+});
+
+igdbRateLimiter.on('received', (info) => {
+  console.log('Received');
+  console.log(info.options);
+});
+
+const getIgdbAccess = async (
+  searchParams: URLSearchParams
+): Promise<IgdbAccess> => {
+  const response = await axios.post<IgdbAccess>(
+    `${process.env.TWITCH_ACCESS_API}?${searchParams.toString()}`
+  );
+
+  return response.data;
+};
+
 const updateIgdbAccess = async (): Promise<ApiToken> => {
   const searchParams = new URLSearchParams({
     client_id: process.env.TWITCH_CLIENT_ID ?? '',
@@ -19,14 +54,14 @@ const updateIgdbAccess = async (): Promise<ApiToken> => {
     grant_type: 'client_credentials'
   });
 
-  const response = await axios.post<IgdbAccess>(
-    `${process.env.TWITCH_ACCESS_API}?${searchParams.toString()}`
+  const igdbAccess = await igdbRateLimiter.schedule({ priority: 0 }, () =>
+    getIgdbAccess(searchParams)
   );
 
   const apiToken: ApiToken = {
-    accessToken: response.data.access_token,
-    expiresAt: Date.now() + response.data.expires_in,
-    tokenType: response.data.token_type
+    accessToken: igdbAccess.access_token,
+    expiresAt: Date.now() + igdbAccess.expires_in,
+    tokenType: igdbAccess.token_type
   };
 
   const apiAccess: ApiAccess = {
@@ -62,6 +97,21 @@ const getQueryString = <DataType>(query: IgdbQuery<DataType>): string =>
     })
     .join('; ') + ';';
 
+const getIgdbData = async <DataType>(
+  url: string,
+  queryString: string,
+  apiToken: ApiToken
+): Promise<DataType[]> => {
+  const response = await AxiosIgdbInstance.post<DataType[]>(url, queryString, {
+    headers: {
+      'Client-ID': process.env.TWITCH_CLIENT_ID,
+      Authorization: `${apiToken.tokenType} ${apiToken.accessToken}`
+    }
+  });
+
+  return response.data;
+};
+
 export const igdbRequest = async <DataType>(
   url: string,
   query: IgdbQuery<DataType>
@@ -76,12 +126,10 @@ export const igdbRequest = async <DataType>(
 
   const queryString = getQueryString(query);
   console.log(queryString);
-  const response = await AxiosIgdbInstance.post<DataType[]>(url, queryString, {
-    headers: {
-      'Client-ID': process.env.TWITCH_CLIENT_ID,
-      Authorization: `${apiToken.tokenType} ${apiToken.accessToken}`
-    }
-  });
+  const igdbData = await igdbRateLimiter.schedule<DataType[]>(
+    { priority: 1 },
+    () => getIgdbData(url, queryString, apiToken)
+  );
 
-  return response.data;
+  return igdbData;
 };

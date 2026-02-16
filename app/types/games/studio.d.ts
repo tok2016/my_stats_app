@@ -2,7 +2,7 @@ import { IgdbItemInfo } from './api-response';
 import Game, { IgdbGameRatings } from './game';
 import { IgdbGenre } from './genre';
 import { IgdbImage } from './image';
-import { ItemIdCompareData, PeriodTopsMetric } from './metric';
+import { ItemIdCompareData, PeriodTopsMetric, RatingData } from './metric';
 import { ExternalRatings } from './rating';
 import { IgdbSeries } from './series';
 
@@ -56,6 +56,11 @@ export interface StudioCountryMetric {
   developer?: ItemIdCompareData;
   publisher?: ItemIdCompareData;
 }
+
+export type StudioRatingMetric = Omit<RatingData, 'rating'>
+  & ExternalRatings & {
+    averageRating?: number;
+  };
 
 export type Studio = Omit<IgdbItemInfo, 'games'> & {
   developed: Game[];

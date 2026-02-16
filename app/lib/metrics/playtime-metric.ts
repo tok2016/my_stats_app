@@ -1,8 +1,8 @@
 import { GameCore } from '@ts/games/game';
 import { PlaytimeData } from '@ts/games/metric';
 
-import { isNumberOrString, isNumberOrStringArray } from './type-guards';
-import { MINUTES } from './utils';
+import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
+import { MINUTES } from '../utils';
 
 const setPlaytimeData = (
   item: number | string,
@@ -15,6 +15,7 @@ const setPlaytimeData = (
   map.set(item, {
     id: Number(item) ?? 0,
     hours: (currentItem?.hours ?? 0) + Math.round(game.minutes / MINUTES),
+    count: (currentItem?.count ?? 0) + 1,
     topGame: game.minutes >= previosGame.minutes ? game : previosGame
   });
 };
