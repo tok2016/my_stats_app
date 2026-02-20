@@ -1,20 +1,22 @@
 'use client';
 
-import { memo, useEffect } from 'react';
 import { ControllerSolid, LogoutSolid, MusicSolid } from '@mynaui/icons-react';
+import { memo, useEffect } from 'react';
 
-import { User } from '@ts/users/user';
-
-import SidebarOption from './SidebarOption';
-import { useUserState } from '@store/user-store';
-import Avatar from './Avatar';
 import {
   SidebarModuleProps,
   SidebarOptionProps
 } from '@ts/ui/components-props';
-import UserSearch from './UserSearch';
+import { User } from '@ts/users/user';
+
 import { logout } from '@lib/server-actions';
-import { defaultUser } from '@lib/utils';
+import { ModulesPaths, defaultUser } from '@lib/utils';
+
+import { useUserState } from '@store/user-store';
+
+import Avatar from './Avatar';
+import SidebarOption from './SidebarOption';
+import UserSearch from './UserSearch';
 
 type AuthorizedSidebarProps = SidebarModuleProps & {
   user: User;
@@ -25,65 +27,23 @@ const SidebarOptions: SidebarOptionProps[] = [
     name: 'music',
     label: 'Music',
     icon: <MusicSolid />,
-    subButtons: [
-      {
-        name: 'genres',
-        label: 'Genres & Tags',
-        href: '/music/genres'
-      },
-      {
-        name: 'artists',
-        label: 'Artists',
-        href: '/music/artists'
-      },
-      {
-        name: 'albums',
-        label: 'Albums',
-        href: '/music/albums'
-      },
-      {
-        name: 'tracks',
-        label: 'Tracks',
-        href: '/music/tracks'
-      },
-      {
-        name: 'library',
-        label: 'Library',
-        href: '/music/library'
-      }
-    ]
+    subButtons: Object.entries(ModulesPaths)
+      .filter((entry) => entry[0].startsWith('/music'))
+      .map((entry) => ({
+        ...entry[1],
+        href: entry[0]
+      }))
   },
   {
     name: 'games',
     label: 'Video Games',
     icon: <ControllerSolid />,
-    subButtons: [
-      {
-        name: 'genres',
-        label: 'Genres & Tags',
-        href: '/games/genres'
-      },
-      {
-        name: 'developers',
-        label: 'Developers',
-        href: '/games/developers'
-      },
-      {
-        name: 'platforms',
-        label: 'Platforms',
-        href: '/games/platforms'
-      },
-      {
-        name: 'items',
-        label: 'Video Games',
-        href: '/games/items'
-      },
-      {
-        name: 'library',
-        label: 'Library',
-        href: '/music/library'
-      }
-    ]
+    subButtons: Object.entries(ModulesPaths)
+      .filter((entry) => entry[0].startsWith('/games'))
+      .map((entry) => ({
+        ...entry[1],
+        href: entry[0]
+      }))
   }
 ];
 

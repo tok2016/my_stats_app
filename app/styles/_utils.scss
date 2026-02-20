@@ -70,17 +70,19 @@ $bg-2-colors: (
   'success': #0f2717
 );
 
-$diagram-color-1: #1fbb70;
-$diagram-color-2: #d5c534;
-$diagram-color-3: #c05431;
-$diagram-color-4: #982dc6;
-$diagram-color-5: #2eacc8;
-$diagram-color-6: #d235c7;
-$diagram-color-7: #c33333;
-$diagram-color-8: #3257df;
-$diagram-color-9: #63d43a;
-$diagram-color-10: #1fbba4;
-$diagram-color-11: #cdcdcd;
+$diagram-colors: (
+  0: #2eacc8,
+  1: #982dc6,
+  2: #c05431,
+  3: #d5c534,
+  4: #1fbb70,
+  5: #d235c7,
+  6: #c33333,
+  7: #3257df,
+  8: #63d43a,
+  9: #1fbba4,
+  10: #cdcdcd
+);
 
 $white: #ffffff;
 $black: #000000;
@@ -117,7 +119,7 @@ $bold-font: 700;
 $large-size: 1.125rem; //18px
 $regular-size: 1rem; //16px
 $small-size: 0.875rem; //14px
-$min-size: 0.8125rem;
+$min-size: 0.8125rem; //13px
 
 $title-size: 2.25rem; //36px
 $h1-size: 1.75rem; //28px
