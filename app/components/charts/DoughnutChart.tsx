@@ -1,12 +1,14 @@
 'use client';
 
 import { ArcElement, Chart, Legend, Tooltip } from 'chart.js';
-import { useEffect, useRef, useState } from 'react';
+import { useContext } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 
-import { DoughnutData } from '@ts/ui/charts-data';
+import { DisplayFields, DoughnutData } from '@ts/ui/charts-data';
 
 import { ChartColors } from '@lib/utils';
+
+import ChartProvider, { ChartContext } from '@store/ChartProvider';
 
 import ChartLegend from './ChartLegend';
 import { getTooltip } from './ChartTooltip';
@@ -15,54 +17,29 @@ Chart.register(ArcElement, Tooltip, Legend);
 
 type DoughnutChartProps<DataType extends DoughnutData> = {
   data: DataType[];
-  dataField: keyof DataType;
-  displayFields: (keyof Omit<DataType, 'id' | 'name'>)[];
+  displayFields: DisplayFields<DataType>;
   fieldsNames: Record<keyof DataType, string>;
   chartId: string;
   className?: string;
 };
 
-export default function DoughnutChart<DataType extends DoughnutData>({
-  data,
-  dataField,
-  displayFields,
-  fieldsNames,
-  chartId,
-  className = ''
-}: DoughnutChartProps<DataType>) {
+type DoughnutInternalProps<DataType extends DoughnutData> = {
+  data: DataType[];
+};
+
+function DoughnutCore<DataType extends DoughnutData>({
+  data
+}: DoughnutInternalProps<DataType>) {
   const dataMap = new Map(data.map((d) => [d.id, d]));
   const indexMap = new Map(data.map((d, i) => [d.id, i]));
   const percentsMap = new Map(data.map((d) => [d.id, d.percent]));
 
-  const chartRef = useRef<HTMLDivElement>(null);
-  const [tooltip, setTooltip] = useState<HTMLElement>();
-
-  useEffect(() => {
-    const chartContainer = chartRef.current;
-    if (!tooltip) {
-      let container = document.getElementById(chartId);
-      if (!container) {
-        container = document.createElement('div');
-        container.id = chartId;
-        container.classList.add('tooltip-container');
-        chartContainer?.appendChild(container);
-      }
-      setTooltip(container);
-    }
-
-    return () => {
-      if (tooltip) chartContainer?.removeChild(tooltip);
-    };
-  }, [chartId, tooltip]);
-
-  if (data.every((value) => typeof value[dataField] !== 'number')) {
-    return <h4 className='chart-error'>{`Couldn't create chart`}</h4>;
-  }
+  const { updateTooltip, tooltipRef } = useContext(ChartContext);
 
   return (
-    <div className={`chart ${className}`} ref={chartRef}>
+    <>
       <Doughnut
-        className='doughnut-chart'
+        className='doughnut-chart chart-core'
         options={{
           aspectRatio: 1,
           rotation: 90,
@@ -85,10 +62,9 @@ export default function DoughnutChart<DataType extends DoughnutData>({
           locale: 'en-US',
           plugins: {
             tooltip: getTooltip(
-              tooltip,
+              tooltipRef,
+              updateTooltip,
               dataMap,
-              displayFields,
-              fieldsNames,
               indexMap,
               percentsMap
             ),
@@ -101,7 +77,7 @@ export default function DoughnutChart<DataType extends DoughnutData>({
           labels: data.map((d) => d.id),
           datasets: [
             {
-              data: data.map((value) => value[dataField]),
+              data: data.map((value) => value.value),
               backgroundColor: ChartColors,
               selfJoin: true,
               normalized: true
@@ -111,6 +87,25 @@ export default function DoughnutChart<DataType extends DoughnutData>({
       />
 
       <ChartLegend data={data} percentsMap={percentsMap} />
-    </div>
+    </>
+  );
+}
+
+export default function DoughnutChart<DataType extends DoughnutData>({
+  data,
+  displayFields,
+  fieldsNames,
+  chartId,
+  className
+}: DoughnutChartProps<DataType>) {
+  return (
+    <ChartProvider
+      chartId={chartId}
+      displayFields={displayFields}
+      fieldsNames={fieldsNames}
+      className={className}
+    >
+      <DoughnutCore data={data} />
+    </ChartProvider>
   );
 }

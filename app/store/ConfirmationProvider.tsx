@@ -1,28 +1,28 @@
 'use client';
 
-import { createContext, useEffect, useState } from 'react';
+import { type ReactNode, createContext, useEffect, useState } from 'react';
 
+import { FormAction } from '@ts/ui/form-state';
 import {
   ConfirmationBaseAction,
   ConfirmationInfo,
   ConfirmationState
 } from '@ts/users/confirmation';
-import { FormAction } from '@ts/ui/form-state';
 
+import { deleteConfirmation, getOperation } from '@lib/actions';
 import { useAction } from '@lib/hooks';
 import {
   defaultConfirmation,
   defaultFormState,
   getErrorFormState
 } from '@lib/utils';
-import { deleteConfirmation, getOperation } from '@lib/actions';
 
 type ConfirmationFormAction = <DataType>(
   baseAction: ConfirmationBaseAction
 ) => FormAction<DataType>;
 
 type ConfirmationProviderProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 type ConfirmationContextProps = {

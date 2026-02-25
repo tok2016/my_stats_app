@@ -13,8 +13,9 @@ import { isAxiosError, isErrorResponse } from './type-guards';
 
 export const MILLISECONDS = 1000;
 export const MINUTES = 60;
-export const MONTH_IN_QUARTER = 3;
-const MONTH_SHIFT = 11;
+export const MONTHS_IN_QUARTER = 3;
+export const MONTHS_IN_YEAR = 12;
+const MONTHS_SHIFT = 11;
 
 export const FOUND_USERS_LIMIT = 5;
 
@@ -47,6 +48,22 @@ export const ServiceStatuses = [
 ] as const;
 
 export const Modules = ['user', 'music', 'games'] as const;
+
+export const Seasons = ['Winter', 'Spring', 'Summer', 'Fall'] as const;
+export const Months = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec'
+] as const;
 
 export const ChartColors = [
   '#2EACC8',
@@ -206,7 +223,7 @@ export const getPeriodDate: Record<PrecisePeriod, (date: Date) => string> = {
   year: (date) => date.getFullYear().toString(),
   season: (date) => {
     const seasonNumber = Math.floor(
-      ((date.getMonth() % MONTH_SHIFT) + 1) / MONTH_IN_QUARTER
+      ((date.getMonth() % MONTHS_SHIFT) + 1) / MONTHS_IN_QUARTER
     );
     return `${date.getFullYear()}-${seasonNumber}`;
   },

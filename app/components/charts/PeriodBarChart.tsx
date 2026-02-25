@@ -1,18 +1,344 @@
-import { BarElement, Chart, Legend, Tooltip } from 'chart.js';
+'use client';
+
+import {
+  BarElement,
+  CategoryScale,
+  Chart,
+  ChartDataset,
+  Legend,
+  LinearScale,
+  Tooltip
+} from 'chart.js';
+import { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 
-import { ChartData, PeriodChartData } from '@ts/ui/charts-data';
+import { PrecisePeriod } from '@ts/games/metric';
+import {
+  ChartData,
+  DisplayFields,
+  PeriodChartData,
+  PeriodChartTransformed
+} from '@ts/ui/charts-data';
+import { Option } from '@ts/ui/components-props';
+
+import { useAction, useChart } from '@lib/hooks';
+import { ChartColors, MONTHS_IN_YEAR, Seasons } from '@lib/utils';
+
+import ChartProvider from '@store/ChartProvider';
+
+import Select from '@components/Select';
+import Spinner from '@components/Spinner';
+
+import ChartLegend from './ChartLegend';
+import { getPeriodTooltip } from './ChartTooltip';
 
 type PeriodBarChartProps<DataType extends ChartData> = {
-  data: PeriodChartData<DataType>;
+  data: PeriodChartData<DataType>[];
+  periodType: PrecisePeriod;
+  displayFields: DisplayFields<DataType>;
+  fieldsNames: Record<keyof DataType, string>;
+  chartId: string;
   className?: string;
 };
 
-Chart.register(BarElement, Tooltip, Legend);
+type PeriodBarCoreProps = {
+  data: PeriodChartData<ChartData>[];
+  periodType: PrecisePeriod;
+  year: string;
+};
+
+type PeriodDataset = {
+  labels: string[];
+  datasets: ChartDataset<'bar'>[];
+  dataMap: Map<number, PeriodChartTransformed>;
+  indexMap: Map<number, number>;
+};
+
+Chart.register(BarElement, Tooltip, Legend, CategoryScale, LinearScale);
+
+const UnitsPerYear: Record<PrecisePeriod, number> = {
+  year: 0,
+  season: Seasons.length,
+  month: MONTHS_IN_YEAR
+};
+
+const parsePeriod = (period?: string) => {
+  const parts = period?.split('-') ?? [];
+
+  return {
+    year: Number(parts[0] ?? 0),
+    unit: Number(parts[1] ?? 0)
+  };
+};
+
+const getAllPeriods = (
+  periods: string[],
+  periodType: PrecisePeriod,
+  year: number
+) => {
+  const startPeriod = parsePeriod(periods[0]);
+  const recentPeriod = parsePeriod(periods.at(-1));
+  const unitsPerYear = UnitsPerYear[periodType] ?? 0;
+
+  const allPeriods: string[] = [];
+
+  if (periodType === 'year') {
+    for (let year = startPeriod.year; year <= recentPeriod.year; year++)
+      allPeriods.push(year.toString());
+  } else {
+    const startUnit = year === startPeriod.year ? startPeriod.unit : 0;
+    const endUnit =
+      year === recentPeriod.year ? recentPeriod.unit : unitsPerYear - 1;
+    for (let unit = startUnit; unit <= endUnit; unit++) {
+      allPeriods.push(`${year}-${unit}`);
+    }
+  }
+
+  return allPeriods;
+};
+
+const getPeriodString: Record<PrecisePeriod, (period: string) => string> = {
+  year: (period) => period.split('-')[0] ?? '',
+  season: (period) => {
+    const parts = period.split('-');
+    if (!parts[1]) return parts[0] ?? '';
+
+    const seasonNumber = parseInt(parts[1]) % Seasons.length;
+    return Seasons[seasonNumber];
+  },
+  month: (period) => {
+    const parts = period.split('-');
+    if (!parts[1]) return parts[0] ?? '';
+
+    return new Date(period).toLocaleDateString('en-US', {
+      month: 'short'
+    });
+  }
+};
+
+const getPeriodDatasets = async (params?: {
+  data: PeriodChartData<ChartData>[];
+  periodType: PrecisePeriod;
+  year: number;
+}): Promise<PeriodDataset | undefined> => {
+  if (!params) return;
+  const { data, periodType, year } = params;
+
+  const isYear = periodType === 'year';
+  const allPeriods = getAllPeriods(
+    data.map((d) => d.period),
+    periodType,
+    year
+  );
+
+  const periodsNames = Object.fromEntries(
+    allPeriods.map((period) => [period, getPeriodString[periodType](period)])
+  );
+
+  const itemsMap = new Map<number, PeriodChartTransformed>();
+  data.forEach((periodData) => {
+    if (!isYear && !periodData.period.startsWith(year.toString())) return;
+
+    periodData.data.forEach((chartData) => {
+      const storedItem = itemsMap.get(chartData.id);
+      const period = periodsNames[periodData.period] ?? '';
+      if (!storedItem)
+        itemsMap.set(chartData.id, {
+          ...chartData,
+          countByPeriod: { [period]: chartData.value }
+        });
+      else storedItem.countByPeriod[period] = chartData.value;
+    });
+  });
+
+  const indexMap = new Map<number, number>();
+  const dataMap = new Map<number, PeriodChartTransformed>();
+  const datasets: ChartDataset<'bar'>[] = [];
+  itemsMap.values().forEach((item, i) => {
+    dataMap.set(item.id, item);
+    indexMap.set(item.id, i);
+
+    datasets.push({
+      label: item.name,
+      backgroundColor: ChartColors[i % ChartColors.length],
+      data: Object.values(periodsNames).map((period) => {
+        if (typeof item.countByPeriod[period] === 'undefined') return null;
+        return item.countByPeriod[period];
+      })
+    });
+  });
+
+  return {
+    labels: Object.values(periodsNames),
+    datasets,
+    dataMap,
+    indexMap
+  };
+};
+
+function PeriodBarCore({ data, periodType, year }: PeriodBarCoreProps) {
+  const [dataset, getDataset] = useAction(getPeriodDatasets, undefined);
+  const { updateTooltip, tooltipRef } = useChart();
+
+  useEffect(() => {
+    getDataset({ data, periodType, year: Number(year) });
+  }, [data, getDataset, periodType, year]);
+
+  if (!dataset) {
+    return <Spinner size={20} strokeWidth={6} />;
+  }
+
+  return (
+    <>
+      <div className='chart-core-wrapper'>
+        <Bar
+          className='period-bar-chart'
+          options={{
+            font: {
+              family: 'Inter'
+            },
+            responsive: true,
+            skipNull: true,
+            elements: {
+              bar: {
+                borderRadius: {
+                  topLeft: 4,
+                  topRight: 4
+                }
+              }
+            },
+            scales: {
+              x: {
+                type: 'category',
+                position: 'bottom',
+                labels: dataset.labels,
+                border: {
+                  color: '#dee4e6',
+                  width: 2
+                },
+                ticks: {
+                  align: 'center',
+                  display: true,
+                  color: '#dee4e6',
+                  padding: 2,
+                  font: {
+                    size: 12
+                  }
+                },
+                title: {
+                  display: true,
+                  text: periodType[0].toUpperCase() + periodType.slice(1),
+                  align: 'end',
+                  color: '#dee4e6',
+                  padding: 0,
+                  font: {
+                    size: 14,
+                    weight: 700
+                  }
+                }
+              },
+              y: {
+                type: 'linear',
+                position: 'left',
+                border: {
+                  color: '#dee4e6',
+                  width: 2
+                },
+                title: {
+                  display: true,
+                  text: 'Hours',
+                  align: 'end',
+                  color: '#dee4e6',
+                  padding: 10,
+                  font: {
+                    size: 14,
+                    weight: 700
+                  }
+                },
+                ticks: {
+                  mirror: true,
+                  align: 'center',
+                  display: true,
+                  color: '#dee4e6',
+                  backdropColor: '#050709',
+                  textStrokeWidth: 2,
+                  textStrokeColor: '#050709',
+                  padding: -2,
+                  showLabelBackdrop: true,
+                  z: 5,
+                  font: {
+                    size: 12
+                  }
+                },
+                grid: {
+                  drawTicks: false,
+                  color: '#146086',
+                  lineWidth: 1
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: getPeriodTooltip(
+                tooltipRef,
+                updateTooltip,
+                dataset.dataMap,
+                dataset.indexMap
+              )
+            }
+          }}
+          data={{
+            labels: dataset.datasets.map((d) => d.label ?? ''),
+            datasets: dataset.datasets
+          }}
+        />
+      </div>
+
+      <ChartLegend data={dataset.dataMap.values().toArray()} />
+    </>
+  );
+}
 
 export default function PeriodBarChart<DataType extends ChartData>({
   data,
+  periodType,
+  displayFields,
+  fieldsNames,
+  chartId,
   className
 }: PeriodBarChartProps<DataType>) {
-  return <div className={`chart ${className}`}></div>;
+  const yearOptions: Option[] = getAllPeriods(
+    data.map((d) => d.period),
+    'year',
+    0
+  ).map((year) => ({
+    label: year,
+    key: year,
+    value: year
+  }));
+
+  const [year, setYear] = useState<string>(yearOptions.at(-1)?.value ?? '');
+
+  return (
+    <ChartProvider
+      chartId={chartId}
+      displayFields={displayFields}
+      fieldsNames={fieldsNames}
+      className={`period-chart ${className}`}
+    >
+      <PeriodBarCore data={data} periodType={periodType} year={year} />
+
+      <Select
+        className='chart-select'
+        variant='text'
+        defaultValue={year}
+        options={yearOptions}
+        id={`${chartId}-year`}
+        name={`${chartId}-year`}
+        onSelect={setYear}
+      />
+    </ChartProvider>
+  );
 }

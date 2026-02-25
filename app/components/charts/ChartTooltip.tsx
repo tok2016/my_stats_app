@@ -1,90 +1,124 @@
 'use client';
 
-import { TooltipOptions } from 'chart.js';
-import { renderToStaticMarkup } from 'react-dom/server';
+import { Chart } from 'chart.js';
+import { RefObject } from 'react';
 
-import { IgdbBasic } from '@ts/games/api-response';
-import { ChartData, DoughnutData } from '@ts/ui/charts-data';
+import {
+  ChartContextProps,
+  ChartData,
+  DisplayFields,
+  PeriodChartTransformed,
+  TooltipData
+} from '@ts/ui/charts-data';
 
-type ChartTooltipProps<DataType extends IgdbBasic> = {
-  data: DataType;
-  displayFields: (keyof Omit<DataType, 'id' | 'name'>)[];
+type ChartTooltipProps<DataType extends ChartData> = {
+  data?: TooltipData;
+  displayFields: DisplayFields<DataType>;
   fieldsNames: Record<keyof DataType, string>;
-  index?: number;
-  percent?: number;
+  ref: RefObject<HTMLDivElement | null>;
 };
 
 export default function ChartTooltip<DataType extends ChartData>({
   data,
   displayFields,
   fieldsNames,
-  index,
-  percent
+  ref
 }: ChartTooltipProps<DataType>) {
-  const rank = (index ?? -1) + 1;
+  if (!data) return;
+
+  const rank = (data.index ?? -1) + 1;
   return (
-    <div className='chart-tooltip' data-rank={index}>
-      <h3 className='colored'>{data.name}</h3>
+    <div className='tooltip-container' data-item={data.id} ref={ref}>
+      <div className='chart-tooltip' data-rank={data.index}>
+        <h3 className='colored'>{data.name}</h3>
 
-      {displayFields.map((field) => (
-        <div key={field.toString()} className='tooltip-key'>
-          <span>{fieldsNames[field]}: </span>
-          <span className='colored'>{data[field] ?? 'no data'}</span>
-        </div>
-      ))}
+        {displayFields.map((field) => (
+          <div key={field.toString()} className='tooltip-key'>
+            <span>{fieldsNames[field]}: </span>
+            <span className='colored'>{data[field] ?? 'no data'}</span>
+          </div>
+        ))}
 
-      {!rank || (
-        <div className='tooltip-badge tooltip-rank'>
-          <h3>{rank}</h3>
-        </div>
-      )}
+        {!rank || (
+          <div className='tooltip-badge tooltip-rank'>
+            <h3>{rank}</h3>
+          </div>
+        )}
 
-      {!percent || (
-        <div className='tooltip-badge tooltip-percent'>
-          <h4>{percent}%</h4>
-        </div>
-      )}
+        {!data.percent || (
+          <div className='tooltip-badge tooltip-percent'>
+            <h4>{data.percent}%</h4>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-export const getTooltip = <DataType extends DoughnutData>(
-  tooltipContainer: HTMLElement | undefined,
-  dataMap: Map<string | number, DataType>,
-  displayFields: (keyof Omit<DataType, 'id' | 'name'>)[],
-  fieldsNames: Record<keyof DataType, string>,
-  indexMap: Map<string | number, number>,
-  percentsMap: Map<string | number, number>
-): Partial<TooltipOptions> => ({
+export const getTooltip = <DataType extends ChartData>(
+  tooltipContainer: RefObject<HTMLDivElement | null>,
+  updateTooltip: ChartContextProps['updateTooltip'],
+  dataMap: Map<number, DataType>,
+  indexMap: Map<number, number>,
+  percentsMap?: Map<number, number>
+): NonNullable<Chart['options']['plugins']>['tooltip'] => ({
   enabled: false,
   position: 'nearest',
   external: ({ tooltip }) => {
-    if (!tooltipContainer) return;
-    if (!tooltip.opacity) {
-      tooltipContainer.style.opacity = '0';
+    if (!tooltip.opacity && tooltipContainer.current) {
+      tooltipContainer.current.style.opacity = '0';
       return;
     }
 
-    const itemId = tooltip.title[0];
+    const itemId = Number(tooltip.title[0] ?? '0');
     const data = dataMap.get(itemId);
-    if (!data || tooltipContainer?.dataset['item'] === itemId) return;
+    const storedId = tooltipContainer.current?.dataset['item'];
 
-    const index = indexMap.get(itemId);
-    const tooltopElement = renderToStaticMarkup(
-      ChartTooltip({
-        data,
-        displayFields,
-        fieldsNames,
-        index: index,
-        percent: percentsMap.get(itemId)
-      })
+    if (tooltipContainer.current) {
+      tooltipContainer.current.style.opacity = '1';
+      tooltipContainer.current.style.left = `${tooltip.caretX}px`;
+      tooltipContainer.current.style.top = `${tooltip.caretY}px`;
+    }
+
+    if (!data || storedId?.toString() === itemId.toString()) return;
+
+    updateTooltip(data, indexMap.get(itemId), percentsMap?.get(itemId));
+  }
+});
+
+export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
+  tooltipContainer: RefObject<HTMLDivElement | null>,
+  updateTooltip: ChartContextProps['updateTooltip'],
+  dataMap: Map<number, DataType>,
+  indexMap: Map<number, number>
+): NonNullable<Chart['options']['plugins']>['tooltip'] => ({
+  enabled: false,
+  position: 'nearest',
+  external: ({ tooltip }) => {
+    if (!tooltip.opacity && tooltipContainer.current) {
+      tooltipContainer.current.style.opacity = '0';
+      return;
+    }
+
+    const valueKey = tooltip.title[0];
+    const itemId = Number(tooltip.dataPoints[0].dataset.label ?? '0');
+    const data = dataMap.get(itemId);
+    const storedId = tooltipContainer.current?.dataset['item'];
+
+    if (tooltipContainer.current) {
+      tooltipContainer.current.style.opacity = '1';
+      tooltipContainer.current.style.left = `${tooltip.caretX}px`;
+      tooltipContainer.current.style.top = `${tooltip.caretY}px`;
+    }
+
+    if (!data || storedId?.toString() === itemId.toString()) return;
+
+    updateTooltip(
+      {
+        ...data,
+        value: data.countByPeriod[valueKey] ?? data.value
+      },
+      indexMap.get(itemId)
     );
-
-    tooltipContainer.dataset['item'] = itemId;
-    tooltipContainer.dataset['rank'] = index?.toString();
-    tooltipContainer.innerHTML = tooltopElement;
-    tooltipContainer.style.opacity = '1';
-    tooltipContainer.style.left = `${tooltip.caretX}px`;
-    tooltipContainer.style.top = `${tooltip.caretY}px`;
   }
 });

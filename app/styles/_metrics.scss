@@ -5,7 +5,11 @@ $tooltip-radius: 0.5rem;
 $tooltip-padding: 0.625rem;
 $tooltip-badge-min: 2rem;
 $tooltip-badge-max: 3rem;
+
+$chart-padding: 1.25rem;
+$chart-padding-right: 2rem;
 $rank-padding: 0.25rem;
+
 $default-color: map.get(utils.$diagram-colors, 10);
 
 .metrics {
@@ -20,6 +24,10 @@ $default-color: map.get(utils.$diagram-colors, 10);
   height: 20rem;
 }
 
+.test-periods {
+  width: 100%;
+}
+
 .chart {
   display: flex;
   flex-direction: row;
@@ -27,7 +35,11 @@ $default-color: map.get(utils.$diagram-colors, 10);
   gap: 1rem;
   align-items: center;
 
-  padding-right: 2rem;
+  box-sizing: border-box;
+  position: relative;
+
+  padding: 1.25rem;
+  padding-right: $chart-padding-right;
   border-radius: utils.$regular-radius;
 }
 
@@ -48,6 +60,15 @@ $default-color: map.get(utils.$diagram-colors, 10);
 .doughnut-chart {
   max-width: 20rem;
   max-height: 20rem;
+}
+
+.chart-core-wrapper {
+  flex: 1 1;
+  max-width: 85%;
+}
+
+.period-bar-chart {
+  max-height: 22rem;
 }
 
 .tooltip-container {
@@ -128,6 +149,10 @@ $default-color: map.get(utils.$diagram-colors, 10);
   padding: 0;
   margin: 0;
 
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
   li {
     @include utils.font(
       utils.$regular-size,
@@ -152,6 +177,12 @@ $default-color: map.get(utils.$diagram-colors, 10);
       background-color: $default-color;
     }
   }
+}
+
+.chart-select {
+  position: absolute;
+  top: $chart-padding;
+  right: $chart-padding-right;
 }
 
 @each $rank, $color in utils.$diagram-colors {

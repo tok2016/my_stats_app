@@ -1,9 +1,12 @@
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useActionState, useCallback, useContext, useState } from 'react';
+
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import FormState, { FormAction } from '@ts/ui/form-state';
 
+import { ChartContext } from '@store/ChartProvider';
 import { ConfirmationContext } from '@store/ConfirmationProvider';
+
 import { defaultFormState } from './utils';
 
 export const useURLSearchParams = () => {
@@ -56,6 +59,7 @@ export const useAction = <DataType, ParameterType = undefined>(
 };
 
 export const useConfirm = () => useContext(ConfirmationContext);
+export const useChart = () => useContext(ChartContext);
 
 export const useRedirectActionForm = <DataType>(
   baseAction: FormAction<DataType>,

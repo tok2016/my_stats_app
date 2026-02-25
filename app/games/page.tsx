@@ -17,6 +17,7 @@ type GenreCount = {
   name: string;
   count: number;
   percent: number;
+  value: number;
   seriesName?: number;
 };
 
@@ -25,7 +26,8 @@ const fieldsNames: Record<keyof GenreCount, string> = {
   name: 'Name',
   count: 'Games Count',
   percent: 'Percent',
-  seriesName: 'Best series'
+  seriesName: 'Best series',
+  value: 'value'
 };
 
 export default function GamesMainPage() {
@@ -67,6 +69,7 @@ export default function GamesMainPage() {
         id: -1,
         name: 'Other',
         count,
+        value: count,
         percent: Math.round((count / sum) * 100),
         seriesName: topSeries
           .entries()
@@ -80,6 +83,7 @@ export default function GamesMainPage() {
       id: data.id,
       name: data.id.toString(),
       count: data.count,
+      value: data.count,
       percent: Math.round(percent),
       seriesName: data.topSeries
     });
@@ -96,7 +100,6 @@ export default function GamesMainPage() {
               chartId='genres-count-1'
               className='test-count-chart'
               data={genres}
-              dataField='count'
               displayFields={['count', 'seriesName']}
               fieldsNames={fieldsNames}
             />
