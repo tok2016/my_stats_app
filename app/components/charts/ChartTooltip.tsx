@@ -1,6 +1,6 @@
 'use client';
 
-import { Chart } from 'chart.js';
+import { Chart, ChartType, TooltipModel } from 'chart.js';
 import { RefObject } from 'react';
 
 import {
@@ -10,6 +10,8 @@ import {
   PeriodChartTransformed,
   TooltipData
 } from '@ts/ui/charts-data';
+
+import { clamp } from '@lib/utils';
 
 type ChartTooltipProps<DataType extends ChartData> = {
   data?: TooltipData;
@@ -55,8 +57,34 @@ export default function ChartTooltip<DataType extends ChartData>({
   );
 }
 
+const adjustTooltipPosition = <T extends ChartType>(
+  tooltipRef: RefObject<HTMLDivElement | null>,
+  tooltip: TooltipModel<T>
+) => {
+  if (tooltipRef.current) {
+    tooltipRef.current.style.opacity = '1';
+
+    const { top, left } = tooltip.chart.canvas.getBoundingClientRect();
+
+    const adjustedLeft = clamp(
+      tooltip.caretX,
+      -left,
+      window.innerWidth - tooltipRef.current.offsetWidth - left
+    );
+
+    const adjustedTop = clamp(
+      tooltip.caretY,
+      -top,
+      window.innerHeight - tooltipRef.current.offsetHeight - top
+    );
+
+    tooltipRef.current.style.left = `${adjustedLeft}px`;
+    tooltipRef.current.style.top = `${adjustedTop}px`;
+  }
+};
+
 export const getTooltip = <DataType extends ChartData>(
-  tooltipContainer: RefObject<HTMLDivElement | null>,
+  tooltipRef: RefObject<HTMLDivElement | null>,
   updateTooltip: ChartContextProps['updateTooltip'],
   dataMap: Map<number, DataType>,
   indexMap: Map<number, number>,
@@ -65,20 +93,15 @@ export const getTooltip = <DataType extends ChartData>(
   enabled: false,
   position: 'nearest',
   external: ({ tooltip }) => {
-    if (!tooltip.opacity && tooltipContainer.current) {
-      tooltipContainer.current.style.opacity = '0';
+    if (!tooltip.opacity && tooltipRef.current) {
+      tooltipRef.current.style.opacity = '0';
       return;
     }
 
     const itemId = Number(tooltip.title[0] ?? '0');
     const data = dataMap.get(itemId);
-    const storedId = tooltipContainer.current?.dataset['item'];
-
-    if (tooltipContainer.current) {
-      tooltipContainer.current.style.opacity = '1';
-      tooltipContainer.current.style.left = `${tooltip.caretX}px`;
-      tooltipContainer.current.style.top = `${tooltip.caretY}px`;
-    }
+    const storedId = tooltipRef.current?.dataset['item'];
+    adjustTooltipPosition(tooltipRef, tooltip);
 
     if (!data || storedId?.toString() === itemId.toString()) return;
 
@@ -87,7 +110,7 @@ export const getTooltip = <DataType extends ChartData>(
 });
 
 export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
-  tooltipContainer: RefObject<HTMLDivElement | null>,
+  tooltipRef: RefObject<HTMLDivElement | null>,
   updateTooltip: ChartContextProps['updateTooltip'],
   dataMap: Map<number, DataType>,
   indexMap: Map<number, number>
@@ -95,21 +118,16 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
   enabled: false,
   position: 'nearest',
   external: ({ tooltip }) => {
-    if (!tooltip.opacity && tooltipContainer.current) {
-      tooltipContainer.current.style.opacity = '0';
+    if (!tooltip.opacity && tooltipRef.current) {
+      tooltipRef.current.style.opacity = '0';
       return;
     }
 
     const valueKey = tooltip.title[0];
     const itemId = Number(tooltip.dataPoints[0].dataset.label ?? '0');
     const data = dataMap.get(itemId);
-    const storedId = tooltipContainer.current?.dataset['item'];
-
-    if (tooltipContainer.current) {
-      tooltipContainer.current.style.opacity = '1';
-      tooltipContainer.current.style.left = `${tooltip.caretX}px`;
-      tooltipContainer.current.style.top = `${tooltip.caretY}px`;
-    }
+    const storedId = tooltipRef.current?.dataset['item'];
+    adjustTooltipPosition(tooltipRef, tooltip);
 
     if (!data || storedId?.toString() === itemId.toString()) return;
 

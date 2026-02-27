@@ -15,7 +15,7 @@ import { Bar } from 'react-chartjs-2';
 import { PrecisePeriod } from '@ts/games/metric';
 import {
   ChartData,
-  DisplayFields,
+  ChartProps,
   PeriodChartData,
   PeriodChartTransformed
 } from '@ts/ui/charts-data';
@@ -31,14 +31,14 @@ import Spinner from '@components/Spinner';
 
 import ChartLegend from './ChartLegend';
 import { getPeriodTooltip } from './ChartTooltip';
+import { barElements, xBarAxis, yBarLineAxis } from './chart-styles';
 
-type PeriodBarChartProps<DataType extends ChartData> = {
+type PeriodBarChartProps<DataType extends ChartData> = Omit<
+  ChartProps<DataType>,
+  'data'
+> & {
   data: PeriodChartData<DataType>[];
   periodType: PrecisePeriod;
-  displayFields: DisplayFields<DataType>;
-  fieldsNames: Record<keyof DataType, string>;
-  chartId: string;
-  className?: string;
 };
 
 type PeriodBarCoreProps = {
@@ -189,7 +189,7 @@ function PeriodBarCore({ data, periodType, year }: PeriodBarCoreProps) {
   }
 
   return (
-    <>
+    <div className='chart-content'>
       <div className='chart-core-wrapper'>
         <Bar
           className='period-bar-chart'
@@ -199,83 +199,13 @@ function PeriodBarCore({ data, periodType, year }: PeriodBarCoreProps) {
             },
             responsive: true,
             skipNull: true,
-            elements: {
-              bar: {
-                borderRadius: {
-                  topLeft: 4,
-                  topRight: 4
-                }
-              }
-            },
+            elements: barElements,
             scales: {
-              x: {
-                type: 'category',
-                position: 'bottom',
-                labels: dataset.labels,
-                border: {
-                  color: '#dee4e6',
-                  width: 2
-                },
-                ticks: {
-                  align: 'center',
-                  display: true,
-                  color: '#dee4e6',
-                  padding: 2,
-                  font: {
-                    size: 12
-                  }
-                },
-                title: {
-                  display: true,
-                  text: periodType[0].toUpperCase() + periodType.slice(1),
-                  align: 'end',
-                  color: '#dee4e6',
-                  padding: 0,
-                  font: {
-                    size: 14,
-                    weight: 700
-                  }
-                }
-              },
-              y: {
-                type: 'linear',
-                position: 'left',
-                border: {
-                  color: '#dee4e6',
-                  width: 2
-                },
-                title: {
-                  display: true,
-                  text: 'Hours',
-                  align: 'end',
-                  color: '#dee4e6',
-                  padding: 10,
-                  font: {
-                    size: 14,
-                    weight: 700
-                  }
-                },
-                ticks: {
-                  mirror: true,
-                  align: 'center',
-                  display: true,
-                  color: '#dee4e6',
-                  backdropColor: '#050709',
-                  textStrokeWidth: 2,
-                  textStrokeColor: '#050709',
-                  padding: -2,
-                  showLabelBackdrop: true,
-                  z: 5,
-                  font: {
-                    size: 12
-                  }
-                },
-                grid: {
-                  drawTicks: false,
-                  color: '#146086',
-                  lineWidth: 1
-                }
-              }
+              x: xBarAxis(
+                periodType[0].toUpperCase() + periodType.slice(1),
+                dataset.labels
+              ),
+              y: yBarLineAxis('Hours')
             },
             plugins: {
               legend: {
@@ -297,7 +227,7 @@ function PeriodBarCore({ data, periodType, year }: PeriodBarCoreProps) {
       </div>
 
       <ChartLegend data={dataset.dataMap.values().toArray()} />
-    </>
+    </div>
   );
 }
 
@@ -328,17 +258,19 @@ export default function PeriodBarChart<DataType extends ChartData>({
       fieldsNames={fieldsNames}
       className={`period-chart ${className}`}
     >
-      <PeriodBarCore data={data} periodType={periodType} year={year} />
+      {periodType === 'year' || (
+        <Select
+          className='chart-select'
+          variant='text'
+          defaultValue={year}
+          options={yearOptions}
+          id={`${chartId}-year`}
+          name={`${chartId}-year`}
+          onSelect={setYear}
+        />
+      )}
 
-      <Select
-        className='chart-select'
-        variant='text'
-        defaultValue={year}
-        options={yearOptions}
-        id={`${chartId}-year`}
-        name={`${chartId}-year`}
-        onSelect={setYear}
-      />
+      <PeriodBarCore data={data} periodType={periodType} year={year} />
     </ChartProvider>
   );
 }

@@ -4,7 +4,7 @@ import { ArcElement, Chart, Legend, Tooltip } from 'chart.js';
 import { useContext } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 
-import { DisplayFields, DoughnutData } from '@ts/ui/charts-data';
+import { ChartProps, DoughnutData } from '@ts/ui/charts-data';
 
 import { ChartColors } from '@lib/utils';
 
@@ -12,16 +12,9 @@ import ChartProvider, { ChartContext } from '@store/ChartProvider';
 
 import ChartLegend from './ChartLegend';
 import { getTooltip } from './ChartTooltip';
+import { arcElements } from './chart-styles';
 
 Chart.register(ArcElement, Tooltip, Legend);
-
-type DoughnutChartProps<DataType extends DoughnutData> = {
-  data: DataType[];
-  displayFields: DisplayFields<DataType>;
-  fieldsNames: Record<keyof DataType, string>;
-  chartId: string;
-  className?: string;
-};
 
 type DoughnutInternalProps<DataType extends DoughnutData> = {
   data: DataType[];
@@ -51,14 +44,7 @@ function DoughnutCore<DataType extends DoughnutData>({
           layout: {
             padding: 20
           },
-          elements: {
-            arc: {
-              hoverOffset: 25,
-              borderColor: 'transparent',
-              borderRadius: 10,
-              spacing: 10
-            }
-          },
+          elements: arcElements,
           locale: 'en-US',
           plugins: {
             tooltip: getTooltip(
@@ -97,7 +83,7 @@ export default function DoughnutChart<DataType extends DoughnutData>({
   fieldsNames,
   chartId,
   className
-}: DoughnutChartProps<DataType>) {
+}: ChartProps<DataType>) {
   return (
     <ChartProvider
       chartId={chartId}

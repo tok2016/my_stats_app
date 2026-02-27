@@ -1,3 +1,5 @@
+'use client';
+
 import { ChevronDown, ChevronUp, ChevronUpDown } from '@mynaui/icons-react';
 import { useEffect, useRef } from 'react';
 
@@ -5,6 +7,7 @@ import { SortDirection } from '@ts/games/filter';
 import { ChartData } from '@ts/ui/charts-data';
 
 type TableProps<DataType extends ChartData> = {
+  id?: string;
   data: DataType[];
   headers: Partial<Record<keyof Omit<DataType, 'id'>, string>>;
   className?: string;
@@ -17,6 +20,7 @@ type TableProps<DataType extends ChartData> = {
 const ROW_ANIMATION_DELAY = 75;
 
 export default function Table<DataType extends ChartData>({
+  id,
   data,
   headers,
   className = '',
@@ -35,14 +39,14 @@ export default function Table<DataType extends ChartData>({
   }, []);
 
   return (
-    <div className={`table ${className}`}>
+    <div id={id} className={`table ${className}`}>
       <div ref={headerRef} className='table-header'>
         <div className='header-cell'>№</div>
         {Object.entries(headers).map(([key, name]) => (
           <div
             key={key}
             className={`header-cell ${onSort ? 'sort-header' : ''}`}
-            onClick={() => onSort?.(key)}
+            onClick={() => onSort?.(key as keyof DataType)}
           >
             {name}
             {!onSort || (
