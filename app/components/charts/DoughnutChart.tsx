@@ -52,6 +52,8 @@ function DoughnutCore<DataType extends DoughnutData>({
               updateTooltip,
               dataMap,
               indexMap,
+              'start',
+              'start',
               percentsMap
             ),
             legend: {

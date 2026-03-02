@@ -10,7 +10,7 @@ $chart-padding: 1.25rem;
 $chart-padding-right: 2rem;
 $rank-padding: 0.25rem;
 
-$default-color: map.get(utils.$diagram-colors, 10);
+$default-color: map.get(utils.$active-colors, 'games');
 
 .metrics {
   display: flex;
@@ -104,6 +104,10 @@ $default-color: map.get(utils.$diagram-colors, 10);
   flex: 1;
 }
 
+.line-chart {
+  min-width: 30rem;
+}
+
 .tooltip-container {
   position: absolute;
   pointer-events: none;
@@ -116,7 +120,7 @@ $default-color: map.get(utils.$diagram-colors, 10);
 
   box-sizing: border-box;
   width: max-content;
-  max-width: 16rem;
+  max-width: 18rem;
   padding: $tooltip-padding;
   padding-right: $tooltip-badge-max + $tooltip-padding;
 
@@ -137,6 +141,11 @@ $default-color: map.get(utils.$diagram-colors, 10);
   display: flex;
   flex-direction: row;
   gap: 0.25rem;
+
+  * {
+    overflow-x: hidden;
+    word-wrap: break-word;
+  }
 }
 
 .tooltip-badge {

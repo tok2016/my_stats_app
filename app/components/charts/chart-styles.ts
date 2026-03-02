@@ -1,6 +1,6 @@
 import { Chart } from 'chart.js';
 
-export const yBarLineAxis = (
+export const yLinearAxis = (
   title: string
 ): NonNullable<Chart<'bar' | 'line'>['options']['scales']>[string] => ({
   type: 'linear',
@@ -34,16 +34,33 @@ export const yBarLineAxis = (
     font: {
       size: 12
     },
-    backdropPadding: 5
+    backdropPadding: 5,
+    callback: (tick) => (!tick || tick === '0' ? undefined : tick.toString())
   },
   grid: {
     drawTicks: false,
     color: '#146086',
     lineWidth: 1
-  }
+  },
+  grace: 1
 });
 
-export const xBarAxis = (
+export const xLinearAxis = (
+  title: string
+): NonNullable<Chart<'bar' | 'line'>['options']['scales']>[string] => ({
+  ...yLinearAxis(title),
+  ticks: {
+    ...yLinearAxis(title)?.ticks,
+    padding: -7
+  },
+  title: {
+    ...yLinearAxis(title)?.title,
+    padding: 14
+  },
+  grace: undefined
+});
+
+export const xCategoryBarAxis = (
   title: string,
   labels: string[]
 ): NonNullable<Chart<'bar'>['options']['scales']>[string] => ({

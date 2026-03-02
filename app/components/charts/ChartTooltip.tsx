@@ -20,6 +20,14 @@ type ChartTooltipProps<DataType extends ChartData> = {
   ref: RefObject<HTMLDivElement | null>;
 };
 
+type TooltipPosition = 'start' | 'center' | 'end';
+
+const PositionMult: Record<TooltipPosition, number> = {
+  start: 0,
+  center: 0.5,
+  end: 1
+};
+
 export default function ChartTooltip<DataType extends ChartData>({
   data,
   displayFields,
@@ -59,22 +67,31 @@ export default function ChartTooltip<DataType extends ChartData>({
 
 const adjustTooltipPosition = <T extends ChartType>(
   tooltipRef: RefObject<HTMLDivElement | null>,
-  tooltip: TooltipModel<T>
+  tooltip: TooltipModel<T>,
+  horizontalPos: TooltipPosition,
+  verticalPos: TooltipPosition
 ) => {
   if (tooltipRef.current) {
+    const originX =
+      tooltip.caretX
+      - tooltipRef.current.offsetWidth * PositionMult[horizontalPos];
+    const originY =
+      tooltip.caretY
+      - tooltipRef.current.offsetHeight * PositionMult[verticalPos];
+
     tooltipRef.current.style.opacity = '1';
 
     const { top, left } = tooltip.chart.canvas.getBoundingClientRect();
 
     const adjustedLeft = clamp(
-      tooltip.caretX,
-      -left,
+      originX,
+      -left / 2,
       window.innerWidth - tooltipRef.current.offsetWidth - left
     );
 
     const adjustedTop = clamp(
-      tooltip.caretY,
-      -top,
+      originY,
+      -top / 2,
       window.innerHeight - tooltipRef.current.offsetHeight - top
     );
 
@@ -83,11 +100,16 @@ const adjustTooltipPosition = <T extends ChartType>(
   }
 };
 
+const tooltipTitleToNumber = (title?: string) =>
+  Number(title?.toString().replace(/\s/g, '') ?? '0');
+
 export const getTooltip = <DataType extends ChartData>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   updateTooltip: ChartContextProps['updateTooltip'],
   dataMap: Map<number, DataType>,
-  indexMap: Map<number, number>,
+  indexMap: Map<number, number> | undefined,
+  horizontalPos: TooltipPosition = 'start',
+  verticalPos: TooltipPosition = 'start',
   percentsMap?: Map<number, number>
 ): NonNullable<Chart['options']['plugins']>['tooltip'] => ({
   enabled: false,
@@ -98,14 +120,14 @@ export const getTooltip = <DataType extends ChartData>(
       return;
     }
 
-    const itemId = Number(tooltip.title[0] ?? '0');
+    const itemId = tooltipTitleToNumber(tooltip.title?.[0]);
     const data = dataMap.get(itemId);
     const storedId = tooltipRef.current?.dataset['item'];
-    adjustTooltipPosition(tooltipRef, tooltip);
+    adjustTooltipPosition(tooltipRef, tooltip, horizontalPos, verticalPos);
 
     if (!data || storedId?.toString() === itemId.toString()) return;
 
-    updateTooltip(data, indexMap.get(itemId), percentsMap?.get(itemId));
+    updateTooltip(data, indexMap?.get(itemId), percentsMap?.get(itemId));
   }
 });
 
@@ -113,7 +135,9 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   updateTooltip: ChartContextProps['updateTooltip'],
   dataMap: Map<number, DataType>,
-  indexMap: Map<number, number>
+  indexMap: Map<number, number> | undefined,
+  horizontalPos: TooltipPosition = 'start',
+  verticalPos: TooltipPosition = 'start'
 ): NonNullable<Chart['options']['plugins']>['tooltip'] => ({
   enabled: false,
   position: 'nearest',
@@ -124,10 +148,10 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
     }
 
     const valueKey = tooltip.title[0];
-    const itemId = Number(tooltip.dataPoints[0].dataset.label ?? '0');
+    const itemId = tooltipTitleToNumber(tooltip.dataPoints[0].dataset.label);
     const data = dataMap.get(itemId);
     const storedId = tooltipRef.current?.dataset['item'];
-    adjustTooltipPosition(tooltipRef, tooltip);
+    adjustTooltipPosition(tooltipRef, tooltip, horizontalPos, verticalPos);
 
     if (!data || storedId?.toString() === itemId.toString()) return;
 
@@ -136,7 +160,7 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
         ...data,
         value: data.countByPeriod[valueKey] ?? data.value
       },
-      indexMap.get(itemId)
+      indexMap?.get(itemId)
     );
   }
 });

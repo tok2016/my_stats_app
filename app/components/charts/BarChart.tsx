@@ -22,7 +22,7 @@ import ChartProvider from '@store/ChartProvider';
 import Select from '@components/Select';
 
 import { getTooltip } from './ChartTooltip';
-import { barElements, xBarAxis, yBarLineAxis } from './chart-styles';
+import { barElements, xCategoryBarAxis, xLinearAxis } from './chart-styles';
 
 type BarChartProps<DataType extends IndexBarChartData> =
   ChartProps<DataType> & {
@@ -81,7 +81,7 @@ function BarChartCore<DataType extends IndexBarChartData>({
         },
         scales: {
           y: {
-            ...xBarAxis(
+            ...xCategoryBarAxis(
               '',
               valueData.map((value) => value.name)
             ),
@@ -93,13 +93,7 @@ function BarChartCore<DataType extends IndexBarChartData>({
             },
             offset: true
           },
-          x: {
-            ...yBarLineAxis(''),
-            ticks: {
-              ...yBarLineAxis('')?.ticks,
-              padding: -8
-            }
-          }
+          x: xLinearAxis('')
         },
         plugins: {
           legend: {

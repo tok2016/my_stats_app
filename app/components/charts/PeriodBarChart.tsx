@@ -31,7 +31,7 @@ import Spinner from '@components/Spinner';
 
 import ChartLegend from './ChartLegend';
 import { getPeriodTooltip } from './ChartTooltip';
-import { barElements, xBarAxis, yBarLineAxis } from './chart-styles';
+import { barElements, xCategoryBarAxis, yLinearAxis } from './chart-styles';
 
 type PeriodBarChartProps<DataType extends ChartData> = Omit<
   ChartProps<DataType>,
@@ -201,11 +201,11 @@ function PeriodBarCore({ data, periodType, year }: PeriodBarCoreProps) {
             skipNull: true,
             elements: barElements,
             scales: {
-              x: xBarAxis(
+              x: xCategoryBarAxis(
                 periodType[0].toUpperCase() + periodType.slice(1),
                 dataset.labels
               ),
-              y: yBarLineAxis('Hours')
+              y: yLinearAxis('Hours')
             },
             plugins: {
               legend: {
