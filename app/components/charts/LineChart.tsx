@@ -1,12 +1,5 @@
 'use client';
 
-import {
-  Chart,
-  LineElement,
-  LinearScale,
-  PointElement,
-  Tooltip
-} from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
 import { ChartData, ChartProps } from '@ts/ui/charts-data';
@@ -16,9 +9,7 @@ import { useChart } from '@lib/hooks';
 import ChartProvider from '@store/ChartProvider';
 
 import { getTooltip } from './ChartTooltip';
-import { xLinearAxis, yLinearAxis } from './chart-styles';
-
-Chart.register(LineElement, Tooltip, LinearScale, PointElement);
+import { ChartClasses } from './chart-styles';
 
 type LineChartCoreProps = {
   data: ChartData[];
@@ -27,7 +18,7 @@ type LineChartCoreProps = {
 
 const MAX_TICKS = 20;
 
-function LineChartCore({ data, fieldsNames }: LineChartCoreProps) {
+export function LineChartCore({ data, fieldsNames }: LineChartCoreProps) {
   const dataMap = new Map<number, ChartData>(
     data.map((value) => [value.id, value])
   );
@@ -36,30 +27,33 @@ function LineChartCore({ data, fieldsNames }: LineChartCoreProps) {
 
   return (
     <Line
-      className='line-chart'
+      className={ChartClasses.line.core}
       options={{
-        responsive: true,
-        aspectRatio: 4,
-        elements: {
-          point: {
-            radius: 6,
-            backgroundColor: '#2eacc8',
-            hoverRadius: 12
-          }
+        interaction: {
+          mode: 'nearest',
+          intersect: false
         },
+        maintainAspectRatio: false,
+        responsive: true,
         scales: {
           x: {
-            ...xLinearAxis(fieldsNames.name),
+            type: 'linear',
             grid: {
-              display: false
+              color: 'transparent'
             },
             offset: true,
             ticks: {
-              ...(xLinearAxis(fieldsNames.name)?.ticks ?? {}),
               stepSize: Math.ceil(data.length / MAX_TICKS)
+            },
+            title: {
+              text: fieldsNames.name
             }
           },
-          y: { ...yLinearAxis(fieldsNames.value), beginAtZero: true }
+          y: {
+            type: 'linear',
+            beginAtZero: true,
+            title: { text: fieldsNames.value }
+          }
         },
         plugins: {
           legend: {
@@ -105,7 +99,7 @@ export default function LineChart<DataType extends ChartData>({
   return (
     <ChartProvider
       chartId={chartId}
-      className={className}
+      className={`${ChartClasses.line.container} ${className}`}
       displayFields={displayFields}
       fieldsNames={fieldsNames}
     >

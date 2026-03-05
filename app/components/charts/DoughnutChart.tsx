@@ -1,6 +1,5 @@
 'use client';
 
-import { ArcElement, Chart, Legend, Tooltip } from 'chart.js';
 import { useContext } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 
@@ -12,15 +11,13 @@ import ChartProvider, { ChartContext } from '@store/ChartProvider';
 
 import ChartLegend from './ChartLegend';
 import { getTooltip } from './ChartTooltip';
-import { arcElements } from './chart-styles';
-
-Chart.register(ArcElement, Tooltip, Legend);
+import { ChartClasses } from './chart-styles';
 
 type DoughnutInternalProps<DataType extends DoughnutData> = {
   data: DataType[];
 };
 
-function DoughnutCore<DataType extends DoughnutData>({
+export function DoughnutCore<DataType extends DoughnutData>({
   data
 }: DoughnutInternalProps<DataType>) {
   const dataMap = new Map(data.map((d) => [d.id, d]));
@@ -32,19 +29,17 @@ function DoughnutCore<DataType extends DoughnutData>({
   return (
     <>
       <Doughnut
-        className='doughnut-chart chart-core'
+        className={ChartClasses.doughnut.core}
         options={{
           aspectRatio: 1,
           rotation: 90,
           responsive: true,
           cutout: '40%',
-          interaction: {
-            mode: 'index'
+          elements: {
+            arc: {
+              spacing: 10 //global spacing doesn't work
+            }
           },
-          layout: {
-            padding: 20
-          },
-          elements: arcElements,
           locale: 'en-US',
           plugins: {
             tooltip: getTooltip(
@@ -91,7 +86,7 @@ export default function DoughnutChart<DataType extends DoughnutData>({
       chartId={chartId}
       displayFields={displayFields}
       fieldsNames={fieldsNames}
-      className={className}
+      className={`${ChartClasses.doughnut.container} ${className}`}
     >
       <DoughnutCore data={data} />
     </ChartProvider>

@@ -22,6 +22,8 @@ type ChartTooltipProps<DataType extends ChartData> = {
 
 type TooltipPosition = 'start' | 'center' | 'end';
 
+const SCREEN_MARGIN = 20;
+
 const PositionMult: Record<TooltipPosition, number> = {
   start: 0,
   center: 0.5,
@@ -34,18 +36,21 @@ export default function ChartTooltip<DataType extends ChartData>({
   fieldsNames,
   ref
 }: ChartTooltipProps<DataType>) {
-  if (!data) return;
-
-  const rank = (data.index ?? -1) + 1;
+  const rank = (data?.index ?? -1) + 1;
   return (
-    <div className='tooltip-container' data-item={data.id} ref={ref}>
-      <div className='chart-tooltip' data-rank={data.index}>
-        <h3 className='colored'>{data.name}</h3>
+    <div
+      style={{ opacity: !data ? '0' : undefined }}
+      className='tooltip-container'
+      data-item={data?.id}
+      ref={ref}
+    >
+      <div className='chart-tooltip' data-rank={data?.index}>
+        <h3 className='colored'>{data?.name}</h3>
 
         {displayFields.map((field) => (
           <div key={field.toString()} className='tooltip-key'>
             <span>{fieldsNames[field]}: </span>
-            <span className='colored'>{data[field] ?? 'no data'}</span>
+            <span className='colored'>{data?.[field] ?? 'no data'}</span>
           </div>
         ))}
 
@@ -55,9 +60,9 @@ export default function ChartTooltip<DataType extends ChartData>({
           </div>
         )}
 
-        {!data.percent || (
+        {!data?.percent || (
           <div className='tooltip-badge tooltip-percent'>
-            <h4>{data.percent}%</h4>
+            <h4>{data?.percent}%</h4>
           </div>
         )}
       </div>
@@ -86,13 +91,13 @@ const adjustTooltipPosition = <T extends ChartType>(
     const adjustedLeft = clamp(
       originX,
       -left / 2,
-      window.innerWidth - tooltipRef.current.offsetWidth - left
+      window.innerWidth - tooltipRef.current.offsetWidth - left - SCREEN_MARGIN
     );
 
     const adjustedTop = clamp(
       originY,
       -top / 2,
-      window.innerHeight - tooltipRef.current.offsetHeight - top
+      window.innerHeight - tooltipRef.current.offsetHeight - top - SCREEN_MARGIN
     );
 
     tooltipRef.current.style.left = `${adjustedLeft}px`;

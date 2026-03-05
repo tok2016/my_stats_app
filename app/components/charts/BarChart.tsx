@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  BarElement,
-  CategoryScale,
-  Chart,
-  Legend,
-  LinearScale,
-  Tooltip
-} from 'chart.js';
+import { Chart } from 'chart.js';
 import { useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 
@@ -22,7 +15,7 @@ import ChartProvider from '@store/ChartProvider';
 import Select from '@components/Select';
 
 import { getTooltip } from './ChartTooltip';
-import { barElements, xCategoryBarAxis, xLinearAxis } from './chart-styles';
+import { ChartClasses } from './chart-styles';
 
 type BarChartProps<DataType extends IndexBarChartData> =
   ChartProps<DataType> & {
@@ -36,9 +29,9 @@ type BarChartCoreProps<DataType extends IndexBarChartData> = {
   horizontal?: boolean;
 };
 
-Chart.register(BarElement, Tooltip, Legend, CategoryScale, LinearScale);
+type ChartScaleType = NonNullable<Chart['options']['scales']>[string];
 
-function BarChartCore<DataType extends IndexBarChartData>({
+export function BarChartCore<DataType extends IndexBarChartData>({
   data,
   valueField,
   horizontal = false
@@ -59,60 +52,69 @@ function BarChartCore<DataType extends IndexBarChartData>({
 
   const { updateTooltip, tooltipRef } = useChart();
 
+  const xAxis: ChartScaleType = {
+    type: 'category',
+    labels: valueData.map((value) => value.name),
+    ticks: {
+      display: false
+    },
+    title: {
+      display: false
+    },
+    offset: true
+  };
+
+  const yAxis: ChartScaleType = {
+    type: 'linear',
+    title: {
+      display: false
+    }
+  };
+
   return (
-    <Bar
-      className={`bar-chart ${horizontal ? 'horizontal' : ''}`}
-      options={{
-        aspectRatio: 1.2,
-        elements: {
-          bar: {
-            borderRadius: !horizontal
-              ? barElements?.bar?.borderRadius
-              : {
-                  topRight: 4,
-                  bottomRight: 4
-                }
-          }
-        },
-        indexAxis: horizontal ? 'y' : 'x',
-        responsive: true,
-        layout: {
-          padding: 20
-        },
-        scales: {
-          y: {
-            ...xCategoryBarAxis(
-              '',
-              valueData.map((value) => value.name)
-            ),
-            ticks: {
+    <div className={`chart-core-wrapper ${horizontal ? 'horizontal' : ''}`}>
+      <Bar
+        className={ChartClasses.bar.core}
+        options={{
+          maintainAspectRatio: false,
+          layout: {
+            padding: 10
+          },
+          elements: {
+            bar: {
+              borderRadius: !horizontal
+                ? undefined
+                : {
+                    topRight: 4,
+                    bottomRight: 4
+                  }
+            }
+          },
+          indexAxis: horizontal ? 'y' : 'x',
+          responsive: true,
+          scales: {
+            y: horizontal ? xAxis : yAxis,
+            x: horizontal ? yAxis : xAxis
+          },
+          plugins: {
+            legend: {
               display: false
             },
-            title: {
-              display: false
-            },
-            offset: true
-          },
-          x: xLinearAxis('')
-        },
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: getTooltip(tooltipRef, updateTooltip, dataMap, indexMap)
-        }
-      }}
-      data={{
-        labels: valueData.map((value) => value.name),
-        datasets: [
-          {
-            backgroundColor: ChartColors,
-            data: valueData.map((value) => value.value),
-            categoryPercentage: 0.5
+            tooltip: getTooltip(tooltipRef, updateTooltip, dataMap, indexMap)
           }
-        ]
-      }}
-    />
+        }}
+        data={{
+          labels: valueData.map((value) => value.name),
+          datasets: [
+            {
+              backgroundColor: ChartColors,
+              data: valueData.map((value) => value.value),
+              categoryPercentage: 0.5
+            }
+          ]
+        }}
+      />
+    </div>
   );
 }
 
@@ -140,18 +142,20 @@ export default function BarChart<DataType extends IndexBarChartData>({
 
   return (
     <ChartProvider
-      className={`period-chart ${className}`}
+      className={`filter-chart ${ChartClasses.bar.container} ${className}`}
       chartId={chartId}
       displayFields={displayFields}
       fieldsNames={fieldsNames}
     >
-      <Select
-        variant='text'
-        name={`${chartId}-field`}
-        id={`${chartId}-field`}
-        options={fieldsOptions}
-        onSelect={onFieldSelect}
-      />
+      {valueFields.length > 1 && (
+        <Select
+          variant='text'
+          name={`${chartId}-field`}
+          id={`${chartId}-field`}
+          options={fieldsOptions}
+          onSelect={onFieldSelect}
+        />
+      )}
       <BarChartCore data={data} valueField={field} horizontal={horizontal} />
     </ChartProvider>
   );

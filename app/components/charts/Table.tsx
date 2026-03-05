@@ -1,7 +1,6 @@
 'use client';
 
 import { ChevronDown, ChevronUp, ChevronUpDown } from '@mynaui/icons-react';
-import { useEffect, useRef } from 'react';
 
 import { SortDirection } from '@ts/games/filter';
 import { ChartData } from '@ts/ui/charts-data';
@@ -29,18 +28,9 @@ export default function Table<DataType extends ChartData>({
   rowContent,
   onSort
 }: TableProps<DataType>) {
-  const headerRef = useRef<HTMLDivElement>(null);
-  const rowRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (headerRef.current && rowRef.current) {
-      headerRef.current.style.width = `${rowRef.current.clientWidth}px`;
-    }
-  }, []);
-
   return (
     <div id={id} className={`table ${className}`}>
-      <div ref={headerRef} className='table-header'>
+      <div className='table-header'>
         <div className='header-cell'>№</div>
         {Object.entries(headers).map(([key, name]) => (
           <div
@@ -69,7 +59,6 @@ export default function Table<DataType extends ChartData>({
       <div className='table-body'>
         {data.map((value, i) => (
           <div
-            ref={i === 0 ? rowRef : undefined}
             key={value.id}
             className={`table-row ${i === 0 ? 'top-row' : ''}`}
             style={{ animationDelay: `${ROW_ANIMATION_DELAY * i}ms` }}

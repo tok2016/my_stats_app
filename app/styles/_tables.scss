@@ -2,6 +2,7 @@
 
 .table {
   height: inherit;
+  overflow-x: auto;
 }
 
 .table,
@@ -24,6 +25,7 @@
 
 .table-header,
 .table-body {
+  min-width: 30rem;
   box-sizing: border-box;
   padding: 2px 2px;
 }

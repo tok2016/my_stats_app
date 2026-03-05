@@ -1,5 +1,7 @@
 import { IgdbBasic } from '@ts/games/api-response';
 
+export type CustomChartType = 'doughnut' | 'periodBar' | 'bar' | 'line';
+
 export type ChartData = IgdbBasic & { value: number };
 
 export type TooltipData = ChartData & {

@@ -34,7 +34,7 @@ export default function BarPage() {
     index: i,
     value: 0,
     count: data.count,
-    hours: Math.round(Math.random() * 100000) % 100
+    hours: 20
   }));
 
   return (

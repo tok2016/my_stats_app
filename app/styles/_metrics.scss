@@ -38,7 +38,7 @@ $default-color: map.get(utils.$active-colors, 'games');
 }
 
 .chart,
-.chart-content {
+.chart-legend-content {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -58,20 +58,23 @@ $default-color: map.get(utils.$active-colors, 'games');
 
 .adjacent-chart {
   width: 100%;
-  height: 25vw;
+  height: 23rem;
 
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
 
   .chart {
     padding: 0.5rem;
-    width: 30vw;
+    flex: 2;
+    min-width: 29rem;
   }
 
   .table {
-    flex: 1;
+    flex: 3;
+    min-width: 29rem;
   }
 }
 
@@ -85,11 +88,16 @@ $default-color: map.get(utils.$active-colors, 'games');
 }
 
 .chart-core-wrapper {
-  flex: 1 1;
-  max-width: 85%;
+  flex: 1;
 }
 
-.period-chart {
+.chart-legend-content {
+  .chart-core-wrapper {
+    width: 85%;
+  }
+}
+
+.filter-chart {
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
@@ -97,15 +105,16 @@ $default-color: map.get(utils.$active-colors, 'games');
 }
 
 .period-bar-chart {
-  max-height: 22rem;
+  height: 22rem;
 }
 
-.bar-chart-wrapper.horizontal {
-  flex: 1;
+.period-bar-container {
+  max-height: 26rem;
 }
 
 .line-chart {
   min-width: 30rem;
+  min-height: 20rem;
 }
 
 .tooltip-container {
@@ -191,6 +200,7 @@ $default-color: map.get(utils.$active-colors, 'games');
   list-style: none;
   padding: 0;
   margin: 0;
+  max-width: 13rem;
 
   display: flex;
   flex-direction: column;

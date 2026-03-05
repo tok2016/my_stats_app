@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  BarElement,
-  CategoryScale,
-  Chart,
-  ChartDataset,
-  Legend,
-  LinearScale,
-  Tooltip
-} from 'chart.js';
+import { ChartDataset } from 'chart.js';
 import { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 
@@ -27,11 +19,11 @@ import { ChartColors, MONTHS_IN_YEAR, Seasons } from '@lib/utils';
 import ChartProvider from '@store/ChartProvider';
 
 import Select from '@components/Select';
-import Spinner from '@components/Spinner';
 
 import ChartLegend from './ChartLegend';
 import { getPeriodTooltip } from './ChartTooltip';
-import { barElements, xCategoryBarAxis, yLinearAxis } from './chart-styles';
+import './chart-styles';
+import { ChartClasses } from './chart-styles';
 
 type PeriodBarChartProps<DataType extends ChartData> = Omit<
   ChartProps<DataType>,
@@ -54,12 +46,17 @@ type PeriodDataset = {
   indexMap: Map<number, number>;
 };
 
-Chart.register(BarElement, Tooltip, Legend, CategoryScale, LinearScale);
-
 const UnitsPerYear: Record<PrecisePeriod, number> = {
   year: 0,
   season: Seasons.length,
   month: MONTHS_IN_YEAR
+};
+
+const defaultPeriodDataset: PeriodDataset = {
+  labels: [],
+  datasets: [],
+  dataMap: new Map(),
+  indexMap: new Map()
 };
 
 const parsePeriod = (period?: string) => {
@@ -120,8 +117,8 @@ const getPeriodDatasets = async (params?: {
   data: PeriodChartData<ChartData>[];
   periodType: PrecisePeriod;
   year: number;
-}): Promise<PeriodDataset | undefined> => {
-  if (!params) return;
+}): Promise<PeriodDataset> => {
+  if (!params) return defaultPeriodDataset;
   const { data, periodType, year } = params;
 
   const isYear = periodType === 'year';
@@ -177,35 +174,39 @@ const getPeriodDatasets = async (params?: {
 };
 
 function PeriodBarCore({ data, periodType, year }: PeriodBarCoreProps) {
-  const [dataset, getDataset] = useAction(getPeriodDatasets, undefined);
+  const [dataset, getDataset] = useAction(
+    getPeriodDatasets,
+    defaultPeriodDataset
+  );
   const { updateTooltip, tooltipRef } = useChart();
 
   useEffect(() => {
     getDataset({ data, periodType, year: Number(year) });
   }, [data, getDataset, periodType, year]);
 
-  if (!dataset) {
-    return <Spinner size={20} strokeWidth={6} />;
-  }
-
   return (
-    <div className='chart-content'>
+    <div className='chart-legend-content'>
       <div className='chart-core-wrapper'>
         <Bar
-          className='period-bar-chart'
+          className={ChartClasses.periodBar.core}
           options={{
-            font: {
-              family: 'Inter'
-            },
+            maintainAspectRatio: false,
             responsive: true,
             skipNull: true,
-            elements: barElements,
             scales: {
-              x: xCategoryBarAxis(
-                periodType[0].toUpperCase() + periodType.slice(1),
-                dataset.labels
-              ),
-              y: yLinearAxis('Hours')
+              x: {
+                type: 'category',
+                labels: dataset.labels,
+                title: {
+                  text: periodType[0].toUpperCase() + periodType.slice(1)
+                }
+              },
+              y: {
+                type: 'linear',
+                title: {
+                  text: 'Hours'
+                }
+              }
             },
             plugins: {
               legend: {
@@ -256,7 +257,7 @@ export default function PeriodBarChart<DataType extends ChartData>({
       chartId={chartId}
       displayFields={displayFields}
       fieldsNames={fieldsNames}
-      className={`period-chart ${className}`}
+      className={`filter-chart ${ChartClasses.periodBar.container} ${className}`}
     >
       {periodType === 'year' || (
         <Select
