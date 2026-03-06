@@ -1,4 +1,4 @@
-import { ImageSolid, ChartColumnBigSolid } from '@mynaui/icons-react';
+import { ChartColumnBigSolid, ImageSolid } from '@mynaui/icons-react';
 
 type SkeletonProps = {
   type?: 'h1' | 'h2' | 'h3' | 'h4' | 'text' | 'image' | 'graph';
@@ -8,13 +8,15 @@ type SkeletonProps = {
   height?: string;
   rows?: number;
   className?: string;
+  unitClassName?: string;
 };
 
 export default function Skeleton({
   type = 'text',
   fontSize = 'regular',
   lineHeight = 'fit',
-  className,
+  className = '',
+  unitClassName = '',
   width,
   height,
   rows = 1
@@ -24,7 +26,7 @@ export default function Skeleton({
       {Array.from({ length: rows }, (_v, i) => (
         <div
           key={i}
-          className={`skeleton ${type} ${fontSize} ${lineHeight}`}
+          className={`skeleton ${unitClassName} ${type} ${fontSize} ${lineHeight}`}
           style={{ height }}
         >
           {type !== 'image' || <ImageSolid />}

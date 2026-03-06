@@ -30,7 +30,6 @@ export default async function Page() {
         displayFields={['value']}
         fieldsNames={DisplayPeriodFields}
         chartId='genres-periods-bar'
-        className='test-periods'
       />
     </>
   );

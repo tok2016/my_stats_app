@@ -72,48 +72,50 @@ export function BarChartCore<DataType extends IndexBarChartData>({
   };
 
   return (
-    <div className={`chart-core-wrapper ${horizontal ? 'horizontal' : ''}`}>
-      <Bar
-        className={ChartClasses.bar.core}
-        options={{
-          maintainAspectRatio: false,
-          layout: {
-            padding: 10
-          },
-          elements: {
-            bar: {
-              borderRadius: !horizontal
-                ? undefined
-                : {
-                    topRight: 4,
-                    bottomRight: 4
-                  }
-            }
-          },
-          indexAxis: horizontal ? 'y' : 'x',
-          responsive: true,
-          scales: {
-            y: horizontal ? xAxis : yAxis,
-            x: horizontal ? yAxis : xAxis
-          },
-          plugins: {
-            legend: {
-              display: false
+    <div className='chart-legend-content'>
+      <div className={`chart-core-wrapper ${horizontal ? 'horizontal' : ''}`}>
+        <Bar
+          className={ChartClasses.bar.core}
+          options={{
+            maintainAspectRatio: false,
+            layout: {
+              padding: 10
             },
-            tooltip: getTooltip(tooltipRef, updateTooltip, dataMap, indexMap)
-          }
-        }}
-        data={{
-          labels: valueData.map((value) => value.name),
-          datasets: [
-            {
-              backgroundColor: ChartColors,
-              data: valueData.map((value) => value.value),
-              categoryPercentage: 0.5
+            elements: {
+              bar: {
+                borderRadius: !horizontal
+                  ? undefined
+                  : {
+                      topRight: 4,
+                      bottomRight: 4
+                    }
+              }
+            },
+            indexAxis: horizontal ? 'y' : 'x',
+            responsive: true,
+            scales: {
+              y: horizontal ? xAxis : yAxis,
+              x: horizontal ? yAxis : xAxis
+            },
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: getTooltip(tooltipRef, updateTooltip, dataMap, indexMap)
             }
-          ]
-        }}
-      />
+          }}
+          data={{
+            labels: valueData.map((value) => value.name),
+            datasets: [
+              {
+                backgroundColor: ChartColors,
+                data: valueData.map((value) => value.value),
+                categoryPercentage: 0.5
+              }
+            ]
+          }}
+        />
+      </div>
     </div>
   );
 }

@@ -24,36 +24,92 @@ $default-color: map.get(utils.$active-colors, 'games');
   height: 20rem;
 }
 
-.test-periods {
-  width: 100%;
-}
-
 .chart {
   box-sizing: border-box;
   position: relative;
-
   padding: 1.25rem;
   padding-right: $chart-padding-right;
-  border-radius: utils.$regular-radius;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.25rem;
 }
 
 .chart,
+.skeleton.graph {
+  border-radius: utils.$regular-radius;
+}
+
+.chart-core-wrapper {
+  flex: 1;
+}
+
 .chart-legend-content {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   gap: 1rem;
   align-items: center;
+  flex: 1;
+  max-height: 100%;
+
+  .chart-core-wrapper {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .switchable-chart {
   position: relative;
+
+  > div {
+    width: 100% !important;
+    height: 100% !important;
+  }
 
   > button {
     position: absolute;
     top: 0;
     right: 0;
   }
+}
+
+.doughnut-container {
+  width: 32rem;
+  aspect-ratio: 1.8;
+
+  .chart-core-wrapper {
+    flex: 0;
+    width: unset;
+    height: 100%;
+    aspect-ratio: 1;
+  }
+}
+
+.period-bar-container {
+  .chart-core-wrapper {
+    width: 85%;
+  }
+}
+
+.period-bar-container,
+.bar-container {
+  width: 100%;
+  min-width: 32rem;
+  height: 26rem;
+}
+
+.bar-container.horizontal {
+  width: 100%;
+  min-width: 32rem;
+  height: 32rem;
+}
+
+.line-container {
+  width: 100%;
+  min-width: 32rem;
+  height: 24rem;
 }
 
 .adjacent-chart {
@@ -69,6 +125,8 @@ $default-color: map.get(utils.$active-colors, 'games');
   .chart {
     padding: 0.5rem;
     flex: 2;
+    width: unset;
+    height: unset;
     min-width: 29rem;
   }
 
@@ -78,43 +136,11 @@ $default-color: map.get(utils.$active-colors, 'games');
   }
 }
 
-.test-count-chart {
-  height: 100%;
-}
-
-.doughnut-chart {
-  max-width: 20rem;
-  max-height: 20rem;
-}
-
-.chart-core-wrapper {
-  flex: 1;
-}
-
-.chart-legend-content {
-  .chart-core-wrapper {
-    width: 85%;
-  }
-}
-
 .filter-chart {
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
   gap: 0.25rem;
-}
-
-.period-bar-chart {
-  height: 22rem;
-}
-
-.period-bar-container {
-  max-height: 26rem;
-}
-
-.line-chart {
-  min-width: 30rem;
-  min-height: 20rem;
 }
 
 .tooltip-container {

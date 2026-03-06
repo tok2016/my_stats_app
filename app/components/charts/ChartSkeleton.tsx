@@ -13,7 +13,8 @@ export function ChartSkeleton({ className, type }: ChartSkeletonProps) {
   return (
     <Skeleton
       type='graph'
-      className={`${ChartClasses[type].container} ${className}`}
+      className={className}
+      unitClassName={ChartClasses[type].container}
     />
   );
 }

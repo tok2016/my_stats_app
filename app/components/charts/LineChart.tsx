@@ -26,66 +26,70 @@ export function LineChartCore({ data, fieldsNames }: LineChartCoreProps) {
   const { updateTooltip, tooltipRef } = useChart();
 
   return (
-    <Line
-      className={ChartClasses.line.core}
-      options={{
-        interaction: {
-          mode: 'nearest',
-          intersect: false
-        },
-        maintainAspectRatio: false,
-        responsive: true,
-        scales: {
-          x: {
-            type: 'linear',
-            grid: {
-              color: 'transparent'
+    <div className='chart-legend-content'>
+      <div className='chart-core-wrapper'>
+        <Line
+          className={ChartClasses.line.core}
+          options={{
+            interaction: {
+              mode: 'nearest',
+              intersect: false
             },
-            offset: true,
-            ticks: {
-              stepSize: Math.ceil(data.length / MAX_TICKS)
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+              x: {
+                type: 'linear',
+                grid: {
+                  color: 'transparent'
+                },
+                offset: true,
+                ticks: {
+                  stepSize: Math.ceil(data.length / MAX_TICKS)
+                },
+                title: {
+                  text: fieldsNames.name
+                }
+              },
+              y: {
+                type: 'linear',
+                beginAtZero: true,
+                title: { text: fieldsNames.value }
+              }
             },
-            title: {
-              text: fieldsNames.name
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: getTooltip(
+                tooltipRef,
+                updateTooltip,
+                dataMap,
+                undefined,
+                'end',
+                'end'
+              )
             }
-          },
-          y: {
-            type: 'linear',
-            beginAtZero: true,
-            title: { text: fieldsNames.value }
-          }
-        },
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: getTooltip(
-            tooltipRef,
-            updateTooltip,
-            dataMap,
-            undefined,
-            'end',
-            'end'
-          )
-        }
-      }}
-      data={{
-        labels: data.map((value) => value.id),
-        datasets: [
-          {
-            borderColor: '#2eacc8',
-            borderWidth: 3,
-            data: data.map((value) => (!value.value ? null : value.value)),
-            segment: {
-              borderDash: (ctx) =>
-                ctx.p0.skip || ctx.p1.skip ? [6, 10] : undefined
-            },
-            borderCapStyle: 'round',
-            spanGaps: true
-          }
-        ]
-      }}
-    />
+          }}
+          data={{
+            labels: data.map((value) => value.id),
+            datasets: [
+              {
+                borderColor: '#2eacc8',
+                borderWidth: 3,
+                data: data.map((value) => (!value.value ? null : value.value)),
+                segment: {
+                  borderDash: (ctx) =>
+                    ctx.p0.skip || ctx.p1.skip ? [6, 10] : undefined
+                },
+                borderCapStyle: 'round',
+                spanGaps: true
+              }
+            ]
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
