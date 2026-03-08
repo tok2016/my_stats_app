@@ -1,15 +1,17 @@
 'use server';
 
 import { AxiosRequestConfig } from 'axios';
+
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+import { CountData } from '@ts/games/metric';
 import Country, { CountryIso, CountryResponse } from '@ts/users/country';
 import { ServicesMap } from '@ts/users/service';
 import { BasicUser, User } from '@ts/users/user';
 
-import { defaultCountry } from './utils';
 import AxiosInstanse, { AxiosCountriesInstanse } from './axios-instanse';
+import { defaultCountry } from './utils';
 
 export const logout = async () => {
   const cookiesStorage = await cookies();
@@ -104,4 +106,17 @@ export const getUserCountries = async (
       user.country ? countriesMap[user.country] : undefined
     ])
   );
+};
+
+export const getGenresCount = async (): Promise<CountData[]> => {
+  try {
+    const response = await AxiosInstanse.get<CountData[]>(
+      `/api/games/genres/count`,
+      await getAuthConfig()
+    );
+
+    return response.data;
+  } catch {
+    return [];
+  }
 };

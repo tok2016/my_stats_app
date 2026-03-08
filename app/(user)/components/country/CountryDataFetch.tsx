@@ -5,10 +5,12 @@ import { useEffect } from 'react';
 import Country from '@ts/users/country';
 
 import { useAction } from '@lib/hooks';
-import CountryDataSkeleton from './CountryDataSkeleton';
-import FetchImage from '@components/FetchImage';
 import { getCountyData } from '@lib/server-actions';
 import { defaultCountry } from '@lib/utils';
+
+import FetchImage from '@components/FetchImage';
+
+import CountryDataSkeleton from './CountryDataSkeleton';
 
 type CountryDataFetchProps = {
   country: string;

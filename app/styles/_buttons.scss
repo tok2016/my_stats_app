@@ -174,16 +174,16 @@ button {
     background-color: transparent;
 
     * {
-      filter: drop-shadow(0 0 utils.$spread $main-color);
+      filter: drop-shadow(0 0 utils.$spread * 0.5 $main-color);
     }
 
     &:hover,
     &:focus-visible * {
-      filter: drop-shadow(0 0 2 * utils.$spread $hover-color);
+      filter: drop-shadow(0 0 2 * utils.$spread * 0.5 $hover-color);
     }
 
     &:active * {
-      filter: drop-shadow(0 0 2 * utils.$spread $active-color);
+      filter: drop-shadow(0 0 2 * utils.$spread * 0.5 $active-color);
     }
 
     &:disabled * {

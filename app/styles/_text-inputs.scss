@@ -389,6 +389,7 @@ select {
 ) {
   .text-select-group {
     .select {
+      cursor: pointer;
       color: $main-color;
 
       span {

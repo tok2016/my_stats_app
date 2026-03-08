@@ -1,4 +1,4 @@
-import { type ReactNode, type MouseEvent } from 'react';
+import { type MouseEvent, type ReactNode } from 'react';
 
 import { ButtonStatus, ButtonVariant } from './components-variants';
 
@@ -55,9 +55,12 @@ export interface SliderProps extends InputBaseProps {
   max: number;
 }
 
-export type SidebarSubButtonProps = {
+export type PathInfo = {
   name: string;
   label: string;
+};
+
+export type SidebarSubButtonProps = PathInfo & {
   href: string;
   loading?: boolean;
 };

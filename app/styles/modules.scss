@@ -6,11 +6,33 @@
 @use 'number-inputs';
 @use 'components';
 @use 'sidebar';
+@use 'metrics';
+@use 'tables';
 
 $bg-1-color-length: 28%;
 $modules: 'user', 'music', 'games';
 
 @each $module in $modules {
+  :root:has(> body > .#{$module}) * {
+    &::-webkit-scrollbar {
+      width: 14px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: map.get(utils.$bg-2-colors, $module);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: map.get(utils.$hover-colors, $module);
+      border: solid 3px map.get(utils.$bg-2-colors, $module);
+      border-radius: utils.$regular-radius;
+    }
+
+    &::-webkit-scrollbar-corner {
+      background-color: map.get(utils.$bg-2-colors, $module);
+    }
+  }
+
   body > .#{$module} {
     box-sizing: border-box;
     padding: utils.$layout-padding;
@@ -165,6 +187,20 @@ $modules: 'user', 'music', 'games';
       map.get(utils.$active-colors, $module)
     );
 
+    @include metrics.chart(
+      map.get(utils.$bg-1-colors, $module),
+      map.get(utils.$text-colors, $module)
+    );
+
+    @include tables.table(
+      map.get(utils.$bg-1-colors, $module),
+      map.get(utils.$active-colors, $module),
+      map.get(utils.$disabled-colors, $module),
+      map.get(utils.$text-colors, $module),
+      utils.$text-darker,
+      utils.$white
+    );
+
     .light {
       @include utils.light-scrollbar();
 
@@ -277,6 +313,26 @@ $modules: 'user', 'music', 'games';
       );
 
       @include components.spinner(map.get(utils.$bg-2-colors, $module));
+
+      @include metrics.chart(
+        map.get(utils.$text-colors, $module),
+        map.get(utils.$bg-2-colors, $module)
+      );
+
+      @include tables.table(
+        map.get(utils.$text-colors, $module),
+        map.get(utils.$active-colors, $module),
+        map.get(utils.$disabled-colors, $module),
+        map.get(utils.$bg-2-colors, $module),
+        map.get(utils.$hover-colors, $module),
+        map.get(utils.$active-colors, $module)
+      );
     }
+  }
+}
+
+@each $rank, $color in utils.$diagram-colors {
+  .colored[data-rank='#{$rank}'] {
+    color: $color;
   }
 }

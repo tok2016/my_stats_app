@@ -20,25 +20,12 @@ body {
   padding: 0;
   margin: 0;
   font-family: utils.$inter;
-}
 
-::-webkit-scrollbar {
-  width: 14px;
-  border-radius: utils.$small-radius;
-}
-
-::-webkit-scrollbar-track {
-  background-color: map.get(utils.$bg-2-colors, 'user');
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: map.get(utils.$hover-colors, 'user');
-  border: solid 3px map.get(utils.$bg-2-colors, 'user');
-  border-radius: utils.$small-radius;
-}
-
-::-webkit-scrollbar-corner {
-  background-color: map.get(utils.$bg-2-colors, 'user');
+  * {
+    &::-webkit-scrollbar-track {
+      border-radius: utils.$regular-radius;
+    }
+  }
 }
 
 h1,

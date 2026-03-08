@@ -1,6 +1,6 @@
 import { PrecisePeriod } from '@ts/games/metric';
 import ErrorResponse, { ValidationIssue } from '@ts/requests';
-import { Option } from '@ts/ui/components-props';
+import { Option, PathInfo } from '@ts/ui/components-props';
 import FormState from '@ts/ui/form-state';
 import { ConfirmationInfo } from '@ts/users/confirmation';
 import Country from '@ts/users/country';
@@ -13,8 +13,9 @@ import { isAxiosError, isErrorResponse } from './type-guards';
 
 export const MILLISECONDS = 1000;
 export const MINUTES = 60;
-export const MONTH_IN_QUARTER = 3;
-const MONTH_SHIFT = 11;
+export const MONTHS_IN_QUARTER = 3;
+export const MONTHS_IN_YEAR = 12;
+const MONTHS_SHIFT = 11;
 
 export const FOUND_USERS_LIMIT = 5;
 
@@ -25,6 +26,9 @@ export const CONFIRMATION_TTL = 30 * 60;
 export const TOP_ENTRIES = 3;
 export const GAMES_IN_METRIC = 5;
 export const ITEMS_IN_RATING = 5;
+
+export const MAX_ENTRIES_IN_CHART = 10;
+export const MIN_PERCENT_FOR_CHART = 2;
 
 const SUCCESS_CODE_START = 200;
 const SUCCESS_CODE_END = 300;
@@ -44,6 +48,36 @@ export const ServiceStatuses = [
 ] as const;
 
 export const Modules = ['user', 'music', 'games'] as const;
+
+export const Seasons = ['Winter', 'Spring', 'Summer', 'Fall'] as const;
+export const Months = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec'
+] as const;
+
+export const ChartColors = [
+  '#2EACC8',
+  '#982DC6',
+  '#C05431',
+  '#D5C534',
+  '#1FBB70',
+  '#D235C7',
+  '#C33333',
+  '#3257DF',
+  '#63D43A',
+  '#1FBBA4',
+  '#CDCDCD'
+] as const;
 
 export const defaultFormState = <FormDataType>(): FormState<FormDataType> => ({
   error: false,
@@ -189,7 +223,7 @@ export const getPeriodDate: Record<PrecisePeriod, (date: Date) => string> = {
   year: (date) => date.getFullYear().toString(),
   season: (date) => {
     const seasonNumber = Math.floor(
-      ((date.getMonth() % MONTH_SHIFT) + 1) / MONTH_IN_QUARTER
+      ((date.getMonth() % MONTHS_SHIFT) + 1) / MONTHS_IN_QUARTER
     );
     return `${date.getFullYear()}-${seasonNumber}`;
   },
@@ -200,3 +234,46 @@ export const mean = (values: number[]) =>
   values.length > 0
     ? values.reduce((prev, curr) => prev + curr, 0) / values.length
     : undefined;
+
+export const ModulesPaths: Record<string, PathInfo> = {
+  '/music/genres': {
+    name: 'genres',
+    label: 'Genres'
+  },
+  '/music/artists': {
+    name: 'artists',
+    label: 'Artists'
+  },
+  '/music/albums': {
+    name: 'albums',
+    label: 'Albums'
+  },
+  '/music/tracks': {
+    name: 'tracks',
+    label: 'Tracks'
+  },
+  '/music/library': {
+    name: 'library',
+    label: 'Library'
+  },
+  '/games/genres': {
+    name: 'genres',
+    label: 'Genres'
+  },
+  '/games/studios': {
+    name: 'studios',
+    label: 'Studios'
+  },
+  '/games/platforms': {
+    name: 'platforms',
+    label: 'Platforms'
+  },
+  '/games/titles': {
+    name: 'titles',
+    label: 'Video Games'
+  },
+  '/games/library': {
+    name: 'library',
+    label: 'Library'
+  }
+};
