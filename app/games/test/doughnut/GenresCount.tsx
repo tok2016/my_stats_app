@@ -1,16 +1,15 @@
 'use server';
 
+import { ChartData } from '@ts/ui/charts-data';
+
 import { getGenresCount } from '@lib/server-actions';
 import { MAX_ENTRIES_IN_CHART } from '@lib/utils';
 
 import GenresCountChart from './GenresCountChart';
 
-type GenreCount = {
-  id: number;
-  name: string;
+type GenreCount = ChartData & {
   count: number;
   percent: number;
-  value: number;
   seriesName?: number;
 };
 
@@ -44,6 +43,7 @@ export default async function GenresCount() {
       genres.push({
         id: -1,
         name: 'Other',
+        index: i,
         count,
         value: count,
         percent: Math.round((count / sum) * 100),
@@ -57,6 +57,7 @@ export default async function GenresCount() {
 
     genres.push({
       id: Number(data.id),
+      index: i,
       name: data.id.toString(),
       count: data.count,
       value: data.count,

@@ -6,7 +6,8 @@ import {
   ChartContextProps,
   ChartData,
   DisplayFields,
-  TooltipData
+  TooltipData,
+  TooltipProps
 } from '@ts/ui/charts-data';
 
 import ChartTooltip from '@components/charts/ChartTooltip';
@@ -16,6 +17,7 @@ type ChartProviderProps<DataType extends ChartData> = {
   chartId: string;
   displayFields: DisplayFields<DataType>;
   fieldsNames: Record<keyof DataType, string>;
+  tooltipProps?: TooltipProps;
   className?: string;
 };
 
@@ -31,13 +33,14 @@ export default function ChartProvider<DataType extends ChartData>({
   chartId,
   displayFields,
   fieldsNames,
+  tooltipProps,
   className = ''
 }: ChartProviderProps<DataType>) {
   const [tooltipData, setTooltipData] = useState<TooltipData>();
   const tooltipRef = useRef<HTMLDivElement>(null);
 
-  const updateTooltip = (data: ChartData, index?: number, percent?: number) => {
-    setTooltipData({ ...data, index, percent });
+  const updateTooltip = (data: ChartData) => {
+    setTooltipData({ ...data });
   };
 
   const value = useMemo(() => ({ updateTooltip, tooltipRef }), []);
@@ -50,6 +53,8 @@ export default function ChartProvider<DataType extends ChartData>({
           ref={tooltipRef}
           displayFields={displayFields}
           fieldsNames={fieldsNames}
+          showRank={tooltipProps?.showRank}
+          colored={tooltipProps?.colored}
         />
 
         {children}

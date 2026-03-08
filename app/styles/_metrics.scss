@@ -29,6 +29,7 @@ $default-color: map.get(utils.$active-colors, 'games');
   position: relative;
   padding: 1.25rem;
   padding-right: $chart-padding-right;
+
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -100,7 +101,7 @@ $default-color: map.get(utils.$active-colors, 'games');
   height: 26rem;
 }
 
-.bar-container.horizontal {
+.bar-container:has(.horizontal) {
   width: 100%;
   min-width: 32rem;
   height: 32rem;
@@ -134,13 +135,6 @@ $default-color: map.get(utils.$active-colors, 'games');
     flex: 3;
     min-width: 29rem;
   }
-}
-
-.filter-chart {
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-  gap: 0.25rem;
 }
 
 .tooltip-container {

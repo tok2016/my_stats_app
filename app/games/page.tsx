@@ -1,8 +1,4 @@
-import { Suspense } from 'react';
-
-import { ChartSkeleton } from '@components/charts/ChartSkeleton';
-
-import GenresCount from './GenresCount';
+import Link from 'next/link';
 
 export default function GamesMainPage() {
   // return (
@@ -16,10 +12,11 @@ export default function GamesMainPage() {
   // );
 
   return (
-    <Suspense
-      fallback={<ChartSkeleton type='doughnut' className='test-chart' />}
-    >
-      <GenresCount />
-    </Suspense>
+    <>
+      <Link href='/games/test/doughnut'>Dougnut</Link>
+      <Link href='/games/test/bar'>Bar</Link>
+      <Link href='/games/test/line'>Line</Link>
+      <Link href='/games/test/periodBar'>Period Bar</Link>
+    </>
   );
 }

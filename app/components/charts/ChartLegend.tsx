@@ -2,7 +2,7 @@ import { ChartData } from '@ts/ui/charts-data';
 
 type ChartLegendProps<DataType extends ChartData> = {
   data: DataType[];
-  percentsMap?: Map<string | number, number>;
+  percentsMap?: Map<number, number | undefined>;
 };
 
 export default function ChartLegend<DataType extends ChartData>({

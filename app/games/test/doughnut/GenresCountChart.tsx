@@ -4,16 +4,15 @@ import { ChartPieTwoSolid, TableSolid } from '@mynaui/icons-react';
 
 import Link from 'next/link';
 
-import DoughnutChart from '@components/charts/DoughnutChart';
+import { ChartData } from '@ts/ui/charts-data';
+
+import Chart from '@components/charts/Chart';
 import SwitchableChart from '@components/charts/SwitchableChart';
 import Table from '@components/charts/Table';
 
-type GenreCount = {
-  id: number;
-  name: string;
+type GenreCount = ChartData & {
   count: number;
   percent: number;
-  value: number;
   seriesName?: number;
 };
 
@@ -23,6 +22,7 @@ type GenresCountChartProps = {
 
 const fieldsNames: Record<keyof GenreCount, string> = {
   id: 'ID',
+  index: 'Index',
   name: 'Name',
   count: 'Games Count',
   percent: 'Percent',
@@ -58,12 +58,15 @@ export default function GenresCountChart({ data }: GenresCountChartProps) {
       chartsOptions={[
         {
           chart: (
-            <DoughnutChart
+            <Chart
+              type='doughnut'
               key='genres-count-1'
               chartId='genres-count-1'
               data={data}
-              displayFields={['count', 'seriesName']}
               fieldsNames={fieldsNames}
+              displayFields={['count', 'seriesName']}
+              valueFields={['value']}
+              showLegend
             />
           ),
           icon: <ChartPieTwoSolid />

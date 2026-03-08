@@ -2,15 +2,15 @@
 
 import Link from 'next/link';
 
-import { IndexBarChartData } from '@ts/ui/charts-data';
+import { ChartData } from '@ts/ui/charts-data';
 
 import AdjacentChart from '@components/charts/AdjacentChart';
-import BarChart from '@components/charts/BarChart';
+import Chart from '@components/charts/Chart';
 import Table from '@components/charts/Table';
 
 import countTestData from '../../../../mock data/count-test-data.json';
 
-type StudioCount = IndexBarChartData & {
+type StudioCount = ChartData & {
   count: number;
   hours: number;
   seriesName?: number;
@@ -23,7 +23,8 @@ const fieldsNames: Record<keyof StudioCount, string> = {
   count: 'Games',
   hours: 'Hours',
   value: 'Value',
-  index: 'Rank'
+  index: 'Rank',
+  percent: 'Percent'
 };
 
 export default function BarPage() {
@@ -74,13 +75,16 @@ export default function BarPage() {
         )}
       />
 
-      <BarChart
-        horizontal
+      <Chart
+        type='bar'
         chartId='studios-bar-chart'
         data={studios}
         displayFields={['count', 'hours', 'seriesName']}
         fieldsNames={fieldsNames}
         valueFields={['count', 'hours']}
+        props={{
+          horizontal: true
+        }}
       />
     </AdjacentChart>
   );

@@ -7,7 +7,7 @@ import { Bar } from 'react-chartjs-2';
 import { PrecisePeriod } from '@ts/games/metric';
 import {
   ChartData,
-  ChartProps,
+  DisplayFields,
   PeriodChartData,
   PeriodChartTransformed
 } from '@ts/ui/charts-data';
@@ -25,10 +25,11 @@ import { getPeriodTooltip } from './ChartTooltip';
 import './chart-styles';
 import { ChartClasses } from './chart-styles';
 
-type PeriodBarChartProps<DataType extends ChartData> = Omit<
-  ChartProps<DataType>,
-  'data'
-> & {
+type PeriodBarChartProps<DataType extends ChartData> = {
+  displayFields: DisplayFields<DataType>;
+  fieldsNames: Record<keyof DataType, string>;
+  chartId: string;
+  className?: string;
   data: PeriodChartData<DataType>[];
   periodType: PrecisePeriod;
 };
@@ -43,7 +44,6 @@ type PeriodDataset = {
   labels: string[];
   datasets: ChartDataset<'bar'>[];
   dataMap: Map<number, PeriodChartTransformed>;
-  indexMap: Map<number, number>;
 };
 
 const UnitsPerYear: Record<PrecisePeriod, number> = {
@@ -55,8 +55,7 @@ const UnitsPerYear: Record<PrecisePeriod, number> = {
 const defaultPeriodDataset: PeriodDataset = {
   labels: [],
   datasets: [],
-  dataMap: new Map(),
-  indexMap: new Map()
+  dataMap: new Map()
 };
 
 const parsePeriod = (period?: string) => {
@@ -148,12 +147,10 @@ const getPeriodDatasets = async (params?: {
     });
   });
 
-  const indexMap = new Map<number, number>();
   const dataMap = new Map<number, PeriodChartTransformed>();
   const datasets: ChartDataset<'bar'>[] = [];
   itemsMap.values().forEach((item, i) => {
     dataMap.set(item.id, item);
-    indexMap.set(item.id, i);
 
     datasets.push({
       label: item.name,
@@ -168,8 +165,7 @@ const getPeriodDatasets = async (params?: {
   return {
     labels: Object.values(periodsNames),
     datasets,
-    dataMap,
-    indexMap
+    dataMap
   };
 };
 
@@ -215,8 +211,7 @@ function PeriodBarCore({ data, periodType, year }: PeriodBarCoreProps) {
               tooltip: getPeriodTooltip(
                 tooltipRef,
                 updateTooltip,
-                dataset.dataMap,
-                dataset.indexMap
+                dataset.dataMap
               )
             }
           }}
@@ -238,7 +233,7 @@ export default function PeriodBarChart<DataType extends ChartData>({
   displayFields,
   fieldsNames,
   chartId,
-  className
+  className = ''
 }: PeriodBarChartProps<DataType>) {
   const yearOptions: Option[] = getAllPeriods(
     data.map((d) => d.period),
@@ -257,7 +252,10 @@ export default function PeriodBarChart<DataType extends ChartData>({
       chartId={chartId}
       displayFields={displayFields}
       fieldsNames={fieldsNames}
-      className={`filter-chart ${ChartClasses.periodBar.container} ${className}`}
+      tooltipProps={{
+        colored: true
+      }}
+      className={`${ChartClasses.periodBar.container} ${className}`}
     >
       {periodType === 'year' || (
         <Select

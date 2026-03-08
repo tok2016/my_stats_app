@@ -18,6 +18,8 @@ type ChartTooltipProps<DataType extends ChartData> = {
   displayFields: DisplayFields<DataType>;
   fieldsNames: Record<keyof DataType, string>;
   ref: RefObject<HTMLDivElement | null>;
+  showRank?: boolean;
+  colored?: boolean;
 };
 
 type TooltipPosition = 'start' | 'center' | 'end';
@@ -34,7 +36,9 @@ export default function ChartTooltip<DataType extends ChartData>({
   data,
   displayFields,
   fieldsNames,
-  ref
+  ref,
+  showRank,
+  colored
 }: ChartTooltipProps<DataType>) {
   const rank = (data?.index ?? -1) + 1;
   return (
@@ -44,7 +48,10 @@ export default function ChartTooltip<DataType extends ChartData>({
       data-item={data?.id}
       ref={ref}
     >
-      <div className='chart-tooltip' data-rank={data?.index}>
+      <div
+        className='chart-tooltip'
+        data-rank={colored ? data?.index : undefined}
+      >
         <h3 className='colored'>{data?.name}</h3>
 
         {displayFields.map((field) => (
@@ -54,7 +61,7 @@ export default function ChartTooltip<DataType extends ChartData>({
           </div>
         ))}
 
-        {!rank || (
+        {showRank && rank && (
           <div className='tooltip-badge tooltip-rank'>
             <h3>{rank}</h3>
           </div>
@@ -70,6 +77,15 @@ export default function ChartTooltip<DataType extends ChartData>({
   );
 }
 
+const hideTooltip = (tooltipRef: RefObject<HTMLDivElement | null>) => {
+  if (tooltipRef.current) {
+    tooltipRef.current.style.opacity = '0';
+    tooltipRef.current.style.top = '0px';
+    tooltipRef.current.style.left = '0px';
+    tooltipRef.current.style.transition = 'none';
+  }
+};
+
 const adjustTooltipPosition = <T extends ChartType>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   tooltip: TooltipModel<T>,
@@ -83,8 +99,6 @@ const adjustTooltipPosition = <T extends ChartType>(
     const originY =
       tooltip.caretY
       - tooltipRef.current.offsetHeight * PositionMult[verticalPos];
-
-    tooltipRef.current.style.opacity = '1';
 
     const { top, left } = tooltip.chart.canvas.getBoundingClientRect();
 
@@ -102,6 +116,10 @@ const adjustTooltipPosition = <T extends ChartType>(
 
     tooltipRef.current.style.left = `${adjustedLeft}px`;
     tooltipRef.current.style.top = `${adjustedTop}px`;
+
+    if (!Number(tooltipRef.current.style.opacity))
+      tooltipRef.current.style.opacity = '1';
+    else tooltipRef.current.style.transition = 'all 100ms ease';
   }
 };
 
@@ -112,16 +130,14 @@ export const getTooltip = <DataType extends ChartData>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   updateTooltip: ChartContextProps['updateTooltip'],
   dataMap: Map<number, DataType>,
-  indexMap: Map<number, number> | undefined,
   horizontalPos: TooltipPosition = 'start',
-  verticalPos: TooltipPosition = 'start',
-  percentsMap?: Map<number, number>
+  verticalPos: TooltipPosition = 'start'
 ): NonNullable<Chart['options']['plugins']>['tooltip'] => ({
   enabled: false,
   position: 'nearest',
   external: ({ tooltip }) => {
     if (!tooltip.opacity && tooltipRef.current) {
-      tooltipRef.current.style.opacity = '0';
+      hideTooltip(tooltipRef);
       return;
     }
 
@@ -132,7 +148,7 @@ export const getTooltip = <DataType extends ChartData>(
 
     if (!data || storedId?.toString() === itemId.toString()) return;
 
-    updateTooltip(data, indexMap?.get(itemId), percentsMap?.get(itemId));
+    updateTooltip(data);
   }
 });
 
@@ -140,7 +156,6 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   updateTooltip: ChartContextProps['updateTooltip'],
   dataMap: Map<number, DataType>,
-  indexMap: Map<number, number> | undefined,
   horizontalPos: TooltipPosition = 'start',
   verticalPos: TooltipPosition = 'start'
 ): NonNullable<Chart['options']['plugins']>['tooltip'] => ({
@@ -148,7 +163,7 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
   position: 'nearest',
   external: ({ tooltip }) => {
     if (!tooltip.opacity && tooltipRef.current) {
-      tooltipRef.current.style.opacity = '0';
+      hideTooltip(tooltipRef);
       return;
     }
 
@@ -160,12 +175,9 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
 
     if (!data || storedId?.toString() === itemId.toString()) return;
 
-    updateTooltip(
-      {
-        ...data,
-        value: data.countByPeriod[valueKey] ?? data.value
-      },
-      indexMap?.get(itemId)
-    );
+    updateTooltip({
+      ...data,
+      value: data.countByPeriod[valueKey] ?? data.value
+    });
   }
 });

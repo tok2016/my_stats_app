@@ -1,6 +1,6 @@
 import { ChartData } from '@ts/ui/charts-data';
 
-import LineChart from '@components/charts/LineChart';
+import Chart from '@components/charts/Chart';
 
 import testYearData from '../../../../mock data/year-test-data.json';
 
@@ -10,21 +10,25 @@ type YearData = ChartData & {
 
 const yearDataFieldsNames: Record<keyof YearData, string> = {
   id: 'Year',
+  index: 'Index',
   name: 'Year',
   value: 'Count',
-  topGame: 'Top Game'
+  topGame: 'Top Game',
+  percent: 'Percent'
 };
 
 export default function TestLinePage() {
-  const yearData: YearData[] = testYearData.map((data) => ({
+  const yearData: YearData[] = testYearData.map((data, i) => ({
     id: data.year,
+    index: i,
     name: data.year.toString(),
     value: data.count,
     topGame: data.topGames[0]?.id
   }));
 
   return (
-    <LineChart
+    <Chart
+      type='line'
       className='year-chart'
       chartId='test-year-line'
       data={yearData}
