@@ -7,6 +7,7 @@ import {
   ChartContextProps,
   ChartData,
   DisplayFields,
+  FieldsInfo,
   PeriodChartTransformed,
   TooltipData
 } from '@ts/ui/charts-data';
@@ -16,13 +17,17 @@ import { clamp } from '@lib/utils';
 type ChartTooltipProps<DataType extends ChartData> = {
   data?: TooltipData;
   displayFields: DisplayFields<DataType>;
-  fieldsNames: Record<keyof DataType, string>;
+  fieldsNames: FieldsInfo<DataType>;
   ref: RefObject<HTMLDivElement | null>;
   showRank?: boolean;
   colored?: boolean;
 };
 
 type TooltipPosition = 'start' | 'center' | 'end';
+
+type TooltipTransform = Pick<TooltipModel<ChartType>, 'caretX' | 'caretY'> & {
+  boundaries: DOMRect;
+};
 
 const SCREEN_MARGIN = 20;
 
@@ -56,7 +61,12 @@ export default function ChartTooltip<DataType extends ChartData>({
 
         {displayFields.map((field) => (
           <div key={field.toString()} className='tooltip-key'>
-            <span>{fieldsNames[field]}: </span>
+            {fieldsNames[field].keyComponent ? (
+              fieldsNames[field].keyComponent
+            ) : (
+              <span>{fieldsNames[field].name}: </span>
+            )}
+
             <span className='colored'>{data?.[field] ?? 'no data'}</span>
           </div>
         ))}
@@ -77,7 +87,7 @@ export default function ChartTooltip<DataType extends ChartData>({
   );
 }
 
-const hideTooltip = (tooltipRef: RefObject<HTMLDivElement | null>) => {
+const resetTooltip = (tooltipRef: RefObject<HTMLDivElement | null>) => {
   if (tooltipRef.current) {
     tooltipRef.current.style.opacity = '0';
     tooltipRef.current.style.top = '0px';
@@ -86,9 +96,13 @@ const hideTooltip = (tooltipRef: RefObject<HTMLDivElement | null>) => {
   }
 };
 
-const adjustTooltipPosition = <T extends ChartType>(
+export const hideTooltip = (tooltipRef: RefObject<HTMLDivElement | null>) => {
+  if (tooltipRef.current) tooltipRef.current.style.opacity = '0';
+};
+
+const adjustTooltipPosition = (
   tooltipRef: RefObject<HTMLDivElement | null>,
-  tooltip: TooltipModel<T>,
+  tooltip: TooltipTransform,
   horizontalPos: TooltipPosition,
   verticalPos: TooltipPosition
 ) => {
@@ -100,17 +114,19 @@ const adjustTooltipPosition = <T extends ChartType>(
       tooltip.caretY
       - tooltipRef.current.offsetHeight * PositionMult[verticalPos];
 
-    const { top, left } = tooltip.chart.canvas.getBoundingClientRect();
+    const { top, left } = tooltip.boundaries;
 
+    const absLeft = left + window.pageXOffset;
     const adjustedLeft = clamp(
       originX,
-      -left / 2,
+      window.pageXOffset - absLeft + SCREEN_MARGIN,
       window.innerWidth - tooltipRef.current.offsetWidth - left - SCREEN_MARGIN
     );
 
+    const absTop = top + window.pageYOffset;
     const adjustedTop = clamp(
       originY,
-      -top / 2,
+      window.pageYOffset - absTop + SCREEN_MARGIN,
       window.innerHeight - tooltipRef.current.offsetHeight - top - SCREEN_MARGIN
     );
 
@@ -137,14 +153,26 @@ export const getTooltip = <DataType extends ChartData>(
   position: 'nearest',
   external: ({ tooltip }) => {
     if (!tooltip.opacity && tooltipRef.current) {
-      hideTooltip(tooltipRef);
+      resetTooltip(tooltipRef);
       return;
     }
 
     const itemId = tooltipTitleToNumber(tooltip.title?.[0]);
     const data = dataMap.get(itemId);
     const storedId = tooltipRef.current?.dataset['item'];
-    adjustTooltipPosition(tooltipRef, tooltip, horizontalPos, verticalPos);
+
+    const tooltipTransform: TooltipTransform = {
+      caretX: tooltip.caretX,
+      caretY: tooltip.caretY,
+      boundaries: tooltip.chart.canvas.getBoundingClientRect()
+    };
+
+    adjustTooltipPosition(
+      tooltipRef,
+      tooltipTransform,
+      horizontalPos,
+      verticalPos
+    );
 
     if (!data || storedId?.toString() === itemId.toString()) return;
 
@@ -163,7 +191,7 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
   position: 'nearest',
   external: ({ tooltip }) => {
     if (!tooltip.opacity && tooltipRef.current) {
-      hideTooltip(tooltipRef);
+      resetTooltip(tooltipRef);
       return;
     }
 
@@ -171,7 +199,19 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
     const itemId = tooltipTitleToNumber(tooltip.dataPoints[0].dataset.label);
     const data = dataMap.get(itemId);
     const storedId = tooltipRef.current?.dataset['item'];
-    adjustTooltipPosition(tooltipRef, tooltip, horizontalPos, verticalPos);
+
+    const tooltipTransform: TooltipTransform = {
+      caretX: tooltip.caretX,
+      caretY: tooltip.caretY,
+      boundaries: tooltip.chart.canvas.getBoundingClientRect()
+    };
+
+    adjustTooltipPosition(
+      tooltipRef,
+      tooltipTransform,
+      horizontalPos,
+      verticalPos
+    );
 
     if (!data || storedId?.toString() === itemId.toString()) return;
 
@@ -181,3 +221,45 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
     });
   }
 });
+
+export const updateMapTooltipPos = <DataType extends ChartData>(
+  tooltipRef: RefObject<HTMLDivElement | null>,
+  mapRef: RefObject<HTMLDivElement | null>,
+  target: EventTarget & SVGElement,
+  updateTooltip: ChartContextProps['updateTooltip'],
+  dataMap: Map<string, DataType>,
+  horizontalPos: TooltipPosition = 'start',
+  verticalPos: TooltipPosition = 'start'
+) => {
+  if (!mapRef.current || !tooltipRef.current) {
+    resetTooltip(tooltipRef);
+    return;
+  }
+
+  const country = target.id;
+  const data = dataMap.get(country);
+  const storedId = tooltipRef.current?.dataset['item'];
+
+  const { top, left, height, width } = target.getBoundingClientRect();
+  const { top: mapTop, left: mapLeft } = mapRef.current.getBoundingClientRect();
+
+  const tooltipTransform: TooltipTransform = {
+    caretX: left + width / 2 - mapLeft,
+    caretY: top + height / 2 - mapTop,
+    boundaries: mapRef.current.getBoundingClientRect()
+  };
+
+  if (data && storedId?.toString() !== country.toString()) {
+    adjustTooltipPosition(
+      tooltipRef,
+      tooltipTransform,
+      horizontalPos,
+      verticalPos
+    );
+
+    updateTooltip(data);
+  } else {
+    hideTooltip(tooltipRef);
+    return;
+  }
+};

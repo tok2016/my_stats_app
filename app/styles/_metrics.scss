@@ -113,6 +113,15 @@ $default-color: map.get(utils.$active-colors, 'games');
   height: 24rem;
 }
 
+.map-container,
+.map-chart {
+  width: 100%;
+}
+
+.map-container {
+  background-color: none;
+}
+
 .adjacent-chart {
   width: 100%;
   height: 23rem;
@@ -298,6 +307,34 @@ $default-color: map.get(utils.$active-colors, 'games');
   .chart-legend {
     li {
       color: $text-color;
+    }
+  }
+
+  .map {
+    svg {
+      path {
+        fill: $text-color;
+        stroke-color: $bg-color;
+        outline: none;
+      }
+
+      @each $rank, $color in utils.$diagram-colors {
+        path[data-rank='#{$rank}'] {
+          fill: $color;
+          cursor: pointer;
+          transition: 500ms fill;
+
+          &:hover {
+            fill: color-mix(in srgb, $color 80%, white 20%);
+            transition: utils.$hover-time fill;
+          }
+
+          &:active {
+            fill: color-mix(in srgb, $color 85%, black 15%);
+            transition: utils.$active-time fill;
+          }
+        }
+      }
     }
   }
 }

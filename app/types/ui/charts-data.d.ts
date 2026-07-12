@@ -1,6 +1,6 @@
 import { IgdbBasic } from '@ts/games/api-response';
 
-export type CustomChartType = 'doughnut' | 'periodBar' | 'bar' | 'line';
+export type CustomChartType = 'doughnut' | 'periodBar' | 'bar' | 'line' | 'map';
 
 export type ChartData = IgdbBasic & {
   index: number;
@@ -19,7 +19,7 @@ export type TooltipProps = {
 export type ChartCoreProps<DataType extends ChartData> = {
   data: DataType[];
   valueField: keyof DataType;
-  fieldsNames: Record<keyof DataType, string>;
+  fieldsNames: FieldsInfo<DataType>;
 };
 
 export type ChartTypeProps = {
@@ -28,6 +28,7 @@ export type ChartTypeProps = {
     horizontal?: boolean;
   };
   line?: object;
+  map?: object;
 };
 
 export type ChartType = keyof ChartTypeProps;
@@ -45,6 +46,16 @@ export type DisplayFields<DataType extends ChartData> = Exclude<
   keyof DataType,
   'id' | 'name'
 >[];
+
+export type FieldData = {
+  name: string;
+  keyComponent?: React.ReactNode;
+};
+
+export type FieldsInfo<DataType extends ChartData> = Record<
+  keyof DataType,
+  FieldData
+>;
 
 export type ChartContextProps = {
   tooltipRef: React.RefObject<HTMLDivElement | null>;

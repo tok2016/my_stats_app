@@ -6,6 +6,7 @@ import {
   ChartContextProps,
   ChartData,
   DisplayFields,
+  FieldsInfo,
   TooltipData,
   TooltipProps
 } from '@ts/ui/charts-data';
@@ -16,7 +17,7 @@ type ChartProviderProps<DataType extends ChartData> = {
   children: React.ReactNode;
   chartId: string;
   displayFields: DisplayFields<DataType>;
-  fieldsNames: Record<keyof DataType, string>;
+  fieldsNames: FieldsInfo<DataType>;
   tooltipProps?: TooltipProps;
   className?: string;
 };

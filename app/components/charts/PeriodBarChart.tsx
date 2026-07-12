@@ -8,6 +8,7 @@ import { PrecisePeriod } from '@ts/games/metric';
 import {
   ChartData,
   DisplayFields,
+  FieldsInfo,
   PeriodChartData,
   PeriodChartTransformed
 } from '@ts/ui/charts-data';
@@ -27,7 +28,7 @@ import { ChartClasses } from './chart-styles';
 
 type PeriodBarChartProps<DataType extends ChartData> = {
   displayFields: DisplayFields<DataType>;
-  fieldsNames: Record<keyof DataType, string>;
+  fieldsNames: FieldsInfo<DataType>;
   chartId: string;
   className?: string;
   data: PeriodChartData<DataType>[];

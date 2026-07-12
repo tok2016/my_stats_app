@@ -7,6 +7,7 @@ import {
   ChartType,
   ChartTypeProps,
   DisplayFields,
+  FieldsInfo,
   TooltipProps
 } from '@ts/ui/charts-data';
 import { Option } from '@ts/ui/components-props';
@@ -19,6 +20,7 @@ import BarChart from './BarChart';
 import ChartLegend from './ChartLegend';
 import DoughnutChart from './DoughnutChart';
 import LineChart from './LineChart';
+import MapChart from './MapChart';
 import { ChartClasses } from './chart-styles';
 
 type ChartComponentProps<
@@ -29,7 +31,7 @@ type ChartComponentProps<
   chartId: string;
   data: DataType[];
   displayFields: DisplayFields<DataType>;
-  fieldsNames: Record<keyof DataType, string>;
+  fieldsNames: FieldsInfo<DataType>;
   valueFields?: (keyof DataType)[];
   className?: string;
   showLegend?: boolean;
@@ -49,6 +51,10 @@ const TooltipPropsByType: Record<ChartType, TooltipProps> = {
   line: {
     showRank: false,
     colored: false
+  },
+  map: {
+    showRank: true,
+    colored: true
   }
 };
 
@@ -58,7 +64,7 @@ const getChartCore = <
 >(
   data: DataType[],
   valueField: keyof DataType,
-  fieldsNames: Record<keyof DataType, string>,
+  fieldsNames: FieldsInfo<DataType>,
   props?: ChartTypeProps[CurrentChartType]
 ): Record<ChartType, ReactNode> => ({
   doughnut: (
@@ -79,6 +85,14 @@ const getChartCore = <
   ),
   line: (
     <LineChart
+      data={data}
+      valueField={valueField}
+      fieldsNames={fieldsNames}
+      {...props}
+    />
+  ),
+  map: (
+    <MapChart
       data={data}
       valueField={valueField}
       fieldsNames={fieldsNames}
@@ -114,7 +128,7 @@ export default function Chart<
   const options: Option[] = useMemo(
     () =>
       valueFields?.map((field) => ({
-        label: fieldsNames[field],
+        label: fieldsNames[field].name,
         value: field.toString(),
         key: field.toString()
       })) ?? [],
