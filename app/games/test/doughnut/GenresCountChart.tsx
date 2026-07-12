@@ -4,7 +4,7 @@ import { ChartPieTwoSolid, TableSolid } from '@mynaui/icons-react';
 
 import Link from 'next/link';
 
-import { ChartData } from '@ts/ui/charts-data';
+import { ChartData, FieldsInfo } from '@ts/ui/charts-data';
 
 import Chart from '@components/charts/Chart';
 import SwitchableChart from '@components/charts/SwitchableChart';
@@ -20,14 +20,14 @@ type GenresCountChartProps = {
   data: GenreCount[];
 };
 
-const fieldsNames: Record<keyof GenreCount, string> = {
-  id: 'ID',
-  index: 'Index',
-  name: 'Name',
-  count: 'Games Count',
-  percent: 'Percent',
-  seriesName: 'Best series',
-  value: 'value'
+const fieldsNames: FieldsInfo<GenreCount> = {
+  id: { name: 'ID' },
+  index: { name: '№' },
+  name: { name: 'Name' },
+  count: { name: 'Games Count' },
+  percent: { name: 'Percent' },
+  seriesName: { name: 'Best series' },
+  value: { name: 'value' }
 };
 
 const rowContent = (data: GenreCount, i: number) => (

@@ -1,16 +1,16 @@
 import { PrecisePeriod } from '@ts/games/metric';
-import { ChartData, PeriodChartData } from '@ts/ui/charts-data';
+import { ChartData, FieldsInfo, PeriodChartData } from '@ts/ui/charts-data';
 
 import PeriodBarChart from '@components/charts/PeriodBarChart';
 
 import testData from '../../../../mock data/period-test-data.json';
 
-const DisplayPeriodFields: Record<keyof ChartData, string> = {
-  id: 'ID',
-  name: 'Name',
-  value: 'Value',
-  index: 'Index',
-  percent: 'Percent'
+const DisplayPeriodFields: FieldsInfo<ChartData> = {
+  id: { name: 'ID' },
+  name: { name: 'Name' },
+  value: { name: 'Value' },
+  index: { name: 'Index' },
+  percent: { name: 'Percent' }
 };
 
 export default async function Page() {

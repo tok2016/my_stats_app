@@ -1,4 +1,4 @@
-import { ChartData } from '@ts/ui/charts-data';
+import { ChartData, FieldsInfo } from '@ts/ui/charts-data';
 
 import Chart from '@components/charts/Chart';
 
@@ -8,13 +8,13 @@ type YearData = ChartData & {
   topGame: string | undefined;
 };
 
-const yearDataFieldsNames: Record<keyof YearData, string> = {
-  id: 'Year',
-  index: 'Index',
-  name: 'Year',
-  value: 'Count',
-  topGame: 'Top Game',
-  percent: 'Percent'
+const yearDataFieldsNames: FieldsInfo<YearData> = {
+  id: { name: 'Year' },
+  index: { name: 'Index' },
+  name: { name: 'Year' },
+  value: { name: 'Count' },
+  topGame: { name: 'Top Game' },
+  percent: { name: 'Percent' }
 };
 
 export default function TestLinePage() {

@@ -161,5 +161,9 @@ export const ChartClasses: Record<CustomChartType, ChartClassName> = {
   line: {
     core: 'line-chart',
     container: 'line-container'
+  },
+  map: {
+    core: 'map-chart',
+    container: 'map-container'
   }
 };
