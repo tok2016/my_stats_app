@@ -39,6 +39,8 @@ export const ServiceNames = ['spotify', 'steam'] as const;
 
 export const ConfirmationActions = ['password', 'delete'] as const;
 
+export const PrecisePeriods = ['year', 'season', 'month'] as const;
+
 export const ServiceStatuses = [
   'authorized',
   'unauthorized',
@@ -276,4 +278,37 @@ export const ModulesPaths: Record<string, PathInfo> = {
     name: 'library',
     label: 'Library'
   }
+};
+
+const getYearString = (period: string, short: boolean) => {
+  const year = period.split('-')[0] ?? '';
+  const startIndex = short && year.length > 2 ? year.length - 2 : 0;
+  return year.substring(startIndex, year.length);
+};
+
+const getSeasonString = (period: string, short: boolean) => {
+  const parts = period.split('-');
+  if (!parts[1]) return getYearString(parts[0], short);
+
+  const seasonNumber = parseInt(parts[1]) % Seasons.length;
+  const endIndex = short ? 3 : Seasons[seasonNumber].length;
+  return Seasons[seasonNumber].substring(0, endIndex);
+};
+
+const getMonthString = (period: string, short: boolean) => {
+  const parts = period.split('-');
+  if (!parts[1]) return getYearString(parts[0], short);
+
+  return new Date(period).toLocaleDateString('en-US', {
+    month: short ? 'short' : 'long'
+  });
+};
+
+export const getPeriodString: Record<
+  PrecisePeriod,
+  (period: string, short: boolean) => string
+> = {
+  year: getYearString,
+  season: getSeasonString,
+  month: getMonthString
 };

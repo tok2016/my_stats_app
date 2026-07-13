@@ -8,7 +8,7 @@ import AdjacentChart from '@components/charts/AdjacentChart';
 import Chart from '@components/charts/Chart';
 import Table from '@components/charts/Table';
 
-import countTestData from '../../../mock data/count-test-data.json';
+import countTestData from '../../../../mock data/count-test-data.json';
 
 type StudioCount = ChartData & {
   count: number;

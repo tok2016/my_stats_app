@@ -15,7 +15,12 @@ import {
 import { Option } from '@ts/ui/components-props';
 
 import { useAction, useChart } from '@lib/hooks';
-import { ChartColors, MONTHS_IN_YEAR, Seasons } from '@lib/utils';
+import {
+  ChartColors,
+  MONTHS_IN_YEAR,
+  Seasons,
+  getPeriodString
+} from '@lib/utils';
 
 import ChartProvider from '@store/ChartProvider';
 
@@ -51,6 +56,12 @@ const UnitsPerYear: Record<PrecisePeriod, number> = {
   year: 0,
   season: Seasons.length,
   month: MONTHS_IN_YEAR
+};
+
+const ShortFormats: Record<PrecisePeriod, boolean> = {
+  year: false,
+  season: false,
+  month: true
 };
 
 const defaultPeriodDataset: PeriodDataset = {
@@ -94,25 +105,6 @@ const getAllPeriods = (
   return allPeriods;
 };
 
-const getPeriodString: Record<PrecisePeriod, (period: string) => string> = {
-  year: (period) => period.split('-')[0] ?? '',
-  season: (period) => {
-    const parts = period.split('-');
-    if (!parts[1]) return parts[0] ?? '';
-
-    const seasonNumber = parseInt(parts[1]) % Seasons.length;
-    return Seasons[seasonNumber];
-  },
-  month: (period) => {
-    const parts = period.split('-');
-    if (!parts[1]) return parts[0] ?? '';
-
-    return new Date(period).toLocaleDateString('en-US', {
-      month: 'short'
-    });
-  }
-};
-
 const getPeriodDatasets = async (params?: {
   data: PeriodChartData<ChartData>[];
   periodType: PrecisePeriod;
@@ -129,7 +121,10 @@ const getPeriodDatasets = async (params?: {
   );
 
   const periodsNames = Object.fromEntries(
-    allPeriods.map((period) => [period, getPeriodString[periodType](period)])
+    allPeriods.map((period) => [
+      period,
+      getPeriodString[periodType](period, ShortFormats[periodType])
+    ])
   );
 
   const itemsMap = new Map<number, PeriodChartTransformed>();

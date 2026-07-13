@@ -1,16 +1,4 @@
-@use 'sass:map';
 @use 'utils';
-
-$tooltip-radius: 0.5rem;
-$tooltip-padding: 0.625rem;
-$tooltip-badge-min: 2rem;
-$tooltip-badge-max: 3rem;
-
-$chart-padding: 1.25rem;
-$chart-padding-right: 2rem;
-$rank-padding: 0.25rem;
-
-$default-color: map.get(utils.$active-colors, 'games');
 
 .metrics {
   display: flex;
@@ -19,322 +7,87 @@ $default-color: map.get(utils.$active-colors, 'games');
   gap: 3.5rem;
 }
 
-.test-chart {
-  width: 32rem;
-  height: 20rem;
-}
-
-.chart {
-  box-sizing: border-box;
-  position: relative;
-  padding: 1.25rem;
-  padding-right: $chart-padding-right;
-
+.metric {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  justify-content: flex-start;
-  gap: 0.25rem;
+  gap: 1.25rem;
 }
 
-.chart,
-.skeleton.graph {
-  border-radius: utils.$regular-radius;
-}
-
-.chart-core-wrapper {
-  flex: 1;
-}
-
-.chart-legend-content {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: center;
-  flex: 1;
-  max-height: 100%;
-
-  .chart-core-wrapper {
-    width: 100%;
-    height: 100%;
-  }
-}
-
-.switchable-chart {
-  position: relative;
-
-  > div {
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  > button {
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
-}
-
-.doughnut-container {
-  width: 32rem;
-  aspect-ratio: 1.8;
-
-  .chart-core-wrapper {
-    flex: 0;
-    width: unset;
-    height: 100%;
-    aspect-ratio: 1;
-  }
-}
-
-.period-bar-container {
-  .chart-core-wrapper {
-    width: 85%;
-  }
-}
-
-.period-bar-container,
-.bar-container {
-  width: 100%;
-  min-width: 32rem;
-  height: 26rem;
-}
-
-.bar-container:has(.horizontal) {
-  width: 100%;
-  min-width: 32rem;
-  height: 32rem;
-}
-
-.line-container {
-  width: 100%;
-  min-width: 32rem;
-  height: 24rem;
-}
-
-.map-container,
-.map-chart {
-  width: 100%;
-}
-
-.map-container {
-  background-color: none;
-}
-
-.adjacent-chart {
-  width: 100%;
-  height: 23rem;
-
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-
-  .chart {
-    padding: 0.5rem;
-    flex: 2;
-    width: unset;
-    height: unset;
-    min-width: 29rem;
-  }
-
-  .table {
-    flex: 3;
-    min-width: 29rem;
-  }
-}
-
-.tooltip-container {
-  position: absolute;
-  pointer-events: none;
-  transition: all 100ms ease;
-  z-index: 10;
-}
-
-.chart-tooltip {
-  position: relative;
-
-  box-sizing: border-box;
-  width: max-content;
-  max-width: 18rem;
-  padding: $tooltip-padding;
-  padding-right: $tooltip-badge-max + $tooltip-padding;
-
-  box-shadow: 0 0 utils.$blur utils.$spread $default-color;
-  border: solid 3px $default-color;
-  border-radius: $tooltip-radius;
-
+.data-block {
   display: flex;
   flex-direction: column;
-  gap: $tooltip-padding;
+  gap: 0.75rem;
+  align-items: stretch;
 
-  .colored {
-    color: $default-color;
-  }
+  padding: 0.5rem;
+
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 0.5rem;
+
+  @include utils.font(utils.$small-size, utils.$regular-font, utils.$fit-font);
 }
 
-.tooltip-key {
-  display: flex;
-  flex-direction: row;
-  gap: 0.25rem;
+.period-top {
+  @include utils.font(utils.$small-size, utils.$regular-font, utils.$wide-font);
+  min-width: 11rem;
 
-  * {
-    overflow-x: hidden;
-    word-wrap: break-word;
-  }
-}
+  .data-block-title {
+    box-sizing: content-box;
+    border-bottom: solid 0.125rem;
+    padding-bottom: 0.25rem;
 
-.tooltip-badge {
-  position: absolute;
-  right: 0;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  box-sizing: border-box;
-  padding: $rank-padding;
-  min-width: $tooltip-badge-min;
-  max-width: $tooltip-badge-max;
-}
-
-.tooltip-rank {
-  top: 0;
-
-  background-color: $default-color;
-  border-top-right-radius: $tooltip-radius * 0.5;
-  border-bottom-left-radius: $tooltip-radius;
-
-  * {
-    color: utils.$white;
-  }
-}
-
-.tooltip-percent {
-  bottom: 0;
-
-  background-color: transparent;
-  border: solid 2px $default-color;
-  border-top-left-radius: $tooltip-radius;
-  border-bottom-right-radius: $tooltip-radius * 0.5;
-
-  * {
-    color: $default-color;
-  }
-}
-
-.chart-legend {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  max-width: 13rem;
-
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-
-  li {
-    @include utils.font(
-      utils.$regular-size,
-      utils.$regular-font,
-      utils.$wide-font
-    );
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.25rem;
-
-    .percent {
-      width: 3rem;
-      font-weight: utils.$bold-font;
-      text-align: right;
-    }
-
-    .legend-mark {
-      width: 1rem;
-      height: 1rem;
-      border-radius: utils.$max-radius;
-      background-color: $default-color;
-    }
-  }
-}
-
-@each $rank, $color in utils.$diagram-colors {
-  .chart-tooltip[data-rank='#{$rank}'] {
-    box-shadow: 0 0 utils.$blur utils.$spread $color;
-    border-color: $color;
-
-    .colored {
-      color: $color;
-    }
-
-    .tooltip-rank {
-      background-color: $color;
-    }
-
-    .tooltip-percent {
-      border-color: $color;
-
-      * {
-        color: $color;
-      }
+    p {
+      @include utils.font(
+        utils.$regular-size,
+        utils.$bold-font,
+        utils.$wide-font
+      );
+      width: 100%;
+      text-align: center;
     }
   }
 
-  .legend-key[data-rank='#{$rank}'] {
-    .percent {
-      color: $color;
-    }
+  ol {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
 
-    .legend-mark {
-      background-color: $color;
-    }
-  }
-}
-
-@mixin chart($bg-color, $text-color) {
-  .chart {
-    background-color: $bg-color;
-  }
-
-  .chart-tooltip {
-    background-color: $bg-color;
-    color: $text-color;
-  }
-
-  .chart-legend {
     li {
-      color: $text-color;
-    }
-  }
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 2px;
 
-  .map {
-    svg {
-      path {
-        fill: $text-color;
-        stroke-color: $bg-color;
-        outline: none;
+      margin-bottom: 0.75rem;
+
+      .skeletons {
+        width: 100%;
       }
 
-      @each $rank, $color in utils.$diagram-colors {
-        path[data-rank='#{$rank}'] {
-          fill: $color;
-          cursor: pointer;
-          transition: 500ms fill;
+      &:last-child {
+        margin-bottom: 0;
+      }
 
-          &:hover {
-            fill: color-mix(in srgb, $color 80%, white 20%);
-            transition: utils.$hover-time fill;
-          }
-
-          &:active {
-            fill: color-mix(in srgb, $color 85%, black 15%);
-            transition: utils.$active-time fill;
-          }
-        }
+      svg {
+        width: utils.$large-size;
       }
     }
   }
+}
+
+.select-title {
+  display: flex;
+  align-items: flex-end;
+  .text-select-group {
+    display: inline-flex;
+  }
+}
+
+.period-tops {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 1.5rem;
+  overflow-x: auto;
 }

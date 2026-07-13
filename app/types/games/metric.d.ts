@@ -1,7 +1,9 @@
+import { PrecisePeriods } from '@lib/utils';
+
 import { IgdbBasic } from './api-response';
 import { GameCore, GameShort, IgdbRecommendedGame } from './game';
 
-export type PrecisePeriod = 'year' | 'season' | 'month';
+export type PrecisePeriod = (typeof PrecisePeriods)[number];
 export type GreatPeriod = 'allTime' | 'year';
 export type StudioField = keyof Pick<
   GameCore,
