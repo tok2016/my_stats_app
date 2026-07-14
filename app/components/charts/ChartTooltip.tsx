@@ -145,7 +145,7 @@ const tooltipTitleToNumber = (title?: string) =>
 export const getTooltip = <DataType extends ChartData>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   updateTooltip: ChartContextProps['updateTooltip'],
-  dataMap: Map<number, DataType>,
+  dataMap: Map<number | string, DataType>,
   horizontalPos: TooltipPosition = 'start',
   verticalPos: TooltipPosition = 'start'
 ): NonNullable<Chart['options']['plugins']>['tooltip'] => ({
@@ -183,7 +183,7 @@ export const getTooltip = <DataType extends ChartData>(
 export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   updateTooltip: ChartContextProps['updateTooltip'],
-  dataMap: Map<number, DataType>,
+  dataMap: Map<number | string, DataType>,
   horizontalPos: TooltipPosition = 'start',
   verticalPos: TooltipPosition = 'start'
 ): NonNullable<Chart['options']['plugins']>['tooltip'] => ({
@@ -216,8 +216,8 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
     if (!data || storedId?.toString() === itemId.toString()) return;
 
     updateTooltip({
-      ...data,
-      value: data.countByPeriod[valueKey] ?? data.value
+      ...data
+      //reservedValue: data.countByPeriod[valueKey] ?? data.reservedValue
     });
   }
 });
@@ -227,7 +227,7 @@ export const updateMapTooltipPos = <DataType extends ChartData>(
   mapRef: RefObject<HTMLDivElement | null>,
   target: EventTarget & SVGElement,
   updateTooltip: ChartContextProps['updateTooltip'],
-  dataMap: Map<string, DataType>,
+  dataMap: Map<number | string, DataType>,
   horizontalPos: TooltipPosition = 'start',
   verticalPos: TooltipPosition = 'start'
 ) => {

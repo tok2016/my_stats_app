@@ -8,6 +8,7 @@ import { CredentialsInSchema } from '@ts/users/credentials';
 import Dashboard from '@ts/users/dashboard';
 import { NewPassword } from '@ts/users/password';
 import { BasicUser, User, UserInfoInSchema } from '@ts/users/user';
+import { ExtractTypeFields1 } from '@ts/util-types';
 
 import { isAxiosError, isErrorResponse } from './type-guards';
 
@@ -312,3 +313,14 @@ export const getPeriodString: Record<
   season: getSeasonString,
   month: getMonthString
 };
+
+export const getPercentThreshold = (maxPercentInData: number, sum: number) =>
+  (maxPercentInData / (sum * MAX_ENTRIES_IN_CHART)) * 100;
+
+export const getNumericValue = <
+  T,
+  K extends keyof ExtractTypeFields1<T, number>
+>(
+  obj: T & Record<K, number>,
+  key: K
+): number => obj[key];

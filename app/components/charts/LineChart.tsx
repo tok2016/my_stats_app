@@ -2,7 +2,7 @@
 
 import { Line } from 'react-chartjs-2';
 
-import { ChartCoreProps, ChartData } from '@ts/ui/charts-data';
+import { ChartCoreProps, ChartData, ChartValueField } from '@ts/ui/charts-data';
 
 import { useChart } from '@lib/hooks';
 
@@ -11,24 +11,17 @@ import { ChartClasses } from './chart-styles';
 
 const MAX_TICKS = 20;
 
-export default function LineChart<DataType extends ChartData>({
-  data,
-  valueField,
-  fieldsNames
-}: ChartCoreProps<DataType>) {
-  const dataMap = new Map<number, ChartData>(
+export default function LineChart<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+>({ data, valueField, fieldsNames }: ChartCoreProps<DataType, ValueKey>) {
+  const dataMap = new Map<number | string, ChartData>(
     data.map((value) => [value.id, value])
   );
 
   const { updateTooltip, tooltipRef } = useChart();
 
-  const values = data.map((d) => {
-    const value =
-      !d[valueField] || typeof d[valueField] === 'number'
-        ? d[valueField]
-        : d.value;
-    return !value ? null : value;
-  });
+  const values = data.map((d) => (!d[valueField] ? null : d[valueField]));
 
   return (
     <Line
@@ -51,13 +44,13 @@ export default function LineChart<DataType extends ChartData>({
               stepSize: Math.ceil(data.length / MAX_TICKS)
             },
             title: {
-              text: fieldsNames.name
+              text: fieldsNames.name.name
             }
           },
           y: {
             type: 'linear',
             beginAtZero: true,
-            title: { text: fieldsNames.value }
+            title: { text: fieldsNames[valueField].name }
           }
         },
         plugins: {

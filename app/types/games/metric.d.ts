@@ -34,13 +34,15 @@ export interface ItemCompareData<IgdbData extends IgdbBasic = IgdbBasic> {
 export type CountData = {
   id: number | string;
   count: number;
+  percent: number;
   topSeries?: number;
 };
 
 export type PlaytimeData = {
-  id: number;
+  id: number | string;
   hours: number;
   count: number;
+  percent: number;
   topGame: GameShort;
 };
 

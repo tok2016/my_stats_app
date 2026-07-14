@@ -3,7 +3,7 @@
 import { useContext } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 
-import { ChartCoreProps, ChartData } from '@ts/ui/charts-data';
+import { ChartCoreProps, ChartData, ChartValueField } from '@ts/ui/charts-data';
 
 import { ChartColors } from '@lib/utils';
 
@@ -12,10 +12,10 @@ import { ChartContext } from '@store/ChartProvider';
 import { getTooltip } from './ChartTooltip';
 import { ChartClasses } from './chart-styles';
 
-export default function DoughnutChart<DataType extends ChartData>({
-  data,
-  valueField
-}: ChartCoreProps<DataType>) {
+export default function DoughnutChart<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+>({ data, valueField }: ChartCoreProps<DataType, ValueKey>) {
   const dataMap = new Map(data.map((d) => [d.id, d]));
 
   const { updateTooltip, tooltipRef } = useContext(ChartContext);
@@ -52,11 +52,7 @@ export default function DoughnutChart<DataType extends ChartData>({
         labels: data.map((d) => d.id),
         datasets: [
           {
-            data: data.map((value) =>
-              typeof value[valueField] === 'number'
-                ? value[valueField]
-                : value.value
-            ),
+            data: data.map((value) => value[valueField]),
             backgroundColor: ChartColors,
             selfJoin: true,
             normalized: true

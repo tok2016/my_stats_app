@@ -120,3 +120,18 @@ export const getGenresCount = async (): Promise<CountData[]> => {
     return [];
   }
 };
+
+export const getMetricData = async <MetricType>(
+  url: string,
+  defaultValue: MetricType
+): Promise<MetricType> => {
+  try {
+    const response = await AxiosInstanse.get<MetricType>(
+      url,
+      await getAuthConfig()
+    );
+    return response.data;
+  } catch {
+    return defaultValue;
+  }
+};

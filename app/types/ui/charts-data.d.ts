@@ -1,10 +1,11 @@
-import { IgdbBasic } from '@ts/games/api-response';
+import { ExtractTypeFields } from '@ts/util-types';
 
 export type CustomChartType = 'doughnut' | 'periodBar' | 'bar' | 'line' | 'map';
 
-export type ChartData = IgdbBasic & {
+export type ChartData = {
+  id: number | string;
+  name: string;
   index: number;
-  value: number;
   percent?: number;
 };
 
@@ -16,9 +17,17 @@ export type TooltipProps = {
   colored?: boolean;
 };
 
-export type ChartCoreProps<DataType extends ChartData> = {
-  data: DataType[];
-  valueField: keyof DataType;
+export type ChartValueField<DataType extends ChartData> = ExtractTypeFields<
+  DataType,
+  number
+>;
+
+export type ChartCoreProps<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+> = {
+  data: (DataType & Record<ValueKey, number>)[];
+  valueField: ValueKey;
   fieldsNames: FieldsInfo<DataType>;
 };
 
@@ -61,3 +70,5 @@ export type ChartContextProps = {
   tooltipRef: React.RefObject<HTMLDivElement | null>;
   updateTooltip: (data: ChartData) => void;
 };
+
+export type ChartValueField<DataType> = ExtractTypeFields<DataType, number>;

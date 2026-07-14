@@ -75,7 +75,7 @@ export default function GenresCountChart({ data }: GenresCountChartProps) {
           chart: (
             <Table
               key='genres-count-table'
-              data={data.filter((genre) => genre.id > 0)}
+              data={data.filter((genre) => !!genre.id)}
               headers={{
                 name: 'Genre',
                 count: 'Games',

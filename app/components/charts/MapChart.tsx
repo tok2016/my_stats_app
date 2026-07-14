@@ -4,7 +4,7 @@ import { VectorMap } from '@south-paw/react-vector-maps';
 import countries from 'i18n-iso-countries';
 import { MouseEvent, useContext, useEffect, useMemo, useRef } from 'react';
 
-import { ChartCoreProps, ChartData } from '@ts/ui/charts-data';
+import { ChartCoreProps, ChartData, ChartValueField } from '@ts/ui/charts-data';
 
 import { ChartContext } from '@store/ChartProvider';
 
@@ -14,9 +14,10 @@ import WorldData from './world-low-res.json';
 const isHTMLElement = (value: unknown): value is HTMLElement =>
   (value as HTMLElement).style !== undefined;
 
-export default function MapChart<DataType extends ChartData>({
-  data
-}: ChartCoreProps<DataType>) {
+export default function MapChart<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+>({ data }: ChartCoreProps<DataType, ValueKey>) {
   const { updateTooltip, tooltipRef } = useContext(ChartContext);
 
   const countriesMap: Map<string, DataType> = useMemo(

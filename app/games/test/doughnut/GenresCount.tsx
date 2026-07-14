@@ -45,7 +45,7 @@ export default async function GenresCount() {
         name: 'Other',
         index: i,
         count,
-        value: count,
+        reservedValue: count,
         percent: Math.round((count / sum) * 100),
         seriesName: topSeries
           .entries()
@@ -60,7 +60,7 @@ export default async function GenresCount() {
       index: i,
       name: data.id.toString(),
       count: data.count,
-      value: data.count,
+      reservedValue: data.count,
       percent: Math.round(percent),
       seriesName: data.topSeries
     });
