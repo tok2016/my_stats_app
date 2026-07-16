@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { GameCore } from '@ts/games/game';
-import { PeriodTops, PrecisePeriod } from '@ts/games/metric';
+import { PeriodPlaytimeData, PeriodTop, PrecisePeriod } from '@ts/games/metric';
 import { StudiosPeriodMetric, StudiosPeriodTop } from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
@@ -10,7 +10,7 @@ import { getPeriodMetric } from '@lib/metrics/periods-metric';
 const STUDIOS_IN_PERIOD = 1;
 
 const setStuioTopByRole = (
-  periodTop: PeriodTops<string> | undefined,
+  periodTop: PeriodTop<PeriodPlaytimeData> | undefined,
   map: Map<string, StudiosPeriodTop>,
   field: keyof StudiosPeriodTop
 ) => {

@@ -167,7 +167,10 @@ $modules: 'user', 'music', 'games';
       map.get(utils.$text-colors, $module)
     );
 
-    @include components.divider(map.get(utils.$text-colors, $module));
+    @include components.divider(
+      map.get(utils.$text-colors, $module),
+      map.get(utils.$highlight-colors, $module)
+    );
 
     @include components.skeleton(
       utils.$skeleton-color,
@@ -200,6 +203,12 @@ $modules: 'user', 'music', 'games';
       map.get(utils.$text-colors, $module),
       utils.$text-darker,
       utils.$white
+    );
+
+    @include metrics.data-block(
+      map.get(utils.$bg-1-colors, $module),
+      map.get(utils.$bg-2-colors, $module),
+      map.get(utils.$hover-colors, $module)
     );
 
     .light {
@@ -306,7 +315,10 @@ $modules: 'user', 'music', 'games';
         map.get(utils.$bg-2-colors, $module)
       );
 
-      @include components.divider(map.get(utils.$bg-2-colors, $module));
+      @include components.divider(
+        map.get(utils.$bg-2-colors, $module),
+        map.get(utils.$active-colors, $module)
+      );
 
       @include components.skeleton(
         utils.$skeleton-light-color,
@@ -326,6 +338,12 @@ $modules: 'user', 'music', 'games';
         map.get(utils.$disabled-colors, $module),
         map.get(utils.$bg-2-colors, $module),
         map.get(utils.$hover-colors, $module),
+        map.get(utils.$active-colors, $module)
+      );
+
+      @include metrics.data-block(
+        map.get(utils.$text-colors, $module),
+        map.get(utils.$highlight-colors, $module),
         map.get(utils.$active-colors, $module)
       );
     }

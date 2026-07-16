@@ -228,9 +228,9 @@ export const getPeriodDate: Record<PrecisePeriod, (date: Date) => string> = {
     const seasonNumber = Math.floor(
       ((date.getMonth() % MONTHS_SHIFT) + 1) / MONTHS_IN_QUARTER
     );
-    return `${date.getFullYear()}-${seasonNumber}`;
+    return `${date.getFullYear()}-${seasonNumber + 1}`;
   },
-  month: (date) => `${date.getFullYear()}-${date.getMonth()}`
+  month: (date) => `${date.getFullYear()}-${date.getMonth() + 1}`
 };
 
 export const mean = (values: number[]) =>
@@ -291,7 +291,7 @@ const getSeasonString = (period: string, short: boolean) => {
   const parts = period.split('-');
   if (!parts[1]) return getYearString(parts[0], short);
 
-  const seasonNumber = parseInt(parts[1]) % Seasons.length;
+  const seasonNumber = (parseInt(parts[1]) - 1) % Seasons.length;
   const endIndex = short ? 3 : Seasons[seasonNumber].length;
   return Seasons[seasonNumber].substring(0, endIndex);
 };

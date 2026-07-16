@@ -1,12 +1,17 @@
 import Skeleton from '@components/Skeleton';
 
+type PeriodTopsSkeletonsProps = {
+  metricId: string;
+  periodTopClassName?: string;
+};
+
+const SKELETONS_COUNT = 10;
+
 type PeriodTopSkeletonProps = {
   className?: string;
 };
 
-export default function PeriodTopSkeleton({
-  className
-}: PeriodTopSkeletonProps) {
+function PeriodTopSkeleton({ className }: PeriodTopSkeletonProps) {
   return (
     <div className={`data-block period-top ${className}`}>
       <Skeleton
@@ -41,6 +46,22 @@ export default function PeriodTopSkeleton({
           />
         </li>
       </ol>
+    </div>
+  );
+}
+
+export default function PeriodTopsSkeletons({
+  metricId,
+  periodTopClassName
+}: PeriodTopsSkeletonsProps) {
+  return (
+    <div className='period-tops-in-group'>
+      {Array.from({ length: SKELETONS_COUNT }, (_v, k) => (
+        <PeriodTopSkeleton
+          key={`${metricId}-${k}`}
+          className={periodTopClassName}
+        />
+      ))}
     </div>
   );
 }

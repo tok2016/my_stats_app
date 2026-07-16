@@ -43,12 +43,23 @@ $skeleton-icon-min-width: 2rem;
   }
 }
 
-@mixin divider($color) {
-  color: $color;
+@mixin divider($color, $highlight-color) {
+  .divider {
+    color: $color;
 
-  .left-hand,
-  .right-hand {
-    border-color: $color;
+    .left-hand,
+    .right-hand {
+      border-color: $color;
+    }
+  }
+
+  .divider.colored {
+    color: $highlight-color;
+
+    .left-hand,
+    .right-hand {
+      border-color: $highlight-color;
+    }
   }
 }
 

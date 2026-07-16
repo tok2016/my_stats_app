@@ -1,10 +1,10 @@
-import { PeriodTops, PrecisePeriod } from '@ts/games/metric';
+import { PeriodTop, PrecisePeriod } from '@ts/games/metric';
 
 import { getPeriodString } from '@lib/utils';
 
 type PeriodTopBlockProps<ItemType> = {
   className?: string;
-  periodTop: PeriodTops<ItemType>;
+  periodTop: PeriodTop<ItemType>;
   periodType: PrecisePeriod;
   current?: boolean;
   listItemContent: (item: ItemType, i: number) => React.ReactNode;

@@ -1,5 +1,5 @@
 import Game from '@ts/games/game';
-import { CountData, PlaytimeData } from '@ts/games/metric';
+import { CountData, PeriodPlaytimeData, PlaytimeData } from '@ts/games/metric';
 import { ChartData } from '@ts/ui/charts-data';
 
 export type GenresCountData = ChartData
@@ -8,3 +8,5 @@ export type GenresCountData = ChartData
   };
 
 export type GenresPlaytimeData = ChartData & PlaytimeData;
+
+export type GenresPeriodPlaytimeData = ChartData & PeriodPlaytimeData;

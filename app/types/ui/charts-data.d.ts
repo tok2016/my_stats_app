@@ -1,3 +1,4 @@
+import { PeriodTop, PrecisePeriod } from '@ts/games/metric';
 import { ExtractTypeFields } from '@ts/util-types';
 
 export type CustomChartType = 'doughnut' | 'periodBar' | 'bar' | 'line' | 'map';
@@ -72,3 +73,12 @@ export type ChartContextProps = {
 };
 
 export type ChartValueField<DataType> = ExtractTypeFields<DataType, number>;
+
+export type PeriodBarChartMainProps<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+> = {
+  displayFields: DisplayFields<DataType>;
+  fieldsNames: FieldsInfo<DataType>;
+  valueField: ValueKey;
+};

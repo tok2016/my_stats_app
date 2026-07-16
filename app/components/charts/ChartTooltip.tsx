@@ -195,7 +195,6 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
       return;
     }
 
-    const valueKey = tooltip.title[0];
     const itemId = tooltipTitleToNumber(tooltip.dataPoints[0].dataset.label);
     const data = dataMap.get(itemId);
     const storedId = tooltipRef.current?.dataset['item'];

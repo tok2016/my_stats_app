@@ -54,15 +54,22 @@ export type RatingData = {
 
 export type MetricMap<MetricData> = Record<number | string, MetricData>;
 
-export type PeriodTops<MetricData> = {
+export type PeriodPlaytimeData = {
+  id: number | string;
+  hours: number;
+};
+
+export type PeriodTop<MetricData> = {
   period: string;
   top: MetricData[];
 };
 
 export type PeriodTopsMetric<MetricData> = {
   periodType: PrecisePeriod;
-  tops: PeriodTops<MetricData>[];
+  tops: PeriodTop<MetricData>[];
 };
+
+export type PeriodPlaytimeTops = PeriodTopsMetric<PeriodPlaytimeData>;
 
 export type RecommendedMetric = {
   favorite: IgdbRecommendedGame[];
