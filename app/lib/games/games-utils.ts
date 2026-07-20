@@ -10,17 +10,19 @@ import { getCredentialsById } from '../auth';
 import { GamesModel } from '../models';
 import { isIgdbItemArray, isIgdbItemBasic } from '../type-guards';
 import { MINUTES, generateErrorResponse, mean } from '../utils';
-import { igdbRequest } from './igdb';
+import { getImageUrl, igdbRequest } from './igdb';
 
 type ItemsFields = keyof Omit<GameInSchema, 'userId' | 'storeId'>;
 
+const MAX_SCREENSHOTS = 3;
+
 export const FULL_GAME_FIELDS: Required<IgdbQuery<IgdbGameFull>>['fields'] = [
   'name',
-  'cover.url',
+  'cover.image_id',
   'first_release_date',
   'platforms.name',
   'platforms.platform_family.name',
-  'platforms.platform_logo.url',
+  'platforms.platform_logo.image_id',
   'collections.games',
   'collections.name',
   'genres.name',
@@ -29,7 +31,8 @@ export const FULL_GAME_FIELDS: Required<IgdbQuery<IgdbGameFull>>['fields'] = [
   'involved_companies.company.name',
   'involved_companies.company.country',
   'aggregated_rating',
-  'rating'
+  'rating',
+  'screenshots.image_id'
 ];
 
 export const SERIES_EXPANDED_FIELDS: Required<
@@ -95,7 +98,12 @@ export const uniteGameCoreAndIgdb = (
     curr.games.length > prev.games.length ? curr : prev
   ),
   genres: igdbGame.genres,
-  cover: igdbGame.cover?.url
+  cover: igdbGame.cover?.image_id
+    ? getImageUrl(igdbGame.cover.image_id, 'cover_big')
+    : undefined,
+  screenshots: igdbGame.screenshots
+    ?.slice(0, MAX_SCREENSHOTS)
+    .map((screenshot) => getImageUrl(screenshot.image_id, 'screenshot_med'))
 });
 
 export const getFullGames = async (

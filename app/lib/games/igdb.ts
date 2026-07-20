@@ -7,6 +7,7 @@ import {
   IgdbAccess,
   IgdbQuery
 } from '@ts/games/api-response';
+import { IgdbImageSize } from '@ts/games/image';
 
 import { AxiosIgdbInstance } from '../axios-instanse';
 import { ApiModel } from '../models';
@@ -47,7 +48,7 @@ const getIgdbAccess = async (
   return response.data;
 };
 
-const updateIgdbAccess = async (): Promise<ApiToken> => {
+const updateIgdbAccess = async (isExpired: boolean): Promise<ApiToken> => {
   const searchParams = new URLSearchParams({
     client_id: process.env.TWITCH_CLIENT_ID ?? '',
     client_secret: process.env.TWITCH_SECRET ?? '',
@@ -69,7 +70,8 @@ const updateIgdbAccess = async (): Promise<ApiToken> => {
     token: await encodeJwt(apiToken)
   };
 
-  await ApiModel.updateOne({ service: 'igdb' }, apiAccess);
+  if (isExpired) await ApiModel.updateOne({ service: 'igdb' }, apiAccess);
+  else await ApiModel.create(apiAccess);
   return apiToken;
 };
 
@@ -118,11 +120,14 @@ export const igdbRequest = async <DataType>(
 ): Promise<DataType[]> => {
   const apiAccess = (await ApiModel.findOne({ service: 'igdb' }).lean())?.token;
   let apiToken = apiAccess ? await decodeApiToken(apiAccess) : undefined;
+  const isTokenExpired = apiToken ? isExpired(apiToken.expiresAt) : false;
 
   if (!apiToken || isExpired(apiToken.expiresAt)) {
-    const newAccess = await updateIgdbAccess();
+    const newAccess = await updateIgdbAccess(isTokenExpired);
     apiToken = newAccess;
   }
+
+  console.log(apiToken);
 
   const queryString = getQueryString(query);
   console.log(queryString);
@@ -133,3 +138,6 @@ export const igdbRequest = async <DataType>(
 
   return igdbData;
 };
+
+export const getImageUrl = (imageId: string, size: IgdbImageSize) =>
+  `https://images.igdb.com/igdb/image/upload/t_${size}/${imageId}.jpg`;

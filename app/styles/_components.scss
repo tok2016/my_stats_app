@@ -480,3 +480,33 @@ form .drawer-submenu {
     border-color: $color;
   }
 }
+
+.rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 2.75rem;
+  height: 2.75rem;
+
+  border-radius: utils.$max-radius;
+
+  .value {
+    @include utils.header(3);
+
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: utils.$max-radius;
+
+    text-align: center;
+    line-height: 2.25rem;
+  }
+}
+
+@mixin rating($bg-color) {
+  .rating {
+    .value {
+      background-color: $bg-color;
+    }
+  }
+}

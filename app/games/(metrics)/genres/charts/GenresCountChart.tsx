@@ -29,23 +29,6 @@ const genresCountFieldsNames: FieldsInfo<GenresCountForDoughnut> = {
   topSeries: { name: 'Biggest series' }
 };
 
-const genresCountRowContent = (data: GenresCountData) => (
-  <>
-    <span>{data.index}</span>
-    <Link href={`/games/genres/${data.id}`} className='colored'>
-      {data.name}
-    </Link>
-    <span>{data.count}</span>
-    {data.topSeries ? (
-      <Link href={`/games/series/${data.topSeries.id}`} className='underline'>
-        {data.topSeries.name}
-      </Link>
-    ) : (
-      <span>—</span>
-    )}
-  </>
-);
-
 export default function GenresCountChart({ data }: GenresCountChartProps) {
   const doughnutData: GenresCountForDoughnut[] = data.map((value) => ({
     ...value,
@@ -54,6 +37,7 @@ export default function GenresCountChart({ data }: GenresCountChartProps) {
 
   return (
     <SwitchableChart
+      className='dougnut-chart-table'
       chartsOptions={[
         {
           chart: (
@@ -64,6 +48,7 @@ export default function GenresCountChart({ data }: GenresCountChartProps) {
               data={doughnutData}
               displayFields={['count', 'topSeries']}
               valueFields={['count']}
+              showLegend
               fieldsNames={genresCountFieldsNames}
             />
           ),
@@ -75,12 +60,43 @@ export default function GenresCountChart({ data }: GenresCountChartProps) {
               id='genres-count-table'
               data={data}
               headers={{
-                index: '№',
-                name: 'Genre',
-                count: 'Games',
-                topSeries: 'Biggest series'
+                index: {
+                  title: '№',
+                  width: '1rem',
+                  renderRow: (value) => value.index + 1
+                },
+                name: {
+                  title: 'Genre',
+                  width: '5fr',
+                  renderRow: (value) => (
+                    <Link
+                      href={`/games/genres/${value.id}`}
+                      className='colored'
+                    >
+                      {value.name}
+                    </Link>
+                  )
+                },
+                count: {
+                  title: 'Games',
+                  width: '2fr'
+                },
+                topSeries: {
+                  title: 'Biggest series',
+                  width: '5fr',
+                  renderRow: (value) =>
+                    value.topSeries ? (
+                      <Link
+                        href={`/games/series/${value.topSeries.id}`}
+                        className='underline'
+                      >
+                        {value.topSeries.name}
+                      </Link>
+                    ) : (
+                      <span>—</span>
+                    )
+                }
               }}
-              rowContent={genresCountRowContent}
             />
           ),
           icon: <TableIcon />

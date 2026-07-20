@@ -175,7 +175,7 @@ export default function PeriodTops<
   }, [periodMetricData, observer]);
 
   return (
-    <div id={id} className={`metric ${className}`}>
+    <section id={id} className={`metric ${className}`}>
       <h3 className='select-title'>
         {title}
         <Select
@@ -259,6 +259,6 @@ export default function PeriodTops<
             valueField={valueField}
           />
         ))}
-    </div>
+    </section>
   );
 }

@@ -2,6 +2,8 @@ import { GameCore, GameShort } from '@ts/games/game';
 import { RatingData } from '@ts/games/metric';
 import { RequiredFields } from '@ts/util-types';
 
+import { getImageUrl } from '@lib/games/igdb';
+
 import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
 import { GAMES_IN_METRIC } from '../utils';
 import { mean } from '../utils';
@@ -12,13 +14,18 @@ const setRatingData = (
   map: Map<number | string, RatingData>
 ) => {
   const currentItemRating = map.get(item);
+  const gameShort: GameShort = {
+    ...game,
+    cover: game.cover ? getImageUrl(game.cover, 'cover_big') : undefined
+  };
+
   if (!currentItemRating)
     map.set(item, {
       id: Number(item) ?? 0,
       rating: 0,
-      topGames: [game]
+      topGames: [gameShort]
     });
-  else currentItemRating.topGames.push(game);
+  else currentItemRating.topGames.push(gameShort);
 };
 
 export const getRatingMetric = (

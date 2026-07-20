@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { GamesFilter } from '@ts/games/filter';
 import Game, { GameCore } from '@ts/games/game';
+import { IgdbImage } from '@ts/games/image';
 import Token from '@ts/users/token';
 import { LiteralType } from '@ts/util-types';
 
 import { getCredentialsById } from '@lib/auth';
 import { gameEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
 import { getFullGames } from '@lib/games/games-utils';
+import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
 import { generateErrorResponse } from '@lib/utils';
 import { NewGameValidator, validateData } from '@lib/validation-schemas';
@@ -79,7 +81,8 @@ const sortByFilter: Record<keyof Game, (a: Game, b: Game) => number> = {
   genres: (a, b) =>
     a.genres[0]?.name.localeCompare(b.genres[0]?.name ?? '') ?? 0,
   hours: (a, b) => a.hours - b.hours,
-  cover: () => 0
+  cover: () => 0,
+  screenshots: () => 0
 };
 
 const getGames = async (games: GameCore[], req: NextRequest) => {
@@ -131,5 +134,42 @@ const postNewGame = async (token: Token, req: NextRequest) => {
   });
 };
 
+type GameCover = {
+  id: number;
+  cover?: IgdbImage;
+};
+
+const changeCovers = async (token: Token, req: NextRequest) => {
+  const credentials = await getCredentialsById(token.id);
+  const gamesCore = await GamesModel.find({
+    userId: credentials.userId
+  }).lean();
+
+  const gamesCovers = await igdbRequest<GameCover>('/games', {
+    fields: ['cover.image_id'],
+    where: `id = (${gamesCore.map((game) => game.apiId).join(',')})`,
+    limit: gamesCore.length
+  });
+
+  const promises = gamesCovers.map((cover) => {
+    return GamesModel.findOneAndUpdate(
+      { apiId: cover.id },
+      { cover: cover.cover?.image_id }
+    );
+  });
+
+  await Promise.all(promises);
+
+  const updatedGamesCore = await GamesModel.find({
+    userId: credentials.userId
+  }).lean();
+
+  return NextResponse.json(updatedGamesCore, {
+    status: 200,
+    statusText: 'Games covers url were replaced with cover image id'
+  });
+};
+
 export const GET = gameEndpoint(getGames);
 export const POST = protectedEndpoint(postNewGame);
+export const PUT = protectedEndpoint(changeCovers);

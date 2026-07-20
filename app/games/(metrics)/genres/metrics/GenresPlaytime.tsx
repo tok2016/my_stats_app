@@ -5,6 +5,7 @@ import { PlaytimeData } from '@ts/games/metric';
 
 import { getMetricData } from '@lib/server-actions';
 
+import genrePlaytimeData from '../../../../../mock data/genres/genres-playtime.json';
 import GenresPlaytimeChart from '../charts/GenresPlaytimeChart';
 import { GenresPlaytimeData } from '../types';
 
@@ -15,10 +16,12 @@ type GenresPlaytimeProps = {
 export default async function GenresPlaytime({
   genresMap
 }: GenresPlaytimeProps) {
-  const playtimeData = await getMetricData<PlaytimeData[]>(
-    '/api/games/genres/playtime',
-    []
-  );
+  // const playtimeData = await getMetricData<PlaytimeData[]>(
+  //   '/api/games/genres/playtime',
+  //   []
+  // );
+
+  const playtimeData = genrePlaytimeData;
 
   const genresPlaytimeData: GenresPlaytimeData[] = playtimeData.map(
     (value, i) => ({
@@ -29,5 +32,10 @@ export default async function GenresPlaytime({
     })
   );
 
-  return <GenresPlaytimeChart data={genresPlaytimeData} />;
+  return (
+    <section className='metric'>
+      <h3>Your longest played genres</h3>
+      <GenresPlaytimeChart data={genresPlaytimeData} />
+    </section>
+  );
 }

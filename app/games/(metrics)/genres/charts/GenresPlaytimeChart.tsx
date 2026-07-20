@@ -30,21 +30,6 @@ const playtimeFieldsNames: FieldsInfo<GenresPlaytimeForDoughnut> = {
   index: { name: '№' }
 };
 
-const genresPlaytimeRowContent = (data: GenresPlaytimeData) => {
-  return (
-    <>
-      <span>{data.index}</span>
-      <Link href={`/games/genres/${data.id}`} className='colored'>
-        {data.name}
-      </Link>
-      <span>{data.count}</span>
-      <Link href={`/games/series/${data.topGame.id}`} className='underline'>
-        {data.topGame.name}
-      </Link>
-    </>
-  );
-};
-
 export default function GenresPlaytimeChart({
   data
 }: GenresPlaytimeChartProps) {
@@ -55,6 +40,7 @@ export default function GenresPlaytimeChart({
 
   return (
     <SwitchableChart
+      className='dougnut-chart-table'
       chartsOptions={[
         {
           chart: (
@@ -65,6 +51,7 @@ export default function GenresPlaytimeChart({
               defaultValueField='hours'
               valueFields={['hours']}
               fieldsNames={playtimeFieldsNames}
+              showLegend
               displayFields={['hours', 'topGame']}
             />
           ),
@@ -76,12 +63,40 @@ export default function GenresPlaytimeChart({
               id='genres-playtime-table'
               data={data}
               headers={{
-                index: '№',
-                name: 'Genre',
-                hours: 'Hours',
-                topGame: 'Biggest game'
+                index: {
+                  title: '№',
+                  width: '1rem',
+                  renderRow: (value) => value.index + 1
+                },
+                name: {
+                  title: 'Genre',
+                  width: '5fr',
+                  renderRow: (value) => (
+                    <Link
+                      href={`/games/genres/${value.id}`}
+                      className='colored'
+                    >
+                      {value.name}
+                    </Link>
+                  )
+                },
+                hours: {
+                  title: 'Hours',
+                  width: '2fr'
+                },
+                topGame: {
+                  title: 'Biggest game',
+                  width: '5fr',
+                  renderRow: (value) => (
+                    <Link
+                      href={`/games/series/${value.topGame.id}`}
+                      className='underline'
+                    >
+                      {value.topGame.name}
+                    </Link>
+                  )
+                }
               }}
-              rowContent={genresPlaytimeRowContent}
             />
           ),
           icon: <TableIcon />

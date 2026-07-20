@@ -1,10 +1,10 @@
-import { PrecisePeriods } from '@lib/utils';
+import { GreatPeriods, PrecisePeriods } from '@lib/utils';
 
 import { IgdbBasic } from './api-response';
-import { GameCore, GameShort, IgdbRecommendedGame } from './game';
+import { GameCore, GameShort, RecommendedGame } from './game';
 
 export type PrecisePeriod = (typeof PrecisePeriods)[number];
-export type GreatPeriod = 'allTime' | 'year';
+export type GreatPeriod = (typeof GreatPeriods)[number];
 export type StudioField = keyof Pick<
   GameCore,
   'developersIds' | 'publishersIds'
@@ -72,8 +72,8 @@ export type PeriodTopsMetric<MetricData> = {
 export type PeriodPlaytimeTops = PeriodTopsMetric<PeriodPlaytimeData>;
 
 export type RecommendedMetric = {
-  favorite: IgdbRecommendedGame[];
-  other: IgdbRecommendedGame[];
+  favorite: RecommendedGame[];
+  other: RecommendedGame[];
 };
 
 export interface YearCountMetric {

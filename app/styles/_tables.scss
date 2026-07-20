@@ -25,7 +25,7 @@
 
 .table-header,
 .table-body {
-  min-width: 30rem;
+  min-width: 15rem;
   box-sizing: border-box;
   padding: 2px 2px;
 }
@@ -34,6 +34,7 @@
 .table-row {
   display: grid;
   grid-template-columns: 1fr 5fr 2fr 5fr;
+  align-items: center;
 
   > * {
     padding: 0 0.625rem;
@@ -114,6 +115,14 @@
       border-right: solid 1px $border-color;
 
       &:last-child {
+        border-right: none;
+      }
+    }
+  }
+
+  .hide-borders {
+    .table-row {
+      > * {
         border-right: none;
       }
     }

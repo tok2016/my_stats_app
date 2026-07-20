@@ -20,7 +20,7 @@ export default function ChartLegend<DataType extends ChartData>({
             ) : (
               <div className='legend-mark'></div>
             )}
-            <span>{value.name}</span>
+            <span className='item-title'>{value.name}</span>
           </li>
         );
       })}

@@ -42,6 +42,8 @@ export const ConfirmationActions = ['password', 'delete'] as const;
 
 export const PrecisePeriods = ['year', 'season', 'month'] as const;
 
+export const GreatPeriods = ['allTime', 'year'] as const;
+
 export const ServiceStatuses = [
   'authorized',
   'unauthorized',
@@ -160,6 +162,12 @@ export const generateErrorResponse = (
   message: string,
   issues: ValidationIssue[] = []
 ): ErrorResponse => ({ status, message, issues });
+
+export const getSingularOrPlural = (
+  number: number,
+  singular: string,
+  plural: string
+) => (number === 1 ? singular : plural);
 
 export const clamp = (value: number, min: number, max: number) => {
   if (value < min) {
