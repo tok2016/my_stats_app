@@ -14,6 +14,25 @@
   gap: 1.25rem;
 }
 
+.metrics-group {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 5rem;
+}
+
+.blocks-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 3rem;
+
+  overflow-x: auto;
+  margin-bottom: 0.25rem;
+}
+
 .data-block {
   display: flex;
   flex-direction: column;
@@ -72,10 +91,6 @@
       &:last-child {
         margin-bottom: 0;
       }
-
-      svg {
-        width: utils.$large-size;
-      }
     }
   }
 }
@@ -122,5 +137,45 @@
     .data-block-title {
       border-color: $underline-color;
     }
+  }
+}
+
+.empty-cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 50%;
+  }
+}
+
+@mixin empty-cover($bg-color, $svg-color) {
+  .empty-cover {
+    background-color: $bg-color;
+
+    svg {
+      color: $svg-color !important;
+    }
+  }
+}
+
+.empty-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+
+  width: 100%;
+  min-height: 7rem;
+  height: 10rem;
+
+  text-align: center;
+
+  svg {
+    width: 5rem;
+    height: 5rem;
   }
 }

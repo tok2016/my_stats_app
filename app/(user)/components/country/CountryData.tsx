@@ -11,6 +11,7 @@ export default function CountryData({ country }: CountryDataProps) {
     <div className='country'>
       <p>{country.name}</p>
       <FetchImage
+        alt={`Flag of ${country.name}`}
         className='flag'
         src={country.flag}
         width={20}

@@ -8,6 +8,7 @@ import Token from '@ts/users/token';
 
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import { getItemById, getTopItem } from '@lib/games/games-utils';
+import { getImageUrl } from '@lib/games/igdb';
 
 type StudioParam = {
   studioId?: string;
@@ -29,7 +30,7 @@ const getStudioById = async (
     ['developersIds', 'publishersIds'],
     [
       'name',
-      'logo.url',
+      'logo.image_id',
       'country',
       'developed.rating',
       'developed.aggregated_rating',
@@ -86,7 +87,9 @@ const getStudioById = async (
     published,
     series,
     country: igdbStudio.country,
-    logo: igdbStudio.logo?.url,
+    logo: igdbStudio.logo?.image_id
+      ? getImageUrl(igdbStudio.logo.image_id, 'logo_med')
+      : undefined,
     topGenre: getTopItem<IgdbGenre>(basicInfo.games, 'genres')
   };
 

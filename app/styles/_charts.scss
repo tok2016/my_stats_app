@@ -69,6 +69,12 @@ $default-color: map.get(utils.$active-colors, 'games');
   }
 }
 
+.dougnut-chart-table {
+  width: 32rem;
+  aspect-ratio: 1.8;
+  overflow: hidden;
+}
+
 .doughnut-container {
   width: 32rem;
   aspect-ratio: 1.8;
@@ -78,6 +84,10 @@ $default-color: map.get(utils.$active-colors, 'games');
     width: unset;
     height: 100%;
     aspect-ratio: 1;
+  }
+
+  .chart-legend-content {
+    gap: 0.5rem;
   }
 }
 
@@ -228,6 +238,9 @@ $default-color: map.get(utils.$active-colors, 'games');
   flex-direction: column;
   gap: 0.25rem;
 
+  max-height: 100%;
+  overflow-y: auto;
+
   li {
     @include utils.font(
       utils.$regular-size,
@@ -250,6 +263,10 @@ $default-color: map.get(utils.$active-colors, 'games');
       height: 1rem;
       border-radius: utils.$max-radius;
       background-color: $default-color;
+    }
+
+    .item-title {
+      flex: 1;
     }
   }
 }

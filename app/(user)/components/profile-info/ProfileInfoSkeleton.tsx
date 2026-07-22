@@ -1,7 +1,8 @@
 import Logo from '@components/Logo';
+import Avatar from '@components/profile-layout/Avatar';
+
 import ProfileControlsSkeleton from './ProfileControlsSkeleton';
 import ProfileCreditsSkeleton from './ProfileCreditsSkeleton';
-import Avatar from '@components/profile-layout/Avatar';
 
 type ProfileInfoSkeletonProps = {
   authorized?: boolean;
@@ -12,7 +13,7 @@ export default function ProfileInfoSkeleton({
 }: ProfileInfoSkeletonProps) {
   return (
     <div className='profile-info'>
-      <Avatar loading />
+      <Avatar username='' loading />
       <ProfileCreditsSkeleton />
 
       <div className='profile-meta'>

@@ -4,6 +4,7 @@ import FetchImage from '@components/FetchImage';
 import Skeleton from '@components/Skeleton';
 
 type AvatarProps = {
+  username: string;
   avatarId?: string | null;
   loading?: boolean;
   className?: string;
@@ -20,7 +21,12 @@ const getAvatarUrl = (avatarId: string) => {
   }
 };
 
-export default function Avatar({ avatarId, loading, className }: AvatarProps) {
+export default function Avatar({
+  username,
+  avatarId,
+  loading,
+  className
+}: AvatarProps) {
   if (loading) {
     return <Skeleton type='image' className={`avatar ${className}`} />;
   } else if (!avatarId) {
@@ -30,6 +36,7 @@ export default function Avatar({ avatarId, loading, className }: AvatarProps) {
   return (
     <FetchImage
       className={`avatar ${className}`}
+      alt={`Avatar of ${username}`}
       src={getAvatarUrl(avatarId)}
       width={AVATAR_WIDTH}
       height={AVATAR_WIDTH}

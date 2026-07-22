@@ -1,7 +1,11 @@
 'use client';
 
 import Game from '@ts/games/game';
-import { PeriodPlaytimeTops, PeriodTopsMetric } from '@ts/games/metric';
+import {
+  PeriodPlaytimeTops,
+  PeriodTopsMetric,
+  PrecisePeriod
+} from '@ts/games/metric';
 
 import { getMetricData } from '@lib/server-actions';
 
@@ -18,11 +22,16 @@ type GenresPeriodTopsProps = {
 
 const getGenresPeriodTops =
   (genresMap: Map<number | string, Genre>) =>
-  async (): Promise<PeriodTopsMetric<GenresPeriodPlaytimeData>> => {
+  async (
+    periodType?: PrecisePeriod
+  ): Promise<PeriodTopsMetric<GenresPeriodPlaytimeData>> => {
+    const searchParams = new URLSearchParams({
+      period: periodType ?? 'season'
+    });
     const periodTops = await getMetricData<PeriodPlaytimeTops>(
-      '/api/games/genres/periods',
+      `/api/games/genres/periods?${searchParams.toString()}`,
       {
-        periodType: 'month',
+        periodType: 'season',
         tops: []
       }
     );
@@ -57,6 +66,7 @@ export default function GenresPeriodTops({ genresMap }: GenresPeriodTopsProps) {
       getPeriodMetric={getGenresPeriodTops(genresMap)}
       displayFields={['hours']}
       valueField='hours'
+      showBar
       fieldsNames={{
         id: { name: 'ID' },
         name: { name: 'Genre' },

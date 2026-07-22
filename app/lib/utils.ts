@@ -31,6 +31,9 @@ export const ITEMS_IN_RATING = 5;
 export const MAX_ENTRIES_IN_CHART = 10;
 export const MIN_PERCENT_FOR_CHART = 2;
 
+export const DEFAULT_PERIOD_BLOCK_WIDTH = 11;
+export const DEFAULT_PERIOD_BLOCKS_GAP = 1.5;
+
 const SUCCESS_CODE_START = 200;
 const SUCCESS_CODE_END = 300;
 
@@ -41,6 +44,8 @@ export const ServiceNames = ['spotify', 'steam'] as const;
 export const ConfirmationActions = ['password', 'delete'] as const;
 
 export const PrecisePeriods = ['year', 'season', 'month'] as const;
+
+export const GreatPeriods = ['allTime', 'year'] as const;
 
 export const ServiceStatuses = [
   'authorized',
@@ -160,6 +165,12 @@ export const generateErrorResponse = (
   message: string,
   issues: ValidationIssue[] = []
 ): ErrorResponse => ({ status, message, issues });
+
+export const getSingularOrPlural = (
+  number: number,
+  singular: string,
+  plural: string
+) => (number === 1 ? singular : plural);
 
 export const clamp = (value: number, min: number, max: number) => {
   if (value < min) {

@@ -45,7 +45,10 @@ export const getPeriodMetric = (
       const top = Object.entries(list)
         .sort((a, b) => b[1] - a[1])
         .map((entry) => ({
-          id: entry[0],
+          id:
+            typeof games[0][dataField] === 'string'
+              ? entry[0]
+              : Number(entry[0]),
           hours: entry[1]
         }))
         .slice(0, maxTopEntries);

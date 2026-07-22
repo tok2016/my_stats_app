@@ -22,7 +22,6 @@ const fieldsNames: FieldsInfo<StudioCount> = {
   seriesName: { name: 'Best Series' },
   count: { name: 'Games' },
   hours: { name: 'Hours' },
-  value: { name: 'Value' },
   index: { name: 'Rank' },
   percent: { name: 'Percent' }
 };
@@ -44,35 +43,48 @@ export default function BarPage() {
         id='studios-table'
         data={studios}
         headers={{
-          name: 'Name',
-          count: 'Games',
-          hours: 'Hours',
-          seriesName: 'Longest Played Series'
-        }}
-        rowContent={(data, index) => (
-          <>
-            <span>{index + 1}</span>
-            <Link
-              href={`/games/studios/${data.id}`}
-              data-rank={data.index}
-              className='bold colored'
-            >
-              {data.name}
-            </Link>
-            <span>{data.count}</span>
-            <span>{data.hours}</span>
-            {data.seriesName ? (
+          index: {
+            title: '№',
+            width: '1rem',
+            renderRow: (value) => value.index + 1
+          },
+          name: {
+            title: 'Name',
+            width: '4fr',
+            renderRow: (value) => (
               <Link
-                href={`/games/series/${data.seriesName}`}
-                className='underline'
+                href={`/games/studios/${value.id}`}
+                data-rank={value.index}
+                className='bold colored'
               >
-                {data.seriesName}
+                {value.name}
               </Link>
-            ) : (
-              <span>no data</span>
-            )}
-          </>
-        )}
+            )
+          },
+          count: {
+            title: 'Games',
+            width: '3fr'
+          },
+          hours: {
+            title: 'Hours',
+            width: '2fr'
+          },
+          seriesName: {
+            title: 'Longest Played Series',
+            width: '4fr',
+            renderRow: (value) =>
+              value.seriesName ? (
+                <Link
+                  href={`/games/series/${value.seriesName}`}
+                  className='underline'
+                >
+                  {value.seriesName}
+                </Link>
+              ) : (
+                <span>—</span>
+              )
+          }
+        }}
       />
 
       <Chart
@@ -82,6 +94,7 @@ export default function BarPage() {
         displayFields={['count', 'hours', 'seriesName']}
         fieldsNames={fieldsNames}
         valueFields={['count', 'hours']}
+        defaultValueField='hours'
         props={{
           horizontal: true
         }}

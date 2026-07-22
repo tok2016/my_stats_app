@@ -1,6 +1,7 @@
 @use 'sass:map';
 @use 'utils';
 @use 'buttons';
+@use 'tables';
 
 $border-style: 2px solid;
 $border-radius: 6px;
@@ -252,6 +253,25 @@ $skeleton-icon-min-width: 2rem;
   margin: 0;
 }
 
+.skeleton.tablet {
+  --font-size: calc(utils.$regular-size + tables.$table-row-padding-y);
+  --line-height: #{utils.$tight-font};
+  margin-top: tables.$table-gap;
+
+  &:last-child {
+    margin-bottom: tables.$table-body-padding;
+  }
+}
+
+.skeleton.tablet.first-row {
+  margin-top: calc(tables.$table-gap + tables.$table-body-padding);
+}
+
+.skeleton.header {
+  --font-size: #{utils.$min-size};
+  --line-height: 2.23;
+}
+
 @keyframes gloss {
   to {
     background-position: calc(100% + $gloss-width) 0%;
@@ -277,10 +297,11 @@ $skeleton-icon-min-width: 2rem;
     left: 0;
   }
 
-  img,
-  .skeletons {
+  > * {
     width: 100%;
     height: 100%;
+
+    border-radius: inherit;
   }
 }
 
@@ -478,5 +499,35 @@ form .drawer-submenu {
 @mixin spinner($color) {
   .spinner {
     border-color: $color;
+  }
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 2.75rem;
+  height: 2.75rem;
+
+  border-radius: utils.$max-radius;
+
+  .value {
+    @include utils.header(3);
+
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: utils.$max-radius;
+
+    text-align: center;
+    line-height: 2.25rem;
+  }
+}
+
+@mixin rating($bg-color) {
+  .rating {
+    .value {
+      background-color: $bg-color;
+    }
   }
 }

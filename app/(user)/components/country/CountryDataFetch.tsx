@@ -36,6 +36,7 @@ export default function CountryDataFetch({ country }: CountryDataFetchProps) {
     <div className='country'>
       <p>{countryData.name}</p>
       <FetchImage
+        alt={`Flag of ${countryData.name}`}
         className='flag'
         src={countryData.flag}
         width={20}

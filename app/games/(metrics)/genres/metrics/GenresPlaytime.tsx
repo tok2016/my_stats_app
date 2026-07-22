@@ -24,7 +24,7 @@ export default async function GenresPlaytime({
     (value, i) => ({
       ...value,
       id: value.id,
-      name: genresMap.get(value.id)?.name ?? '',
+      name: genresMap.get(value.id)?.name ?? 'Other',
       index: i
     })
   );

@@ -25,7 +25,7 @@ export default async function GenresCount({
   const genresCount: GenresCountData[] = countData.map((data, i) => ({
     ...data,
     index: i,
-    name: genresMap.get(data.id)?.name ?? '',
+    name: genresMap.get(data.id)?.name ?? 'Other',
     topSeries: seriesMap.get(data.topSeries ?? ''),
     reservedValue: data.count
   }));

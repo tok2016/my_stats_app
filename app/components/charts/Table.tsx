@@ -5,18 +5,24 @@ import { ChevronDown, ChevronUp, ChevronUpDown } from '@mynaui/icons-react';
 import { SortDirection } from '@ts/games/filter';
 import { ChartData } from '@ts/ui/charts-data';
 
+type TableHeader<DataType extends ChartData> = {
+  title: string;
+  renderRow?: (value: DataType, i: number, header: string) => React.ReactNode;
+  width?: string;
+};
+
 type TableProps<DataType extends ChartData> = {
   id?: string;
   data: DataType[];
-  headers: Partial<Record<keyof Omit<DataType, 'id'>, string>>;
+  headers: Partial<Record<keyof Omit<DataType, 'id'>, TableHeader<DataType>>>;
   className?: string;
   sortField?: keyof DataType;
   sortDirection?: SortDirection;
-  rowContent: (data: DataType, index: number) => React.ReactNode;
   onSort?: (field: keyof DataType) => void;
 };
 
 const ROW_ANIMATION_DELAY = 75;
+const MIN_COLUMNS_TO_SHOW_BORDERS = 4;
 
 export default function Table<DataType extends ChartData>({
   id,
@@ -25,20 +31,28 @@ export default function Table<DataType extends ChartData>({
   className = '',
   sortField,
   sortDirection,
-  rowContent,
   onSort
 }: TableProps<DataType>) {
+  const columnsWidths = Object.values(headers)
+    .map((header) => header.width ?? '1fr')
+    .join(' ');
+
   return (
-    <div id={id} className={`table ${className}`}>
-      <div className='table-header'>
-        <div className='header-cell'>№</div>
-        {Object.entries(headers).map(([key, name]) => (
+    <div
+      id={id}
+      className={`table ${Object.keys(headers).length < MIN_COLUMNS_TO_SHOW_BORDERS ? 'hide-borders' : ''} ${className}`}
+    >
+      <div
+        className='table-header'
+        style={{ gridTemplateColumns: columnsWidths }}
+      >
+        {Object.entries(headers).map(([key, header]) => (
           <div
             key={key}
             className={`header-cell ${onSort ? 'sort-header' : ''}`}
             onClick={() => onSort?.(key as keyof DataType)}
           >
-            {name}
+            {header.title}
             {!onSort || (
               <div
                 className={`sort-button ${sortField === key ? 'colored' : ''}`}
@@ -61,9 +75,18 @@ export default function Table<DataType extends ChartData>({
           <div
             key={value.id}
             className={`table-row ${i === 0 ? 'top-row' : ''}`}
-            style={{ animationDelay: `${ROW_ANIMATION_DELAY * i}ms` }}
+            style={{
+              animationDelay: `${ROW_ANIMATION_DELAY * i}ms`,
+              gridTemplateColumns: columnsWidths
+            }}
           >
-            {rowContent(value, i)}
+            {Object.entries(headers).map(([key, header]) => (
+              <div key={`${value.id}-${key}`}>
+                {header.renderRow
+                  ? header.renderRow(value, i, key)
+                  : value[key as keyof DataType]}
+              </div>
+            ))}
           </div>
         ))}
       </div>

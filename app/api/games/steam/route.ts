@@ -7,7 +7,7 @@ import Service from '@ts/users/service';
 import { getGamesByUserId } from '@lib/auth';
 import { AxiosSteamInstanse } from '@lib/axios-instanse';
 import { serviceEndpoint } from '@lib/endpoint-generators';
-import { igdbRequest } from '@lib/games/igdb';
+import { getImageUrl, igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
 import { isSteamGameObject } from '@lib/type-guards';
 import { MILLISECONDS, generateErrorResponse } from '@lib/utils';
@@ -55,7 +55,9 @@ const uniteSteamAndIgdb = (
     seriesId: igdbGame.collections?.reduce((prev, curr) =>
       curr.games.length > prev.games.length ? curr : prev
     ).id,
-    cover: igdbGame?.cover?.url,
+    cover: igdbGame?.cover?.image_id
+      ? getImageUrl(igdbGame.cover.image_id, 'cover_big')
+      : undefined,
     minutes: steamGame?.playtime_forever ?? 0,
     playDate: steamGame
       ? new Date(steamGame.rtime_last_played * MILLISECONDS)
@@ -80,7 +82,7 @@ const searchGamesFromIgdb = async (
       'external_games.uid',
       'genres',
       'themes',
-      'cover.url'
+      'cover.image_id'
     ],
     where: `external_games.uid = (${steamGamesIds.join(',')}) & external_games.external_game_source = (${STEAM_IGDB_ID})`,
     limit: steamGamesIds.length

@@ -1,6 +1,23 @@
+import { Suspense } from 'react';
+
 import Game from '@ts/games/game';
 
-import { getGamesMap, getItemsMap } from '@app/games/lib/actions';
+import { getGamesMap } from '@lib/server-actions';
+
+import { ChartSkeleton } from '@components/charts/ChartSkeleton';
+import Metric from '@components/data-blocks/Metric';
+
+import { getItemsMap } from '@app/games/lib/actions';
+
+import './genres-metrics.scss';
+import GenreTops from './metrics/GenreTops';
+import GenresCount from './metrics/GenresCount';
+import GenresPeriodTops from './metrics/GenresPeriodTops';
+import GenresPlaytime from './metrics/GenresPlaytime';
+import HighestRatedGenres from './metrics/HighestRatedGenres';
+import RecommendedGames from './metrics/RecommendedGames';
+import HighestRatedGenresSkeleton from './skeletons/HighestRatedGenresSkeleton';
+import RecommendedGamesSkeletons from './skeletons/RecommendedGamesSkeletons';
 
 const isIgdbGenre = (value: unknown): value is Game['genres'][number] =>
   typeof (value as Game['genres'][number])?.name !== 'undefined';
@@ -11,5 +28,54 @@ export default async function GamesGenres() {
     gamesMap,
     'genres',
     isIgdbGenre
+  );
+
+  const seriesMap = new Map<
+    number | string,
+    Exclude<Game['series'], undefined>
+  >();
+
+  gamesMap.values().forEach((game) => {
+    if (game.series && !seriesMap.get(game.series.id))
+      seriesMap.set(game.series.id, game.series);
+  });
+
+  return (
+    <>
+      <div className='metrics-group'>
+        <Metric id='biggest-genres' title='Your biggest genres'>
+          <Suspense
+            fallback={
+              <ChartSkeleton type='doughnut' className='dougnut-chart-table' />
+            }
+          >
+            <GenresCount genresMap={genresMap} seriesMap={seriesMap} />
+          </Suspense>
+        </Metric>
+
+        <Metric id='longest-genres' title='Your longest played genres'>
+          <Suspense
+            fallback={
+              <ChartSkeleton type='doughnut' className='dougnut-chart-table' />
+            }
+          >
+            <GenresPlaytime genresMap={genresMap} />
+          </Suspense>
+        </Metric>
+      </div>
+
+      <GenresPeriodTops genresMap={genresMap} />
+      <GenreTops genresMap={genresMap} gamesMap={gamesMap} />
+
+      <Metric id='rated-genres' title='Your highest rated genres'>
+        <Suspense fallback={<HighestRatedGenresSkeleton />}>
+          <HighestRatedGenres genresMap={genresMap} />
+        </Suspense>
+      </Metric>
+
+      <Suspense fallback={<RecommendedGamesSkeletons />}>
+        <RecommendedGames />
+      </Suspense>
+    </>
   );
 }
