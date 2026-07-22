@@ -4,15 +4,9 @@ import { RecommendedMetric } from '@ts/games/metric';
 import { getMetricData } from '@lib/server-actions';
 
 import GameCollage from '@components/data-blocks/GameCollage';
+import Metric from '@components/data-blocks/Metric';
 
-import Recommendations from '../../../../../mock data/genres/genres-recommendation.json';
-
-const MAX_PLATFORMS = 6;
-
-const RecommendationCategories: Record<keyof RecommendedMetric, string> = {
-  favorite: 'Games of your favorite genres',
-  other: 'Games of genres you might like'
-};
+import { RecommendationCategories, RecommendationIds } from '../utils';
 
 type ExternalLinkProps = {
   external: RecommendedGame['external'][number];
@@ -59,7 +53,7 @@ function RecommendedGameBlock(game: RecommendedMetric['favorite'][number]) {
       {game.external.length > 0 && (
         <div className='recommended-game-platforms'>
           <span>Available at: </span>
-          {game.external.slice(0, MAX_PLATFORMS).map((external, i, arr) => (
+          {game.external.map((external, i, arr) => (
             <ExternalLink
               key={external.id}
               external={external}
@@ -73,25 +67,28 @@ function RecommendedGameBlock(game: RecommendedMetric['favorite'][number]) {
 }
 
 export default async function RecommendedGames() {
-  // const recommendations = await getMetricData<RecommendedMetric>(
-  //   '/api/games/genres/recommend',
-  //   {
-  //     favorite: [],
-  //     other: []
-  //   }
-  // );
+  const recommendations = await getMetricData<RecommendedMetric>(
+    '/api/games/genres/recommend',
+    {
+      favorite: [],
+      other: []
+    }
+  );
 
-  const recommendations = Recommendations;
+  //const recommendations = Recommendations;
 
   return Object.entries(recommendations).map(([key, games]) => (
-    <section key={key} className='metric recommended-group'>
-      <h3>{RecommendationCategories[key as keyof RecommendedMetric]}</h3>
-
-      <div key={key} className='recommended-games'>
+    <Metric
+      key={key}
+      id={RecommendationIds[key as keyof RecommendedMetric]}
+      title={RecommendationCategories[key as keyof RecommendedMetric]}
+      className='recommended-group'
+    >
+      <div className='recommended-games'>
         {games.map((game) => (
           <RecommendedGameBlock key={game.id} {...game} />
         ))}
       </div>
-    </section>
+    </Metric>
   ));
 }

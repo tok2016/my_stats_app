@@ -48,7 +48,7 @@ export default function ChartTooltip<DataType extends ChartData>({
   const rank = (data?.index ?? -1) + 1;
   return (
     <div
-      style={{ opacity: !data ? '0' : undefined }}
+      style={{ opacity: !data ? '0' : undefined, maxWidth: '100px' }}
       className='tooltip-container'
       data-item={data?.id}
       ref={ref}
@@ -114,20 +114,30 @@ const adjustTooltipPosition = (
       tooltip.caretY
       - tooltipRef.current.offsetHeight * PositionMult[verticalPos];
 
-    const { top, left } = tooltip.boundaries;
+    const { top, left, width, height } = tooltip.boundaries;
 
     const absLeft = left + window.pageXOffset;
+    const absWindowRight = window.pageXOffset + window.innerWidth;
+    const absChartRight = left + width + window.pageXOffset;
     const adjustedLeft = clamp(
       originX,
       window.pageXOffset - absLeft + SCREEN_MARGIN,
-      window.innerWidth - tooltipRef.current.offsetWidth - left - SCREEN_MARGIN
+      Math.min(absWindowRight, absChartRight)
+        - tooltipRef.current.offsetWidth
+        - absLeft
+        - SCREEN_MARGIN
     );
 
     const absTop = top + window.pageYOffset;
+    const absWindowBottom = window.pageYOffset + window.innerHeight;
+    const absChartBottom = top + height + window.pageYOffset;
     const adjustedTop = clamp(
       originY,
       window.pageYOffset - absTop + SCREEN_MARGIN,
-      window.innerHeight - tooltipRef.current.offsetHeight - top - SCREEN_MARGIN
+      Math.min(absWindowBottom, absChartBottom)
+        - tooltipRef.current.offsetHeight
+        - absTop
+        - SCREEN_MARGIN
     );
 
     tooltipRef.current.style.left = `${adjustedLeft}px`;

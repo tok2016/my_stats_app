@@ -5,7 +5,6 @@ import { CountData } from '@ts/games/metric';
 
 import { getMetricData } from '@lib/server-actions';
 
-import genresCountData from '../../../../../mock data/genres/genres-count.json';
 import GenresCountChart from '../charts/GenresCountChart';
 import { GenresCountData } from '../types';
 
@@ -18,25 +17,18 @@ export default async function GenresCount({
   seriesMap,
   genresMap
 }: GenresCountProps) {
-  // const countData = await getMetricData<CountData[]>(
-  //   '/api/games/genres/count',
-  //   []
-  // );
-
-  const countData = genresCountData;
+  const countData = await getMetricData<CountData[]>(
+    '/api/games/genres/count',
+    []
+  );
 
   const genresCount: GenresCountData[] = countData.map((data, i) => ({
     ...data,
     index: i,
-    name: genresMap.get(data.id)?.name ?? '',
+    name: genresMap.get(data.id)?.name ?? 'Other',
     topSeries: seriesMap.get(data.topSeries ?? ''),
     reservedValue: data.count
   }));
 
-  return (
-    <section className='metric'>
-      <h3>Your biggest genres</h3>
-      <GenresCountChart data={genresCount} />
-    </section>
-  );
+  return <GenresCountChart data={genresCount} />;
 }

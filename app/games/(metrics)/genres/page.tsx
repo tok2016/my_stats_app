@@ -1,8 +1,14 @@
+import { Suspense } from 'react';
+
 import Game from '@ts/games/game';
 
-import { getGamesMap, getItemsMap } from '@app/games/lib/actions';
+import { getGamesMap } from '@lib/server-actions';
 
-import gamesData from '../../../../mock data/games.json';
+import { ChartSkeleton } from '@components/charts/ChartSkeleton';
+import Metric from '@components/data-blocks/Metric';
+
+import { getItemsMap } from '@app/games/lib/actions';
+
 import './genres-metrics.scss';
 import GenreTops from './metrics/GenreTops';
 import GenresCount from './metrics/GenresCount';
@@ -10,32 +16,19 @@ import GenresPeriodTops from './metrics/GenresPeriodTops';
 import GenresPlaytime from './metrics/GenresPlaytime';
 import HighestRatedGenres from './metrics/HighestRatedGenres';
 import RecommendedGames from './metrics/RecommendedGames';
+import HighestRatedGenresSkeleton from './skeletons/HighestRatedGenresSkeleton';
+import RecommendedGamesSkeletons from './skeletons/RecommendedGamesSkeletons';
 
 const isIgdbGenre = (value: unknown): value is Game['genres'][number] =>
   typeof (value as Game['genres'][number])?.name !== 'undefined';
 
 export default async function GamesGenres() {
-  //const gamesMap = await getGamesMap();
-  const gamesMap = new Map<string, Game>(
-    gamesData.map(
-      (game) =>
-        [
-          game.id,
-          {
-            ...game,
-            playDate: new Date(game.playDate),
-            releasedAt: new Date(game.releasedAt)
-          }
-        ] as const
-    )
-  );
+  const gamesMap = await getGamesMap();
   const genresMap = await getItemsMap<Game['genres'][number]>(
     gamesMap,
     'genres',
     isIgdbGenre
   );
-
-  console.log(genresMap);
 
   const seriesMap = new Map<
     number | string,
@@ -50,14 +43,39 @@ export default async function GamesGenres() {
   return (
     <>
       <div className='metrics-group'>
-        <GenresCount genresMap={genresMap} seriesMap={seriesMap} />
-        <GenresPlaytime genresMap={genresMap} />
+        <Metric id='biggest-genres' title='Your biggest genres'>
+          <Suspense
+            fallback={
+              <ChartSkeleton type='doughnut' className='dougnut-chart-table' />
+            }
+          >
+            <GenresCount genresMap={genresMap} seriesMap={seriesMap} />
+          </Suspense>
+        </Metric>
+
+        <Metric id='longest-genres' title='Your longest played genres'>
+          <Suspense
+            fallback={
+              <ChartSkeleton type='doughnut' className='dougnut-chart-table' />
+            }
+          >
+            <GenresPlaytime genresMap={genresMap} />
+          </Suspense>
+        </Metric>
       </div>
 
       <GenresPeriodTops genresMap={genresMap} />
       <GenreTops genresMap={genresMap} gamesMap={gamesMap} />
-      <HighestRatedGenres genresMap={genresMap} />
-      <RecommendedGames />
+
+      <Metric id='rated-genres' title='Your highest rated genres'>
+        <Suspense fallback={<HighestRatedGenresSkeleton />}>
+          <HighestRatedGenres genresMap={genresMap} />
+        </Suspense>
+      </Metric>
+
+      <Suspense fallback={<RecommendedGamesSkeletons />}>
+        <RecommendedGames />
+      </Suspense>
     </>
   );
 }

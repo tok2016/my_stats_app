@@ -9,7 +9,7 @@ type GameCollageProps = {
   game: Pick<Game, 'cover' | 'screenshots' | 'name' | 'id'>;
 };
 
-const SCREENSHOTS_IN_COLLAGE = 2;
+export const SCREENSHOTS_IN_COLLAGE = 2;
 
 export default function GameCollage({ game }: GameCollageProps) {
   const screenshots = game.screenshots ?? [];

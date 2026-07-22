@@ -30,12 +30,17 @@
 }
 
 .game-cover {
-  aspect-ratio: 174 / 232;
-
+  aspect-ratio: 264 / 374;
   border-radius: utils.$regular-radius;
-  > * {
-    border-radius: utils.$regular-radius;
+
+  img {
+    object-fit: contain;
   }
+}
+
+.screenshot {
+  aspect-ratio: 569 / 320;
+  border-radius: utils.$regular-radius;
 
   img {
     object-fit: contain;
@@ -48,26 +53,25 @@
     'a b'
     'a c';
 
+  align-items: center;
   grid-template-rows: 1fr 1fr;
-  grid-template-columns: 119fr 132fr;
+  grid-template-columns: 90fr 100fr;
 
   justify-content: space-between;
   gap: 0.625rem;
 
   .game-cover {
     grid-area: a;
+    border-radius: utils.$small-radius;
   }
 
   .screenshot-1 {
     grid-area: b;
+    border-radius: utils.$small-radius;
   }
 
   .screenshot-2 {
     grid-area: c;
+    border-radius: utils.$small-radius;
   }
-}
-
-.screenshot {
-  aspect-ratio: 16 / 9;
-  border-radius: utils.$regular-radius;
 }

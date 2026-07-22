@@ -1,9 +1,10 @@
 import Link from 'next/link';
 
-import { BasicUser } from '@ts/users/user';
 import Country from '@ts/users/country';
+import { BasicUser } from '@ts/users/user';
 
 import Avatar from '@components/profile-layout/Avatar';
+
 import CountryData from './country/CountryData';
 
 type UserPreviewProps = {
@@ -14,7 +15,7 @@ type UserPreviewProps = {
 export default function UserPreview({ user, country }: UserPreviewProps) {
   return (
     <Link href={`/users/${user.id}`} className='user-preview'>
-      <Avatar avatarId={user.avatarUrl} />
+      <Avatar username={user.username} avatarId={user.avatarUrl} />
 
       <div className='user-credits'>
         <h3>{user.username}</h3>

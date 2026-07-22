@@ -16,7 +16,7 @@ import Table from '@components/charts/Table';
 import GameTableTitle from '@components/data-blocks/GameTitle';
 import RankIcon from '@components/data-blocks/RankIcon';
 
-import genresTopsData from '../../../../../mock data/genres/genres-tops.json';
+import GenreTopsSkeleton from '../skeletons/GenreTopsSkeleton';
 
 type GenreTopsProps = {
   gamesMap: Map<number | string, Game>;
@@ -51,12 +51,10 @@ const greatPeriodOptions: Option[] = GreatPeriods.map((period) => ({
 
 const getGenreTops = async (params?: GreatPeriod) => {
   const searchParams = new URLSearchParams({ period: params ?? '' });
-  // const genresTops = await getMetricData<GenreTop[]>(
-  //   `/api/games/genres/topGames?${searchParams.toString()}`,
-  //   []
-  // );
-
-  const genresTops = genresTopsData;
+  const genresTops = await getMetricData<GenreTop[]>(
+    `/api/games/genres/topGames?${searchParams.toString()}`,
+    []
+  );
 
   return genresTops;
 };
@@ -68,7 +66,6 @@ function GenreTopBlock({
   index
 }: GenreTopBlockProps) {
   const genre = genresMap.get(top.id);
-  console.log(genre);
   if (!genre) return;
 
   const tableData: GenreTopTableData[] = top.topGames
@@ -115,9 +112,13 @@ function GenreTopBlock({
 }
 
 export default function GenreTops({ gamesMap, genresMap }: GenreTopsProps) {
-  const [genresTops, updateGenresTops] = useAction(getGenreTops, []);
+  const [genresTops, updateGenresTops, isPending] = useAction(
+    getGenreTops,
+    null
+  );
 
   const onPeriodSelect = (value: string) => {
+    console.log(value);
     updateGenresTops(value as GreatPeriod);
   };
 
@@ -139,17 +140,21 @@ export default function GenreTops({ gamesMap, genresMap }: GenreTopsProps) {
         />
       </h3>
 
-      <div className='genres-tops'>
-        {genresTops.map((genreTop, i) => (
-          <GenreTopBlock
-            key={`${genreTop.id}-top`}
-            top={genreTop}
-            gamesMap={gamesMap}
-            genresMap={genresMap}
-            index={i}
-          />
-        ))}
-      </div>
+      {isPending || !genresTops ? (
+        <GenreTopsSkeleton />
+      ) : (
+        <div className='genres-tops'>
+          {genresTops.map((genreTop, i) => (
+            <GenreTopBlock
+              key={`${genreTop.id}-top`}
+              top={genreTop}
+              gamesMap={gamesMap}
+              genresMap={genresMap}
+              index={i}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

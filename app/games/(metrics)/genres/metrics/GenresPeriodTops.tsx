@@ -12,7 +12,6 @@ import { getMetricData } from '@lib/server-actions';
 import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
 import RankIcon from '@components/data-blocks/RankIcon';
 
-import genresPeriodsData from '../../../../../mock data/genres/genres-periods-seasons.json';
 import { GenresPeriodPlaytimeData } from '../types';
 
 type Genre = Game['genres'][number];
@@ -23,11 +22,16 @@ type GenresPeriodTopsProps = {
 
 const getGenresPeriodTops =
   (genresMap: Map<number | string, Genre>) =>
-  async (): Promise<PeriodTopsMetric<GenresPeriodPlaytimeData>> => {
+  async (
+    periodType?: PrecisePeriod
+  ): Promise<PeriodTopsMetric<GenresPeriodPlaytimeData>> => {
+    const searchParams = new URLSearchParams({
+      period: periodType ?? 'season'
+    });
     const periodTops = await getMetricData<PeriodPlaytimeTops>(
-      '/api/games/genres/periods',
+      `/api/games/genres/periods?${searchParams.toString()}`,
       {
-        periodType: 'month',
+        periodType: 'season',
         tops: []
       }
     );
@@ -46,25 +50,6 @@ const getGenresPeriodTops =
     };
   };
 
-const getMockGenresPeriods =
-  (genresMap: Map<number | string, Genre>) =>
-  (): Promise<PeriodTopsMetric<GenresPeriodPlaytimeData>> => {
-    return Promise.resolve({
-      periodType: genresPeriodsData.periodType as PrecisePeriod,
-      tops: genresPeriodsData.tops.map((periodTop) => ({
-        period: periodTop.period,
-        top: periodTop.top.map((item, i) => {
-          return {
-            id: item.id,
-            name: genresMap.get(item.id)?.name ?? '',
-            index: i,
-            hours: item.hours
-          };
-        })
-      }))
-    });
-  };
-
 const genreItemContent = (genre: GenresPeriodPlaytimeData, i: number) => (
   <>
     <RankIcon rank={i} />
@@ -78,7 +63,7 @@ export default function GenresPeriodTops({ genresMap }: GenresPeriodTopsProps) {
       id='genres-periods'
       title='Your most played genres'
       listItemContent={genreItemContent}
-      getPeriodMetric={getMockGenresPeriods(genresMap)}
+      getPeriodMetric={getGenresPeriodTops(genresMap)}
       displayFields={['hours']}
       valueField='hours'
       showBar

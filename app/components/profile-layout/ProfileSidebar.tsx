@@ -67,7 +67,7 @@ function ProfileSidebarRaw({ user, path, expand }: AuthorizedSidebarProps) {
           label={user.username}
           loading={status === 'pending'}
           href='/iam'
-          icon={<Avatar avatarId={user.avatarUrl} />}
+          icon={<Avatar username={user.username} avatarId={user.avatarUrl} />}
         />
 
         {SidebarOptions.map((sidebarOption) => (

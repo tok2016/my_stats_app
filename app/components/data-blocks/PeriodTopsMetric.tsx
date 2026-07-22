@@ -11,7 +11,12 @@ import {
 import { Option } from '@ts/ui/components-props';
 
 import { useAction } from '@lib/hooks';
-import { PrecisePeriods, getPeriodString } from '@lib/utils';
+import {
+  DEFAULT_PERIOD_BLOCKS_GAP,
+  DEFAULT_PERIOD_BLOCK_WIDTH,
+  PrecisePeriods,
+  getPeriodString
+} from '@lib/utils';
 
 import Divider from '@components/Divider';
 import Select from '@components/Select';
@@ -31,6 +36,8 @@ type PeriodTopsProps<
   barClassName?: string;
   id: string;
   title: string;
+  blockWidthRem?: number;
+  gapRem?: number;
   showBar?: boolean;
   listItemContent: (item: ItemType, i: number) => React.ReactNode;
   getPeriodMetric: (
@@ -51,11 +58,15 @@ const periodTypeOptions: Option[] = PrecisePeriods.map((periodType) => ({
 }));
 
 const setTopsIndexes = <ItemType extends ChartData>(
+  periodType: PrecisePeriod,
   tops: PeriodTop<ItemType>[]
 ) => {
   const yearMap = new Map<string, Record<number | string, number>>();
   const indexTops = tops.map((periodTop) => {
-    const year = getPeriodString['year'](periodTop.period, false);
+    const year =
+      periodType === 'year'
+        ? '0'
+        : getPeriodString['year'](periodTop.period, false);
     const yearEntry = yearMap.get(year);
 
     if (!yearEntry) {
@@ -82,6 +93,7 @@ const setTopsIndexes = <ItemType extends ChartData>(
     return { ...periodTop, top: updatedTop };
   });
 
+  console.log(indexTops);
   return indexTops;
 };
 
@@ -93,6 +105,8 @@ export default function PeriodTops<
   periodTopClassName = '',
   id,
   title,
+  blockWidthRem = DEFAULT_PERIOD_BLOCK_WIDTH,
+  gapRem = DEFAULT_PERIOD_BLOCKS_GAP,
   listItemContent,
   getPeriodMetric,
   showBar,
@@ -206,6 +220,8 @@ export default function PeriodTops<
                   periodType={periodMetricData.periodType}
                   listItemContent={listItemContent}
                   periodTopClassName={periodTopClassName}
+                  blockWidthRem={blockWidthRem}
+                  gapRem={gapRem}
                   current={i === 0}
                 />
               ))
@@ -229,7 +245,7 @@ export default function PeriodTops<
                   key={currentYear}
                   className='year-line'
                   style={{
-                    width: `calc(${11 * tops.length}rem + ${1.5 * (tops.length - 1)}rem)`
+                    width: `calc(${blockWidthRem * tops.length}rem + ${gapRem * (tops.length - 1)}rem)`
                   }}
                 >
                   <Divider rounded colored={currentYear === year}>
@@ -253,7 +269,10 @@ export default function PeriodTops<
             className={barClassName}
             periodType={periodMetricData.periodType}
             chartId={`${id}-bar`}
-            data={setTopsIndexes(periodMetricData.tops)}
+            data={setTopsIndexes(
+              periodMetricData.periodType,
+              periodMetricData.tops
+            )}
             displayFields={displayFields}
             fieldsNames={fieldsNames}
             valueField={valueField}
