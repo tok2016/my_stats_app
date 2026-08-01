@@ -1,4 +1,3 @@
-import { PeriodTop, PrecisePeriod } from '@ts/games/metric';
 import { ExtractTypeFields } from '@ts/util-types';
 
 export type CustomChartType = 'doughnut' | 'periodBar' | 'bar' | 'line' | 'map';
@@ -57,19 +56,20 @@ export type DisplayFields<DataType extends ChartData> = Exclude<
   'id' | 'name'
 >[];
 
-export type FieldData = {
+export type FieldData<Value extends object> = {
   name: string;
-  keyComponent?: React.ReactNode;
+  renderKey?: (key: keyof Value, value?: Value) => React.ReactNode;
+  renderValue?: (value?: Value) => React.ReactNode;
 };
 
 export type FieldsInfo<DataType extends ChartData> = Record<
   keyof DataType,
-  FieldData
+  FieldData<DataType>
 >;
 
-export type ChartContextProps = {
+export type ChartContextProps<DataType extends ChartData> = {
   tooltipRef: React.RefObject<HTMLDivElement | null>;
-  updateTooltip: (data: ChartData) => void;
+  updateTooltip: (data: DataType) => void;
 };
 
 export type ChartValueField<DataType> = ExtractTypeFields<DataType, number>;

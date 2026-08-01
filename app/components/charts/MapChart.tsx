@@ -31,6 +31,8 @@ export default function MapChart<
     [data]
   );
 
+  console.log(data);
+
   const mapRef = useRef<HTMLDivElement>(null);
 
   const onMouseEnter = (evt: MouseEvent<SVGPathElement>) => {

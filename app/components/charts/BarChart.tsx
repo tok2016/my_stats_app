@@ -36,7 +36,7 @@ export default function BarChart<
 
   const xAxis: ChartScaleType = {
     type: 'category',
-    labels: data.map((value) => value.name),
+    labels: data.map((value) => value.id.toString()),
     ticks: {
       display: false
     },
@@ -85,7 +85,7 @@ export default function BarChart<
         }
       }}
       data={{
-        labels: data.map((value) => value.name),
+        labels: data.map((value) => value.id),
         datasets: [
           {
             backgroundColor: ChartColors,

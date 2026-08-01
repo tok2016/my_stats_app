@@ -121,10 +121,6 @@ $default-color: map.get(utils.$active-colors, 'games');
   width: 100%;
 }
 
-.map-container {
-  background-color: none;
-}
-
 .adjacent-chart {
   width: 100%;
   height: 23rem;
@@ -307,6 +303,10 @@ $default-color: map.get(utils.$active-colors, 'games');
 @mixin chart($bg-color, $text-color) {
   .chart {
     background-color: $bg-color;
+  }
+
+  .map-container {
+    background-color: unset;
   }
 
   .chart-tooltip {

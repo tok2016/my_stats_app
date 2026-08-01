@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Button from '@components/Button';
 import PageName from '@components/profile-layout/PageName';
 
+import './games-metrics.scss';
+
 export default function GamesMetricLayout({
   children
 }: Readonly<{ children: React.ReactNode }>) {
