@@ -37,7 +37,8 @@ type TooltipTransform = Pick<TooltipModel<ChartType>, 'caretX' | 'caretY'> & {
 };
 
 const SCREEN_MARGIN = 20;
-const MAX_WIDTH = '18rem';
+const MAX_WIDTH = 18;
+const FONT_SIZE = 16;
 
 const PositionMult: Record<TooltipPosition, number> = {
   start: 0,
@@ -81,8 +82,7 @@ export default function ChartTooltip<DataType extends ChartData>({
     <div
       style={{
         opacity: !data ? '0' : undefined,
-        maxWidth: MAX_WIDTH,
-        width: !data ? MAX_WIDTH : 'unset'
+        maxWidth: `${MAX_WIDTH}rem`
       }}
       className='tooltip-container'
       data-item={data?.id}
@@ -150,24 +150,12 @@ const adjustTooltipPosition = (
     const { top, left } = tooltip.boundaries;
 
     const absLeft = left + window.pageXOffset;
-
-    const maxX =
-      window.pageXOffset
-      + window.innerWidth
-      - tooltipRef.current.offsetWidth
-      - absLeft
-      - SCREEN_MARGIN;
-
-    console.log(
-      `${window.pageXOffset} + ${window.innerWidth} - ${tooltipRef.current.offsetWidth} - ${absLeft} - ${SCREEN_MARGIN} = ${maxX}`
-    );
-
     const adjustedLeft = clamp(
       originX,
       window.pageXOffset - absLeft + SCREEN_MARGIN,
       window.pageXOffset
         + window.innerWidth
-        - tooltipRef.current.offsetWidth
+        - MAX_WIDTH * FONT_SIZE
         - absLeft
         - SCREEN_MARGIN
     );
@@ -211,8 +199,6 @@ export const getTooltip = <DataType extends ChartData>(
     }
 
     const itemId = tooltipTitleToNumber(tooltip.title?.[0]);
-    console.log(itemId);
-    console.log(tooltip);
     const data = dataMap.get(itemId);
     const storedId = tooltipRef.current?.dataset['item'];
 

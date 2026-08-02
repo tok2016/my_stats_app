@@ -93,7 +93,6 @@ const setTopsIndexes = <ItemType extends ChartData>(
     return { ...periodTop, top: updatedTop };
   });
 
-  console.log(indexTops);
   return indexTops;
 };
 

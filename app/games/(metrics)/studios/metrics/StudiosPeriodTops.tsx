@@ -61,7 +61,7 @@ const studioItemContent = (item: StudioFullPeriodTopData) => (
     ) : (
       <EarthSolid className='colored' />
     )}
-    <span className='colored'>{item.name}</span>
+    <span className='colored bold'>{item.name}</span>
   </>
 );
 

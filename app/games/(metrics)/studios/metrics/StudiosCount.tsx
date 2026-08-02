@@ -27,15 +27,17 @@ export default async function StudiosCount({
     []
   );
 
-  const chartData: StudioCountData[] = playtimeData.map((data, i) => ({
-    id: data.id,
-    name: studiosMap.get(data.id)?.name ?? 'Other',
-    index: i,
-    topGame: data.topGame,
-    count: data.count,
-    hours: data.hours,
-    percent: data.percent
-  }));
+  const chartData: StudioCountData[] = playtimeData
+    .filter((data) => data.id !== -1)
+    .map((data, i) => ({
+      id: data.id,
+      name: studiosMap.get(data.id)?.name ?? 'Other',
+      index: i,
+      topGame: data.topGame,
+      count: data.count,
+      hours: data.hours,
+      percent: data.percent
+    }));
 
   return <StudiosCountChart data={chartData} type={type} />;
 }

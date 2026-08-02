@@ -127,10 +127,7 @@ export const igdbRequest = async <DataType>(
     apiToken = newAccess;
   }
 
-  console.log(apiToken);
-
   const queryString = getQueryString(query);
-  console.log(queryString);
   const igdbData = await igdbRateLimiter.schedule<DataType[]>(
     { priority: 1 },
     () => getIgdbData(url, queryString, apiToken)

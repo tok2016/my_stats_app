@@ -4,6 +4,7 @@ import Game from '@ts/games/game';
 
 import { getGamesMap } from '@lib/server-actions';
 
+import MapSkeleton from '@components/charts/MapSkeleton';
 import Metric from '@components/data-blocks/Metric';
 
 import { getItemsMap } from '@app/games/lib/actions';
@@ -12,6 +13,8 @@ import HighestRatedStudios from './metrics/HighestRatedStudios';
 import StudiosCount from './metrics/StudiosCount';
 import StudiosCountries from './metrics/StudiosCountries';
 import StudiosPeriodTops from './metrics/StudiosPeriodTops';
+import HighestRatedStudiosSkeleton from './skeletons/HighestRatedStudiosSkeleton';
+import StudiosCountSkeleton from './skeletons/StudiosCountSkeleton';
 
 const isIgdbStudioBase = (
   value: unknown
@@ -36,13 +39,13 @@ export default async function GameStudiosPage() {
   return (
     <>
       <Metric id='developers-count' title='Your favorite developers'>
-        <Suspense>
+        <Suspense fallback={<StudiosCountSkeleton />}>
           <StudiosCount studiosMap={developersMap} type='developer' />
         </Suspense>
       </Metric>
 
       <Metric id='publishers-count' title='Your favorite publishers'>
-        <Suspense>
+        <Suspense fallback={<StudiosCountSkeleton />}>
           <StudiosCount studiosMap={publishersMap} type='publisher' />
         </Suspense>
       </Metric>
@@ -53,13 +56,13 @@ export default async function GameStudiosPage() {
       />
 
       <Metric id='developers-rating' title='Your highest rated developers'>
-        <Suspense>
+        <Suspense fallback={<HighestRatedStudiosSkeleton />}>
           <HighestRatedStudios studiosMap={developersMap} type='developer' />
         </Suspense>
       </Metric>
 
       <Metric id='publishers-rating' title='Your highest rated publishers'>
-        <Suspense>
+        <Suspense fallback={<HighestRatedStudiosSkeleton />}>
           <HighestRatedStudios studiosMap={publishersMap} type='publisher' />
         </Suspense>
       </Metric>
@@ -68,7 +71,7 @@ export default async function GameStudiosPage() {
         id='developers-countries'
         title='Your favorite developers around the world'
       >
-        <Suspense>
+        <Suspense fallback={<MapSkeleton />}>
           <StudiosCountries developersMap={developersMap} />
         </Suspense>
       </Metric>
