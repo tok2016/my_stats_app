@@ -6,103 +6,92 @@ import { IgdbStudioCountry, StudioCountryMetric } from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { igdbRequest } from '@lib/games/igdb';
+import { MAX_ENTRIES_IN_CHART, TOP_ENTRIES } from '@lib/utils';
 
-const getStudiosCountries = async (studiosIds: number[]) => {
-  const studiosCountries = await igdbRequest<IgdbStudioCountry>('/companies', {
-    fields: ['country'],
-    where: `id = (${studiosIds.join(',')})`,
-    limit: studiosIds.length
-  });
+const getCountriesOfStudios = async (studiosIds: number[]) => {
+  const studiosWithCountry = await igdbRequest<IgdbStudioCountry>(
+    '/companies',
+    {
+      fields: ['country'],
+      where: `id = (${studiosIds.join(',')})`,
+      limit: studiosIds.length
+    }
+  );
 
-  const studiosCountriesMap = new Map<number, number>();
-  studiosCountries.forEach((studioCountry) => {
+  const studioCountryMap = new Map<number, number>();
+  studiosWithCountry.forEach((studioCountry) => {
     if (studioCountry.country)
-      studiosCountriesMap.set(studioCountry.id, studioCountry.country);
+      studioCountryMap.set(studioCountry.id, studioCountry.country);
   });
 
-  return studiosCountriesMap;
+  return studioCountryMap;
 };
 
 const setCountryData = (
   studioId: number,
-  studiosCountMap: Map<number, CountCompareData>,
-  countriesMap: Map<number, StudioCountryMetric>,
-  field: keyof Omit<StudioCountryMetric, 'country'>,
-  studioCountry?: number
+  studioCompareData: CountCompareData,
+  countriesMetricMap: Map<number, StudioCountryMetric>,
+  country?: number
 ) => {
-  const studioGamesCount = studiosCountMap.get(studioId);
-  if (!studioCountry || !studioGamesCount) return;
+  if (!country || !studioCompareData) return;
 
-  const countryData = countriesMap.get(studioCountry);
+  const countryData = countriesMetricMap.get(country);
   if (!countryData)
-    countriesMap.set(studioCountry, {
-      country: studioCountry,
-      [field]: { ...studioGamesCount, id: studioId }
+    countriesMetricMap.set(country, {
+      country: country,
+      gamesCount: studioCompareData.count,
+      developers: [studioId]
     });
-  else {
-    const previousStudio =
-      studiosCountMap.get(countryData[field]?.id ?? 0) ?? studioGamesCount;
-
-    countryData[field] =
-      studioGamesCount.count > previousStudio.count
-      || (studioGamesCount.count === previousStudio.count
-        && studioGamesCount.minutes >= previousStudio.minutes)
-        ? { id: studioId, ...studioGamesCount }
-        : countryData[field];
+  else if (countryData.developers.length < TOP_ENTRIES) {
+    countryData.gamesCount += studioCompareData.count;
+    countryData.developers.push(studioId);
   }
 };
 
 const getStudiosByCountry = async (games: GameCore[]) => {
-  const studiosMap = new Map<number, CountCompareData>();
+  const studiosCompareMap = new Map<number, CountCompareData>();
 
   games.forEach((game) => {
-    const gameStudios = [...game.developersIds, ...game.publishersIds];
-    gameStudios.forEach((studioId) => {
-      const studioData = studiosMap.get(studioId);
-      studiosMap.set(studioId, {
+    game.developersIds.forEach((studioId) => {
+      const studioData = studiosCompareMap.get(studioId);
+      studiosCompareMap.set(studioId, {
         count: (studioData?.count ?? 0) + 1,
         minutes: (studioData?.minutes ?? 0) + game.minutes
       });
     });
   });
 
-  const studiosCountries = await getStudiosCountries(
-    studiosMap.keys().toArray()
+  const studioCountryMap = await getCountriesOfStudios(
+    studiosCompareMap.keys().toArray()
   );
-  const countriesMap = new Map<number, StudioCountryMetric>();
+  const countriesMetricMap = new Map<number, StudioCountryMetric>();
 
-  games.forEach((game) => {
-    game.developersIds.forEach((developerId) =>
+  studiosCompareMap
+    .entries()
+    .toArray()
+    .sort((a, b) => {
+      const countDiff = b[1].count - a[1].count;
+      if (!countDiff) return b[1].minutes - a[1].minutes;
+      return countDiff;
+    })
+    .forEach((studio) => {
       setCountryData(
-        developerId,
-        studiosMap,
-        countriesMap,
-        'developer',
-        studiosCountries.get(developerId)
-      )
-    );
-
-    game.publishersIds.forEach((publisherId) => {
-      setCountryData(
-        publisherId,
-        studiosMap,
-        countriesMap,
-        'publisher',
-        studiosCountries.get(publisherId)
+        studio[0],
+        studio[1],
+        countriesMetricMap,
+        studioCountryMap.get(studio[0])
       );
     });
-  });
 
-  const countries = countriesMap
+  const countries = countriesMetricMap
     .values()
     .toArray()
     .sort((a, b) => {
-      const developersDiff =
-        (b.developer?.count ?? 0) - (a.developer?.count ?? 0);
-      if (!developersDiff)
-        return (b.publisher?.count ?? 0) - (a.publisher?.count ?? 0);
-      return developersDiff;
-    });
+      const countDiff = b.gamesCount - a.gamesCount;
+      if (!countDiff) return b.developers.length - a.developers.length;
+      return countDiff;
+    })
+    .slice(0, MAX_ENTRIES_IN_CHART);
 
   return NextResponse.json(countries, {
     status: 200,

@@ -7,20 +7,27 @@ import {
   ChartContextProps,
   ChartData,
   DisplayFields,
+  FieldData,
   FieldsInfo,
-  PeriodChartTransformed,
-  TooltipData
+  PeriodChartTransformed
 } from '@ts/ui/charts-data';
 
+import { isNumberOrString, isNumberOrStringArray } from '@lib/type-guards';
 import { clamp } from '@lib/utils';
 
 type ChartTooltipProps<DataType extends ChartData> = {
-  data?: TooltipData;
+  data?: DataType;
   displayFields: DisplayFields<DataType>;
   fieldsNames: FieldsInfo<DataType>;
   ref: RefObject<HTMLDivElement | null>;
   showRank?: boolean;
   colored?: boolean;
+};
+
+type ChartTooltipKeyProps<DataType extends ChartData> = {
+  data?: DataType;
+  field: keyof DataType;
+  fieldData: FieldData<DataType>;
 };
 
 type TooltipPosition = 'start' | 'center' | 'end';
@@ -30,12 +37,37 @@ type TooltipTransform = Pick<TooltipModel<ChartType>, 'caretX' | 'caretY'> & {
 };
 
 const SCREEN_MARGIN = 20;
+const MAX_WIDTH = 18;
+const FONT_SIZE = 16;
 
 const PositionMult: Record<TooltipPosition, number> = {
   start: 0,
   center: 0.5,
   end: 1
 };
+
+function ChartTooltipKey<DataType extends ChartData>({
+  data,
+  field,
+  fieldData
+}: ChartTooltipKeyProps<DataType>) {
+  let valueComponent = null;
+
+  if (isNumberOrString(data?.[field]))
+    valueComponent = <span className='colored'>{data[field]}</span>;
+  else if (isNumberOrStringArray(data?.[field]))
+    valueComponent = <span className='colored'>{data[field].join(', ')}</span>;
+  else if (!data?.[field]) valueComponent = 'no data';
+
+  if (!valueComponent && !fieldData.renderValue) return;
+
+  return (
+    <div className='tooltip-key'>
+      {fieldData.renderKey?.(field, data) ?? <span>{fieldData.name}: </span>}
+      {fieldData.renderValue?.(data) ?? valueComponent}
+    </div>
+  );
+}
 
 export default function ChartTooltip<DataType extends ChartData>({
   data,
@@ -48,7 +80,10 @@ export default function ChartTooltip<DataType extends ChartData>({
   const rank = (data?.index ?? -1) + 1;
   return (
     <div
-      style={{ opacity: !data ? '0' : undefined, maxWidth: '100px' }}
+      style={{
+        opacity: !data ? '0' : undefined,
+        maxWidth: `${MAX_WIDTH}rem`
+      }}
       className='tooltip-container'
       data-item={data?.id}
       ref={ref}
@@ -56,19 +91,17 @@ export default function ChartTooltip<DataType extends ChartData>({
       <div
         className='chart-tooltip'
         data-rank={colored ? data?.index : undefined}
+        style={{ maxWidth: '100%' }}
       >
         <h3 className='colored'>{data?.name}</h3>
 
         {displayFields.map((field) => (
-          <div key={field.toString()} className='tooltip-key'>
-            {fieldsNames[field].keyComponent ? (
-              fieldsNames[field].keyComponent
-            ) : (
-              <span>{fieldsNames[field].name}: </span>
-            )}
-
-            <span className='colored'>{data?.[field] ?? 'no data'}</span>
-          </div>
+          <ChartTooltipKey
+            key={field.toString()}
+            field={field}
+            data={data}
+            fieldData={fieldsNames[field]}
+          />
         ))}
 
         {showRank && rank && (
@@ -114,27 +147,25 @@ const adjustTooltipPosition = (
       tooltip.caretY
       - tooltipRef.current.offsetHeight * PositionMult[verticalPos];
 
-    const { top, left, width, height } = tooltip.boundaries;
+    const { top, left } = tooltip.boundaries;
 
     const absLeft = left + window.pageXOffset;
-    const absWindowRight = window.pageXOffset + window.innerWidth;
-    const absChartRight = left + width + window.pageXOffset;
     const adjustedLeft = clamp(
       originX,
       window.pageXOffset - absLeft + SCREEN_MARGIN,
-      Math.min(absWindowRight, absChartRight)
-        - tooltipRef.current.offsetWidth
+      window.pageXOffset
+        + window.innerWidth
+        - MAX_WIDTH * FONT_SIZE
         - absLeft
         - SCREEN_MARGIN
     );
 
     const absTop = top + window.pageYOffset;
-    const absWindowBottom = window.pageYOffset + window.innerHeight;
-    const absChartBottom = top + height + window.pageYOffset;
     const adjustedTop = clamp(
       originY,
       window.pageYOffset - absTop + SCREEN_MARGIN,
-      Math.min(absWindowBottom, absChartBottom)
+      window.pageYOffset
+        + window.innerHeight
         - tooltipRef.current.offsetHeight
         - absTop
         - SCREEN_MARGIN
@@ -154,7 +185,7 @@ const tooltipTitleToNumber = (title?: string) =>
 
 export const getTooltip = <DataType extends ChartData>(
   tooltipRef: RefObject<HTMLDivElement | null>,
-  updateTooltip: ChartContextProps['updateTooltip'],
+  updateTooltip: ChartContextProps<DataType>['updateTooltip'],
   dataMap: Map<number | string, DataType>,
   horizontalPos: TooltipPosition = 'start',
   verticalPos: TooltipPosition = 'start'
@@ -192,7 +223,7 @@ export const getTooltip = <DataType extends ChartData>(
 
 export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
   tooltipRef: RefObject<HTMLDivElement | null>,
-  updateTooltip: ChartContextProps['updateTooltip'],
+  updateTooltip: ChartContextProps<DataType>['updateTooltip'],
   dataMap: Map<number | string, DataType>,
   horizontalPos: TooltipPosition = 'start',
   verticalPos: TooltipPosition = 'start'
@@ -235,7 +266,7 @@ export const updateMapTooltipPos = <DataType extends ChartData>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   mapRef: RefObject<HTMLDivElement | null>,
   target: EventTarget & SVGElement,
-  updateTooltip: ChartContextProps['updateTooltip'],
+  updateTooltip: ChartContextProps<DataType>['updateTooltip'],
   dataMap: Map<number | string, DataType>,
   horizontalPos: TooltipPosition = 'start',
   verticalPos: TooltipPosition = 'start'

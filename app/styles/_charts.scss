@@ -121,10 +121,6 @@ $default-color: map.get(utils.$active-colors, 'games');
   width: 100%;
 }
 
-.map-container {
-  background-color: none;
-}
-
 .adjacent-chart {
   width: 100%;
   height: 23rem;
@@ -135,7 +131,8 @@ $default-color: map.get(utils.$active-colors, 'games');
   gap: 1rem;
   flex-wrap: wrap;
 
-  .chart {
+  .chart,
+  .skeletons:has(> .graph) {
     padding: 0.5rem;
     flex: 2;
     width: unset;
@@ -143,7 +140,8 @@ $default-color: map.get(utils.$active-colors, 'games');
     min-width: 29rem;
   }
 
-  .table {
+  .table,
+  .skeletons:has(> .tablet) {
     flex: 3;
     min-width: 29rem;
   }
@@ -309,6 +307,10 @@ $default-color: map.get(utils.$active-colors, 'games');
     background-color: $bg-color;
   }
 
+  .map-container {
+    background-color: unset;
+  }
+
   .chart-tooltip {
     background-color: $bg-color;
     color: $text-color;
@@ -321,28 +323,26 @@ $default-color: map.get(utils.$active-colors, 'games');
   }
 
   .map {
-    svg {
-      path {
-        fill: $text-color;
-        stroke-color: $bg-color;
-        outline: none;
-      }
+    path {
+      fill: $text-color;
+      stroke-color: $bg-color;
+      outline: none;
+    }
 
-      @each $rank, $color in utils.$diagram-colors {
-        path[data-rank='#{$rank}'] {
-          fill: $color;
-          cursor: pointer;
-          transition: 500ms fill;
+    @each $rank, $color in utils.$diagram-colors {
+      path[data-rank='#{$rank}'] {
+        fill: $color;
+        cursor: pointer;
+        transition: 500ms fill;
 
-          &:hover {
-            fill: color-mix(in srgb, $color 80%, white 20%);
-            transition: utils.$hover-time fill;
-          }
+        &:hover {
+          fill: color-mix(in srgb, $color 80%, white 20%);
+          transition: utils.$hover-time fill;
+        }
 
-          &:active {
-            fill: color-mix(in srgb, $color 85%, black 15%);
-            transition: utils.$active-time fill;
-          }
+        &:active {
+          fill: color-mix(in srgb, $color 85%, black 15%);
+          transition: utils.$active-time fill;
         }
       }
     }

@@ -9,7 +9,6 @@ import Metric from '@components/data-blocks/Metric';
 
 import { getItemsMap } from '@app/games/lib/actions';
 
-import './genres-metrics.scss';
 import GenreTops from './metrics/GenreTops';
 import GenresCount from './metrics/GenresCount';
 import GenresPeriodTops from './metrics/GenresPeriodTops';
@@ -22,7 +21,7 @@ import RecommendedGamesSkeletons from './skeletons/RecommendedGamesSkeletons';
 const isIgdbGenre = (value: unknown): value is Game['genres'][number] =>
   typeof (value as Game['genres'][number])?.name !== 'undefined';
 
-export default async function GamesGenres() {
+export default async function GamesGenresPage() {
   const gamesMap = await getGamesMap();
   const genresMap = await getItemsMap<Game['genres'][number]>(
     gamesMap,

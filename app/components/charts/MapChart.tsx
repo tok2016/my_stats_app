@@ -9,6 +9,7 @@ import { ChartCoreProps, ChartData, ChartValueField } from '@ts/ui/charts-data';
 import { ChartContext } from '@store/ChartProvider';
 
 import { hideTooltip, updateMapTooltipPos } from './ChartTooltip';
+import { ChartClasses } from './chart-styles';
 import WorldData from './world-low-res.json';
 
 const isHTMLElement = (value: unknown): value is HTMLElement =>
@@ -64,8 +65,9 @@ export default function MapChart<
   }, [mapRef, countriesMap]);
 
   return (
-    <div className='map' ref={mapRef}>
+    <div className={ChartClasses.map.core} ref={mapRef}>
       <VectorMap
+        className='map'
         {...WorldData}
         layerProps={{
           strokeWidth: 0.5,

@@ -15,6 +15,13 @@ const getStudiosRating = async (games: GameCore[], req: NextRequest) => {
     (req.nextUrl.searchParams.get('field') as StudioField) ?? 'developersIds';
 
   const studiosRatings = getRatingMetric(games, studioType);
+
+  if (!studiosRatings.length)
+    return NextResponse.json([], {
+      status: 200,
+      statusText: 'Studios ratings list is empty'
+    });
+
   const topGamesIds: number[] = [];
 
   studiosRatings.forEach((studioRating) => {

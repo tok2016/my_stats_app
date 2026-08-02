@@ -1,13 +1,12 @@
 'use client';
 
-import { createContext, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useMemo, useRef, useState } from 'react';
 
 import {
   ChartContextProps,
   ChartData,
   DisplayFields,
   FieldsInfo,
-  TooltipData,
   TooltipProps
 } from '@ts/ui/charts-data';
 
@@ -22,7 +21,7 @@ type ChartProviderProps<DataType extends ChartData> = {
   className?: string;
 };
 
-const defaultContext: ChartContextProps = {
+const defaultContext: ChartContextProps<ChartData> = {
   tooltipRef: { current: null },
   updateTooltip: () => {}
 };
@@ -37,14 +36,14 @@ export default function ChartProvider<DataType extends ChartData>({
   tooltipProps,
   className = ''
 }: ChartProviderProps<DataType>) {
-  const [tooltipData, setTooltipData] = useState<TooltipData>();
+  const [tooltipData, setTooltipData] = useState<DataType>();
   const tooltipRef = useRef<HTMLDivElement>(null);
 
-  const updateTooltip = (data: ChartData) => {
-    setTooltipData({ ...data });
-  };
+  const updateTooltip = useCallback((data: ChartData) => {
+    setTooltipData({ ...data } as DataType);
+  }, []);
 
-  const value = useMemo(() => ({ updateTooltip, tooltipRef }), []);
+  const value = useMemo(() => ({ updateTooltip, tooltipRef }), [updateTooltip]);
 
   return (
     <ChartContext.Provider value={value}>

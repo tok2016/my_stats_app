@@ -87,6 +87,8 @@ export const ChartColors = [
   '#CDCDCD'
 ] as const;
 
+export const StudioTypes = ['developer', 'publisher'] as const;
+
 export const defaultFormState = <FormDataType>(): FormState<FormDataType> => ({
   error: false,
   message: ''

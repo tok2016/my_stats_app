@@ -118,7 +118,6 @@ export default function GenreTops({ gamesMap, genresMap }: GenreTopsProps) {
   );
 
   const onPeriodSelect = (value: string) => {
-    console.log(value);
     updateGenresTops(value as GreatPeriod);
   };
 

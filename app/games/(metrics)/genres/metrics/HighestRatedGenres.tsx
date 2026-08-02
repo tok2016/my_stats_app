@@ -60,7 +60,7 @@ export default async function HighestRatedGenres({
   );
 
   return !ratingData.length ? (
-    <EmptyMetric message={`You haven't rated any game yeat`} />
+    <EmptyMetric message={`You haven't rated any game yet`} />
   ) : (
     <div className='blocks-group'>
       {ratingData.map((data) => (
