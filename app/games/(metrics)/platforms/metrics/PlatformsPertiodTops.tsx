@@ -10,26 +10,24 @@ import {
 import { getMetricData } from '@lib/server-actions';
 
 import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
-import RankIcon from '@components/data-blocks/RankIcon';
 
-import { GenresPeriodPlaytimeData } from '../types';
+import { PlatformPeriodPlaytimeData } from '../types';
 
-type Genre = Game['genres'][number];
-
-type GenresPeriodTopsProps = {
-  genresMap: Map<number | string, Genre>;
+type PlatformsPeriodTopsProps = {
+  platformsMap: Map<number | string, NonNullable<Game['platform']>>;
 };
 
-const getGenresPeriodTops =
-  (genresMap: Map<number | string, Genre>) =>
+const getPlatformsPeriods =
+  (platformsMap: Map<number | string, NonNullable<Game['platform']>>) =>
   async (
     periodType?: PrecisePeriod
-  ): Promise<PeriodTopsMetric<GenresPeriodPlaytimeData>> => {
+  ): Promise<PeriodTopsMetric<PlatformPeriodPlaytimeData>> => {
     const searchParams = new URLSearchParams({
       period: periodType ?? 'season'
     });
+
     const periodTops = await getMetricData<PeriodPlaytimeTops>(
-      `/api/games/genres/periods?${searchParams.toString()}`,
+      `/api/games/platforms/periods?${searchParams.toString()}`,
       {
         periodType: 'season',
         tops: []
@@ -42,37 +40,38 @@ const getGenresPeriodTops =
         period: periodTop.period,
         top: periodTop.top.map((item, i) => ({
           id: item.id,
-          name: genresMap.get(item.id)?.name ?? 'Other',
+          name: platformsMap.get(item.id)?.name ?? 'Other',
           index: i,
-          hours: item.hours
+          hours: item.hours,
+          logo: platformsMap.get(item.id)?.logo
         }))
       }))
     };
   };
 
-const genreItemContent = (genre: GenresPeriodPlaytimeData, i: number) => (
-  <>
-    <RankIcon rank={i} />
-    <span>{genre.name}</span>
-  </>
+const platformItemContent = (value: PlatformPeriodPlaytimeData) => (
+  <p className='h4 colored period-platform-title'>{value.name}</p>
 );
 
-export default function GenresPeriodTops({ genresMap }: GenresPeriodTopsProps) {
+export default function PlatformsPeriodTops({
+  platformsMap
+}: PlatformsPeriodTopsProps) {
   return (
     <PeriodTops
-      id='genres-periods'
-      title='Your most played genres'
-      listItemContent={genreItemContent}
-      getPeriodMetric={getGenresPeriodTops(genresMap)}
+      id='platform-periods'
+      title='Your favorite platform'
+      getPeriodMetric={getPlatformsPeriods(platformsMap)}
+      listItemContent={platformItemContent}
       displayFields={['hours']}
       valueField='hours'
       showBar
       fieldsNames={{
         id: { name: 'ID' },
-        name: { name: 'Genre' },
+        name: { name: 'Platform' },
         index: { name: '№' },
+        percent: { name: '%' },
         hours: { name: 'Hours' },
-        percent: { name: '%' }
+        logo: { name: 'Logo' }
       }}
     />
   );

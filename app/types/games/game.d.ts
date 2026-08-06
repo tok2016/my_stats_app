@@ -1,7 +1,7 @@
 import { IgdbBasic } from './api-response';
 import { IgdbGenre } from './genre';
 import { IgdbImage } from './image';
-import { IgdbPlatform } from './platform';
+import { IgdbPlatform, PlatformShort } from './platform';
 import { ExternalRatings } from './rating';
 import { IgdbSeries } from './series';
 import {
@@ -137,7 +137,7 @@ export default interface Game extends ExternalRatings {
   name: string;
   apiId: number;
   genres: IgdbGenre[];
-  platform?: IgdbPlatform;
+  platform?: PlatformShort;
   developers: IgdbStudioBase[];
   publishers: IgdbStudioBase[];
   series?: IgdbSeries;

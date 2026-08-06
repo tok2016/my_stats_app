@@ -2,6 +2,7 @@ import { IgdbBasic, IgdbItemInfo, IgdbQuery } from '@ts/games/api-response';
 import Game, { GameCore, GameInSchema, IgdbGameFull } from '@ts/games/game';
 import { IgdbGenre } from '@ts/games/genre';
 import { ItemCompareData } from '@ts/games/metric';
+import { PlatformShort } from '@ts/games/platform';
 import { IgdbSeriesExpanded } from '@ts/games/series';
 import Token from '@ts/users/token';
 import { LiteralType } from '@ts/util-types';
@@ -68,6 +69,20 @@ export const getGenres = async (games: GameCore[]) => {
   return genresMap;
 };
 
+const igdbPlatfromToPlatformShort = (
+  igdbPlatform: IgdbGameFull['platforms'][number] | undefined
+): PlatformShort | undefined =>
+  !igdbPlatform
+    ? undefined
+    : {
+        id: igdbPlatform.id,
+        name: igdbPlatform.name,
+        logo: igdbPlatform.platform_logo
+          ? getImageUrl(igdbPlatform.platform_logo.image_id, 'logo_med')
+          : undefined,
+        family: igdbPlatform.platform_family
+      };
+
 export const uniteGameCoreAndIgdb = (
   gameCore: GameCore,
   igdbGame: IgdbGameFull
@@ -91,8 +106,10 @@ export const uniteGameCoreAndIgdb = (
     igdbGame.involved_companies
       ?.filter((studio) => studio.publisher)
       .map((studio) => studio.company) ?? [],
-  platform: igdbGame.platforms.find(
-    (igdbPlatform) => igdbPlatform.id === gameCore.platformId
+  platform: igdbPlatfromToPlatformShort(
+    igdbGame.platforms.find(
+      (igdbPlatform) => igdbPlatform.id === gameCore.platformId
+    )
   ),
   series: igdbGame.collections?.reduce((prev, curr) =>
     curr.games.length > prev.games.length ? curr : prev

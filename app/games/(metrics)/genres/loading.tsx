@@ -9,13 +9,13 @@ import RecommendedGamesSkeletons from './skeletons/RecommendedGamesSkeletons';
 export default function GenresLoading() {
   return (
     <>
-      <div className='metrics-group'>
+      <div className='double-doughnut'>
         <Metric id='biggest-genres' title='Your biggest genres'>
-          <ChartSkeleton type='doughnut' className='dougnut-chart-table' />
+          <ChartSkeleton type='doughnut' />
         </Metric>
 
         <Metric id='longest-genres' title='Your longest played genres'>
-          <ChartSkeleton type='doughnut' className='dougnut-chart-table' />
+          <ChartSkeleton type='doughnut' />
         </Metric>
       </div>
 

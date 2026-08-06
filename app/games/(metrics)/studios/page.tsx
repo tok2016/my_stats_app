@@ -21,7 +21,7 @@ const isIgdbStudioBase = (
 ): value is Game['developers'][number] =>
   typeof (value as Game['developers'][number])?.name !== 'undefined';
 
-export default async function GameStudiosPage() {
+export default async function GamesStudiosPage() {
   const gamesMap = await getGamesMap();
 
   const developersMap = await getItemsMap<Game['developers'][number]>(

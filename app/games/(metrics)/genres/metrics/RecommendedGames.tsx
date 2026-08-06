@@ -6,7 +6,7 @@ import { getMetricData } from '@lib/server-actions';
 import GameCollage from '@components/data-blocks/GameCollage';
 import Metric from '@components/data-blocks/Metric';
 
-import { RecommendationCategories, RecommendationIds } from '../utils';
+import { RecommendationCategories, RecommendationIds } from '../../utils';
 
 type ExternalLinkProps = {
   external: RecommendedGame['external'][number];

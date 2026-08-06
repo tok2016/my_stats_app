@@ -12,7 +12,10 @@ export default function GameTableTitle({ game }: GameTableTitleProps) {
   return (
     <div className='game-table-title'>
       <GameCover game={game} className='game-table-cover' />
-      <Link href={`/games/titles/${game.id}`} className='colored bold'>
+      <Link
+        href={`/games/titles/${game.id}`}
+        className='colored bold game-table-name'
+      >
         {game.name}
       </Link>
     </div>

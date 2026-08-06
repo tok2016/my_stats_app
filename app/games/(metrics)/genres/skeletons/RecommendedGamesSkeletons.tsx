@@ -2,7 +2,7 @@ import Skeleton from '@components/Skeleton';
 import GameCollageSkeleton from '@components/data-blocks/GameCollageSkeleton';
 import Metric from '@components/data-blocks/Metric';
 
-import { RecommendationCategories, RecommendationIds } from '../utils';
+import { RecommendationCategories, RecommendationIds } from '../../utils';
 
 type RecommendedGameSkeletonProps = {
   parentKey: string;

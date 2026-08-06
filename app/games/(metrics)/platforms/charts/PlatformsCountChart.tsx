@@ -10,46 +10,47 @@ import Chart from '@components/charts/Chart';
 import SwitchableChart from '@components/charts/SwitchableChart';
 import Table from '@components/charts/Table';
 
-import { GenresCountData } from '../types';
+import { PlatformCountChartData } from '../types';
 
-type GenresCountChartProps = {
-  data: GenresCountData[];
+type PlatformsCountChartProps = {
+  data: PlatformCountChartData[];
 };
 
-type GenresCountForDoughnut = Omit<GenresCountData, 'topSeries'> & {
+type PlatformsCountDataForChart = Omit<PlatformCountChartData, 'topSeries'> & {
   topSeries?: string;
 };
 
-const genresCountFieldsNames: FieldsInfo<GenresCountForDoughnut> = {
+const fieldsNames: FieldsInfo<PlatformsCountDataForChart> = {
   id: { name: 'ID' },
-  name: { name: 'Genre' },
+  name: { name: 'Platform' },
   count: { name: 'Games' },
-  percent: { name: '%' },
   index: { name: '№' },
-  topSeries: { name: 'Biggest series' }
+  topSeries: { name: 'Best series' },
+  percent: { name: '%' }
 };
 
-export default function GenresCountChart({ data }: GenresCountChartProps) {
-  const doughnutData: GenresCountForDoughnut[] = data.map((value) => ({
+export default function PlatformsCountChart({
+  data
+}: PlatformsCountChartProps) {
+  const chartData = data.map((value) => ({
     ...value,
     topSeries: value.topSeries?.name
   }));
 
   return (
     <SwitchableChart
-      className='dougnut-chart-table'
       chartsOptions={[
         {
           chart: (
             <Chart
-              chartId='genres-count'
+              chartId='platforms-count-chart'
               type='doughnut'
-              defaultValueField='count'
-              data={doughnutData}
+              data={chartData}
               displayFields={['count', 'topSeries']}
               valueFields={['count']}
+              defaultValueField='count'
+              fieldsNames={fieldsNames}
               showLegend
-              fieldsNames={genresCountFieldsNames}
             />
           ),
           icon: <ChartPieSolid />
@@ -57,7 +58,7 @@ export default function GenresCountChart({ data }: GenresCountChartProps) {
         {
           chart: (
             <Table
-              id='genres-count-table'
+              id='platforms-count-table'
               data={data}
               headers={{
                 index: {
@@ -66,11 +67,11 @@ export default function GenresCountChart({ data }: GenresCountChartProps) {
                   renderRow: (value) => value.index + 1
                 },
                 name: {
-                  title: 'Genre',
+                  title: 'Platform',
                   width: '5fr',
                   renderRow: (value) => (
                     <Link
-                      href={`/games/genres/${value.id}`}
+                      href={`/games/platforms/${value.id}`}
                       className='colored'
                     >
                       {value.name}

@@ -14,14 +14,6 @@
   gap: 1.25rem;
 }
 
-.metrics-group {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 5rem;
-}
-
 .blocks-group {
   display: flex;
   flex-direction: row;
@@ -109,7 +101,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  overflow-x: scroll;
+  overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: 0.25rem;
 }
