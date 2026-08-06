@@ -9,7 +9,7 @@ import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameCover from '@components/data-blocks/GameCover';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
-import { StudiosTypeFields } from '../utils';
+import { StudiosTypeFields } from '../../utils';
 
 type HighestRatedStudiosProps = {
   studiosMap: Map<number | string, Game['developers'][number]>;

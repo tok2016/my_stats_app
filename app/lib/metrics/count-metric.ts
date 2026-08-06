@@ -31,6 +31,8 @@ const getTopCountData = (
 
   for (let i = 0; i < MAX_ENTRIES_IN_CHART + 1; i++) {
     const data = values[i];
+    if (!data) break;
+
     const percent = (data.count / sum) * 100;
 
     if (percent < threshold || i === MAX_ENTRIES_IN_CHART) {

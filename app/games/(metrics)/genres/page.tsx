@@ -9,6 +9,7 @@ import Metric from '@components/data-blocks/Metric';
 
 import { getItemsMap } from '@app/games/lib/actions';
 
+import { isIgdbGenre, isIgdbSeries } from '../utils';
 import GenreTops from './metrics/GenreTops';
 import GenresCount from './metrics/GenresCount';
 import GenresPeriodTops from './metrics/GenresPeriodTops';
@@ -18,9 +19,6 @@ import RecommendedGames from './metrics/RecommendedGames';
 import HighestRatedGenresSkeleton from './skeletons/HighestRatedGenresSkeleton';
 import RecommendedGamesSkeletons from './skeletons/RecommendedGamesSkeletons';
 
-const isIgdbGenre = (value: unknown): value is Game['genres'][number] =>
-  typeof (value as Game['genres'][number])?.name !== 'undefined';
-
 export default async function GamesGenresPage() {
   const gamesMap = await getGamesMap();
   const genresMap = await getItemsMap<Game['genres'][number]>(
@@ -28,36 +26,23 @@ export default async function GamesGenresPage() {
     'genres',
     isIgdbGenre
   );
-
-  const seriesMap = new Map<
-    number | string,
-    Exclude<Game['series'], undefined>
-  >();
-
-  gamesMap.values().forEach((game) => {
-    if (game.series && !seriesMap.get(game.series.id))
-      seriesMap.set(game.series.id, game.series);
-  });
+  const seriesMap = await getItemsMap<NonNullable<Game['series']>>(
+    gamesMap,
+    'series',
+    isIgdbSeries
+  );
 
   return (
     <>
-      <div className='metrics-group'>
+      <div className='double-doughnut'>
         <Metric id='biggest-genres' title='Your biggest genres'>
-          <Suspense
-            fallback={
-              <ChartSkeleton type='doughnut' className='dougnut-chart-table' />
-            }
-          >
+          <Suspense fallback={<ChartSkeleton type='doughnut' />}>
             <GenresCount genresMap={genresMap} seriesMap={seriesMap} />
           </Suspense>
         </Metric>
 
         <Metric id='longest-genres' title='Your longest played genres'>
-          <Suspense
-            fallback={
-              <ChartSkeleton type='doughnut' className='dougnut-chart-table' />
-            }
-          >
+          <Suspense fallback={<ChartSkeleton type='doughnut' />}>
             <GenresPlaytime genresMap={genresMap} />
           </Suspense>
         </Metric>

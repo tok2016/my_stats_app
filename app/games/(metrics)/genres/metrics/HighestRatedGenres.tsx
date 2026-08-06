@@ -26,9 +26,9 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
   const hours = Math.round(topGame.minutes / MINUTES);
   return (
     <div className='data-block genre-rating-block'>
-      <div className='data-block-title'>
+      <div className='rating-title'>
         <Rating value={ratingData.rating} />
-        <h4 className='colored'>{genre.name ?? ''}</h4>
+        <h4 className='colored'>{genre.name}</h4>
       </div>
 
       <div className='data-block-content'>

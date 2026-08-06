@@ -10,49 +10,48 @@ import Chart from '@components/charts/Chart';
 import SwitchableChart from '@components/charts/SwitchableChart';
 import Table from '@components/charts/Table';
 
-import { GenresPlaytimeData } from '../types';
+import { PlatformPlaytimeChartData } from '../types';
 
-type GenresPlaytimeChartProps = {
-  data: GenresPlaytimeData[];
+type PlatformsPlaytimeChartProps = {
+  data: PlatformPlaytimeChartData[];
 };
 
-type GenresPlaytimeForDoughnut = Omit<GenresPlaytimeData, 'topGame'> & {
+type PlatformPlaytimeForChart = Omit<PlatformPlaytimeChartData, 'topGame'> & {
   topGame: string;
 };
 
-const playtimeFieldsNames: FieldsInfo<GenresPlaytimeForDoughnut> = {
-  topGame: { name: 'Best game' },
+const fieldsNames: FieldsInfo<PlatformPlaytimeForChart> = {
   id: { name: 'ID' },
-  hours: { name: 'Hours played' },
-  count: { name: 'Games' },
+  index: { name: '№' },
+  name: { name: 'Platform' },
   percent: { name: '%' },
-  name: { name: 'Genre' },
-  index: { name: '№' }
+  topGame: { name: 'Best game' },
+  count: { name: 'Games' },
+  hours: { name: 'Hours played' }
 };
 
-export default function GenresPlaytimeChart({
+export default function PlatformsPlaytimeChart({
   data
-}: GenresPlaytimeChartProps) {
-  const doughnutData = data.map((value) => ({
+}: PlatformsPlaytimeChartProps) {
+  const chartData: PlatformPlaytimeForChart[] = data.map((value) => ({
     ...value,
     topGame: value.topGame.name
   }));
 
   return (
     <SwitchableChart
-      className='dougnut-chart-table'
       chartsOptions={[
         {
           chart: (
             <Chart
-              chartId='genres-playtime'
+              chartId='platforms-playtime-chart'
               type='doughnut'
-              data={doughnutData}
-              defaultValueField='hours'
-              valueFields={['hours']}
-              fieldsNames={playtimeFieldsNames}
-              showLegend
+              data={chartData}
               displayFields={['hours', 'topGame']}
+              valueFields={['hours']}
+              defaultValueField='hours'
+              fieldsNames={fieldsNames}
+              showLegend
             />
           ),
           icon: <ChartPieSolid />
@@ -60,7 +59,7 @@ export default function GenresPlaytimeChart({
         {
           chart: (
             <Table
-              id='genres-playtime-table'
+              id='platforms-playtime-table'
               data={data}
               headers={{
                 index: {
@@ -69,11 +68,11 @@ export default function GenresPlaytimeChart({
                   renderRow: (value) => value.index + 1
                 },
                 name: {
-                  title: 'Genre',
+                  title: 'Platform',
                   width: '5fr',
                   renderRow: (value) => (
                     <Link
-                      href={`/games/genres/${value.id}`}
+                      href={`/games/platforms/${value.id}`}
                       className='colored'
                     >
                       {value.name}
