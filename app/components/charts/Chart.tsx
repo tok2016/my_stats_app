@@ -45,19 +45,23 @@ type ChartComponentProps<
 const TooltipPropsByType: Record<ChartType, TooltipProps> = {
   doughnut: {
     showRank: true,
-    colored: true
+    colored: true,
+    enableTransition: true
   },
   bar: {
     showRank: true,
-    colored: true
+    colored: true,
+    enableTransition: true
   },
   line: {
     showRank: false,
-    colored: false
+    colored: false,
+    enableTransition: true
   },
   map: {
     showRank: true,
-    colored: true
+    colored: true,
+    enableTransition: true
   }
 };
 

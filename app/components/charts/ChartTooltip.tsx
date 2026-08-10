@@ -137,7 +137,8 @@ const adjustTooltipPosition = (
   tooltipRef: RefObject<HTMLDivElement | null>,
   tooltip: TooltipTransform,
   horizontalPos: TooltipPosition,
-  verticalPos: TooltipPosition
+  verticalPos: TooltipPosition,
+  enableTransition: boolean = true
 ) => {
   if (tooltipRef.current) {
     const originX =
@@ -176,19 +177,21 @@ const adjustTooltipPosition = (
 
     if (!Number(tooltipRef.current.style.opacity))
       tooltipRef.current.style.opacity = '1';
-    else tooltipRef.current.style.transition = 'all 100ms ease';
+    else if (enableTransition)
+      tooltipRef.current.style.transition = 'all 100ms ease';
   }
 };
 
 const tooltipTitleToNumber = (title?: string) =>
-  Number(title?.toString().replace(/\s/g, '') ?? '0');
+  Number(title?.toString().replace(/[\s,]/g, '') ?? '0');
 
 export const getTooltip = <DataType extends ChartData>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   updateTooltip: ChartContextProps<DataType>['updateTooltip'],
   dataMap: Map<number | string, DataType>,
   horizontalPos: TooltipPosition = 'start',
-  verticalPos: TooltipPosition = 'start'
+  verticalPos: TooltipPosition = 'start',
+  enableTransition: boolean = true
 ): NonNullable<Chart['options']['plugins']>['tooltip'] => ({
   enabled: false,
   position: 'nearest',
@@ -212,7 +215,8 @@ export const getTooltip = <DataType extends ChartData>(
       tooltipRef,
       tooltipTransform,
       horizontalPos,
-      verticalPos
+      verticalPos,
+      enableTransition
     );
 
     if (!data || storedId?.toString() === itemId.toString()) return;
@@ -226,7 +230,8 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
   updateTooltip: ChartContextProps<DataType>['updateTooltip'],
   dataMap: Map<number | string, DataType>,
   horizontalPos: TooltipPosition = 'start',
-  verticalPos: TooltipPosition = 'start'
+  verticalPos: TooltipPosition = 'start',
+  enableTransition: boolean = true
 ): NonNullable<Chart['options']['plugins']>['tooltip'] => ({
   enabled: false,
   position: 'nearest',
@@ -250,7 +255,8 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
       tooltipRef,
       tooltipTransform,
       horizontalPos,
-      verticalPos
+      verticalPos,
+      enableTransition
     );
 
     if (!data || storedId?.toString() === itemId.toString()) return;
@@ -269,7 +275,8 @@ export const updateMapTooltipPos = <DataType extends ChartData>(
   updateTooltip: ChartContextProps<DataType>['updateTooltip'],
   dataMap: Map<number | string, DataType>,
   horizontalPos: TooltipPosition = 'start',
-  verticalPos: TooltipPosition = 'start'
+  verticalPos: TooltipPosition = 'start',
+  enableTransition: boolean = true
 ) => {
   if (!mapRef.current || !tooltipRef.current) {
     resetTooltip(tooltipRef);
@@ -294,7 +301,8 @@ export const updateMapTooltipPos = <DataType extends ChartData>(
       tooltipRef,
       tooltipTransform,
       horizontalPos,
-      verticalPos
+      verticalPos,
+      enableTransition
     );
 
     updateTooltip(data);

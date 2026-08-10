@@ -1,5 +1,8 @@
 @use 'utils';
 
+$max-data-rank-width: 3rem;
+$min-data-rank-width: 2rem;
+
 .metrics {
   display: flex;
   flex-direction: column;
@@ -121,7 +124,39 @@
   gap: 1rem;
 }
 
-@mixin data-block($bg-color, $border-color, $underline-color) {
+.data-block-rank {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  box-sizing: border-box;
+  min-width: $min-data-rank-width;
+  max-width: $max-data-rank-width;
+  height: $min-data-rank-width;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-top-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+
+  @include utils.header(4);
+}
+
+.data-block-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@mixin data-block(
+  $bg-color,
+  $border-color,
+  $underline-color,
+  $rank-bg-color,
+  $rank-text-color
+) {
   .data-block {
     background-color: $bg-color;
     border-color: $border-color;
@@ -131,6 +166,11 @@
     .data-block-title {
       border-color: $underline-color;
     }
+  }
+
+  .data-block-rank {
+    background-color: $rank-bg-color;
+    color: $rank-text-color;
   }
 }
 

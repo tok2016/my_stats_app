@@ -26,13 +26,15 @@ const getSeriesInfo = (
   if (typeof ownedGames[0].rating !== 'number')
     ownedGames.sort((a, b) => b.minutes - a.minutes);
 
-  const developers = new Set<IgdbStudioBase>();
-  const publishers = new Set<IgdbStudioBase>();
+  const developers = new Map<number, IgdbStudioBase>();
+  const publishers = new Map<number, IgdbStudioBase>();
 
   igdbSeries.games.forEach((game) => {
     game.involved_companies?.forEach((involved) => {
-      if (involved.developer) developers.add(involved.company);
-      if (involved.publisher) publishers.add(involved.company);
+      if (involved.developer && !developers.get(involved.company.id))
+        developers.set(involved.company.id, involved.company);
+      if (involved.publisher && !publishers.get(involved.company.id))
+        publishers.set(involved.company.id, involved.company);
     });
   });
 

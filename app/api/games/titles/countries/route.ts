@@ -4,6 +4,7 @@ import { GameCore, GameCountryMetric } from '@ts/games/game';
 import { IgdbStudioCountry } from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameCoreToShort } from '@lib/games/games-utils';
 import { igdbRequest } from '@lib/games/igdb';
 
 const GAMES_IN_COUNTRIES = 3;
@@ -32,19 +33,20 @@ const getGamesByCountries = async (games: GameCore[]) => {
       const devCountry = developersMap[developerId];
       if (!devCountry) return;
 
+      const gameShort = gameCoreToShort(game);
       const countryData = gamesCountriesMap.get(devCountry);
 
       if (!countryData)
         gamesCountriesMap.set(devCountry, {
           country: devCountry,
           count: 1,
-          minutes: game.minutes,
-          topGames: [game]
+          hours: gameShort.hours,
+          topGames: [gameShort]
         });
       else {
         countryData.count++;
-        countryData.minutes += game.minutes;
-        countryData.topGames.push(game);
+        countryData.hours += gameShort.hours;
+        countryData.topGames.push(gameShort);
       }
     });
   });
@@ -53,8 +55,8 @@ const getGamesByCountries = async (games: GameCore[]) => {
     .values()
     .map((countryData) => {
       const ratingTops = countryData.topGames
+        .sort((a, b) => b.hours - a.hours)
         .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
-        .filter((game) => typeof game.rating === 'number')
         .slice(0, GAMES_IN_COUNTRIES);
 
       const sortedCountyData: GameCountryMetric = {
@@ -67,7 +69,7 @@ const getGamesByCountries = async (games: GameCore[]) => {
     .toArray()
     .sort((a, b) => {
       const countDiff = b.count - a.count;
-      if (!countDiff) return b.minutes - a.minutes;
+      if (!countDiff) return b.hours - a.hours;
       return countDiff;
     });
 

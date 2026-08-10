@@ -15,6 +15,7 @@ export type TooltipData = ChartData
 export type TooltipProps = {
   showRank?: boolean;
   colored?: boolean;
+  enableTransition?: boolean;
 };
 
 export type ChartValueField<DataType extends ChartData> = ExtractTypeFields<
@@ -29,6 +30,7 @@ export type ChartCoreProps<
   data: (DataType & Record<ValueKey, number>)[];
   valueField: ValueKey;
   fieldsNames: FieldsInfo<DataType>;
+  tooltipProps?: TooltipProps;
 };
 
 export type ChartTypeProps = {
@@ -69,6 +71,7 @@ export type FieldsInfo<DataType extends ChartData> = Record<
 
 export type ChartContextProps<DataType extends ChartData> = {
   tooltipRef: React.RefObject<HTMLDivElement | null>;
+  tooltipProps: TooltipProps;
   updateTooltip: (data: DataType) => void;
 };
 

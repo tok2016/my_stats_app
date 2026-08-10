@@ -1,8 +1,10 @@
-import { GameCore } from '@ts/games/game';
+import { GameCore, GameShort } from '@ts/games/game';
 import { PlaytimeData } from '@ts/games/metric';
 
+import { gameCoreToShort } from '@lib/games/games-utils';
+
 import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
-import { MAX_ENTRIES_IN_CHART, MINUTES, getPercentThreshold } from '../utils';
+import { MAX_ENTRIES_IN_CHART, getPercentThreshold } from '../utils';
 
 const getTopCountData = (
   itemsCount: Map<number | string, PlaytimeData>
@@ -37,8 +39,7 @@ const getTopCountData = (
       values.slice(i).forEach((value) => {
         count += value.count;
         hours += value.hours;
-        topGame =
-          value.topGame.minutes > topGame.minutes ? value.topGame : topGame;
+        topGame = value.topGame.hours > topGame.hours ? value.topGame : topGame;
       });
 
       countData.push({
@@ -66,7 +67,7 @@ const getTopCountData = (
 
 const setPlaytimeData = (
   item: number | string,
-  game: GameCore,
+  game: GameShort,
   map: Map<number | string, PlaytimeData>
 ) => {
   const currentItem = map.get(item);
@@ -74,10 +75,10 @@ const setPlaytimeData = (
 
   map.set(item, {
     id: Number(item) ?? 0,
-    hours: (currentItem?.hours ?? 0) + Math.round(game.minutes / MINUTES),
+    hours: (currentItem?.hours ?? 0) + game.hours,
     count: (currentItem?.count ?? 0) + 1,
     percent: 0,
-    topGame: game.minutes >= previosGame.minutes ? game : previosGame
+    topGame: game.hours >= previosGame.hours ? game : previosGame
   });
 };
 
@@ -88,9 +89,11 @@ export const getPlaytimeMetric = (
   const itemsMap = new Map<number | string, PlaytimeData>();
   games.forEach((game) => {
     if (isNumberOrStringArray(game[dataField]))
-      game[dataField].forEach((item) => setPlaytimeData(item, game, itemsMap));
+      game[dataField].forEach((item) =>
+        setPlaytimeData(item, gameCoreToShort(game), itemsMap)
+      );
     else if (isNumberOrString(game[dataField]))
-      setPlaytimeData(game[dataField], game, itemsMap);
+      setPlaytimeData(game[dataField], gameCoreToShort(game), itemsMap);
   });
 
   return getTopCountData(itemsMap);

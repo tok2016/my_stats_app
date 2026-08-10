@@ -53,25 +53,30 @@
     'a b'
     'a c';
 
-  align-items: center;
   grid-template-rows: 1fr 1fr;
   grid-template-columns: 90fr 100fr;
 
-  justify-content: space-between;
+  align-items: stretch;
   gap: 0.625rem;
+
+  aspect-ratio: 124 / 79;
 
   .game-cover {
     grid-area: a;
     border-radius: utils.$small-radius;
+    aspect-ratio: unset;
+  }
+
+  .screenshot {
+    border-radius: utils.$small-radius;
+    aspect-ratio: unset;
   }
 
   .screenshot-1 {
     grid-area: b;
-    border-radius: utils.$small-radius;
   }
 
   .screenshot-2 {
     grid-area: c;
-    border-radius: utils.$small-radius;
   }
 }

@@ -17,12 +17,15 @@ type ChartProviderProps<DataType extends ChartData> = {
   chartId: string;
   displayFields: DisplayFields<DataType>;
   fieldsNames: FieldsInfo<DataType>;
-  tooltipProps?: TooltipProps;
+  tooltipProps: TooltipProps;
   className?: string;
 };
 
 const defaultContext: ChartContextProps<ChartData> = {
   tooltipRef: { current: null },
+  tooltipProps: {
+    enableTransition: true
+  },
   updateTooltip: () => {}
 };
 
@@ -43,7 +46,10 @@ export default function ChartProvider<DataType extends ChartData>({
     setTooltipData({ ...data } as DataType);
   }, []);
 
-  const value = useMemo(() => ({ updateTooltip, tooltipRef }), [updateTooltip]);
+  const value = useMemo(
+    () => ({ updateTooltip, tooltipRef, tooltipProps }),
+    [updateTooltip, tooltipProps]
+  );
 
   return (
     <ChartContext.Provider value={value}>

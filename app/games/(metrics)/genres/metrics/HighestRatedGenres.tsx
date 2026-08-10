@@ -4,7 +4,7 @@ import Game from '@ts/games/game';
 import { RatingData } from '@ts/games/metric';
 
 import { getMetricData } from '@lib/server-actions';
-import { MINUTES, getSingularOrPlural } from '@lib/utils';
+import { getSingularOrPlural } from '@lib/utils';
 
 import Rating from '@components/Rating';
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
@@ -23,7 +23,6 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
   if (!genre) return;
 
   const topGame = ratingData.topGames[0];
-  const hours = Math.round(topGame.minutes / MINUTES);
   return (
     <div className='data-block genre-rating-block'>
       <div className='rating-title'>
@@ -44,7 +43,7 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
         </Link>
 
         <span className='min'>
-          {hours} {getSingularOrPlural(hours, 'hour', 'hours')}
+          {topGame.hours} {getSingularOrPlural(topGame.hours, 'hour', 'hours')}
         </span>
       </div>
     </div>

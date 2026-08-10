@@ -1,5 +1,10 @@
 import { IgdbBasic, IgdbItemInfo, IgdbQuery } from '@ts/games/api-response';
-import Game, { GameCore, GameInSchema, IgdbGameFull } from '@ts/games/game';
+import Game, {
+  GameCore,
+  GameInSchema,
+  GameShort,
+  IgdbGameFull
+} from '@ts/games/game';
 import { IgdbGenre } from '@ts/games/genre';
 import { ItemCompareData } from '@ts/games/metric';
 import { PlatformShort } from '@ts/games/platform';
@@ -121,6 +126,15 @@ export const uniteGameCoreAndIgdb = (
   screenshots: igdbGame.screenshots
     ?.slice(0, MAX_SCREENSHOTS)
     .map((screenshot) => getImageUrl(screenshot.image_id, 'screenshot_med'))
+});
+
+export const gameCoreToShort = (game: GameCore): GameShort => ({
+  id: game.id,
+  apiId: game.apiId,
+  name: game.name,
+  hours: Math.round(game.minutes / MINUTES),
+  rating: game.rating,
+  cover: game.cover ? getImageUrl(game.cover, 'cover_big') : undefined
 });
 
 export const getFullGames = async (
