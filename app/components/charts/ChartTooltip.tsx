@@ -181,7 +181,7 @@ const adjustTooltipPosition = (
 };
 
 const tooltipTitleToNumber = (title?: string) =>
-  Number(title?.toString().replace(/\s/g, '') ?? '0');
+  Number(title?.toString().replace(/[\s,]/g, '') ?? '0');
 
 export const getTooltip = <DataType extends ChartData>(
   tooltipRef: RefObject<HTMLDivElement | null>,

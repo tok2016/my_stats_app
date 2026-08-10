@@ -172,7 +172,7 @@ export const getSingularOrPlural = (
   number: number,
   singular: string,
   plural: string
-) => (number === 1 ? singular : plural);
+) => (number <= 1 ? singular : plural);
 
 export const clamp = (value: number, min: number, max: number) => {
   if (value < min) {

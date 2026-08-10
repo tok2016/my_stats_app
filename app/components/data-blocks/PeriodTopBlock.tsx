@@ -22,7 +22,10 @@ export default function PeriodTopBlock<ItemType>({
   return (
     <div
       className={`data-block period-top ${className}`}
-      style={{ width: `${blockWidthRem}rem` }}
+      style={{
+        minWidth: `${blockWidthRem}rem`,
+        maxWidth: `${blockWidthRem}rem`
+      }}
     >
       <div className='data-block-title'>
         <p className={current ? 'colored' : ''}>

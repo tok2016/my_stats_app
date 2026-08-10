@@ -210,7 +210,9 @@ $modules: 'user', 'music', 'games';
     @include metrics.data-block(
       map.get(utils.$bg-1-colors, $module),
       map.get(utils.$bg-2-colors, $module),
-      map.get(utils.$hover-colors, $module)
+      map.get(utils.$hover-colors, $module),
+      map.get(utils.$active-colors, $module),
+      map.get(utils.$text-colors, $module)
     );
 
     @include metrics.empty-cover(
@@ -351,7 +353,9 @@ $modules: 'user', 'music', 'games';
       @include metrics.data-block(
         map.get(utils.$text-colors, $module),
         map.get(utils.$highlight-colors, $module),
-        map.get(utils.$active-colors, $module)
+        map.get(utils.$active-colors, $module),
+        map.get(utils.$hover-colors, $module),
+        map.get(utils.$text-colors, $module)
       );
 
       @include metrics.empty-cover(

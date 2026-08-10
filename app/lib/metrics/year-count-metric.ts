@@ -1,6 +1,8 @@
 import { GameCore } from '@ts/games/game';
 import { YearCountMetric } from '@ts/games/metric';
 
+import { gameCoreToShort } from '@lib/games/games-utils';
+
 import { isDateSource } from '../type-guards';
 import { GAMES_IN_METRIC } from '../utils';
 
@@ -22,11 +24,11 @@ export const getYearCountMetric = (
       yearsMap.set(year, {
         year,
         count: 1,
-        topGames: [game]
+        topGames: [gameCoreToShort(game)]
       });
     else {
       yearData.count++;
-      yearData.topGames.push(game);
+      yearData.topGames.push(gameCoreToShort(game));
     }
   });
 
@@ -43,7 +45,7 @@ export const getYearCountMetric = (
   ) {
     const yearCount = yearsMap.get(year);
     const top = yearCount?.topGames
-      .sort((a, b) => b.minutes - a.minutes)
+      .sort((a, b) => b.hours - a.hours)
       .slice(0, GAMES_IN_METRIC);
 
     yearsMetric.push({

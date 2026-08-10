@@ -1,5 +1,14 @@
 @use 'sass:map';
 @use '../../styles/utils';
+@use '../../styles/metrics';
+
+$series-collage-areas: (
+  0: a,
+  1: b,
+  2: c,
+  3: d,
+  4: e
+);
 
 .genres-tops {
   display: flex;
@@ -158,5 +167,89 @@
     width: 100%;
     aspect-ratio: 1.8;
     overflow: hidden;
+  }
+}
+
+.top-game {
+  min-width: 15.5rem;
+  position: relative;
+}
+
+.games-playtime {
+  overflow-x: auto;
+  min-width: 50rem;
+
+  .top-3-games {
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+
+    margin-bottom: 1.5rem;
+  }
+
+  .table,
+  .skeleton:has(> .tablet) {
+    width: 100%;
+  }
+}
+
+.game-prop-block * {
+  font-size: utils.$min-size;
+}
+
+.pre-rank-prop {
+  padding-right: metrics.$max-data-rank-width;
+}
+
+.top-games-grid {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.period-game {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.top-series {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.series-block {
+  min-width: 19rem;
+}
+
+.series-games-collage {
+  display: grid;
+  grid-template-areas:
+    'a b c'
+    'a d e';
+  grid-template-columns: 90fr 43fr 43fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.625rem;
+
+  .game-cover {
+    aspect-ratio: unset;
+  }
+
+  @each $rank, $area in $series-collage-areas {
+    .series-game-#{$rank} {
+      grid-area: $area;
+    }
   }
 }

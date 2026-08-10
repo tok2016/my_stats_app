@@ -292,6 +292,7 @@ $skeleton-icon-min-width: 2rem;
 
 .fetch-image {
   position: relative;
+  overflow: hidden;
 
   .skeletons {
     position: absolute;

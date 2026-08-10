@@ -105,8 +105,8 @@ export interface GameCore extends GameInSchema {
 
 export type GameShort = Pick<
   GameCore,
-  'id' | 'apiId' | 'minutes' | 'name' | 'cover' | 'rating'
->;
+  'id' | 'apiId' | 'name' | 'cover' | 'rating'
+> & { hours: number };
 
 export interface IgdbGameFull extends IgdbBasic {
   first_release_date?: number;
@@ -167,7 +167,7 @@ export type RecommendedGame = IgdbBasic & {
 export interface GameCountryMetric {
   country: number;
   count: number;
-  minutes: number;
+  hours: number;
   topGames: GameShort[];
 }
 
