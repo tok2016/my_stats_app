@@ -1,16 +1,7 @@
-@use 'sass:map';
 @use 'utils';
 
-$tooltip-radius: 0.5rem;
-$tooltip-padding: 0.625rem;
-$tooltip-badge-min: 2rem;
-$tooltip-badge-max: 3rem;
-
-$chart-padding: 1.25rem;
-$chart-padding-right: 2rem;
-$rank-padding: 0.25rem;
-
-$default-color: map.get(utils.$active-colors, 'games');
+$max-data-rank-width: 3rem;
+$min-data-rank-width: 2rem;
 
 .metrics {
   display: flex;
@@ -19,322 +10,224 @@ $default-color: map.get(utils.$active-colors, 'games');
   gap: 3.5rem;
 }
 
-.test-chart {
-  width: 32rem;
-  height: 20rem;
-}
-
-.chart {
-  box-sizing: border-box;
-  position: relative;
-  padding: 1.25rem;
-  padding-right: $chart-padding-right;
-
+.metric {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  justify-content: flex-start;
-  gap: 0.25rem;
+  gap: 1.25rem;
 }
 
-.chart,
-.skeleton.graph {
-  border-radius: utils.$regular-radius;
-}
-
-.chart-core-wrapper {
-  flex: 1;
-}
-
-.chart-legend-content {
+.blocks-group {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  gap: 1rem;
-  align-items: center;
-  flex: 1;
+  align-items: flex-start;
+  gap: 3rem;
+
+  overflow-x: auto;
+  margin-bottom: 0.25rem;
+}
+
+.data-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+
+  padding: 0.5rem;
+
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 0.5rem;
+
+  max-width: 10rem;
+
+  @include utils.font(utils.$small-size, utils.$regular-font, utils.$fit-font);
+}
+
+.period-top {
+  @include utils.font(utils.$small-size, utils.$regular-font, utils.$wide-font);
+  box-sizing: border-box;
+  min-width: 11rem;
+  height: fit-content;
   max-height: 100%;
 
-  .chart-core-wrapper {
-    width: 100%;
-    height: 100%;
+  .data-block-title {
+    box-sizing: content-box;
+    border-bottom: solid 0.125rem;
+    padding-bottom: 0.25rem;
+
+    p {
+      @include utils.font(
+        utils.$regular-size,
+        utils.$bold-font,
+        utils.$wide-font
+      );
+      width: 100%;
+      text-align: center;
+    }
   }
 }
 
-.switchable-chart {
-  position: relative;
-
-  > div {
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  > button {
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
-}
-
-.doughnut-container {
-  width: 32rem;
-  aspect-ratio: 1.8;
-
-  .chart-core-wrapper {
-    flex: 0;
-    width: unset;
-    height: 100%;
-    aspect-ratio: 1;
-  }
-}
-
-.period-bar-container {
-  .chart-core-wrapper {
-    width: 85%;
-  }
-}
-
-.period-bar-container,
-.bar-container {
-  width: 100%;
-  min-width: 32rem;
-  height: 26rem;
-}
-
-.bar-container:has(.horizontal) {
-  width: 100%;
-  min-width: 32rem;
-  height: 32rem;
-}
-
-.line-container {
-  width: 100%;
-  min-width: 32rem;
-  height: 24rem;
-}
-
-.map-container,
-.map-chart {
-  width: 100%;
-}
-
-.map-container {
-  background-color: none;
-}
-
-.adjacent-chart {
-  width: 100%;
-  height: 23rem;
-
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-
-  .chart {
-    padding: 0.5rem;
-    flex: 2;
-    width: unset;
-    height: unset;
-    min-width: 29rem;
-  }
-
-  .table {
-    flex: 3;
-    min-width: 29rem;
-  }
-}
-
-.tooltip-container {
-  position: absolute;
-  pointer-events: none;
-  transition: all 100ms ease;
-  z-index: 10;
-}
-
-.chart-tooltip {
-  position: relative;
-
-  box-sizing: border-box;
-  width: max-content;
-  max-width: 18rem;
-  padding: $tooltip-padding;
-  padding-right: $tooltip-badge-max + $tooltip-padding;
-
-  box-shadow: 0 0 utils.$blur utils.$spread $default-color;
-  border: solid 3px $default-color;
-  border-radius: $tooltip-radius;
-
-  display: flex;
-  flex-direction: column;
-  gap: $tooltip-padding;
-
-  .colored {
-    color: $default-color;
-  }
-}
-
-.tooltip-key {
-  display: flex;
-  flex-direction: row;
-  gap: 0.25rem;
-
-  * {
-    overflow-x: hidden;
-    word-wrap: break-word;
-  }
-}
-
-.tooltip-badge {
-  position: absolute;
-  right: 0;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  box-sizing: border-box;
-  padding: $rank-padding;
-  min-width: $tooltip-badge-min;
-  max-width: $tooltip-badge-max;
-}
-
-.tooltip-rank {
-  top: 0;
-
-  background-color: $default-color;
-  border-top-right-radius: $tooltip-radius * 0.5;
-  border-bottom-left-radius: $tooltip-radius;
-
-  * {
-    color: utils.$white;
-  }
-}
-
-.tooltip-percent {
-  bottom: 0;
-
-  background-color: transparent;
-  border: solid 2px $default-color;
-  border-top-left-radius: $tooltip-radius;
-  border-bottom-right-radius: $tooltip-radius * 0.5;
-
-  * {
-    color: $default-color;
-  }
-}
-
-.chart-legend {
-  list-style: none;
+.data-block-list {
   padding: 0;
   margin: 0;
-  max-width: 13rem;
-
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  list-style-type: none;
 
   li {
-    @include utils.font(
-      utils.$regular-size,
-      utils.$regular-font,
-      utils.$wide-font
-    );
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 0.25rem;
+    gap: 2px;
 
-    .percent {
-      width: 3rem;
-      font-weight: utils.$bold-font;
-      text-align: right;
+    margin-bottom: 0.75rem;
+
+    .skeletons {
+      width: 100%;
     }
 
-    .legend-mark {
-      width: 1rem;
-      height: 1rem;
-      border-radius: utils.$max-radius;
-      background-color: $default-color;
+    &:last-child {
+      margin-bottom: 0;
     }
   }
 }
 
-@each $rank, $color in utils.$diagram-colors {
-  .chart-tooltip[data-rank='#{$rank}'] {
-    box-shadow: 0 0 utils.$blur utils.$spread $color;
-    border-color: $color;
-
-    .colored {
-      color: $color;
-    }
-
-    .tooltip-rank {
-      background-color: $color;
-    }
-
-    .tooltip-percent {
-      border-color: $color;
-
-      * {
-        color: $color;
-      }
-    }
-  }
-
-  .legend-key[data-rank='#{$rank}'] {
-    .percent {
-      color: $color;
-    }
-
-    .legend-mark {
-      background-color: $color;
-    }
+.select-title {
+  display: flex;
+  align-items: flex-end;
+  .text-select-group {
+    display: inline-flex;
   }
 }
 
-@mixin chart($bg-color, $text-color) {
-  .chart {
+.period-tops {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.25rem;
+}
+
+.period-tops-groups,
+.period-tops-in-group,
+.years {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 1.5rem;
+  width: fit-content;
+}
+
+.period-tops-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.data-block-rank {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  box-sizing: border-box;
+  min-width: $min-data-rank-width;
+  max-width: $max-data-rank-width;
+  height: $min-data-rank-width;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-top-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+
+  @include utils.header(4);
+}
+
+.data-block-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@mixin data-block(
+  $bg-color,
+  $border-color,
+  $underline-color,
+  $rank-bg-color,
+  $rank-text-color
+) {
+  .data-block {
     background-color: $bg-color;
+    border-color: $border-color;
   }
 
-  .chart-tooltip {
-    background-color: $bg-color;
-    color: $text-color;
-  }
-
-  .chart-legend {
-    li {
-      color: $text-color;
+  .period-top {
+    .data-block-title {
+      border-color: $underline-color;
     }
   }
 
-  .map {
+  .data-block-rank {
+    background-color: $rank-bg-color;
+    color: $rank-text-color;
+  }
+}
+
+.empty-cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 50%;
+  }
+}
+
+@mixin empty-cover($bg-color, $svg-color) {
+  .empty-cover {
+    background-color: $bg-color;
+
     svg {
-      path {
-        fill: $text-color;
-        stroke-color: $bg-color;
-        outline: none;
-      }
-
-      @each $rank, $color in utils.$diagram-colors {
-        path[data-rank='#{$rank}'] {
-          fill: $color;
-          cursor: pointer;
-          transition: 500ms fill;
-
-          &:hover {
-            fill: color-mix(in srgb, $color 80%, white 20%);
-            transition: utils.$hover-time fill;
-          }
-
-          &:active {
-            fill: color-mix(in srgb, $color 85%, black 15%);
-            transition: utils.$active-time fill;
-          }
-        }
-      }
+      color: $svg-color !important;
     }
+  }
+}
+
+.empty-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+
+  width: 100%;
+  min-height: 7rem;
+  height: 10rem;
+
+  text-align: center;
+
+  svg {
+    width: 5rem;
+    height: 5rem;
+  }
+}
+
+.multiple-ratings {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  padding: 0 0.25rem;
+
+  .rating-source {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2px;
   }
 }

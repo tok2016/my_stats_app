@@ -1,8 +1,10 @@
-import { IgdbBasic } from './api-response';
-import { GameCore, GameShort, IgdbRecommendedGame } from './game';
+import { GreatPeriods, PrecisePeriods } from '@lib/utils';
 
-export type PrecisePeriod = 'year' | 'season' | 'month';
-export type GreatPeriod = 'allTime' | 'year';
+import { IgdbBasic } from './api-response';
+import { GameCore, GameShort, RecommendedGame } from './game';
+
+export type PrecisePeriod = (typeof PrecisePeriods)[number];
+export type GreatPeriod = (typeof GreatPeriods)[number];
 export type StudioField = keyof Pick<
   GameCore,
   'developersIds' | 'publishersIds'
@@ -32,13 +34,15 @@ export interface ItemCompareData<IgdbData extends IgdbBasic = IgdbBasic> {
 export type CountData = {
   id: number | string;
   count: number;
+  percent: number;
   topSeries?: number;
 };
 
 export type PlaytimeData = {
-  id: number;
+  id: number | string;
   hours: number;
   count: number;
+  percent: number;
   topGame: GameShort;
 };
 
@@ -50,19 +54,26 @@ export type RatingData = {
 
 export type MetricMap<MetricData> = Record<number | string, MetricData>;
 
-export type PeriodTops<MetricData> = {
+export type PeriodPlaytimeData = {
+  id: number | string;
+  hours: number;
+};
+
+export type PeriodTop<MetricData> = {
   period: string;
   top: MetricData[];
 };
 
 export type PeriodTopsMetric<MetricData> = {
   periodType: PrecisePeriod;
-  tops: PeriodTops<MetricData>[];
+  tops: PeriodTop<MetricData>[];
 };
 
+export type PeriodPlaytimeTops = PeriodTopsMetric<PeriodPlaytimeData>;
+
 export type RecommendedMetric = {
-  favorite: IgdbRecommendedGame[];
-  other: IgdbRecommendedGame[];
+  favorite: RecommendedGame[];
+  other: RecommendedGame[];
 };
 
 export interface YearCountMetric {

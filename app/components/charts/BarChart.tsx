@@ -3,7 +3,7 @@
 import { Chart } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
-import { ChartCoreProps, ChartData } from '@ts/ui/charts-data';
+import { ChartCoreProps, ChartData, ChartValueField } from '@ts/ui/charts-data';
 
 import { useChart } from '@lib/hooks';
 import { ChartColors } from '@lib/utils';
@@ -11,25 +11,32 @@ import { ChartColors } from '@lib/utils';
 import { getTooltip } from './ChartTooltip';
 import { ChartClasses } from './chart-styles';
 
-type BarChartCoreProps<DataType extends ChartData> =
-  ChartCoreProps<DataType> & {
-    horizontal?: boolean;
-  };
+type BarChartCoreProps<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+> = ChartCoreProps<DataType, ValueKey> & {
+  horizontal?: boolean;
+};
 
 type ChartScaleType = NonNullable<Chart['options']['scales']>[string];
 
-export default function BarChart<DataType extends ChartData>({
+export default function BarChart<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+>({
   data,
   valueField,
   horizontal = false
-}: BarChartCoreProps<DataType>) {
-  const dataMap = new Map<number, DataType>(data.map((d) => [d.id, d]));
+}: BarChartCoreProps<DataType, ValueKey>) {
+  const dataMap = new Map<number | string, DataType>(
+    data.map((d) => [d.id, d])
+  );
 
-  const { updateTooltip, tooltipRef } = useChart();
+  const { updateTooltip, tooltipRef, tooltipProps } = useChart();
 
   const xAxis: ChartScaleType = {
     type: 'category',
-    labels: data.map((value) => value.name),
+    labels: data.map((value) => value.id.toString()),
     ticks: {
       display: false
     },
@@ -74,19 +81,22 @@ export default function BarChart<DataType extends ChartData>({
           legend: {
             display: false
           },
-          tooltip: getTooltip(tooltipRef, updateTooltip, dataMap)
+          tooltip: getTooltip(
+            tooltipRef,
+            updateTooltip,
+            dataMap,
+            'start',
+            'start',
+            tooltipProps.enableTransition
+          )
         }
       }}
       data={{
-        labels: data.map((value) => value.name),
+        labels: data.map((value) => value.id),
         datasets: [
           {
             backgroundColor: ChartColors,
-            data: data.map((value) =>
-              typeof value[valueField] === 'number'
-                ? value[valueField]
-                : value.value
-            ),
+            data: data.map((value) => value[valueField]),
             categoryPercentage: 0.5
           }
         ]

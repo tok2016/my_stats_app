@@ -6,5 +6,5 @@ import { ModulesPaths } from '@lib/utils';
 
 export default function PageName() {
   const pathname = usePathname();
-  return <h2>{ModulesPaths[pathname]?.name}</h2>;
+  return <h2>{ModulesPaths[pathname]?.label}</h2>;
 }

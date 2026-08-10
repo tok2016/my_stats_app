@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { GameCore } from '@ts/games/game';
-import { PeriodTops, PrecisePeriod } from '@ts/games/metric';
-import { StudiosPeriodMetric, StudiosPeriodTop } from '@ts/games/studio';
+import { PeriodPlaytimeData, PeriodTop, PrecisePeriod } from '@ts/games/metric';
+import {
+  StudioPeriodTop,
+  StudioType,
+  StudiosPeriodMetric
+} from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { getPeriodMetric } from '@lib/metrics/periods-metric';
@@ -10,14 +14,22 @@ import { getPeriodMetric } from '@lib/metrics/periods-metric';
 const STUDIOS_IN_PERIOD = 1;
 
 const setStuioTopByRole = (
-  periodTop: PeriodTops<string> | undefined,
-  map: Map<string, StudiosPeriodTop>,
-  field: keyof StudiosPeriodTop
+  periodTop: PeriodTop<PeriodPlaytimeData> | undefined,
+  map: Map<string, StudioPeriodTop[]>,
+  type: StudioType
 ) => {
   if (!periodTop) return;
 
-  const currentTop = map.get(periodTop?.period) ?? {};
-  map.set(periodTop.period, { ...currentTop, [field]: periodTop.top });
+  const currentTop = map.get(periodTop?.period);
+  if (!currentTop)
+    map.set(
+      periodTop.period,
+      periodTop.top.map((entry) => ({ ...entry, type }))
+    );
+  else
+    periodTop.top.forEach((entry) => {
+      currentTop.push({ ...entry, type });
+    });
 };
 
 const getStudiosPeriods = async (games: GameCore[], req: NextRequest) => {
@@ -38,12 +50,12 @@ const getStudiosPeriods = async (games: GameCore[], req: NextRequest) => {
     STUDIOS_IN_PERIOD
   ).tops;
 
-  const unitedTops = new Map<string, StudiosPeriodTop>();
+  const unitedTops = new Map<string, StudioPeriodTop[]>();
   const maxLength = Math.max(developersTops.length, publishersTops.length);
 
   for (let i = 0; i < maxLength; i++) {
-    setStuioTopByRole(developersTops[i], unitedTops, 'developers');
-    setStuioTopByRole(publishersTops[i], unitedTops, 'publishers');
+    setStuioTopByRole(developersTops[i], unitedTops, 'developer');
+    setStuioTopByRole(publishersTops[i], unitedTops, 'publisher');
   }
 
   const periodMetric: StudiosPeriodMetric = {
@@ -52,8 +64,7 @@ const getStudiosPeriods = async (games: GameCore[], req: NextRequest) => {
       .entries()
       .map(([period, top]) => ({
         period,
-        developers: top.developers,
-        publishers: top.publishers
+        top
       }))
       .toArray()
   };

@@ -1,56 +1,69 @@
 'use client';
 
 import { ChartDataset } from 'chart.js';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 
-import { PrecisePeriod } from '@ts/games/metric';
+import { PeriodTop, PrecisePeriod } from '@ts/games/metric';
 import {
   ChartData,
-  DisplayFields,
-  FieldsInfo,
-  PeriodChartData,
+  ChartValueField,
+  PeriodBarChartMainProps,
   PeriodChartTransformed
 } from '@ts/ui/charts-data';
-import { Option } from '@ts/ui/components-props';
 
 import { useAction, useChart } from '@lib/hooks';
-import { ChartColors, MONTHS_IN_YEAR, Seasons } from '@lib/utils';
+import {
+  ChartColors,
+  MONTHS_IN_YEAR,
+  Seasons,
+  getPeriodString
+} from '@lib/utils';
 
 import ChartProvider from '@store/ChartProvider';
 
-import Select from '@components/Select';
+import ChartLegend from '../charts/ChartLegend';
+import { getPeriodTooltip } from '../charts/ChartTooltip';
+import '../charts/chart-styles';
+import { ChartClasses } from '../charts/chart-styles';
 
-import ChartLegend from './ChartLegend';
-import { getPeriodTooltip } from './ChartTooltip';
-import './chart-styles';
-import { ChartClasses } from './chart-styles';
-
-type PeriodBarChartProps<DataType extends ChartData> = {
-  displayFields: DisplayFields<DataType>;
-  fieldsNames: FieldsInfo<DataType>;
+type PeriodBarChartProps<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+> = PeriodBarChartMainProps<DataType, ValueKey> & {
   chartId: string;
   className?: string;
-  data: PeriodChartData<DataType>[];
-  periodType: PrecisePeriod;
-};
-
-type PeriodBarCoreProps = {
-  data: PeriodChartData<ChartData>[];
+  data: PeriodTop<DataType & Record<ValueKey, number>>[];
   periodType: PrecisePeriod;
   year: string;
+};
+
+type PeriodBarCoreProps<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+> = {
+  data: PeriodTop<DataType & Record<ValueKey, number>>[];
+  periodType: PrecisePeriod;
+  year: string;
+  valueField: ValueKey;
 };
 
 type PeriodDataset = {
   labels: string[];
   datasets: ChartDataset<'bar'>[];
-  dataMap: Map<number, PeriodChartTransformed>;
+  dataMap: Map<number | string, PeriodChartTransformed>;
 };
 
 const UnitsPerYear: Record<PrecisePeriod, number> = {
   year: 0,
   season: Seasons.length,
   month: MONTHS_IN_YEAR
+};
+
+const ShortFormats: Record<PrecisePeriod, boolean> = {
+  year: false,
+  season: false,
+  month: true
 };
 
 const defaultPeriodDataset: PeriodDataset = {
@@ -83,9 +96,9 @@ const getAllPeriods = (
     for (let year = startPeriod.year; year <= recentPeriod.year; year++)
       allPeriods.push(year.toString());
   } else {
-    const startUnit = year === startPeriod.year ? startPeriod.unit : 0;
+    const startUnit = year === startPeriod.year ? startPeriod.unit : 1;
     const endUnit =
-      year === recentPeriod.year ? recentPeriod.unit : unitsPerYear - 1;
+      year === recentPeriod.year ? recentPeriod.unit : unitsPerYear;
     for (let unit = startUnit; unit <= endUnit; unit++) {
       allPeriods.push(`${year}-${unit}`);
     }
@@ -94,32 +107,17 @@ const getAllPeriods = (
   return allPeriods;
 };
 
-const getPeriodString: Record<PrecisePeriod, (period: string) => string> = {
-  year: (period) => period.split('-')[0] ?? '',
-  season: (period) => {
-    const parts = period.split('-');
-    if (!parts[1]) return parts[0] ?? '';
-
-    const seasonNumber = parseInt(parts[1]) % Seasons.length;
-    return Seasons[seasonNumber];
-  },
-  month: (period) => {
-    const parts = period.split('-');
-    if (!parts[1]) return parts[0] ?? '';
-
-    return new Date(period).toLocaleDateString('en-US', {
-      month: 'short'
-    });
-  }
-};
-
-const getPeriodDatasets = async (params?: {
-  data: PeriodChartData<ChartData>[];
+const getPeriodDatasets = async <
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+>(params?: {
+  data: PeriodTop<DataType & Record<ValueKey, number>>[];
+  valueField: ValueKey;
   periodType: PrecisePeriod;
   year: number;
 }): Promise<PeriodDataset> => {
   if (!params) return defaultPeriodDataset;
-  const { data, periodType, year } = params;
+  const { data, periodType, year, valueField } = params;
 
   const isYear = periodType === 'year';
   const allPeriods = getAllPeriods(
@@ -129,32 +127,38 @@ const getPeriodDatasets = async (params?: {
   );
 
   const periodsNames = Object.fromEntries(
-    allPeriods.map((period) => [period, getPeriodString[periodType](period)])
+    allPeriods.map((period) => [
+      period,
+      getPeriodString[periodType](period, ShortFormats[periodType])
+    ])
   );
 
-  const itemsMap = new Map<number, PeriodChartTransformed>();
+  const itemsMap = new Map<number | string, PeriodChartTransformed>();
   data.forEach((periodData) => {
     if (!isYear && !periodData.period.startsWith(year.toString())) return;
 
-    periodData.data.forEach((chartData) => {
-      const storedItem = itemsMap.get(chartData.id);
+    periodData.top.forEach((top) => {
+      const storedItem = itemsMap.get(top.id);
       const period = periodsNames[periodData.period] ?? '';
+
       if (!storedItem)
-        itemsMap.set(chartData.id, {
-          ...chartData,
-          countByPeriod: { [period]: chartData.value }
+        itemsMap.set(top.id, {
+          ...top,
+          countByPeriod: {
+            [period]: top[valueField]
+          }
         });
-      else storedItem.countByPeriod[period] = chartData.value;
+      else storedItem.countByPeriod[period] = top[valueField];
     });
   });
 
-  const dataMap = new Map<number, PeriodChartTransformed>();
+  const dataMap = new Map<number | string, PeriodChartTransformed>();
   const datasets: ChartDataset<'bar'>[] = [];
   itemsMap.values().forEach((item, i) => {
     dataMap.set(item.id, item);
 
     datasets.push({
-      label: item.name,
+      label: item.id.toString(),
       backgroundColor: ChartColors[i % ChartColors.length],
       data: Object.values(periodsNames).map((period) => {
         if (typeof item.countByPeriod[period] === 'undefined') return null;
@@ -170,16 +174,24 @@ const getPeriodDatasets = async (params?: {
   };
 };
 
-function PeriodBarCore({ data, periodType, year }: PeriodBarCoreProps) {
+function PeriodBarCore<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+>({
+  data,
+  periodType,
+  year,
+  valueField
+}: PeriodBarCoreProps<DataType, ValueKey>) {
   const [dataset, getDataset] = useAction(
-    getPeriodDatasets,
+    getPeriodDatasets<DataType, ValueKey>,
     defaultPeriodDataset
   );
   const { updateTooltip, tooltipRef } = useChart();
 
   useEffect(() => {
-    getDataset({ data, periodType, year: Number(year) });
-  }, [data, getDataset, periodType, year]);
+    getDataset({ data, periodType, year: Number(year), valueField });
+  }, [data, getDataset, periodType, year, valueField]);
 
   return (
     <div className='chart-legend-content'>
@@ -195,7 +207,10 @@ function PeriodBarCore({ data, periodType, year }: PeriodBarCoreProps) {
                 type: 'category',
                 labels: dataset.labels,
                 title: {
-                  text: periodType[0].toUpperCase() + periodType.slice(1)
+                  text:
+                    periodType[0].toUpperCase()
+                    + periodType.slice(1)
+                    + (periodType === 'year' ? '' : `, ${year}`)
                 }
               },
               y: {
@@ -228,26 +243,19 @@ function PeriodBarCore({ data, periodType, year }: PeriodBarCoreProps) {
   );
 }
 
-export default function PeriodBarChart<DataType extends ChartData>({
+export default function PeriodBarChart<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+>({
   data,
   periodType,
   displayFields,
   fieldsNames,
+  valueField,
   chartId,
+  year,
   className = ''
-}: PeriodBarChartProps<DataType>) {
-  const yearOptions: Option[] = getAllPeriods(
-    data.map((d) => d.period),
-    'year',
-    0
-  ).map((year) => ({
-    label: year,
-    key: year,
-    value: year
-  }));
-
-  const [year, setYear] = useState<string>(yearOptions.at(-1)?.value ?? '');
-
+}: PeriodBarChartProps<DataType, ValueKey>) {
   return (
     <ChartProvider
       chartId={chartId}
@@ -258,19 +266,12 @@ export default function PeriodBarChart<DataType extends ChartData>({
       }}
       className={`${ChartClasses.periodBar.container} ${className}`}
     >
-      {periodType === 'year' || (
-        <Select
-          className='chart-select'
-          variant='text'
-          defaultValue={year}
-          options={yearOptions}
-          id={`${chartId}-year`}
-          name={`${chartId}-year`}
-          onSelect={setYear}
-        />
-      )}
-
-      <PeriodBarCore data={data} periodType={periodType} year={year} />
+      <PeriodBarCore
+        data={data}
+        periodType={periodType}
+        year={year}
+        valueField={valueField}
+      />
     </ChartProvider>
   );
 }

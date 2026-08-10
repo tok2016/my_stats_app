@@ -1,7 +1,7 @@
 import { IgdbBasic } from './api-response';
 import { IgdbGenre } from './genre';
 import { IgdbImage } from './image';
-import { IgdbPlatform } from './platform';
+import { IgdbPlatform, PlatformShort } from './platform';
 import { ExternalRatings } from './rating';
 import { IgdbSeries } from './series';
 import {
@@ -52,13 +52,21 @@ export interface IgdbGame extends IgdbBasic {
 }
 
 export type IgdbRecommendedGame = Pick<IgdbGame, 'id' | 'name' | 'cover'> & {
-  platforms: {
+  external_games: {
     id: number;
-    name: string;
+    url?: string;
+    external_game_source: {
+      id: number;
+      name: string;
+    };
+    game_release_format?: number;
   }[];
   genres: {
     id: number;
     name: string;
+  }[];
+  screenshots?: {
+    image_id: string;
   }[];
   rating?: number;
 };
@@ -97,12 +105,13 @@ export interface GameCore extends GameInSchema {
 
 export type GameShort = Pick<
   GameCore,
-  'id' | 'apiId' | 'minutes' | 'name' | 'cover' | 'rating'
->;
+  'id' | 'apiId' | 'name' | 'cover' | 'rating'
+> & { hours: number };
 
 export interface IgdbGameFull extends IgdbBasic {
   first_release_date?: number;
   cover?: IgdbImage;
+  screenshots?: IgdbImage[];
   genres: IgdbGenre[];
   platforms: IgdbPlatform[];
   collections?: IgdbSeries[];
@@ -128,21 +137,37 @@ export default interface Game extends ExternalRatings {
   name: string;
   apiId: number;
   genres: IgdbGenre[];
-  platform?: IgdbPlatform;
+  platform?: PlatformShort;
   developers: IgdbStudioBase[];
   publishers: IgdbStudioBase[];
   series?: IgdbSeries;
   cover?: string;
+  screenshots?: string[];
   hours: number;
   releasedAt?: Date;
   rating?: number;
   playDate?: Date;
 }
 
+export type RecommendedGame = IgdbBasic & {
+  cover?: string;
+  external: {
+    id: number;
+    url?: string;
+    source?: {
+      id: number;
+      name: string;
+    };
+  }[];
+  genres: IgdbBasic[];
+  screenshots?: string[];
+  rating?: number;
+};
+
 export interface GameCountryMetric {
   country: number;
   count: number;
-  minutes: number;
+  hours: number;
   topGames: GameShort[];
 }
 

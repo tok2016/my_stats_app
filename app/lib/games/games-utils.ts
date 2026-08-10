@@ -1,7 +1,13 @@
 import { IgdbBasic, IgdbItemInfo, IgdbQuery } from '@ts/games/api-response';
-import Game, { GameCore, GameInSchema, IgdbGameFull } from '@ts/games/game';
+import Game, {
+  GameCore,
+  GameInSchema,
+  GameShort,
+  IgdbGameFull
+} from '@ts/games/game';
 import { IgdbGenre } from '@ts/games/genre';
 import { ItemCompareData } from '@ts/games/metric';
+import { PlatformShort } from '@ts/games/platform';
 import { IgdbSeriesExpanded } from '@ts/games/series';
 import Token from '@ts/users/token';
 import { LiteralType } from '@ts/util-types';
@@ -10,17 +16,19 @@ import { getCredentialsById } from '../auth';
 import { GamesModel } from '../models';
 import { isIgdbItemArray, isIgdbItemBasic } from '../type-guards';
 import { MINUTES, generateErrorResponse, mean } from '../utils';
-import { igdbRequest } from './igdb';
+import { getImageUrl, igdbRequest } from './igdb';
 
 type ItemsFields = keyof Omit<GameInSchema, 'userId' | 'storeId'>;
 
+const MAX_SCREENSHOTS = 3;
+
 export const FULL_GAME_FIELDS: Required<IgdbQuery<IgdbGameFull>>['fields'] = [
   'name',
-  'cover.url',
+  'cover.image_id',
   'first_release_date',
   'platforms.name',
   'platforms.platform_family.name',
-  'platforms.platform_logo.url',
+  'platforms.platform_logo.image_id',
   'collections.games',
   'collections.name',
   'genres.name',
@@ -29,7 +37,8 @@ export const FULL_GAME_FIELDS: Required<IgdbQuery<IgdbGameFull>>['fields'] = [
   'involved_companies.company.name',
   'involved_companies.company.country',
   'aggregated_rating',
-  'rating'
+  'rating',
+  'screenshots.image_id'
 ];
 
 export const SERIES_EXPANDED_FIELDS: Required<
@@ -65,6 +74,20 @@ export const getGenres = async (games: GameCore[]) => {
   return genresMap;
 };
 
+const igdbPlatfromToPlatformShort = (
+  igdbPlatform: IgdbGameFull['platforms'][number] | undefined
+): PlatformShort | undefined =>
+  !igdbPlatform
+    ? undefined
+    : {
+        id: igdbPlatform.id,
+        name: igdbPlatform.name,
+        logo: igdbPlatform.platform_logo
+          ? getImageUrl(igdbPlatform.platform_logo.image_id, 'logo_med')
+          : undefined,
+        family: igdbPlatform.platform_family
+      };
+
 export const uniteGameCoreAndIgdb = (
   gameCore: GameCore,
   igdbGame: IgdbGameFull
@@ -88,14 +111,30 @@ export const uniteGameCoreAndIgdb = (
     igdbGame.involved_companies
       ?.filter((studio) => studio.publisher)
       .map((studio) => studio.company) ?? [],
-  platform: igdbGame.platforms.find(
-    (igdbPlatform) => igdbPlatform.id === gameCore.platformId
+  platform: igdbPlatfromToPlatformShort(
+    igdbGame.platforms.find(
+      (igdbPlatform) => igdbPlatform.id === gameCore.platformId
+    )
   ),
   series: igdbGame.collections?.reduce((prev, curr) =>
     curr.games.length > prev.games.length ? curr : prev
   ),
   genres: igdbGame.genres,
-  cover: igdbGame.cover?.url
+  cover: igdbGame.cover?.image_id
+    ? getImageUrl(igdbGame.cover.image_id, 'cover_big')
+    : undefined,
+  screenshots: igdbGame.screenshots
+    ?.slice(0, MAX_SCREENSHOTS)
+    .map((screenshot) => getImageUrl(screenshot.image_id, 'screenshot_med'))
+});
+
+export const gameCoreToShort = (game: GameCore): GameShort => ({
+  id: game.id,
+  apiId: game.apiId,
+  name: game.name,
+  hours: Math.round(game.minutes / MINUTES),
+  rating: game.rating,
+  cover: game.cover ? getImageUrl(game.cover, 'cover_big') : undefined
 });
 
 export const getFullGames = async (

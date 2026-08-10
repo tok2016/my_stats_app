@@ -1,16 +1,18 @@
 'use client';
 
-import Link from 'next/link';
 import { Share, Wrench } from '@mynaui/icons-react';
+
+import Link from 'next/link';
 
 import { User } from '@ts/users/user';
 
-import Avatar from '@components/profile-layout/Avatar';
 import IconButton from '@components/IconButton';
+import Logo from '@components/Logo';
+import Avatar from '@components/profile-layout/Avatar';
+
+import CountryDataFetch from '../country/CountryDataFetch';
 import PublishButton from '../publish-controlls/PublishButton';
 import ProfileCreditsSkeleton from './ProfileCreditsSkeleton';
-import CountryDataFetch from '../country/CountryDataFetch';
-import Logo from '@components/Logo';
 
 type ProfileInfoProps = {
   user: User;
@@ -46,7 +48,11 @@ export default function ProfileInfo({
 
   return (
     <div className='profile-info'>
-      <Avatar avatarId={user.avatarUrl} loading={loading} />
+      <Avatar
+        username={user.username}
+        avatarId={user.avatarUrl}
+        loading={loading}
+      />
 
       {loading ? (
         <ProfileCreditsSkeleton />

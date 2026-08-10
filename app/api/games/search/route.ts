@@ -6,7 +6,7 @@ import Token from '@ts/users/token';
 import { getCredentialsById } from '@lib/auth';
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import { FULL_GAME_FIELDS } from '@lib/games/games-utils';
-import { igdbRequest } from '@lib/games/igdb';
+import { getImageUrl, igdbRequest } from '@lib/games/igdb';
 import { MILLISECONDS } from '@lib/utils';
 
 const SEARCHED_GAMES_LIMIT = 10;
@@ -51,7 +51,9 @@ export const searchForGames = async (token: Token, req: NextRequest) => {
     releasedAt: game.first_release_date
       ? new Date(game.first_release_date * MILLISECONDS)
       : undefined,
-    cover: game.cover?.url
+    cover: game.cover?.image_id
+      ? getImageUrl(game.cover.image_id, 'cover_big')
+      : undefined
   }));
 
   return NextResponse.json(games, {

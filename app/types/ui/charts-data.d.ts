@@ -1,10 +1,11 @@
-import { IgdbBasic } from '@ts/games/api-response';
+import { ExtractTypeFields } from '@ts/util-types';
 
 export type CustomChartType = 'doughnut' | 'periodBar' | 'bar' | 'line' | 'map';
 
-export type ChartData = IgdbBasic & {
+export type ChartData = {
+  id: number | string;
+  name: string;
   index: number;
-  value: number;
   percent?: number;
 };
 
@@ -14,12 +15,22 @@ export type TooltipData = ChartData
 export type TooltipProps = {
   showRank?: boolean;
   colored?: boolean;
+  enableTransition?: boolean;
 };
 
-export type ChartCoreProps<DataType extends ChartData> = {
-  data: DataType[];
-  valueField: keyof DataType;
+export type ChartValueField<DataType extends ChartData> = ExtractTypeFields<
+  DataType,
+  number
+>;
+
+export type ChartCoreProps<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+> = {
+  data: (DataType & Record<ValueKey, number>)[];
+  valueField: ValueKey;
   fieldsNames: FieldsInfo<DataType>;
+  tooltipProps?: TooltipProps;
 };
 
 export type ChartTypeProps = {
@@ -47,17 +58,30 @@ export type DisplayFields<DataType extends ChartData> = Exclude<
   'id' | 'name'
 >[];
 
-export type FieldData = {
+export type FieldData<Value extends object> = {
   name: string;
-  keyComponent?: React.ReactNode;
+  renderKey?: (key: keyof Value, value?: Value) => React.ReactNode;
+  renderValue?: (value?: Value) => React.ReactNode;
 };
 
 export type FieldsInfo<DataType extends ChartData> = Record<
   keyof DataType,
-  FieldData
+  FieldData<DataType>
 >;
 
-export type ChartContextProps = {
+export type ChartContextProps<DataType extends ChartData> = {
   tooltipRef: React.RefObject<HTMLDivElement | null>;
-  updateTooltip: (data: ChartData) => void;
+  tooltipProps: TooltipProps;
+  updateTooltip: (data: DataType) => void;
+};
+
+export type ChartValueField<DataType> = ExtractTypeFields<DataType, number>;
+
+export type PeriodBarChartMainProps<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+> = {
+  displayFields: DisplayFields<DataType>;
+  fieldsNames: FieldsInfo<DataType>;
+  valueField: ValueKey;
 };

@@ -26,30 +26,8 @@ const fieldsNames: FieldsInfo<GenreCount> = {
   name: { name: 'Name' },
   count: { name: 'Games Count' },
   percent: { name: 'Percent' },
-  seriesName: { name: 'Best series' },
-  value: { name: 'value' }
+  seriesName: { name: 'Best series' }
 };
-
-const rowContent = (data: GenreCount, i: number) => (
-  <>
-    <div>{i + 1}</div>
-    <div>
-      <Link href={`/games/genres/${data.id}`} className='bold colored'>
-        {data.name}
-      </Link>
-    </div>
-    <div>{data.count}</div>
-    <div>
-      {data.seriesName ? (
-        <Link href={`/games/series/${data.seriesName}`} className='underline'>
-          {data.seriesName}
-        </Link>
-      ) : (
-        '-'
-      )}
-    </div>
-  </>
-);
 
 export default function GenresCountChart({ data }: GenresCountChartProps) {
   return (
@@ -65,7 +43,8 @@ export default function GenresCountChart({ data }: GenresCountChartProps) {
               data={data}
               fieldsNames={fieldsNames}
               displayFields={['count', 'seriesName']}
-              valueFields={['value']}
+              valueFields={['count']}
+              defaultValueField='count'
               showLegend
             />
           ),
@@ -75,13 +54,45 @@ export default function GenresCountChart({ data }: GenresCountChartProps) {
           chart: (
             <Table
               key='genres-count-table'
-              data={data.filter((genre) => genre.id > 0)}
+              data={data.filter((genre) => !!genre.id)}
               headers={{
-                name: 'Genre',
-                count: 'Games',
-                seriesName: 'Biggest Series'
+                index: {
+                  title: '№',
+                  width: '1rem',
+                  renderRow: (value) => value.index + 1
+                },
+                name: {
+                  title: 'Genre',
+                  width: '5fr',
+                  renderRow: (value) => (
+                    <Link
+                      href={`/games/genres/${value.id}`}
+                      className='bold colored'
+                    >
+                      {value.name}
+                    </Link>
+                  )
+                },
+                count: {
+                  title: 'Games',
+                  width: '2fr'
+                },
+                seriesName: {
+                  title: 'Biggest Series',
+                  width: '5fr',
+                  renderRow: (value) =>
+                    value.seriesName ? (
+                      <Link
+                        href={`/games/series/${value.seriesName}`}
+                        className='underline'
+                      >
+                        {value.seriesName}
+                      </Link>
+                    ) : (
+                      <span>—</span>
+                    )
+                }
               }}
-              rowContent={rowContent}
             />
           ),
           icon: <TableSolid />

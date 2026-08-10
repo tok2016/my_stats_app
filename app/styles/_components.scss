@@ -1,6 +1,7 @@
 @use 'sass:map';
 @use 'utils';
 @use 'buttons';
+@use 'tables';
 
 $border-style: 2px solid;
 $border-radius: 6px;
@@ -43,12 +44,23 @@ $skeleton-icon-min-width: 2rem;
   }
 }
 
-@mixin divider($color) {
-  color: $color;
+@mixin divider($color, $highlight-color) {
+  .divider {
+    color: $color;
 
-  .left-hand,
-  .right-hand {
-    border-color: $color;
+    .left-hand,
+    .right-hand {
+      border-color: $color;
+    }
+  }
+
+  .divider.colored {
+    color: $highlight-color;
+
+    .left-hand,
+    .right-hand {
+      border-color: $highlight-color;
+    }
   }
 }
 
@@ -160,6 +172,7 @@ $skeleton-icon-min-width: 2rem;
   display: block;
   border-radius: utils.$small-radius;
   height: var(--font-size);
+  min-height: var(--font-size);
   margin: calc((var(--font-size) * var(--line-height) - var(--font-size)) / 2) 0;
 
   background-repeat: no-repeat;
@@ -234,11 +247,33 @@ $skeleton-icon-min-width: 2rem;
 .skeleton.image,
 .skeleton.graph {
   height: 100%;
+  min-height: unset;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: utils.$regular-radius;
   margin: 0;
+}
+
+.skeleton.tablet {
+  --font-size: calc(
+    #{utils.$regular-size} + #{tables.$table-row-padding-y} * 2
+  );
+  --line-height: #{utils.$tight-font};
+  margin-top: tables.$table-gap;
+
+  &:last-child {
+    margin-bottom: tables.$table-body-padding;
+  }
+}
+
+.skeleton.tablet.first-row {
+  margin-top: calc(tables.$table-gap + tables.$table-body-padding);
+}
+
+.skeleton.header {
+  --font-size: #{utils.$min-size};
+  --line-height: 2.23;
 }
 
 @keyframes gloss {
@@ -259,6 +294,7 @@ $skeleton-icon-min-width: 2rem;
 
 .fetch-image {
   position: relative;
+  overflow: hidden;
 
   .skeletons {
     position: absolute;
@@ -266,10 +302,11 @@ $skeleton-icon-min-width: 2rem;
     left: 0;
   }
 
-  img,
-  .skeletons {
+  > * {
     width: 100%;
     height: 100%;
+
+    border-radius: inherit;
   }
 }
 
@@ -467,5 +504,35 @@ form .drawer-submenu {
 @mixin spinner($color) {
   .spinner {
     border-color: $color;
+  }
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 2.75rem;
+  height: 2.75rem;
+
+  border-radius: utils.$max-radius;
+
+  .value {
+    @include utils.header(3);
+
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: utils.$max-radius;
+
+    text-align: center;
+    line-height: 2.25rem;
+  }
+}
+
+@mixin rating($bg-color) {
+  .rating {
+    .value {
+      background-color: $bg-color;
+    }
   }
 }

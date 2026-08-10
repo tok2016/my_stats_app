@@ -4,20 +4,22 @@ import { VectorMap } from '@south-paw/react-vector-maps';
 import countries from 'i18n-iso-countries';
 import { MouseEvent, useContext, useEffect, useMemo, useRef } from 'react';
 
-import { ChartCoreProps, ChartData } from '@ts/ui/charts-data';
+import { ChartCoreProps, ChartData, ChartValueField } from '@ts/ui/charts-data';
 
 import { ChartContext } from '@store/ChartProvider';
 
 import { hideTooltip, updateMapTooltipPos } from './ChartTooltip';
+import { ChartClasses } from './chart-styles';
 import WorldData from './world-low-res.json';
 
 const isHTMLElement = (value: unknown): value is HTMLElement =>
   (value as HTMLElement).style !== undefined;
 
-export default function MapChart<DataType extends ChartData>({
-  data
-}: ChartCoreProps<DataType>) {
-  const { updateTooltip, tooltipRef } = useContext(ChartContext);
+export default function MapChart<
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
+>({ data }: ChartCoreProps<DataType, ValueKey>) {
+  const { updateTooltip, tooltipRef, tooltipProps } = useContext(ChartContext);
 
   const countriesMap: Map<string, DataType> = useMemo(
     () =>
@@ -40,7 +42,8 @@ export default function MapChart<DataType extends ChartData>({
       updateTooltip,
       countriesMap,
       'center',
-      'center'
+      'center',
+      tooltipProps.enableTransition
     );
   };
 
@@ -63,8 +66,9 @@ export default function MapChart<DataType extends ChartData>({
   }, [mapRef, countriesMap]);
 
   return (
-    <div className='map' ref={mapRef}>
+    <div className={ChartClasses.map.core} ref={mapRef}>
       <VectorMap
+        className='map'
         {...WorldData}
         layerProps={{
           strokeWidth: 0.5,

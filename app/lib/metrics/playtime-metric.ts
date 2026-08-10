@@ -1,12 +1,73 @@
-import { GameCore } from '@ts/games/game';
+import { GameCore, GameShort } from '@ts/games/game';
 import { PlaytimeData } from '@ts/games/metric';
 
+import { gameCoreToShort } from '@lib/games/games-utils';
+
 import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
-import { MINUTES } from '../utils';
+import { MAX_ENTRIES_IN_CHART, getPercentThreshold } from '../utils';
+
+const getTopCountData = (
+  itemsCount: Map<number | string, PlaytimeData>
+): PlaytimeData[] => {
+  let sum = 0;
+  let max = 0;
+
+  const values = itemsCount
+    .values()
+    .toArray()
+    .sort((a, b) => b.hours - a.hours);
+
+  values.forEach((value) => {
+    sum += value.count;
+    max = value.count > max ? value.count : max;
+  });
+
+  const threshold = getPercentThreshold((max / sum) * 100, sum);
+  const countData: PlaytimeData[] = [];
+
+  for (let i = 0; i < MAX_ENTRIES_IN_CHART + 1; i++) {
+    const data = values[i];
+    if (!data) break;
+
+    const percent = (data.count / sum) * 100;
+
+    if (percent < threshold || i === MAX_ENTRIES_IN_CHART) {
+      let count = 0;
+      let hours = 0;
+      let topGame = values[i].topGame;
+
+      values.slice(i).forEach((value) => {
+        count += value.count;
+        hours += value.hours;
+        topGame = value.topGame.hours > topGame.hours ? value.topGame : topGame;
+      });
+
+      countData.push({
+        id: -1,
+        count,
+        hours,
+        percent: Math.round((count / sum) * 100),
+        topGame
+      });
+
+      break;
+    }
+
+    countData.push({
+      id: data.id,
+      count: data.count,
+      hours: data.hours,
+      percent: Math.round(percent),
+      topGame: data.topGame
+    });
+  }
+
+  return countData;
+};
 
 const setPlaytimeData = (
   item: number | string,
-  game: GameCore,
+  game: GameShort,
   map: Map<number | string, PlaytimeData>
 ) => {
   const currentItem = map.get(item);
@@ -14,9 +75,10 @@ const setPlaytimeData = (
 
   map.set(item, {
     id: Number(item) ?? 0,
-    hours: (currentItem?.hours ?? 0) + Math.round(game.minutes / MINUTES),
+    hours: (currentItem?.hours ?? 0) + game.hours,
     count: (currentItem?.count ?? 0) + 1,
-    topGame: game.minutes >= previosGame.minutes ? game : previosGame
+    percent: 0,
+    topGame: game.hours >= previosGame.hours ? game : previosGame
   });
 };
 
@@ -24,19 +86,15 @@ export const getPlaytimeMetric = (
   games: GameCore[],
   dataField: keyof GameCore
 ): PlaytimeData[] => {
-  const itemsMap = new Map<number, PlaytimeData>();
+  const itemsMap = new Map<number | string, PlaytimeData>();
   games.forEach((game) => {
     if (isNumberOrStringArray(game[dataField]))
-      game[dataField].forEach((item) => setPlaytimeData(item, game, itemsMap));
+      game[dataField].forEach((item) =>
+        setPlaytimeData(item, gameCoreToShort(game), itemsMap)
+      );
     else if (isNumberOrString(game[dataField]))
-      setPlaytimeData(game[dataField], game, itemsMap);
+      setPlaytimeData(game[dataField], gameCoreToShort(game), itemsMap);
   });
 
-  const playtimeMetric = itemsMap
-    .entries()
-    .map((entry) => entry[1])
-    .toArray()
-    .sort((a, b) => b.hours - a.hours);
-
-  return playtimeMetric;
+  return getTopCountData(itemsMap);
 };

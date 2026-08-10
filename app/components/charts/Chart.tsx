@@ -6,6 +6,7 @@ import {
   ChartData,
   ChartType,
   ChartTypeProps,
+  ChartValueField,
   DisplayFields,
   FieldsInfo,
   TooltipProps
@@ -25,14 +26,16 @@ import { ChartClasses } from './chart-styles';
 
 type ChartComponentProps<
   CurrentChartType extends ChartType,
-  DataType extends ChartData
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
 > = {
   type: CurrentChartType;
   chartId: string;
-  data: DataType[];
+  data: (DataType & Record<ValueKey, number>)[];
   displayFields: DisplayFields<DataType>;
   fieldsNames: FieldsInfo<DataType>;
-  valueFields?: (keyof DataType)[];
+  valueFields?: ValueKey[];
+  defaultValueField: ValueKey;
   className?: string;
   showLegend?: boolean;
   tooltipProps?: TooltipProps;
@@ -42,28 +45,33 @@ type ChartComponentProps<
 const TooltipPropsByType: Record<ChartType, TooltipProps> = {
   doughnut: {
     showRank: true,
-    colored: true
+    colored: true,
+    enableTransition: true
   },
   bar: {
     showRank: true,
-    colored: true
+    colored: true,
+    enableTransition: true
   },
   line: {
     showRank: false,
-    colored: false
+    colored: false,
+    enableTransition: true
   },
   map: {
     showRank: true,
-    colored: true
+    colored: true,
+    enableTransition: true
   }
 };
 
 const getChartCore = <
   CurrentChartType extends ChartType,
-  DataType extends ChartData
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
 >(
-  data: DataType[],
-  valueField: keyof DataType,
+  data: (DataType & Record<ValueKey, number>)[],
+  valueField: ValueKey,
   fieldsNames: FieldsInfo<DataType>,
   props?: ChartTypeProps[CurrentChartType]
 ): Record<ChartType, ReactNode> => ({
@@ -103,7 +111,8 @@ const getChartCore = <
 
 export default function Chart<
   CurrentChartType extends ChartType,
-  DataType extends ChartData
+  DataType extends ChartData,
+  ValueKey extends ChartValueField<DataType>
 >({
   type,
   chartId,
@@ -111,17 +120,18 @@ export default function Chart<
   displayFields,
   fieldsNames,
   valueFields,
+  defaultValueField,
   className = '',
   showLegend: showLabel,
   tooltipProps,
   props
-}: ChartComponentProps<CurrentChartType, DataType>) {
-  const [valueField, setValueField] = useState<keyof DataType>(
-    valueFields?.[0] ?? 'value'
+}: ChartComponentProps<CurrentChartType, DataType, ValueKey>) {
+  const [valueField, setValueField] = useState<ValueKey>(
+    valueFields?.[0] ?? defaultValueField
   );
 
   const onFieldSelect = (newValue: string) => {
-    const newKey = newValue as keyof DataType;
+    const newKey = newValue as ValueKey;
     setValueField((currValue) => (!fieldsNames[newKey] ? currValue : newKey));
   };
 

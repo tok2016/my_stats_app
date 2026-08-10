@@ -8,6 +8,7 @@ import { CredentialsInSchema } from '@ts/users/credentials';
 import Dashboard from '@ts/users/dashboard';
 import { NewPassword } from '@ts/users/password';
 import { BasicUser, User, UserInfoInSchema } from '@ts/users/user';
+import { ExtractTypeFields1 } from '@ts/util-types';
 
 import { isAxiosError, isErrorResponse } from './type-guards';
 
@@ -30,6 +31,9 @@ export const ITEMS_IN_RATING = 5;
 export const MAX_ENTRIES_IN_CHART = 10;
 export const MIN_PERCENT_FOR_CHART = 2;
 
+export const DEFAULT_PERIOD_BLOCK_WIDTH = 11;
+export const DEFAULT_PERIOD_BLOCKS_GAP = 1.5;
+
 const SUCCESS_CODE_START = 200;
 const SUCCESS_CODE_END = 300;
 
@@ -38,6 +42,10 @@ export const DashboardTypes = ['metric', 'media', 'text'] as const;
 export const ServiceNames = ['spotify', 'steam'] as const;
 
 export const ConfirmationActions = ['password', 'delete'] as const;
+
+export const PrecisePeriods = ['year', 'season', 'month'] as const;
+
+export const GreatPeriods = ['allTime', 'year'] as const;
 
 export const ServiceStatuses = [
   'authorized',
@@ -78,6 +86,8 @@ export const ChartColors = [
   '#1FBBA4',
   '#CDCDCD'
 ] as const;
+
+export const StudioTypes = ['developer', 'publisher'] as const;
 
 export const defaultFormState = <FormDataType>(): FormState<FormDataType> => ({
   error: false,
@@ -158,6 +168,12 @@ export const generateErrorResponse = (
   issues: ValidationIssue[] = []
 ): ErrorResponse => ({ status, message, issues });
 
+export const getSingularOrPlural = (
+  number: number,
+  singular: string,
+  plural: string
+) => (number <= 1 ? singular : plural);
+
 export const clamp = (value: number, min: number, max: number) => {
   if (value < min) {
     return min;
@@ -225,9 +241,9 @@ export const getPeriodDate: Record<PrecisePeriod, (date: Date) => string> = {
     const seasonNumber = Math.floor(
       ((date.getMonth() % MONTHS_SHIFT) + 1) / MONTHS_IN_QUARTER
     );
-    return `${date.getFullYear()}-${seasonNumber}`;
+    return `${date.getFullYear()}-${seasonNumber + 1}`;
   },
-  month: (date) => `${date.getFullYear()}-${date.getMonth()}`
+  month: (date) => `${date.getFullYear()}-${date.getMonth() + 1}`
 };
 
 export const mean = (values: number[]) =>
@@ -277,3 +293,47 @@ export const ModulesPaths: Record<string, PathInfo> = {
     label: 'Library'
   }
 };
+
+const getYearString = (period: string, short: boolean) => {
+  const year = period.split('-')[0] ?? '';
+  const startIndex = short && year.length > 2 ? year.length - 2 : 0;
+  return year.substring(startIndex, year.length);
+};
+
+const getSeasonString = (period: string, short: boolean) => {
+  const parts = period.split('-');
+  if (!parts[1]) return getYearString(parts[0], short);
+
+  const seasonNumber = (parseInt(parts[1]) - 1) % Seasons.length;
+  const endIndex = short ? 3 : Seasons[seasonNumber].length;
+  return Seasons[seasonNumber].substring(0, endIndex);
+};
+
+const getMonthString = (period: string, short: boolean) => {
+  const parts = period.split('-');
+  if (!parts[1]) return getYearString(parts[0], short);
+
+  return new Date(period).toLocaleDateString('en-US', {
+    month: short ? 'short' : 'long'
+  });
+};
+
+export const getPeriodString: Record<
+  PrecisePeriod,
+  (period: string, short: boolean) => string
+> = {
+  year: getYearString,
+  season: getSeasonString,
+  month: getMonthString
+};
+
+export const getPercentThreshold = (maxPercentInData: number, sum: number) =>
+  (maxPercentInData / (sum * MAX_ENTRIES_IN_CHART)) * 100;
+
+export const getNumericValue = <
+  T,
+  K extends keyof ExtractTypeFields1<T, number>
+>(
+  obj: T & Record<K, number>,
+  key: K
+): number => obj[key];

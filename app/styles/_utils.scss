@@ -84,6 +84,14 @@ $diagram-colors: (
   10: #cdcdcd
 );
 
+$rating-classes: 'high', 'medium', 'low';
+
+$rating-colors: (
+  high: #1fbba4,
+  medium: #d5c534,
+  low: #c33333
+);
+
 $white: #ffffff;
 $black: #000000;
 $black-alpha: #0000004d;

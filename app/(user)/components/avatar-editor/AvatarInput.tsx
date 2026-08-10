@@ -1,5 +1,6 @@
 'use client';
 
+import { Refresh, Trash } from '@mynaui/icons-react';
 import {
   type ChangeEvent,
   useEffect,
@@ -7,21 +8,23 @@ import {
   useRef,
   useState
 } from 'react';
-import { Refresh, Trash } from '@mynaui/icons-react';
 
 import { AvatarState } from '@ts/users/avatar';
 
-import Avatar from '@components/profile-layout/Avatar';
-import AvatarEditor from './AvatarEditor';
 import IconButton from '@components/IconButton';
+import Avatar from '@components/profile-layout/Avatar';
+
+import AvatarEditor from './AvatarEditor';
 
 type AvatarInputProps = {
+  username: string;
   avatarId?: string | null;
   defaultFile?: Blob;
 };
 
 //Check rerender of this component before memoizing it
 export default function AvatarInputRaw({
+  username,
   avatarId = '',
   defaultFile
 }: AvatarInputProps) {
@@ -87,7 +90,7 @@ export default function AvatarInputRaw({
 
   return (
     <div className='avatar-field'>
-      <Avatar avatarId={avatar} />
+      <Avatar username={username} avatarId={avatar} />
 
       <label htmlFor='avatar' className='avatar-label'>
         <Refresh />

@@ -6,8 +6,9 @@
 @use 'number-inputs';
 @use 'components';
 @use 'sidebar';
-@use 'metrics';
+@use 'charts';
 @use 'tables';
+@use 'metrics';
 
 $bg-1-color-length: 28%;
 $modules: 'user', 'music', 'games';
@@ -166,7 +167,10 @@ $modules: 'user', 'music', 'games';
       map.get(utils.$text-colors, $module)
     );
 
-    @include components.divider(map.get(utils.$text-colors, $module));
+    @include components.divider(
+      map.get(utils.$text-colors, $module),
+      map.get(utils.$highlight-colors, $module)
+    );
 
     @include components.skeleton(
       utils.$skeleton-color,
@@ -179,6 +183,8 @@ $modules: 'user', 'music', 'games';
 
     @include components.spinner(map.get(utils.$text-colors, $module));
 
+    @include components.rating(map.get(utils.$bg-1-colors, $module));
+
     @include sidebar.sidebar(
       map.get(utils.$bg-1-colors, $module),
       map.get(utils.$bg-2-colors, $module),
@@ -187,7 +193,7 @@ $modules: 'user', 'music', 'games';
       map.get(utils.$active-colors, $module)
     );
 
-    @include metrics.chart(
+    @include charts.chart(
       map.get(utils.$bg-1-colors, $module),
       map.get(utils.$text-colors, $module)
     );
@@ -199,6 +205,19 @@ $modules: 'user', 'music', 'games';
       map.get(utils.$text-colors, $module),
       utils.$text-darker,
       utils.$white
+    );
+
+    @include metrics.data-block(
+      map.get(utils.$bg-1-colors, $module),
+      map.get(utils.$bg-2-colors, $module),
+      map.get(utils.$hover-colors, $module),
+      map.get(utils.$active-colors, $module),
+      map.get(utils.$text-colors, $module)
+    );
+
+    @include metrics.empty-cover(
+      utils.$skeleton-color,
+      utils.$skeleton-light-color
     );
 
     .light {
@@ -305,7 +324,10 @@ $modules: 'user', 'music', 'games';
         map.get(utils.$bg-2-colors, $module)
       );
 
-      @include components.divider(map.get(utils.$bg-2-colors, $module));
+      @include components.divider(
+        map.get(utils.$bg-2-colors, $module),
+        map.get(utils.$active-colors, $module)
+      );
 
       @include components.skeleton(
         utils.$skeleton-light-color,
@@ -314,7 +336,7 @@ $modules: 'user', 'music', 'games';
 
       @include components.spinner(map.get(utils.$bg-2-colors, $module));
 
-      @include metrics.chart(
+      @include charts.chart(
         map.get(utils.$text-colors, $module),
         map.get(utils.$bg-2-colors, $module)
       );
@@ -326,6 +348,19 @@ $modules: 'user', 'music', 'games';
         map.get(utils.$bg-2-colors, $module),
         map.get(utils.$hover-colors, $module),
         map.get(utils.$active-colors, $module)
+      );
+
+      @include metrics.data-block(
+        map.get(utils.$text-colors, $module),
+        map.get(utils.$highlight-colors, $module),
+        map.get(utils.$active-colors, $module),
+        map.get(utils.$hover-colors, $module),
+        map.get(utils.$text-colors, $module)
+      );
+
+      @include metrics.empty-cover(
+        utils.$skeleton-light-color,
+        utils.$skeleton-color
       );
     }
   }

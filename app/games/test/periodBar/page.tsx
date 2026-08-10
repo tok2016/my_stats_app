@@ -1,11 +1,13 @@
-import { PrecisePeriod } from '@ts/games/metric';
-import { ChartData, FieldsInfo, PeriodChartData } from '@ts/ui/charts-data';
+import { PeriodTop, PrecisePeriod } from '@ts/games/metric';
+import { ChartData, FieldsInfo } from '@ts/ui/charts-data';
 
-import PeriodBarChart from '@components/charts/PeriodBarChart';
+import PeriodBarChart from '@components/data-blocks/PeriodBarChart';
 
 import testData from '../../../../mock data/period-test-data.json';
 
-const DisplayPeriodFields: FieldsInfo<ChartData> = {
+type TestPeriodData = ChartData & { value: number };
+
+const DisplayPeriodFields: FieldsInfo<TestPeriodData> = {
   id: { name: 'ID' },
   name: { name: 'Name' },
   value: { name: 'Value' },
@@ -14,9 +16,9 @@ const DisplayPeriodFields: FieldsInfo<ChartData> = {
 };
 
 export default async function Page() {
-  const data: PeriodChartData<ChartData>[] = testData.tops.map((top) => ({
+  const data: PeriodTop<TestPeriodData>[] = testData.tops.map((top) => ({
     period: top.period,
-    data: top.top.map((item, i) => ({
+    top: top.top.map((item, i) => ({
       id: Number(item) ?? 0,
       index: i,
       name: item,
@@ -28,9 +30,11 @@ export default async function Page() {
     <>
       <h1>Period bar</h1>
       <PeriodBarChart
+        year='2025'
         data={data}
         periodType={testData.periodType as PrecisePeriod}
         displayFields={['value']}
+        valueField='value'
         fieldsNames={DisplayPeriodFields}
         chartId='genres-periods-bar'
       />

@@ -1,10 +1,5 @@
 import { GameCore } from '@ts/games/game';
-import {
-  MetricMap,
-  PeriodTops,
-  PeriodTopsMetric,
-  PrecisePeriod
-} from '@ts/games/metric';
+import { MetricMap, PeriodPlaytimeTops, PrecisePeriod } from '@ts/games/metric';
 
 import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
 import { MINUTES, getPeriodDate } from '../utils';
@@ -29,7 +24,7 @@ export const getPeriodMetric = (
   periodType: PrecisePeriod,
   dataField: keyof GameCore,
   maxTopEntries: number
-): PeriodTopsMetric<string> => {
+): PeriodPlaytimeTops => {
   const periodLists = new Map<string, MetricMap<number>>();
 
   games.forEach((game) => {
@@ -49,10 +44,16 @@ export const getPeriodMetric = (
     .map(([period, list]) => {
       const top = Object.entries(list)
         .sort((a, b) => b[1] - a[1])
-        .map((entry) => entry[0])
+        .map((entry) => ({
+          id:
+            typeof games[0][dataField] === 'string'
+              ? entry[0]
+              : Number(entry[0]),
+          hours: entry[1]
+        }))
         .slice(0, maxTopEntries);
 
-      const periodTop: PeriodTops<string> = { period, top };
+      const periodTop: PeriodPlaytimeTops['tops'][number] = { period, top };
       return periodTop;
     })
     .toArray()

@@ -2,16 +2,19 @@ import { GameCore, GameShort } from '@ts/games/game';
 import { RatingData } from '@ts/games/metric';
 import { RequiredFields } from '@ts/util-types';
 
+import { gameCoreToShort } from '@lib/games/games-utils';
+
 import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
 import { GAMES_IN_METRIC } from '../utils';
 import { mean } from '../utils';
 
 const setRatingData = (
   item: number | string,
-  game: GameCore,
+  game: GameShort,
   map: Map<number | string, RatingData>
 ) => {
   const currentItemRating = map.get(item);
+
   if (!currentItemRating)
     map.set(item, {
       id: Number(item) ?? 0,
@@ -30,9 +33,11 @@ export const getRatingMetric = (
 
   games.forEach((game) => {
     if (isNumberOrStringArray(game[dataField]))
-      game[dataField].forEach((item) => setRatingData(item, game, itemsMap));
+      game[dataField].forEach((item) =>
+        setRatingData(item, gameCoreToShort(game), itemsMap)
+      );
     else if (isNumberOrString(game[dataField]))
-      setRatingData(game[dataField], game, itemsMap);
+      setRatingData(game[dataField], gameCoreToShort(game), itemsMap);
   });
 
   const ratingDataMetric = itemsMap
