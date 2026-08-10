@@ -10,6 +10,7 @@ import GamesPlaytimeTable from '../charts/GamesPlaytimeTable';
 import GamePropBlock from '../components/GamePropBlock';
 import { GameStudiosLinks } from '../components/GameStudiosLinks';
 import { GamesPlaytimeTableData } from '../types';
+import { SPECIAL_GAMES_COUNT } from '../utils';
 
 type GamesPlaytimeProps = {
   gamesMap: Map<string, Game>;
@@ -18,8 +19,6 @@ type GamesPlaytimeProps = {
 type TopGameBlockProps = {
   game: GamesPlaytimeTableData;
 };
-
-const SPECIAL_GAMES_COUNT = 3;
 
 function TopGameBlock({ game }: TopGameBlockProps) {
   return (

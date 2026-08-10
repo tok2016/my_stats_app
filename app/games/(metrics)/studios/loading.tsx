@@ -1,4 +1,4 @@
-import MapSkeleton from '@components/charts/MapSkeleton';
+import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import Metric from '@components/data-blocks/Metric';
 import PeriodTopsSkeletons from '@components/data-blocks/PeriodTopsSkeletons';
 
@@ -30,7 +30,7 @@ export default function GameStudiosLoading() {
         id='developers-countries'
         title='Your favorite developers around the world'
       >
-        <MapSkeleton />
+        <ChartSkeleton type='map' />
       </Metric>
     </>
   );

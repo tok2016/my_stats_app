@@ -35,6 +35,11 @@ export default function GamesCountriesChart({
       displayFields={['topGames']}
       valueFields={['count']}
       defaultValueField='count'
+      tooltipProps={{
+        showRank: true,
+        colored: true,
+        enableTransition: false
+      }}
       fieldsNames={{
         id: { name: 'ID' },
         index: { name: '№' },

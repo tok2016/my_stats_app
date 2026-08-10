@@ -19,7 +19,7 @@ export default function LineChart<
     data.map((value) => [value.id, value])
   );
 
-  const { updateTooltip, tooltipRef } = useChart();
+  const { updateTooltip, tooltipRef, tooltipProps } = useChart();
 
   const values = data.map((d) => (!d[valueField] ? null : d[valueField]));
 
@@ -57,7 +57,14 @@ export default function LineChart<
           legend: {
             display: false
           },
-          tooltip: getTooltip(tooltipRef, updateTooltip, dataMap, 'end', 'end')
+          tooltip: getTooltip(
+            tooltipRef,
+            updateTooltip,
+            dataMap,
+            'end',
+            'end',
+            tooltipProps.enableTransition
+          )
         }
       }}
       data={{

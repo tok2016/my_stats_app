@@ -2,6 +2,7 @@ import Game from '@ts/games/game';
 
 import { getMetricData } from '@lib/server-actions';
 
+import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameCollage from '@components/data-blocks/GameCollage';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
@@ -58,6 +59,10 @@ export default async function HighestRatedGames({
     '/api/games/titles/rating',
     []
   );
+
+  if (!gamesIds.length)
+    return <EmptyMetric message={`You haven't rated any game yet`} />;
+
   const topGames = gamesIds
     .map((id) => gamesMap.get(id))
     .filter((game) => !!game);

@@ -36,13 +36,21 @@ export default async function GamesGenresPage() {
     <>
       <div className='double-doughnut'>
         <Metric id='biggest-genres' title='Your biggest genres'>
-          <Suspense fallback={<ChartSkeleton type='doughnut' />}>
+          <Suspense
+            fallback={
+              <ChartSkeleton type='doughnut' className='switchable-chart' />
+            }
+          >
             <GenresCount genresMap={genresMap} seriesMap={seriesMap} />
           </Suspense>
         </Metric>
 
         <Metric id='longest-genres' title='Your longest played genres'>
-          <Suspense fallback={<ChartSkeleton type='doughnut' />}>
+          <Suspense
+            fallback={
+              <ChartSkeleton type='doughnut' className='switchable-chart' />
+            }
+          >
             <GenresPlaytime genresMap={genresMap} />
           </Suspense>
         </Metric>

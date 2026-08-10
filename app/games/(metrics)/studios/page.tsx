@@ -4,7 +4,7 @@ import Game from '@ts/games/game';
 
 import { getGamesMap } from '@lib/server-actions';
 
-import MapSkeleton from '@components/charts/MapSkeleton';
+import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import Metric from '@components/data-blocks/Metric';
 
 import { getItemsMap } from '@app/games/lib/actions';
@@ -71,7 +71,7 @@ export default async function GamesStudiosPage() {
         id='developers-countries'
         title='Your favorite developers around the world'
       >
-        <Suspense fallback={<MapSkeleton />}>
+        <Suspense fallback={<ChartSkeleton type='map' />}>
           <StudiosCountries developersMap={developersMap} />
         </Suspense>
       </Metric>

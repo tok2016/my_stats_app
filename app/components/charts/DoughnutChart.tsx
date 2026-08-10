@@ -18,7 +18,7 @@ export default function DoughnutChart<
 >({ data, valueField }: ChartCoreProps<DataType, ValueKey>) {
   const dataMap = new Map(data.map((d) => [d.id, d]));
 
-  const { updateTooltip, tooltipRef } = useContext(ChartContext);
+  const { updateTooltip, tooltipRef, tooltipProps } = useContext(ChartContext);
 
   return (
     <Doughnut
@@ -41,7 +41,8 @@ export default function DoughnutChart<
             updateTooltip,
             dataMap,
             'start',
-            'start'
+            'start',
+            tooltipProps.enableTransition
           ),
           legend: {
             display: false

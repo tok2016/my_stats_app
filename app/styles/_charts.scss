@@ -123,13 +123,16 @@ $default-color: map.get(utils.$active-colors, 'games');
 
 .adjacent-chart {
   width: 100%;
-  height: 23rem;
 
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+
+  > * {
+    height: 23rem;
+  }
 
   .chart,
   .skeletons:has(> .graph) {
@@ -145,12 +148,15 @@ $default-color: map.get(utils.$active-colors, 'games');
     flex: 3;
     min-width: 29rem;
   }
+
+  .skeletons:has(> .tablet) {
+    overflow: auto;
+  }
 }
 
 .tooltip-container {
   position: absolute;
   pointer-events: none;
-  transition: all 100ms ease;
   z-index: 10;
 }
 

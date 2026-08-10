@@ -19,7 +19,7 @@ export default function MapChart<
   DataType extends ChartData,
   ValueKey extends ChartValueField<DataType>
 >({ data }: ChartCoreProps<DataType, ValueKey>) {
-  const { updateTooltip, tooltipRef } = useContext(ChartContext);
+  const { updateTooltip, tooltipRef, tooltipProps } = useContext(ChartContext);
 
   const countriesMap: Map<string, DataType> = useMemo(
     () =>
@@ -42,7 +42,8 @@ export default function MapChart<
       updateTooltip,
       countriesMap,
       'center',
-      'center'
+      'center',
+      tooltipProps.enableTransition
     );
   };
 

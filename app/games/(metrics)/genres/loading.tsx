@@ -11,11 +11,11 @@ export default function GenresLoading() {
     <>
       <div className='double-doughnut'>
         <Metric id='biggest-genres' title='Your biggest genres'>
-          <ChartSkeleton type='doughnut' />
+          <ChartSkeleton type='doughnut' className='switchable-chart' />
         </Metric>
 
         <Metric id='longest-genres' title='Your longest played genres'>
-          <ChartSkeleton type='doughnut' />
+          <ChartSkeleton type='doughnut' className='switchable-chart' />
         </Metric>
       </div>
 

@@ -32,7 +32,7 @@ export default function BarChart<
     data.map((d) => [d.id, d])
   );
 
-  const { updateTooltip, tooltipRef } = useChart();
+  const { updateTooltip, tooltipRef, tooltipProps } = useChart();
 
   const xAxis: ChartScaleType = {
     type: 'category',
@@ -81,7 +81,14 @@ export default function BarChart<
           legend: {
             display: false
           },
-          tooltip: getTooltip(tooltipRef, updateTooltip, dataMap)
+          tooltip: getTooltip(
+            tooltipRef,
+            updateTooltip,
+            dataMap,
+            'start',
+            'start',
+            tooltipProps.enableTransition
+          )
         }
       }}
       data={{

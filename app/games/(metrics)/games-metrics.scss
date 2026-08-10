@@ -162,6 +162,7 @@ $series-collage-areas: (
 .double-doughnut {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 
   .switchable-chart {
     width: 100%;
@@ -242,6 +243,10 @@ $series-collage-areas: (
   grid-template-columns: 90fr 43fr 43fr;
   grid-template-rows: 1fr 1fr;
   gap: 0.625rem;
+
+  align-items: stretch;
+
+  aspect-ratio: 152 / 101;
 
   .game-cover {
     aspect-ratio: unset;

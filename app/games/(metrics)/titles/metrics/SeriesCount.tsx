@@ -11,6 +11,7 @@ import MultipleRating from '@components/data-blocks/MultipleRatings';
 
 import GamePropBlock from '../components/GamePropBlock';
 import { GameStudiosLinks } from '../components/GameStudiosLinks';
+import { MAX_GAMES_IN_SERIES } from '../utils';
 
 type SeriesCountProps = {
   gamesMap: Map<string, Game>;
@@ -20,8 +21,6 @@ type TopSeriesProps = {
   series: SeriesCollapsed;
   gamesMap: Map<string, Game>;
 };
-
-const MAX_GAMES_IN_SERIES = 5;
 
 function TopSeries({ series, gamesMap }: TopSeriesProps) {
   const games = series.games
@@ -54,7 +53,7 @@ function TopSeries({ series, gamesMap }: TopSeriesProps) {
         {games[0] ? (
           <Link
             href={`/games/titles/${games[0].id}`}
-            className='underline bold'
+            className='underline wide'
           >
             {games[0].name}
           </Link>
