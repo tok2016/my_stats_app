@@ -1,4 +1,4 @@
-import Game from './game';
+import { GameTableData } from './game';
 
 export type SortDirection = 'desc' | 'asc';
 
@@ -15,12 +15,16 @@ export interface GamesFilter {
   playDateTo?: string;
   ratingFrom?: string;
   ratingTo?: string;
+  showRating?: string;
   criticsRatingFrom?: string;
   criticsRatingTo?: string;
+  showCriticsRating?: string;
   usersRatingFrom?: string;
   usersRatingTo?: string;
+  showUsersRating?: string;
   hoursFrom?: string;
   hoursTo?: string;
-  sort?: keyof Game;
+  sort?: keyof GameTableData;
   direction?: SortDirection;
+  page?: string;
 }

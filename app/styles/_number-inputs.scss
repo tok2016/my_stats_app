@@ -7,6 +7,7 @@ $inner-circle-diameter: 5.5rem;
 .double-slider {
   position: relative;
   min-width: 12.5rem;
+  height: $slider-height;
 }
 
 input[type='range'] {

@@ -59,10 +59,16 @@ export default function Table<DataType extends ChartData>({
               >
                 <ChevronUpDown className={!!sortDirection ? 'hidden' : ''} />
                 <ChevronUp
-                  className={sortDirection !== 'asc' ? 'hidden' : ''}
+                  className={
+                    sortDirection === 'asc' && key === sortField ? '' : 'hidden'
+                  }
                 />
                 <ChevronDown
-                  className={sortDirection !== 'desc' ? 'hidden' : ''}
+                  className={
+                    sortDirection !== 'desc' && key === sortField
+                      ? 'hidden'
+                      : ''
+                  }
                 />
               </div>
             )}
@@ -81,7 +87,7 @@ export default function Table<DataType extends ChartData>({
             }}
           >
             {Object.entries(headers).map(([key, header]) => (
-              <div key={`${value.id}-${key}`}>
+              <div key={`${value.id}-${key}`} className='table-cell'>
                 {header.renderRow
                   ? header.renderRow(value, i, key)
                   : value[key as keyof DataType]}

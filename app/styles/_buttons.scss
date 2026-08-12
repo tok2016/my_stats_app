@@ -3,6 +3,7 @@
 
 $button-icon-size: 1.25rem;
 $icon-button-width: 2rem;
+$button-padding: 0.75rem;
 
 button {
   @include utils.font(utils.$large-size, utils.$bold-font, utils.$tight-font);
@@ -12,8 +13,8 @@ button {
   flex-direction: row;
   gap: 1rem;
 
-  padding: 0.75rem;
-  min-height: $button-icon-size;
+  padding: $button-padding;
+  min-height: $button-icon-size + $button-padding * 2;
   min-width: 6.25rem;
 
   border-radius: utils.$regular-radius;

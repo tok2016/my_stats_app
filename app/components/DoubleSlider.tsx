@@ -4,11 +4,15 @@ import { ChangeEvent, useRef, useState } from 'react';
 
 import { SliderProps } from '@ts/ui/components-props';
 
-import Hint from './Hint';
-
 import '@styles/_number-inputs.scss';
 
-type DoubleSliderProps = SliderProps & {
+import Hint from './Hint';
+
+type DoubleSliderProps = Omit<SliderProps, 'name' | 'id'> & {
+  leftId: string;
+  rightId: string;
+  leftName: string;
+  rightName: string;
   defaultValues?: [number, number];
   valueUnit?: string;
   onChange?: (left: number, right: number) => void;
@@ -19,8 +23,10 @@ const normalize = (value: number, min: number, max: number): number =>
 
 export default function DoubleSlider({
   label,
-  id,
-  name,
+  leftId,
+  rightId,
+  leftName,
+  rightName,
   min,
   max,
   valueUnit,
@@ -61,7 +67,7 @@ export default function DoubleSlider({
 
   return (
     <div className={`input-select-group ${className}`}>
-      <label htmlFor={id} className='slider-label'>
+      <label htmlFor={leftId} className='slider-label'>
         <span>{label}</span>
         <span>
           {valueUnit}
@@ -73,8 +79,8 @@ export default function DoubleSlider({
         <div className='slider-background' ref={trackRef}></div>
         <input
           type='range'
-          id={id}
-          name={name}
+          id={leftId}
+          name={leftName}
           className='left'
           value={left}
           min={min}
@@ -83,8 +89,8 @@ export default function DoubleSlider({
         />
         <input
           type='range'
-          id={`${id}-right`}
-          name={`${name}-right`}
+          id={rightId}
+          name={rightName}
           className='right'
           value={right}
           min={min}

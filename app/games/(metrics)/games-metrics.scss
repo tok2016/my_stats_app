@@ -258,3 +258,16 @@ $series-collage-areas: (
     }
   }
 }
+
+.games-library-wrapper {
+  overflow: auto;
+}
+
+#games-library {
+  width: 100%;
+  min-width: 60rem;
+
+  .table-cell:has(> .table-rating) {
+    align-items: center;
+  }
+}

@@ -209,7 +209,8 @@ select {
   justify-content: space-between;
 }
 
-.input-select-group {
+.input-select-group,
+.hidden-input {
   display: flex;
   flex-direction: column;
   gap: utils.$input-label-gap;

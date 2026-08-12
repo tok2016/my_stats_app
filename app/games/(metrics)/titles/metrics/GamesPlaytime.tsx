@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import Game from '@ts/games/game';
+import Game, { GameTableData } from '@ts/games/game';
 
 import { getMetricData } from '@lib/server-actions';
 
@@ -9,7 +9,6 @@ import GameCollage from '@components/data-blocks/GameCollage';
 import GamesPlaytimeTable from '../charts/GamesPlaytimeTable';
 import GamePropBlock from '../components/GamePropBlock';
 import { GameStudiosLinks } from '../components/GameStudiosLinks';
-import { GamesPlaytimeTableData } from '../types';
 import { SPECIAL_GAMES_COUNT } from '../utils';
 
 type GamesPlaytimeProps = {
@@ -17,7 +16,7 @@ type GamesPlaytimeProps = {
 };
 
 type TopGameBlockProps = {
-  game: GamesPlaytimeTableData;
+  game: GameTableData;
 };
 
 function TopGameBlock({ game }: TopGameBlockProps) {
@@ -74,7 +73,7 @@ export default async function GamesPlaytime({ gamesMap }: GamesPlaytimeProps) {
       const game = gamesMap.get(id);
       if (!game) return;
 
-      const data: GamesPlaytimeTableData = {
+      const data: GameTableData = {
         ...game,
         index: i
       };

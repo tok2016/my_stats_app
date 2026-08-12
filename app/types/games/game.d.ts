@@ -1,3 +1,5 @@
+import { ChartData } from '@ts/ui/charts-data';
+
 import { IgdbBasic } from './api-response';
 import { IgdbGenre } from './genre';
 import { IgdbImage } from './image';
@@ -178,4 +180,14 @@ export type IgdbGameRatings = Pick<
 
 export type IgdbGameRatingsStudios = IgdbGameRatings & {
   involved_companies?: IgdbInvolvedStuioExtended[];
+};
+
+export type GameTableData = ChartData & Game;
+
+export type GamesTablePage = {
+  games: Game[];
+  startIndex: number;
+  currentPage: number;
+  pagesCount: number;
+  maxHours: number;
 };

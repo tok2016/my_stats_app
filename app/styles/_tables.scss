@@ -39,7 +39,7 @@ $table-row-padding-x: 0.375rem;
 .table-row {
   display: grid;
   grid-template-columns: 1fr 5fr 2fr 5fr;
-  align-items: center;
+  align-items: stretch;
 
   > * {
     padding: 0 0.625rem;
@@ -64,6 +64,12 @@ $table-row-padding-x: 0.375rem;
   flex-direction: row;
   align-items: center;
   gap: 2px;
+}
+
+.table-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .sort-header {

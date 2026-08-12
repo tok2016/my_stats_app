@@ -230,6 +230,16 @@ export const getFormDataValue = (
   formData?: FormData
 ): string | undefined => formData?.get(name)?.toString() ?? undefined;
 
+export const getNumberFormDataValue = (
+  name: string,
+  formData?: FormData
+): number | undefined => {
+  const formValue = formData?.get(name)?.toString();
+  if (!formValue) return undefined;
+  const parsed = parseInt(formValue);
+  return Number.isNaN(parsed) ? undefined : parsed;
+};
+
 export const parseBooleanString = (value: string) => {
   const lowercase = value.toLowerCase();
   return !!value && lowercase !== 'false' && lowercase !== 'off';

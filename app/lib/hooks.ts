@@ -22,13 +22,30 @@ export const useURLSearchParams = () => {
     push(`${pathname}?${params.toString()}`);
   };
 
+  const updateParams = (
+    updatedParams: Record<string, string>,
+    deletedParams?: string[]
+  ) => {
+    const newParams = new URLSearchParams(searchParams);
+
+    Object.entries(updatedParams).forEach((param) => {
+      newParams.set(param[0], param[1]);
+    });
+
+    deletedParams?.forEach((param) => {
+      newParams.delete(param);
+    });
+
+    push(`${pathname}?${newParams.toString()}`);
+  };
+
   const deleteParam = (param: string) => {
     const params = new URLSearchParams(searchParams);
     params.delete(param);
     push(`${pathname}?${params.toString()}`);
   };
 
-  return { getParam, setParam, deleteParam } as const;
+  return { getParam, setParam, updateParams, deleteParam } as const;
 };
 
 export const useAction = <DataType, ParameterType = undefined>(
