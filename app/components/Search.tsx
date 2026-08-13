@@ -57,7 +57,7 @@ export default function Search<T>({
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (query) search(query);
+      search(query);
     }, SEARCH_COOLDOWN);
 
     return () => clearTimeout(timer);

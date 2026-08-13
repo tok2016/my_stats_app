@@ -16,6 +16,7 @@ import AdvanceSearch from './AdvanceSearch';
 type GamesFilterMenuProps = {
   maxHours: number;
   filters: GamesFilter;
+  disabled?: boolean;
 };
 
 const ADVANCE_SEARCH_POPUP = 'advance-search-menu';
@@ -31,7 +32,8 @@ const removeNonFormFields = (filters: GamesFilter): GamesFilterFormData => {
 
 export default function GamesFilterMenu({
   maxHours,
-  filters
+  filters,
+  disabled = false
 }: GamesFilterMenuProps) {
   const { setParam, deleteParam } = useURLSearchParams();
   const { togglePopup } = usePopupState();
@@ -53,10 +55,12 @@ export default function GamesFilterMenu({
           action={onGameSearch}
           onSearchSubmit={onGameSearch}
           placeholder='Search games'
+          disabled={disabled}
         />
 
         <Button
           variant='outlined'
+          disabled={disabled}
           onClick={() => togglePopup(ADVANCE_SEARCH_POPUP)}
         >
           Advance search

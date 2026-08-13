@@ -263,11 +263,11 @@ $series-collage-areas: (
   overflow: auto;
 }
 
-#games-library {
+.games-library {
   width: 100%;
   min-width: 60rem;
 
-  .table-cell:has(> .table-rating) {
+  .table-cell-rating {
     align-items: center;
   }
 }

@@ -35,6 +35,7 @@ export default function GamesTable({
     <div className='games-library-wrapper'>
       <Table
         id='games-library'
+        className='games-library'
         data={games}
         sortField={sortField}
         sortDirection={sortDirection}
@@ -48,11 +49,15 @@ export default function GamesTable({
           name: {
             title: 'Game',
             width: '3fr',
+            minWidth: '13rem',
+            sort: true,
             renderRow: (value) => <GameTableTitle game={value} />
           },
           developers: {
             title: 'Developers',
             width: '2fr',
+            minWidth: '8.5rem',
+            sort: true,
             renderRow: (value) => (
               <LinksString
                 items={value.developers}
@@ -64,6 +69,8 @@ export default function GamesTable({
           platform: {
             title: 'Platform',
             width: '2fr',
+            minWidth: '8.5rem',
+            sort: true,
             renderRow: (value) =>
               value.platform ? (
                 <a
@@ -79,6 +86,8 @@ export default function GamesTable({
           genres: {
             title: 'Genres',
             width: '2fr',
+            minWidth: '8.5rem',
+            sort: true,
             renderRow: (value) => (
               <LinksString
                 items={value.genres}
@@ -90,6 +99,7 @@ export default function GamesTable({
           releasedAt: {
             title: 'Released date',
             width: '6rem',
+            sort: true,
             renderRow: (value) =>
               value.releasedAt ? (
                 new Date(value.releasedAt).toLocaleDateString('en-US', {
@@ -103,28 +113,29 @@ export default function GamesTable({
           },
           hours: {
             title: 'Hours',
-            width: '4rem'
+            width: '4rem',
+            sort: true
           },
           rating: {
             title: 'Your rating',
             width: '4.5rem',
-            renderRow: (value) => (
-              <Rating value={value.rating} className='table-rating' />
-            )
+            sort: true,
+            bodyCellClassName: 'table-cell-rating',
+            renderRow: (value) => <Rating value={value.rating} />
           },
           criticsRating: {
             title: 'Critics rating',
             width: '4.5rem',
-            renderRow: (value) => (
-              <Rating value={value.criticsRating} className='table-rating' />
-            )
+            sort: true,
+            bodyCellClassName: 'table-cell-rating',
+            renderRow: (value) => <Rating value={value.criticsRating} />
           },
           usersRating: {
             title: 'Users rating',
             width: '4.5rem',
-            renderRow: (value) => (
-              <Rating value={value.usersRating} className='table-rating' />
-            )
+            sort: true,
+            bodyCellClassName: 'table-cell-rating',
+            renderRow: (value) => <Rating value={value.usersRating} />
           }
         }}
       />

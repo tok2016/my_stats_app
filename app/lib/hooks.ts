@@ -1,4 +1,12 @@
-import { useActionState, useCallback, useContext, useState } from 'react';
+import {
+  useActionState,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
@@ -56,11 +64,12 @@ export const useAction = <DataType, ParameterType = undefined>(
   const { refresh } = useRouter();
   const [data, setData] = useState<DataType>(initialData);
   const [isPending, setPending] = useState<boolean>(false);
+  const actionRef = useRef(action);
 
   const startAction = useCallback(
     async (newData?: ParameterType) => {
       setPending(true);
-      const data = await action(newData);
+      const data = await actionRef.current(newData);
 
       setData(data);
       setPending(false);
@@ -69,10 +78,18 @@ export const useAction = <DataType, ParameterType = undefined>(
         refresh();
       }
     },
-    [action, refresh, refreshPath]
+    [actionRef, refresh, refreshPath]
   );
 
-  return [data, startAction, isPending, setData] as const;
+  useEffect(() => {
+    actionRef.current = action;
+  }, [action]);
+
+  const tools = useMemo(
+    () => [data, startAction, isPending, setData] as const,
+    [data, startAction, isPending]
+  );
+  return tools;
 };
 
 export const useConfirm = () => useContext(ConfirmationContext);

@@ -8,7 +8,11 @@ import { ChartData } from '@ts/ui/charts-data';
 type TableHeader<DataType extends ChartData> = {
   title: string;
   renderRow?: (value: DataType, i: number, header: string) => React.ReactNode;
+  minWidth?: string;
   width?: string;
+  sort?: boolean;
+  headerCellClassName?: string;
+  bodyCellClassName?: string;
 };
 
 type TableProps<DataType extends ChartData> = {
@@ -34,7 +38,10 @@ export default function Table<DataType extends ChartData>({
   onSort
 }: TableProps<DataType>) {
   const columnsWidths = Object.values(headers)
-    .map((header) => header.width ?? '1fr')
+    .map((header) => {
+      const width = header.width ?? '1fr';
+      return header.minWidth ? `minmax(${header.minWidth}, ${width})` : width;
+    })
     .join(' ');
 
   return (
@@ -49,11 +56,11 @@ export default function Table<DataType extends ChartData>({
         {Object.entries(headers).map(([key, header]) => (
           <div
             key={key}
-            className={`header-cell ${onSort ? 'sort-header' : ''}`}
+            className={`header-cell ${onSort && header.sort ? 'sort-header' : ''} ${header.headerCellClassName ?? ''}`}
             onClick={() => onSort?.(key as keyof DataType)}
           >
             {header.title}
-            {!onSort || (
+            {onSort && header.sort && (
               <div
                 className={`sort-button ${sortField === key ? 'colored' : ''}`}
               >
@@ -87,7 +94,10 @@ export default function Table<DataType extends ChartData>({
             }}
           >
             {Object.entries(headers).map(([key, header]) => (
-              <div key={`${value.id}-${key}`} className='table-cell'>
+              <div
+                key={`${value.id}-${key}`}
+                className={`table-cell ${header.bodyCellClassName ?? ''}`}
+              >
                 {header.renderRow
                   ? header.renderRow(value, i, key)
                   : value[key as keyof DataType]}
