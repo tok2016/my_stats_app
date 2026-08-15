@@ -1,21 +1,12 @@
 'use client';
 
-import { EyeSlash, Eye } from '@mynaui/icons-react';
-import {
-  type ChangeEvent,
-  type HTMLInputTypeAttribute,
-  type Ref,
-  useReducer
-} from 'react';
+import { Eye, EyeSlash } from '@mynaui/icons-react';
+import { type ChangeEvent, type Ref, useReducer } from 'react';
 
 import { TextInputProps } from '@ts/ui/components-props';
+import { InputType } from '@ts/ui/components-variants';
 
 import Hint from './Hint';
-
-type InputType = Extract<
-  HTMLInputTypeAttribute,
-  'text' | 'password' | 'date' | 'email'
->;
 
 type InputProps = TextInputProps & {
   ref?: Ref<HTMLInputElement>;

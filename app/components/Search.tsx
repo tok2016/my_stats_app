@@ -1,17 +1,18 @@
 'use client';
 
+import { Search as SearchIcon } from '@mynaui/icons-react';
 import {
   type ChangeEvent,
   type KeyboardEvent,
   useEffect,
   useState
 } from 'react';
-import { Search as SearchIcon } from '@mynaui/icons-react';
 
 import { SearchBaseProps } from '@ts/ui/components-props';
 
-import Picker from './Picker';
 import { useAction } from '@lib/hooks';
+
+import Picker from './Picker';
 import Spinner from './Spinner';
 
 const SEARCH_COOLDOWN = 1000;
@@ -19,7 +20,7 @@ const SEARCH_COOLDOWN = 1000;
 type SearchProps<T> = SearchBaseProps & {
   defaultQuery?: string;
   renderOption?: (option: T) => React.ReactNode;
-  action: (query?: string) => Promise<(T & { key: string })[]>;
+  action: (query?: string) => Promise<(T & { key: string })[] | undefined>;
   onOptionSelect?: (option: T) => void;
   onSearchSubmit: (query: string) => void;
 };
@@ -56,7 +57,7 @@ export default function Search<T>({
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (query) search(query);
+      search(query);
     }, SEARCH_COOLDOWN);
 
     return () => clearTimeout(timer);
@@ -84,7 +85,7 @@ export default function Search<T>({
         )}
       </div>
 
-      {!renderOption || (
+      {renderOption && options && (
         <Picker
           focusId={id}
           inputId={id}

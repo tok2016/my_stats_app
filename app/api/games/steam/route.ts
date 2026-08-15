@@ -40,7 +40,6 @@ const uniteSteamAndIgdb = (
     name: igdbGame.name,
     platformId: PC_ID,
     genresIds: igdbGame.genres,
-    themesId: igdbGame.themes,
     developersIds:
       igdbGame.involved_companies
         ?.filter((company) => company.developer)

@@ -14,7 +14,7 @@ export default function GamesMetricLayout({
     <>
       <div className='games-page-name'>
         <PageName />
-        <Link href='/add-game'>
+        <Link href='/games/add-game'>
           <Button variant='secondary' beforeIcon={<Plus />}>
             Add Game
           </Button>

@@ -34,6 +34,8 @@ export const MIN_PERCENT_FOR_CHART = 2;
 export const DEFAULT_PERIOD_BLOCK_WIDTH = 11;
 export const DEFAULT_PERIOD_BLOCKS_GAP = 1.5;
 
+export const MAX_RATING = 100;
+
 const SUCCESS_CODE_START = 200;
 const SUCCESS_CODE_END = 300;
 
@@ -229,6 +231,16 @@ export const getFormDataValue = (
   name: string,
   formData?: FormData
 ): string | undefined => formData?.get(name)?.toString() ?? undefined;
+
+export const getNumberFormDataValue = (
+  name: string,
+  formData?: FormData
+): number | undefined => {
+  const formValue = formData?.get(name)?.toString();
+  if (!formValue) return undefined;
+  const parsed = parseInt(formValue);
+  return Number.isNaN(parsed) ? undefined : parsed;
+};
 
 export const parseBooleanString = (value: string) => {
   const lowercase = value.toLowerCase();

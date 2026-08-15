@@ -5,6 +5,7 @@ import { MouseEvent, useRef, useState } from 'react';
 import { SliderProps } from '@ts/ui/components-props';
 
 import Hint from './Hint';
+import NumberInput from './NumberInput';
 
 const MAX_ANGLE = 360;
 const STRAIGHT_ANGLE = 180;
@@ -12,7 +13,7 @@ const TURN_ANGLE = 450;
 
 type CircleSliderProps = SliderProps & {
   defaultValue?: number;
-  onChange?: (value: number) => void;
+  onChange?: (value?: number) => void;
 };
 
 export default function CircleSlider({
@@ -32,20 +33,28 @@ export default function CircleSlider({
   const sliderRef = useRef<HTMLDivElement>(null);
   const isMouseDown = useRef<boolean>(false);
 
+  const onNumberChange = (value?: number) => {
+    if (sliderRef.current) {
+      const sliderValue = value ?? 0;
+      const angle = Math.round((sliderValue * MAX_ANGLE) / max);
+      sliderRef.current.style.setProperty('--angle', `${angle}deg`);
+      setValue(value ?? min);
+      onChange?.(value);
+    }
+  };
+
   const onMouseDown = () => {
     isMouseDown.current = true;
   };
 
   const onMouseMove = (evt: MouseEvent<HTMLDivElement>) => {
     if (sliderRef.current && isMouseDown.current) {
+      const { left, top } = sliderRef.current.getBoundingClientRect();
+
       const closeCathetus =
-        evt.pageX
-        - sliderRef.current.offsetLeft
-        - sliderRef.current.offsetWidth / 2;
+        evt.pageX - left - window.scrollX - sliderRef.current.offsetWidth / 2;
       const farCathetus =
-        evt.pageY
-        - sliderRef.current.offsetTop
-        - sliderRef.current.offsetHeight / 2;
+        evt.pageY - top - window.scrollY - sliderRef.current.offsetHeight / 2;
 
       const angle =
         Math.round(
@@ -85,8 +94,17 @@ export default function CircleSlider({
           onChange={() => {}}
         />
 
-        <span className='value'>{value}</span>
+        <span className='value'>{value ?? 'NR'}</span>
       </div>
+
+      <NumberInput
+        id={`${id}-number`}
+        name={name}
+        value={value}
+        onChange={onNumberChange}
+        min={min}
+        max={max}
+      />
 
       <Hint variant='error'>{errorHint}</Hint>
       <Hint>{hint}</Hint>

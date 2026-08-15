@@ -1,3 +1,5 @@
+import { ChartData } from '@ts/ui/charts-data';
+
 import { IgdbBasic } from './api-response';
 import { IgdbGenre } from './genre';
 import { IgdbImage } from './image';
@@ -87,7 +89,6 @@ export interface NewGame extends GameUpdate {
   name: string;
   platformId: number;
   genresIds: number[];
-  themesId: number[];
   developersIds: number[];
   publishersIds: number[];
   seriesId?: number;
@@ -130,6 +131,13 @@ export interface SearchGame {
   releasedAt?: Date;
   cover?: string;
   series?: IgdbSeries;
+}
+
+export interface SearchGamesResults {
+  games: SearchGame[];
+  page: number;
+  query: string;
+  isEnd: boolean;
 }
 
 export default interface Game extends ExternalRatings {
@@ -178,4 +186,14 @@ export type IgdbGameRatings = Pick<
 
 export type IgdbGameRatingsStudios = IgdbGameRatings & {
   involved_companies?: IgdbInvolvedStuioExtended[];
+};
+
+export type GameTableData = ChartData & Game;
+
+export type GamesTablePage = {
+  games: Game[];
+  startIndex: number;
+  currentPage: number;
+  pagesCount: number;
+  maxHours: number;
 };

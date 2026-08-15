@@ -1,4 +1,12 @@
-import { useActionState, useCallback, useContext, useState } from 'react';
+import {
+  useActionState,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
@@ -16,10 +24,29 @@ export const useURLSearchParams = () => {
 
   const getParam = (param: string) => searchParams.get(param);
 
+  const getParams = () => searchParams;
+
   const setParam = (param: string, value: string) => {
     const params = new URLSearchParams(searchParams);
     params.set(param, value);
     push(`${pathname}?${params.toString()}`);
+  };
+
+  const updateParams = (
+    updatedParams: Record<string, string>,
+    deletedParams?: string[]
+  ) => {
+    const newParams = new URLSearchParams(searchParams);
+
+    Object.entries(updatedParams).forEach((param) => {
+      newParams.set(param[0], param[1]);
+    });
+
+    deletedParams?.forEach((param) => {
+      newParams.delete(param);
+    });
+
+    push(`${pathname}?${newParams.toString()}`);
   };
 
   const deleteParam = (param: string) => {
@@ -28,7 +55,7 @@ export const useURLSearchParams = () => {
     push(`${pathname}?${params.toString()}`);
   };
 
-  return { getParam, setParam, deleteParam } as const;
+  return { getParam, getParams, setParam, updateParams, deleteParam } as const;
 };
 
 export const useAction = <DataType, ParameterType = undefined>(
@@ -39,11 +66,12 @@ export const useAction = <DataType, ParameterType = undefined>(
   const { refresh } = useRouter();
   const [data, setData] = useState<DataType>(initialData);
   const [isPending, setPending] = useState<boolean>(false);
+  const actionRef = useRef(action);
 
   const startAction = useCallback(
     async (newData?: ParameterType) => {
       setPending(true);
-      const data = await action(newData);
+      const data = await actionRef.current(newData);
 
       setData(data);
       setPending(false);
@@ -52,10 +80,18 @@ export const useAction = <DataType, ParameterType = undefined>(
         refresh();
       }
     },
-    [action, refresh, refreshPath]
+    [actionRef, refresh, refreshPath]
   );
 
-  return [data, startAction, isPending, setData] as const;
+  useEffect(() => {
+    actionRef.current = action;
+  }, [action]);
+
+  const tools = useMemo(
+    () => [data, startAction, isPending, setData] as const,
+    [data, startAction, isPending]
+  );
+  return tools;
 };
 
 export const useConfirm = () => useContext(ConfirmationContext);

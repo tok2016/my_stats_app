@@ -100,9 +100,9 @@ export const uniteGameCoreAndIgdb = (
     ? Math.round(igdbGame.aggregated_rating)
     : undefined,
   usersRating: igdbGame.rating ? Math.round(igdbGame.rating) : undefined,
-  releasedAt: gameCore.releasedAt,
+  releasedAt: gameCore.releasedAt ? new Date(gameCore.releasedAt) : undefined,
   hours: Math.round(gameCore.minutes / MINUTES),
-  playDate: gameCore.playDate,
+  playDate: gameCore.playDate ? new Date(gameCore.playDate) : undefined,
   developers:
     igdbGame.involved_companies
       ?.filter((studio) => studio.developer)
@@ -166,7 +166,6 @@ const fieldToEndpoint: Record<ItemsFields, string> = {
   publishersIds: '/companies',
   platformId: '/platforms',
   genresIds: '/genres',
-  themesId: '/themes',
   playDate: '/games',
   minutes: '/games',
   releasedAt: '/release_dates',

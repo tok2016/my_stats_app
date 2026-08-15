@@ -2,14 +2,15 @@
 
 import Link from 'next/link';
 
+import { GameTableData } from '@ts/games/game';
+
 import Table from '@components/charts/Table';
 import GameTableTitle from '@components/data-blocks/GameTitle';
 
 import { GameStudiosLinks } from '../components/GameStudiosLinks';
-import { GamesPlaytimeTableData } from '../types';
 
 type GamesPlaytimeTableProps = {
-  data: GamesPlaytimeTableData[];
+  data: GameTableData[];
 };
 
 export default function GamesPlaytimeTable({ data }: GamesPlaytimeTableProps) {

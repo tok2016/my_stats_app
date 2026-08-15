@@ -142,7 +142,6 @@ export const GamesSchema = new Schema<GameInSchema>({
     required: true
   },
   genresIds: Array<number>,
-  themesId: Array<number>,
   developersIds: Array<number>,
   publishersIds: Array<number>,
   releasedAt: Date,

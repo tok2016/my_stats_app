@@ -6,7 +6,7 @@ $input-min-width: 12.5rem;
 $option-padding-x: 0.5rem;
 $option-padding-y: 0.25rem;
 $input-min-height: 2.5rem;
-$input-text-types: 'search', 'text', 'date', 'password', 'email';
+$input-text-types: 'search', 'text', 'date', 'password', 'email', 'number';
 $code-input-padding-x: 0.75rem;
 
 @mixin input-select() {
@@ -209,7 +209,8 @@ select {
   justify-content: space-between;
 }
 
-.input-select-group {
+.input-select-group,
+.hidden-input {
   display: flex;
   flex-direction: column;
   gap: utils.$input-label-gap;
@@ -421,6 +422,42 @@ select {
       &:focus-visible {
         background-color: $option-hover-color;
       }
+    }
+  }
+}
+
+.number-input {
+  .input-wrapper {
+    min-width: 8rem;
+    input[type='number'] {
+      min-width: 6rem;
+
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button {
+        appearance: none;
+        -webkit-appearance: none;
+      }
+    }
+  }
+
+  .increment-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .input-icon {
+    font-size: 1.5rem;
+    position: absolute;
+    top: ($input-min-height - 1.5rem) * 0.5;
+    right: $input-padding-x;
+
+    width: 1rem;
+    height: 1.5rem;
+
+    * {
+      stroke-width: 4px;
     }
   }
 }

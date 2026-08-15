@@ -131,10 +131,6 @@ export const NewGameValidator: z.ZodType<NewGame> = z
       .array(z.number().nonnegative().nonoptional())
       .optional()
       .default([]),
-    themesId: z
-      .array(z.number().nonnegative().nonoptional())
-      .optional()
-      .default([]),
     minutes: z.number().nonnegative().optional().default(0),
     rating: z.number().nonnegative().optional(),
     releasedAt: z.string().optional(),
