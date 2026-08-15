@@ -34,6 +34,8 @@ export const MIN_PERCENT_FOR_CHART = 2;
 export const DEFAULT_PERIOD_BLOCK_WIDTH = 11;
 export const DEFAULT_PERIOD_BLOCKS_GAP = 1.5;
 
+export const MAX_RATING = 100;
+
 const SUCCESS_CODE_START = 200;
 const SUCCESS_CODE_END = 300;
 

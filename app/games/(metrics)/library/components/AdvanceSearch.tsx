@@ -4,6 +4,7 @@ import FormState, { FormAction } from '@ts/ui/form-state';
 
 import { useRedirectActionForm, useURLSearchParams } from '@lib/hooks';
 import {
+  MAX_RATING,
   getFormDataValue,
   getNumberFormDataValue,
   parseBooleanString
@@ -20,7 +21,6 @@ import Popup from '@components/Popup';
 import { GamesFilterFormData } from '../types';
 
 const PLAYDATE_DIFF = 5;
-const MAX_RATING = 100;
 
 type AdvanceSearchProps = {
   maxHours: number;

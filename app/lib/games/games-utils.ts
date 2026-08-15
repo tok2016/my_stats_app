@@ -166,7 +166,6 @@ const fieldToEndpoint: Record<ItemsFields, string> = {
   publishersIds: '/companies',
   platformId: '/platforms',
   genresIds: '/genres',
-  themesId: '/themes',
   playDate: '/games',
   minutes: '/games',
   releasedAt: '/release_dates',

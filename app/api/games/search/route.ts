@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { IgdbGameFull, SearchGame } from '@ts/games/game';
+import { IgdbGameFull, SearchGame, SearchGamesResults } from '@ts/games/game';
 import Token from '@ts/users/token';
 
 import { getCredentialsById } from '@lib/auth';
@@ -13,34 +13,51 @@ const SEARCHED_GAMES_LIMIT = 10;
 
 export const searchForGames = async (token: Token, req: NextRequest) => {
   const query = req.nextUrl.searchParams.get('query');
-  const page = req.nextUrl.searchParams.get('page') ?? '1';
-  if (!query)
-    return NextResponse.json([], {
+  const parsedPage = parseInt(req.nextUrl.searchParams.get('page') ?? '1');
+  const page = Number.isNaN(parsedPage) ? 1 : parsedPage;
+
+  if (!query) {
+    const searchResults: SearchGamesResults = {
+      games: [],
+      page,
+      query: '',
+      isEnd: true
+    };
+
+    return NextResponse.json(searchResults, {
       status: 200,
       statusText: 'No games were found'
     });
+  }
 
   await getCredentialsById(token.id);
 
   const searchedGames = await igdbRequest<IgdbGameFull>('/games', {
     fields: FULL_GAME_FIELDS,
-    where: 'game_type.type = "Main Game"',
     search: `"${query.toLowerCase().trim()}"`,
     limit: SEARCHED_GAMES_LIMIT,
-    offset: (Number(page) - 1) * SEARCHED_GAMES_LIMIT
+    offset: (page - 1) * SEARCHED_GAMES_LIMIT
   });
 
-  if (!searchedGames)
-    return NextResponse.json([], {
+  if (!searchedGames) {
+    const searchResults: SearchGamesResults = {
+      games: [],
+      page,
+      query,
+      isEnd: true
+    };
+
+    return NextResponse.json(searchResults, {
       status: 200,
       statusText: 'No games were found'
     });
+  }
 
   const games: SearchGame[] = searchedGames.map((game) => ({
     apiId: game.id,
     name: game.name,
     platforms: game.platforms,
-    genres: game.genres,
+    genres: game.genres ?? [],
     developers:
       game.involved_companies?.filter((company) => company.developer) ?? [],
     publishers:
@@ -56,7 +73,14 @@ export const searchForGames = async (token: Token, req: NextRequest) => {
       : undefined
   }));
 
-  return NextResponse.json(games, {
+  const searchResults: SearchGamesResults = {
+    games,
+    page,
+    isEnd: games.length < SEARCHED_GAMES_LIMIT,
+    query
+  };
+
+  return NextResponse.json(searchResults, {
     status: 200,
     statusText: `Games with the name "${query}" were found`
   });

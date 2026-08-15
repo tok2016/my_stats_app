@@ -24,6 +24,8 @@ export const useURLSearchParams = () => {
 
   const getParam = (param: string) => searchParams.get(param);
 
+  const getParams = () => searchParams;
+
   const setParam = (param: string, value: string) => {
     const params = new URLSearchParams(searchParams);
     params.set(param, value);
@@ -53,7 +55,7 @@ export const useURLSearchParams = () => {
     push(`${pathname}?${params.toString()}`);
   };
 
-  return { getParam, setParam, updateParams, deleteParam } as const;
+  return { getParam, getParams, setParam, updateParams, deleteParam } as const;
 };
 
 export const useAction = <DataType, ParameterType = undefined>(

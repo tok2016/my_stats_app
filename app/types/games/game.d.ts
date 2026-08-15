@@ -89,7 +89,6 @@ export interface NewGame extends GameUpdate {
   name: string;
   platformId: number;
   genresIds: number[];
-  themesId: number[];
   developersIds: number[];
   publishersIds: number[];
   seriesId?: number;
@@ -132,6 +131,13 @@ export interface SearchGame {
   releasedAt?: Date;
   cover?: string;
   series?: IgdbSeries;
+}
+
+export interface SearchGamesResults {
+  games: SearchGame[];
+  page: number;
+  query: string;
+  isEnd: boolean;
 }
 
 export default interface Game extends ExternalRatings {

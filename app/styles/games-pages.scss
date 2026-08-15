@@ -1,4 +1,5 @@
 @use 'utils';
+@use 'sass:map';
 
 .games-page-name {
   width: 100%;
@@ -9,23 +10,17 @@
   margin-bottom: 2rem;
 }
 
-.game-table-title {
-  display: flex;
-  flex-direction: row;
+.game-table-title,
+.browsed-game {
+  display: grid;
+  grid-template-columns: 1.95rem 1fr;
   align-items: center;
   gap: 0.5rem;
+}
 
-  height: 2.75rem;
-
-  .game-cover {
-    height: 100%;
-  }
-
+.game-table-title {
   .game-table-name {
     flex-grow: 1;
-    max-height: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 }
 
@@ -79,4 +74,61 @@
   .screenshot-2 {
     grid-area: c;
   }
+}
+
+.search-game-form {
+  min-height: 25rem;
+  height: 85vh;
+}
+
+.browsed-game {
+  border-radius: utils.$small-radius;
+  background-color: map.get(utils.$bg-1-colors, 'games');
+  padding: 0.25rem;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      background-color: map.get(utils.$hover-colors, 'games');
+      transition: background-color utils.$hover-time;
+    }
+
+    &:active {
+      background-color: map.get(utils.$active-colors, 'games');
+      transition: background-color utils.$active-time;
+    }
+  }
+
+  .browsed-game-data {
+    .browsed-game-name {
+      margin-bottom: 0.25rem;
+    }
+  }
+}
+
+.browsed-games {
+  overflow: auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.25rem;
+
+  padding: 0.25rem;
+  border-radius: utils.$regular-radius;
+  background-color: map.get(utils.$bg-2-colors, 'games');
+}
+
+#game-rating-form {
+  overflow: auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 1rem;
+
+  padding: 0.25rem;
 }
