@@ -3,9 +3,12 @@ import Game, {
   GameCore,
   GameInSchema,
   GameShort,
-  IgdbGameFull
+  IgdbGameFull,
+  IgdbRecommendedGame,
+  RecommendedGame
 } from '@ts/games/game';
 import { IgdbGenre } from '@ts/games/genre';
+import { IgdbImageSize } from '@ts/games/image';
 import { ItemCompareData } from '@ts/games/metric';
 import { PlatformShort } from '@ts/games/platform';
 import { IgdbSeriesExpanded } from '@ts/games/series';
@@ -21,6 +24,14 @@ import { getImageUrl, igdbRequest } from './igdb';
 type ItemsFields = keyof Omit<GameInSchema, 'userId' | 'storeId'>;
 
 const MAX_SCREENSHOTS = 3;
+
+const AllowedSources: Record<number, string> = {
+  1: 'steam',
+  5: 'gog',
+  11: 'microsoft',
+  13: 'apple',
+  15: 'android'
+};
 
 export const FULL_GAME_FIELDS: Required<IgdbQuery<IgdbGameFull>>['fields'] = [
   'name',
@@ -90,7 +101,9 @@ const igdbPlatfromToPlatformShort = (
 
 export const uniteGameCoreAndIgdb = (
   gameCore: GameCore,
-  igdbGame: IgdbGameFull
+  igdbGame: IgdbGameFull,
+  screenshotSize: IgdbImageSize = 'screenshot_med',
+  screenshotsCount: number = MAX_SCREENSHOTS
 ): Game => ({
   id: gameCore.id,
   name: gameCore.name,
@@ -124,18 +137,54 @@ export const uniteGameCoreAndIgdb = (
     ? getImageUrl(igdbGame.cover.image_id, 'cover_big')
     : undefined,
   screenshots: igdbGame.screenshots
-    ?.slice(0, MAX_SCREENSHOTS)
-    .map((screenshot) => getImageUrl(screenshot.image_id, 'screenshot_med'))
+    ?.slice(0, screenshotsCount)
+    .map((screenshot) => getImageUrl(screenshot.image_id, screenshotSize))
 });
 
 export const gameCoreToShort = (game: GameCore): GameShort => ({
   id: game.id,
   apiId: game.apiId,
   name: game.name,
-  hours: Math.round(game.minutes / MINUTES),
+  hours: Math.round(game.hours / MINUTES),
   rating: game.rating,
   cover: game.cover ? getImageUrl(game.cover, 'cover_big') : undefined
 });
+
+export const formRecommendedGame = (
+  igdbGame: IgdbRecommendedGame
+): RecommendedGame => {
+  const sources: Record<number, boolean> = {};
+
+  return {
+    id: igdbGame.id,
+    name: igdbGame.name,
+    rating: igdbGame.rating,
+    cover: igdbGame.cover
+      ? getImageUrl(igdbGame.cover.image_id, 'cover_big')
+      : undefined,
+    genres: igdbGame.genres,
+    screenshots: igdbGame.screenshots
+      ?.slice(0, MAX_SCREENSHOTS)
+      .map((screenshot) => getImageUrl(screenshot.image_id, 'screenshot_med')),
+    external: igdbGame.external_games
+      .filter((external) => {
+        if (!sources[external.external_game_source.id]) {
+          sources[external.external_game_source.id] = true;
+          return !!AllowedSources[external.external_game_source.id];
+        }
+
+        return false;
+      })
+      .map((external) => ({
+        id: external.id,
+        url: external.url,
+        source: {
+          id: external.external_game_source.id,
+          name: external.external_game_source.name
+        }
+      }))
+  };
+};
 
 export const getFullGames = async (
   gamesMap: Map<number, GameCore>

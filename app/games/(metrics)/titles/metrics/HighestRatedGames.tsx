@@ -6,7 +6,7 @@ import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameCollage from '@components/data-blocks/GameCollage';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
-import GamePropBlock from '../components/GamePropBlock';
+import PropBlock from '../../../../components/data-blocks/PropBlock';
 import { GameStudiosLinks } from '../components/GameStudiosLinks';
 
 type HighestRatedGamesProps = {
@@ -25,19 +25,19 @@ function TopGame({ game, index }: TopGameProps) {
       <GameCollage game={game} />
 
       <div className='data-block-grid min'>
-        <GamePropBlock title='Developer'>
+        <PropBlock title='Developer'>
           <GameStudiosLinks
             studios={game.developers}
             groupKey={`rated-game-developer-${game.id}`}
           />
-        </GamePropBlock>
+        </PropBlock>
 
-        <GamePropBlock title='Publisher'>
+        <PropBlock title='Publisher'>
           <GameStudiosLinks
             studios={game.publishers}
             groupKey={`rated-game-publisher-${game.id}`}
           />
-        </GamePropBlock>
+        </PropBlock>
       </div>
 
       <MultipleRating

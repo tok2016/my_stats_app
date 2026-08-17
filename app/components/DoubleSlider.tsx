@@ -1,10 +1,8 @@
 'use client';
 
-import { ChangeEvent, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { SliderProps } from '@ts/ui/components-props';
-
-import '@styles/_number-inputs.scss';
 
 import Hint from './Hint';
 
@@ -52,18 +50,20 @@ export default function DoubleSlider({
       const leftValue = isLeft ? value : left;
       const rightValue = isLeft ? right : value;
 
-      if (trackRef.current) {
-        const normalLeft = normalize(leftValue, min, max);
-        const normalRight = normalize(rightValue, min, max);
-
-        trackRef.current.style.left = `${normalRight > normalLeft ? normalLeft : normalRight}%`;
-        trackRef.current.style.width = `${Math.abs(normalRight - normalLeft)}%`;
-      }
-
       setLeft(leftValue);
       setRight(rightValue);
       onChange?.(leftValue, rightValue);
     };
+
+  useEffect(() => {
+    if (trackRef.current) {
+      const normalLeft = normalize(left, min, max);
+      const normalRight = normalize(right, min, max);
+
+      trackRef.current.style.left = `${normalRight > normalLeft ? normalLeft : normalRight}%`;
+      trackRef.current.style.width = `${Math.abs(normalRight - normalLeft)}%`;
+    }
+  }, [left, right, min, max]);
 
   return (
     <div className={`input-select-group ${className}`}>

@@ -1,7 +1,7 @@
 import Skeleton from '@components/Skeleton';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
-import GamePropBlock from '../components/GamePropBlock';
+import PropBlock from '../../../../components/data-blocks/PropBlock';
 import { MAX_GAMES_IN_SERIES } from '../utils';
 
 type TopSeriesSkeletonProps = {
@@ -25,26 +25,26 @@ function TopSeriesSkeleton({ parentKey }: TopSeriesSkeletonProps) {
         ))}
       </div>
 
-      <GamePropBlock title='Best game'>
+      <PropBlock title='Best game'>
         <Skeleton fontSize='min' lineHeight='wide' />
-      </GamePropBlock>
+      </PropBlock>
 
       <div className='data-block-grid'>
-        <GamePropBlock title='Developers'>
+        <PropBlock title='Developers'>
           <Skeleton fontSize='min' lineHeight='wide' rows={2} />
-        </GamePropBlock>
+        </PropBlock>
 
-        <GamePropBlock title='Publishers'>
+        <PropBlock title='Publishers'>
           <Skeleton fontSize='min' lineHeight='wide' rows={2} />
-        </GamePropBlock>
+        </PropBlock>
 
-        <GamePropBlock title='Games'>
+        <PropBlock title='Games'>
           <Skeleton fontSize='min' />
-        </GamePropBlock>
+        </PropBlock>
 
-        <GamePropBlock title='Playtime'>
+        <PropBlock title='Playtime'>
           <Skeleton fontSize='min' />
-        </GamePropBlock>
+        </PropBlock>
       </div>
 
       <MultipleRating />

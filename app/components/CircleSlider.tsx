@@ -1,6 +1,6 @@
 'use client';
 
-import { MouseEvent, useRef, useState } from 'react';
+import { MouseEvent, useEffect, useRef, useState } from 'react';
 
 import { SliderProps } from '@ts/ui/components-props';
 
@@ -35,9 +35,6 @@ export default function CircleSlider({
 
   const onNumberChange = (value?: number) => {
     if (sliderRef.current) {
-      const sliderValue = value ?? 0;
-      const angle = Math.round((sliderValue * MAX_ANGLE) / max);
-      sliderRef.current.style.setProperty('--angle', `${angle}deg`);
       setValue(value ?? min);
       onChange?.(value);
     }
@@ -61,7 +58,6 @@ export default function CircleSlider({
           (Math.atan2(farCathetus, closeCathetus) * STRAIGHT_ANGLE) / Math.PI
             + TURN_ANGLE
         ) % MAX_ANGLE;
-      sliderRef.current.style.setProperty('--angle', `${angle}deg`);
 
       const newValue = Math.round((max * angle) / MAX_ANGLE);
       setValue(newValue);
@@ -72,6 +68,13 @@ export default function CircleSlider({
   const onMouseRelease = () => {
     isMouseDown.current = false;
   };
+
+  useEffect(() => {
+    if (sliderRef.current) {
+      const angle = Math.round((value * MAX_ANGLE) / max);
+      sliderRef.current.style.setProperty('--angle', `${angle}deg`);
+    }
+  }, [value, max]);
 
   return (
     <div className={`circle-slider-group ${className}`}>

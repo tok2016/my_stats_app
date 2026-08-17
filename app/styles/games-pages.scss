@@ -1,6 +1,9 @@
 @use 'utils';
 @use 'sass:map';
 
+$rating-block-rating-size: 9rem;
+$rating-block-rating-border: $rating-block-rating-size - 1.5rem;
+
 .games-page-name {
   width: 100%;
   display: flex;
@@ -76,7 +79,8 @@
   }
 }
 
-.search-game-form {
+.search-game-form,
+#update-game-popup .card {
   min-height: 25rem;
   height: 85vh;
 }
@@ -131,4 +135,208 @@
   gap: 1rem;
 
   padding: 0.25rem;
+}
+
+.game-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.game-page-content {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 3rem;
+}
+
+.game-detials {
+  display: grid;
+  grid-template-columns: 34.25rem 1fr;
+  gap: 2rem;
+
+  .game-detials-info {
+    min-height: 17rem;
+    min-width: 30rem;
+
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+
+    padding: 1rem;
+    box-sizing: border-box;
+    border-radius: utils.$large-radius;
+    background-color: map.get(utils.$bg-1-colors, 'games');
+
+    .game-details-info-block {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1.5rem;
+    }
+
+    .prop-block-title {
+      margin-bottom: 0.25rem;
+      font-weight: utils.$bold-font;
+    }
+  }
+
+  .game-details-collage {
+    height: 17rem;
+    display: grid;
+    grid-template-columns: 204fr 332fr;
+    gap: 0.75rem;
+
+    aspect-ratio: 548 / 272;
+
+    .game-cover {
+      aspect-ratio: unset;
+    }
+
+    .screenshots-collage {
+      display: grid;
+      grid-template-rows: 186fr 76fr;
+      aspect-ratio: 332 / 272;
+      gap: 0.625rem;
+
+      .title-screenshot {
+        display: flex;
+        flex-direction: row;
+
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+
+        .screenshot {
+          min-width: 100%;
+        }
+      }
+
+      .screenshots-carousel {
+        max-width: 100%;
+        padding-bottom: 0.25rem;
+        overflow-x: scroll;
+        scroll-behavior: smooth;
+
+        display: flex;
+        flex-direction: row;
+        gap: 0.625rem;
+
+        .screenshot {
+          min-width: fit-content;
+          transition:
+            filter utils.$hover-time,
+            border-width utils.$hover-time;
+          cursor: pointer;
+          border-width: 0rem;
+
+          &:hover {
+            filter: brightness(2);
+          }
+
+          &.choosen {
+            border-style: solid;
+            border-width: 0.1875rem;
+            border-color: map.get(utils.$active-colors, 'games');
+          }
+        }
+      }
+    }
+  }
+}
+
+#game-ratings {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.rating-block {
+  box-sizing: border-box;
+  min-height: 11rem;
+
+  padding: 0.75rem;
+  border-radius: utils.$regular-radius;
+  background-color: map.get(utils.$bg-1-colors, 'games');
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+
+  h3 {
+    text-align: center;
+  }
+
+  .rating {
+    width: $rating-block-rating-size;
+    height: $rating-block-rating-size;
+
+    .value {
+      width: $rating-block-rating-border;
+      height: $rating-block-rating-border;
+      font-size: 3rem;
+      line-height: $rating-block-rating-border;
+    }
+  }
+
+  .playtime-rating {
+    width: $rating-block-rating-size;
+    height: $rating-block-rating-size;
+    border-radius: utils.$large-radius;
+
+    font-size: 3rem;
+  }
+
+  .positions {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 0.5rem;
+
+    .position {
+      flex-grow: 1;
+
+      > * {
+        width: 100%;
+        text-align: center;
+      }
+
+      .position-number {
+        @include utils.font(1.25rem, utils.$bold-font, utils.$fit-font);
+      }
+
+      .position-label {
+        @include utils.font(
+          utils.$small-size,
+          utils.$regular-font,
+          utils.$tight-font
+        );
+
+        font-style: italic;
+        color: utils.$text-darker;
+      }
+    }
+  }
+}
+
+.recommended-games {
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  gap: 3rem;
+
+  overflow-x: auto;
+
+  margin-bottom: 0.25rem;
+}
+
+.recommended-game {
+  min-width: 15.5rem;
+  gap: 0.75rem;
 }

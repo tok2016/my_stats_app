@@ -4,7 +4,7 @@ import { IgdbBasic } from './api-response';
 import { IgdbGenre } from './genre';
 import { IgdbImage } from './image';
 import { IgdbPlatform, PlatformShort } from './platform';
-import { ExternalRatings } from './rating';
+import { ExternalRatings, Ratings } from './rating';
 import { IgdbSeries } from './series';
 import {
   IgdbInvolvedStudio,
@@ -78,16 +78,16 @@ export interface IgdbGameTag extends IgdbBasic {
 }
 
 export interface GameUpdate {
-  minutes: number;
+  hours: number;
   rating?: number;
   playDate?: Date;
+  platformId: number;
 }
 
 export interface NewGame extends GameUpdate {
   apiId: number;
   storeId?: number;
   name: string;
-  platformId: number;
   genresIds: number[];
   developersIds: number[];
   publishersIds: number[];
@@ -171,6 +171,16 @@ export type RecommendedGame = IgdbBasic & {
   screenshots?: string[];
   rating?: number;
 };
+
+export type GameDetailed = Omit<
+  Game,
+  'rating' | 'criticsRating' | 'usersRating' | 'hours'
+>
+  & Ratings & {
+    themes: IgdbBasic[];
+    platforms: IgdbBasic[];
+    similarGames: RecommendedGame[];
+  };
 
 export interface GameCountryMetric {
   country: number;

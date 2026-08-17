@@ -9,7 +9,8 @@ import {
 import { MetricMap, RecommendedMetric } from '@ts/games/metric';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
-import { getImageUrl, igdbRequest } from '@lib/games/igdb';
+import { formRecommendedGame } from '@lib/games/games-utils';
+import { igdbRequest } from '@lib/games/igdb';
 import { TOP_ENTRIES } from '@lib/utils';
 
 type GamesStatusMap = Record<number, 'new' | 'old'>;
@@ -18,15 +19,6 @@ const MAX_TAGS = 5;
 const RECOMMENDED_GAMES = 10;
 const MIN_RATING = 75;
 const MIN_RATINGS_COUNT = 100;
-const MAX_SCREENSHOTS = 2;
-
-const AllowedSources: Record<number, string> = {
-  1: 'steam',
-  5: 'gog',
-  11: 'microsoft',
-  13: 'apple',
-  15: 'android'
-};
 
 const getGamesByGenres = async (
   gamesApiIds: string[],
@@ -60,41 +52,7 @@ const getGamesByGenres = async (
     limit: RECOMMENDED_GAMES
   });
 
-  return igdbGames.map((igdbGame) => {
-    const sources: Record<number, boolean> = {};
-
-    return {
-      id: igdbGame.id,
-      name: igdbGame.name,
-      rating: igdbGame.rating,
-      cover: igdbGame.cover
-        ? getImageUrl(igdbGame.cover.image_id, 'cover_big')
-        : undefined,
-      genres: igdbGame.genres,
-      screenshots: igdbGame.screenshots
-        ?.slice(0, MAX_SCREENSHOTS)
-        .map((screenshot) =>
-          getImageUrl(screenshot.image_id, 'screenshot_med')
-        ),
-      external: igdbGame.external_games
-        .filter((external) => {
-          if (!sources[external.external_game_source.id]) {
-            sources[external.external_game_source.id] = true;
-            return !!AllowedSources[external.external_game_source.id];
-          }
-
-          return false;
-        })
-        .map((external) => ({
-          id: external.id,
-          url: external.url,
-          source: {
-            id: external.external_game_source.id,
-            name: external.external_game_source.name
-          }
-        }))
-    };
-  });
+  return igdbGames.map(formRecommendedGame);
 };
 
 const getGamesTags = async (

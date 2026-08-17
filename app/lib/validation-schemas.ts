@@ -131,7 +131,7 @@ export const NewGameValidator: z.ZodType<NewGame> = z
       .array(z.number().nonnegative().nonoptional())
       .optional()
       .default([]),
-    minutes: z.number().nonnegative().optional().default(0),
+    hours: z.number().nonnegative().optional().default(0),
     rating: z.number().nonnegative().optional(),
     releasedAt: z.string().optional(),
     playDate: z.string().optional()
@@ -144,9 +144,10 @@ export const NewGameValidator: z.ZodType<NewGame> = z
 
 export const GameUpdateValidator: z.ZodType<GameUpdate> = z
   .object({
-    minutes: z.number().nonnegative().optional().default(0),
+    hours: z.number().nonnegative().optional().default(0),
     rating: z.number().nonnegative().optional(),
-    playDate: z.string().optional()
+    playDate: z.string().optional(),
+    platformId: z.number().nonnegative().nonoptional()
   })
   .transform((input) => ({
     ...input,

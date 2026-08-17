@@ -6,14 +6,13 @@ import { MouseEvent, useContext, useEffect, useMemo, useRef } from 'react';
 
 import { ChartCoreProps, ChartData, ChartValueField } from '@ts/ui/charts-data';
 
+import { isHTMLElement } from '@lib/type-guards';
+
 import { ChartContext } from '@store/ChartProvider';
 
 import { hideTooltip, updateMapTooltipPos } from './ChartTooltip';
 import { ChartClasses } from './chart-styles';
 import WorldData from './world-low-res.json';
-
-const isHTMLElement = (value: unknown): value is HTMLElement =>
-  (value as HTMLElement).style !== undefined;
 
 export default function MapChart<
   DataType extends ChartData,
