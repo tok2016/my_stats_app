@@ -4,10 +4,10 @@ import { getMetricData } from '@lib/server-actions';
 
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameCollage from '@components/data-blocks/GameCollage';
+import { LinksString } from '@components/data-blocks/LinksString';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
 import PropBlock from '../../../../components/data-blocks/PropBlock';
-import { GameStudiosLinks } from '../components/GameStudiosLinks';
 
 type HighestRatedGamesProps = {
   gamesMap: Map<string, Game>;
@@ -26,17 +26,27 @@ function TopGame({ game, index }: TopGameProps) {
 
       <div className='data-block-grid min'>
         <PropBlock title='Developer'>
-          <GameStudiosLinks
-            studios={game.developers}
-            groupKey={`rated-game-developer-${game.id}`}
-          />
+          {game.developers.length ? (
+            <LinksString
+              baseEndpoint='/games/studios'
+              items={game.developers}
+              groupKey={`rated-game-developer-${game.id}`}
+            />
+          ) : (
+            <span>—</span>
+          )}
         </PropBlock>
 
         <PropBlock title='Publisher'>
-          <GameStudiosLinks
-            studios={game.publishers}
-            groupKey={`rated-game-publisher-${game.id}`}
-          />
+          {game.publishers.length ? (
+            <LinksString
+              baseEndpoint='/games/studios'
+              items={game.publishers}
+              groupKey={`rated-game-publisher-${game.id}`}
+            />
+          ) : (
+            <span>—</span>
+          )}
         </PropBlock>
       </div>
 

@@ -72,19 +72,27 @@ export default function GameDetails({ game }: GameDetailsProps) {
 
         <div className='game-details-info-block'>
           <PropBlock title='Developers'>
-            <LinksString
-              baseEndpoint='/games/studios'
-              items={game.developers}
-              groupKey='developers'
-            />
+            {game.developers.length ? (
+              <LinksString
+                baseEndpoint='/games/studios'
+                items={game.developers}
+                groupKey='developers'
+              />
+            ) : (
+              <span>—</span>
+            )}
           </PropBlock>
 
           <PropBlock title='Publishers'>
-            <LinksString
-              baseEndpoint='/games/studios'
-              items={game.publishers}
-              groupKey='publishers'
-            />
+            {game.publishers.length ? (
+              <LinksString
+                baseEndpoint='/games/studios'
+                items={game.publishers}
+                groupKey='publishers'
+              />
+            ) : (
+              <span>—</span>
+            )}
           </PropBlock>
 
           <PropBlock title='Series'>
@@ -103,11 +111,15 @@ export default function GameDetails({ game }: GameDetailsProps) {
 
         <div className='game-details-info-block'>
           <PropBlock title='Genres'>
-            <LinksString
-              baseEndpoint='/games/genres'
-              items={game.genres}
-              groupKey='genres'
-            />
+            {game.genres.length ? (
+              <LinksString
+                baseEndpoint='/games/genres'
+                items={game.genres}
+                groupKey='genres'
+              />
+            ) : (
+              <span>—</span>
+            )}
           </PropBlock>
 
           <PropBlock title='Themes'>

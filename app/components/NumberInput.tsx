@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronDown, ChevronUp } from '@mynaui/icons-react';
-import { type ChangeEvent, useRef } from 'react';
+import { type ChangeEvent, type MouseEvent, useRef } from 'react';
 
 import { InputBaseProps } from '@ts/ui/components-props';
 
@@ -59,6 +59,10 @@ export default function NumberInput({
     }
   };
 
+  const onIncrementDown = (evt: MouseEvent) => {
+    if (evt.detail > 1) evt.preventDefault();
+  };
+
   return (
     <div className={`input-select-group number-input ${className}`}>
       <label hidden={!label} htmlFor={id}>
@@ -84,8 +88,14 @@ export default function NumberInput({
         />
 
         <div className='increment-buttons input-icon'>
-          <ChevronUp onClick={onIncrement(step)} />
-          <ChevronDown onClick={onIncrement(-step)} />
+          <ChevronUp
+            onClick={onIncrement(step)}
+            onMouseDown={onIncrementDown}
+          />
+          <ChevronDown
+            onClick={onIncrement(-step)}
+            onMouseDown={onIncrementDown}
+          />
         </div>
       </div>
 

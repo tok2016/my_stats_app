@@ -5,10 +5,10 @@ import Game, { GameTableData } from '@ts/games/game';
 import { getMetricData } from '@lib/server-actions';
 
 import GameCollage from '@components/data-blocks/GameCollage';
+import { LinksString } from '@components/data-blocks/LinksString';
 
 import PropBlock from '../../../../components/data-blocks/PropBlock';
 import GamesPlaytimeTable from '../charts/GamesPlaytimeTable';
-import { GameStudiosLinks } from '../components/GameStudiosLinks';
 import { SPECIAL_GAMES_COUNT } from '../utils';
 
 type GamesPlaytimeProps = {
@@ -26,17 +26,27 @@ function TopGameBlock({ game }: TopGameBlockProps) {
       <GameCollage game={game} />
       <div className='data-block-grid min'>
         <PropBlock title='Developer'>
-          <GameStudiosLinks
-            studios={game.developers}
-            groupKey={`game-time-developer-${game.id}`}
-          />
+          {game.developers.length ? (
+            <LinksString
+              baseEndpoint='/games/studios'
+              items={game.developers}
+              groupKey={`game-time-developer-${game.id}`}
+            />
+          ) : (
+            <span>—</span>
+          )}
         </PropBlock>
 
         <PropBlock title='Publisher'>
-          <GameStudiosLinks
-            studios={game.publishers}
-            groupKey={`game-time-publisher-${game.id}`}
-          />
+          {game.publishers ? (
+            <LinksString
+              baseEndpoint='/games/studios'
+              items={game.publishers}
+              groupKey={`game-time-publisher-${game.id}`}
+            />
+          ) : (
+            <span>—</span>
+          )}
         </PropBlock>
 
         <PropBlock title='Platform'>

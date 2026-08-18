@@ -22,7 +22,7 @@ const minutesToHours = (minutes: number) => Math.round(minutes / MINUTES);
 const updateGamesFromSteam = async (gamesFromSteam: SteamGameWithId[]) => {
   const updatePromises = gamesFromSteam.map((game) =>
     GamesModel.findByIdAndUpdate(game.id, {
-      minutes: minutesToHours(game.playtime_forever ?? 0),
+      hours: minutesToHours(game.playtime_forever ?? 0),
       playDate: game.rtime_last_played
         ? new Date(game.rtime_last_played * MILLISECONDS).toISOString()
         : undefined
@@ -130,17 +130,17 @@ const pullGamesFromSteam = async (_req: NextRequest, service?: Service) => {
     throw generateErrorResponse(401, 'Profile is private');
 
   const savedGames = await getGamesByUserId(service.userId);
-  const savedGamesEntries = savedGames
-    .filter((game) => !!game.storeId)
-    .map((game) => [game.storeId, game]);
-  const gamesMap: Record<string, GameCore> =
-    Object.fromEntries(savedGamesEntries);
+  const gamesMap = new Map<number, GameCore>(
+    savedGames
+      .filter((game) => !!game.storeId)
+      .map((game) => [game.storeId ?? 0, game])
+  );
 
   const gamesToUpdate: SteamGameWithId[] = [];
   const gamesToAdd: SteamGame[] = [];
 
   steamResponse.data.response.games.forEach((game) => {
-    const gameCore = gamesMap[game.appid];
+    const gameCore = gamesMap.get(game.appid);
     if (!gameCore) gamesToAdd.push(game);
     else if (gameCore.hours !== minutesToHours(game.playtime_forever ?? 0))
       gamesToUpdate.push({ ...game, id: gameCore.id });

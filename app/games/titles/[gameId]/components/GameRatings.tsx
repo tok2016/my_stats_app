@@ -1,9 +1,9 @@
 import { GameDetailed } from '@ts/games/game';
 import { RatingDetialed } from '@ts/games/rating';
 
-import { getSingularOrPlural } from '@lib/utils';
-
 import Rating from '@components/Rating';
+
+import PlaytimeRating from '@app/games/components/PlaytimeRating';
 
 type GameRatingsProps = {
   game: GameDetailed;
@@ -56,14 +56,7 @@ function GamePlaytimeBlock({ title, rating, isSeries }: GameRatingBlockProps) {
   return (
     <div className='rating-block'>
       <h3>{title}</h3>
-
-      <div className='playtime-rating'>
-        <span className='playtime-value'>{rating?.value ?? 0}</span>
-        <span className='playtime-label'>
-          {getSingularOrPlural(rating?.value ?? 0, 'hour', 'hours')}
-        </span>
-      </div>
-
+      <PlaytimeRating value={rating?.value} />
       <GamePositions rating={rating} isSeries={isSeries} />
     </div>
   );

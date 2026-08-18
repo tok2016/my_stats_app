@@ -58,13 +58,16 @@ export default function GamesTable({
             width: '2fr',
             minWidth: '8.5rem',
             sort: true,
-            renderRow: (value) => (
-              <LinksString
-                items={value.developers}
-                groupKey={`${value.id}-developers`}
-                baseEndpoint='/games/studios'
-              />
-            )
+            renderRow: (value) =>
+              value.developers.length ? (
+                <LinksString
+                  items={value.developers}
+                  groupKey={`${value.id}-developers`}
+                  baseEndpoint='/games/studios'
+                />
+              ) : (
+                <span>—</span>
+              )
           },
           platform: {
             title: 'Platform',
@@ -88,13 +91,16 @@ export default function GamesTable({
             width: '2fr',
             minWidth: '8.5rem',
             sort: true,
-            renderRow: (value) => (
-              <LinksString
-                items={value.genres}
-                groupKey={`${value.id}-genres`}
-                baseEndpoint='/games/genres'
-              />
-            )
+            renderRow: (value) =>
+              value.genres.length ? (
+                <LinksString
+                  items={value.genres}
+                  groupKey={`${value.id}-genres`}
+                  baseEndpoint='/games/genres'
+                />
+              ) : (
+                <span>—</span>
+              )
           },
           releasedAt: {
             title: 'Released date',

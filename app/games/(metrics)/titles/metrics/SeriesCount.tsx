@@ -7,10 +7,10 @@ import { getMetricData } from '@lib/server-actions';
 
 import EmptyImage from '@components/data-blocks/EmptyImage';
 import GameCover from '@components/data-blocks/GameCover';
+import { LinksString } from '@components/data-blocks/LinksString';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
 import PropBlock from '../../../../components/data-blocks/PropBlock';
-import { GameStudiosLinks } from '../components/GameStudiosLinks';
 import { MAX_GAMES_IN_SERIES } from '../utils';
 
 type SeriesCountProps = {
@@ -64,17 +64,27 @@ function TopSeries({ series, gamesMap }: TopSeriesProps) {
 
       <div className='data-block-grid'>
         <PropBlock title='Developers'>
-          <GameStudiosLinks
-            studios={series.developers}
-            groupKey={`series-developers-${series.id}`}
-          />
+          {series.developers.length ? (
+            <LinksString
+              baseEndpoint='/games/studios'
+              items={series.developers}
+              groupKey={`series-developers-${series.id}`}
+            />
+          ) : (
+            <span>—</span>
+          )}
         </PropBlock>
 
         <PropBlock title='Publishers'>
-          <GameStudiosLinks
-            studios={series.publishers}
-            groupKey={`series-publishers-${series.id}`}
-          />
+          {series.publishers.length ? (
+            <LinksString
+              baseEndpoint='/games/studios'
+              items={series.publishers}
+              groupKey={`series-publishers-${series.id}`}
+            />
+          ) : (
+            <span>—</span>
+          )}
         </PropBlock>
 
         <PropBlock title='Games'>
