@@ -6,7 +6,7 @@ $icon-button-width: 2rem;
 $button-padding: 0.75rem;
 
 button {
-  @include utils.font(utils.$large-size, utils.$bold-font, utils.$tight-font);
+  @include utils.font(utils.$regular-size, utils.$bold-font, utils.$tight-font);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -24,7 +24,8 @@ button {
   cursor: pointer;
 
   svg {
-    font-size: $button-icon-size;
+    width: 1.25em;
+    stroke-width: 0.2em;
   }
 }
 

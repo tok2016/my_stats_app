@@ -1,7 +1,7 @@
 import Skeleton from '@components/Skeleton';
 import GameCollageSkeleton from '@components/data-blocks/GameCollageSkeleton';
 
-import GamePropBlock from '../components/GamePropBlock';
+import PropBlock from '../../../../components/data-blocks/PropBlock';
 import { SPECIAL_GAMES_COUNT } from '../utils';
 
 type TopGameSkeletonProps = {
@@ -17,21 +17,21 @@ function TopGameSkeleton({ parentKey, index }: TopGameSkeletonProps) {
       <Skeleton type='h4' />
       <GameCollageSkeleton parentKey={parentKey} />
       <div className='data-block-grid min'>
-        <GamePropBlock title='Developer'>
+        <PropBlock title='Developer'>
           <Skeleton fontSize='min' lineHeight='wide' rows={2} />
-        </GamePropBlock>
+        </PropBlock>
 
-        <GamePropBlock title='Publisher'>
+        <PropBlock title='Publisher'>
           <Skeleton fontSize='min' lineHeight='wide' rows={2} />
-        </GamePropBlock>
+        </PropBlock>
 
-        <GamePropBlock title='Platform'>
+        <PropBlock title='Platform'>
           <Skeleton fontSize='min' lineHeight='wide' />
-        </GamePropBlock>
+        </PropBlock>
 
-        <GamePropBlock title='Playtime'>
+        <PropBlock title='Playtime'>
           <Skeleton fontSize='min' lineHeight='wide' />
-        </GamePropBlock>
+        </PropBlock>
       </div>
 
       <div className='data-block-rank'>{index + 1}</div>

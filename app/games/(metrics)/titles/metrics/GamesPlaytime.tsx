@@ -5,10 +5,10 @@ import Game, { GameTableData } from '@ts/games/game';
 import { getMetricData } from '@lib/server-actions';
 
 import GameCollage from '@components/data-blocks/GameCollage';
+import { LinksString } from '@components/data-blocks/LinksString';
 
+import PropBlock from '../../../../components/data-blocks/PropBlock';
 import GamesPlaytimeTable from '../charts/GamesPlaytimeTable';
-import GamePropBlock from '../components/GamePropBlock';
-import { GameStudiosLinks } from '../components/GameStudiosLinks';
 import { SPECIAL_GAMES_COUNT } from '../utils';
 
 type GamesPlaytimeProps = {
@@ -25,21 +25,31 @@ function TopGameBlock({ game }: TopGameBlockProps) {
       <h4 className='colored'>{game.name}</h4>
       <GameCollage game={game} />
       <div className='data-block-grid min'>
-        <GamePropBlock title='Developer'>
-          <GameStudiosLinks
-            studios={game.developers}
-            groupKey={`game-time-developer-${game.id}`}
-          />
-        </GamePropBlock>
+        <PropBlock title='Developer'>
+          {game.developers.length ? (
+            <LinksString
+              baseEndpoint='/games/studios'
+              items={game.developers}
+              groupKey={`game-time-developer-${game.id}`}
+            />
+          ) : (
+            <span>—</span>
+          )}
+        </PropBlock>
 
-        <GamePropBlock title='Publisher'>
-          <GameStudiosLinks
-            studios={game.publishers}
-            groupKey={`game-time-publisher-${game.id}`}
-          />
-        </GamePropBlock>
+        <PropBlock title='Publisher'>
+          {game.publishers ? (
+            <LinksString
+              baseEndpoint='/games/studios'
+              items={game.publishers}
+              groupKey={`game-time-publisher-${game.id}`}
+            />
+          ) : (
+            <span>—</span>
+          )}
+        </PropBlock>
 
-        <GamePropBlock title='Platform'>
+        <PropBlock title='Platform'>
           {game.platform ? (
             <Link
               href={`/games/platforms/${game.platform.id}`}
@@ -50,11 +60,11 @@ function TopGameBlock({ game }: TopGameBlockProps) {
           ) : (
             <span>—</span>
           )}
-        </GamePropBlock>
+        </PropBlock>
 
-        <GamePropBlock title='Playtime'>
+        <PropBlock title='Playtime'>
           <span className='bold colored'>{game.hours} h.</span>
-        </GamePropBlock>
+        </PropBlock>
       </div>
 
       <div className='data-block-rank'>{game.index + 1}</div>

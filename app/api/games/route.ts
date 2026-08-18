@@ -2,19 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { GamesFilter } from '@ts/games/filter';
 import Game, { GameCore, GameTableData, GamesTablePage } from '@ts/games/game';
-import { IgdbImage } from '@ts/games/image';
 import Token from '@ts/users/token';
 import { LiteralType } from '@ts/util-types';
 
 import { getCredentialsById } from '@lib/auth';
 import { gameEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
 import { getFullGames } from '@lib/games/games-utils';
-import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
 import { generateErrorResponse, parseBooleanString } from '@lib/utils';
 import { NewGameValidator, validateData } from '@lib/validation-schemas';
-
-const GAMES_PER_PAGE = 20;
 
 const filterByField: Record<
   LiteralType<keyof GamesFilter>,
@@ -39,9 +35,11 @@ const filterByField: Record<
     !!game.genres
     && game.genres.some((genre) => genre.name.toLowerCase().includes(query)),
   releaseFrom: (game, query) =>
-    !!game.releasedAt && game.releasedAt.getTime() >= new Date(query).getTime(),
+    !!game.releasedAt
+    && new Date(game.releasedAt).getTime() >= new Date(query).getTime(),
   releaseTo: (game, query) =>
-    !!game.releasedAt && game.releasedAt.getTime() <= new Date(query).getTime(),
+    !!game.releasedAt
+    && new Date(game.releasedAt).getTime() <= new Date(query).getTime(),
   ratingFrom: (game, query) =>
     typeof game.rating === 'number' && game.rating >= Number(query),
   ratingTo: (game, query) =>
@@ -63,16 +61,19 @@ const filterByField: Record<
   showUsersRating: (game, query) =>
     typeof game.usersRating !== 'undefined' && parseBooleanString(query),
   playDateFrom: (game, query) =>
-    !!game.playDate && game.playDate.getTime() >= new Date(query).getTime(),
+    !!game.playDate
+    && new Date(game.playDate).getTime() >= new Date(query).getTime(),
   playDateTo: (game, query) =>
-    !!game.playDate && game.playDate.getTime() <= new Date(query).getTime(),
+    !!game.playDate
+    && new Date(game.playDate).getTime() <= new Date(query).getTime(),
   hoursFrom: (game, query) =>
     typeof game.hours === 'number' && game.hours >= Number(query),
   hoursTo: (game, query) =>
     typeof game.hours === 'number' && game.hours <= Number(query),
   sort: () => true,
   direction: () => true,
-  page: () => true
+  page: () => true,
+  limit: () => true
 };
 
 const sortByFilter: Record<keyof GameTableData, (a: Game, b: Game) => number> =
@@ -93,13 +94,14 @@ const sortByFilter: Record<keyof GameTableData, (a: Game, b: Game) => number> =
     criticsRating: (a, b) => (a.criticsRating ?? 0) - (b.criticsRating ?? 0),
     usersRating: (a, b) => (a.usersRating ?? 0) - (b.usersRating ?? 0),
     playDate: (a, b) =>
-      (a.playDate?.getTime() ?? 0) - (b.playDate?.getTime() ?? 0),
+      new Date(a.playDate ?? 0).getTime() - new Date(b.playDate ?? 0).getTime(),
     releasedAt: (a, b) =>
-      (a.releasedAt?.getTime() ?? 0) - (b.releasedAt?.getTime() ?? 0),
+      new Date(a.releasedAt ?? 0).getTime()
+      - new Date(b.releasedAt ?? 0).getTime(),
     genres: (a, b) =>
       a.genres[0]?.name.localeCompare(b.genres[0]?.name ?? '') ?? 0,
     hours: (a, b) => a.hours - b.hours,
-    cover: () => 0,
+    coverUrl: () => 0,
     screenshots: () => 0
   };
 
@@ -135,15 +137,22 @@ const getGames = async (games: GameCore[], req: NextRequest) => {
   );
 
   const parsedPage = parseInt(filtersObj.page ?? '1');
-  const page = !parsedPage ? 1 : parsedPage;
+  const page = Number.isNaN(parsedPage) || !parsedPage ? 1 : parsedPage;
+  const parsedLimit = parseInt(filtersObj.limit ?? '');
+  const limit =
+    Number.isNaN(parsedLimit) || !parsedLimit
+      ? !filteredGames.length
+        ? 1
+        : filteredGames.length
+      : parsedLimit;
 
-  const startIndex = (page - 1) * GAMES_PER_PAGE;
+  const startIndex = (page - 1) * limit;
 
   const gamesPage: GamesTablePage = {
     startIndex,
     currentPage: page,
-    games: filteredGames.slice(startIndex, page * GAMES_PER_PAGE),
-    pagesCount: Math.ceil(filteredGames.length / GAMES_PER_PAGE),
+    games: filteredGames.slice(startIndex, page * limit),
+    pagesCount: Math.ceil(filteredGames.length / limit),
     maxHours
   };
 
@@ -172,42 +181,5 @@ const postNewGame = async (token: Token, req: NextRequest) => {
   });
 };
 
-type GameCover = {
-  id: number;
-  cover?: IgdbImage;
-};
-
-const changeCovers = async (token: Token) => {
-  const credentials = await getCredentialsById(token.id);
-  const gamesCore = await GamesModel.find({
-    userId: credentials.userId
-  }).lean();
-
-  const gamesCovers = await igdbRequest<GameCover>('/games', {
-    fields: ['cover.image_id'],
-    where: `id = (${gamesCore.map((game) => game.apiId).join(',')})`,
-    limit: gamesCore.length
-  });
-
-  const promises = gamesCovers.map((cover) => {
-    return GamesModel.findOneAndUpdate(
-      { apiId: cover.id },
-      { cover: cover.cover?.image_id }
-    );
-  });
-
-  await Promise.all(promises);
-
-  const updatedGamesCore = await GamesModel.find({
-    userId: credentials.userId
-  }).lean();
-
-  return NextResponse.json(updatedGamesCore, {
-    status: 200,
-    statusText: 'Games covers url were replaced with cover image id'
-  });
-};
-
 export const GET = gameEndpoint(getGames);
 export const POST = protectedEndpoint(postNewGame);
-export const PUT = protectedEndpoint(changeCovers);

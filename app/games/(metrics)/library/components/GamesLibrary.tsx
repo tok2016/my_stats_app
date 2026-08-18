@@ -7,12 +7,18 @@ import GamesFilterMenu from './GamesFilterMenu';
 import GamesTable from './GamesTable';
 import GamesTablePagination from './GamesTablePagination';
 
+const GAMES_PAGE_LIMIT = 20;
+
 export default async function GamesLibrary({
   filters
 }: {
   filters: GamesFilter;
 }) {
-  const urlParams = new URLSearchParams({ ...filters });
+  const urlParams = new URLSearchParams({
+    ...filters,
+    limit: GAMES_PAGE_LIMIT.toString()
+  });
+
   const gamesPage = await getMetricData<GamesTablePage>(
     `/api/games?${urlParams.toString()}`,
     {

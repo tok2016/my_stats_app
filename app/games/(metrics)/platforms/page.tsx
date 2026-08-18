@@ -31,13 +31,21 @@ export default async function GamesPlatformsPage() {
     <>
       <div className='double-doughnut'>
         <Metric id='platforms-count' title='Your biggest platforms'>
-          <Suspense fallback={<ChartSkeleton type='doughnut' />}>
+          <Suspense
+            fallback={
+              <ChartSkeleton type='doughnut' className='switchable-chart' />
+            }
+          >
             <PlatformsCount platformsMap={platformsMap} seriesMap={seriesMap} />
           </Suspense>
         </Metric>
 
         <Metric id='platforms-playtime' title='Your longest used platforms'>
-          <Suspense fallback={<ChartSkeleton type='doughnut' />}>
+          <Suspense
+            fallback={
+              <ChartSkeleton type='doughnut' className='switchable-chart' />
+            }
+          >
             <PlatformsPlaytime platformsMap={platformsMap} />
           </Suspense>
         </Metric>

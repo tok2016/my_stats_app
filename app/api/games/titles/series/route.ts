@@ -10,7 +10,6 @@ import {
   getAverageRating
 } from '@lib/games/games-utils';
 import { igdbRequest } from '@lib/games/igdb';
-import { MINUTES } from '@lib/utils';
 
 const TOP_SERIES = 5;
 
@@ -24,7 +23,7 @@ const getSeriesInfo = (
     .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
 
   if (typeof ownedGames[0].rating !== 'number')
-    ownedGames.sort((a, b) => b.minutes - a.minutes);
+    ownedGames.sort((a, b) => b.hours - a.hours);
 
   const developers = new Map<number, IgdbStudioBase>();
   const publishers = new Map<number, IgdbStudioBase>();
@@ -45,11 +44,9 @@ const getSeriesInfo = (
     allGames: igdbSeries.games.length,
     developers: developers.values().toArray(),
     publishers: publishers.values().toArray(),
-    hours: Math.round(
-      ownedGames
-        .map((game) => game.minutes)
-        .reduce((prev, curr) => prev + curr, 0) / MINUTES
-    ),
+    hours: ownedGames
+      .map((game) => game.hours)
+      .reduce((prev, curr) => prev + curr, 0),
     averageRating: getAverageRating<GameCore>(ownedGames, 'rating'),
     criticsRating: getAverageRating<IgdbGameRatingsStudios>(
       igdbSeries.games,

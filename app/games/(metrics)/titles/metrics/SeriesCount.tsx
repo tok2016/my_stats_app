@@ -7,10 +7,10 @@ import { getMetricData } from '@lib/server-actions';
 
 import EmptyImage from '@components/data-blocks/EmptyImage';
 import GameCover from '@components/data-blocks/GameCover';
+import { LinksString } from '@components/data-blocks/LinksString';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
-import GamePropBlock from '../components/GamePropBlock';
-import { GameStudiosLinks } from '../components/GameStudiosLinks';
+import PropBlock from '../../../../components/data-blocks/PropBlock';
 import { MAX_GAMES_IN_SERIES } from '../utils';
 
 type SeriesCountProps = {
@@ -49,7 +49,7 @@ function TopSeries({ series, gamesMap }: TopSeriesProps) {
         )}
       </div>
 
-      <GamePropBlock title='Best game'>
+      <PropBlock title='Best game'>
         {games[0] ? (
           <Link
             href={`/games/titles/${games[0].id}`}
@@ -60,31 +60,41 @@ function TopSeries({ series, gamesMap }: TopSeriesProps) {
         ) : (
           <span>—</span>
         )}
-      </GamePropBlock>
+      </PropBlock>
 
       <div className='data-block-grid'>
-        <GamePropBlock title='Developers'>
-          <GameStudiosLinks
-            studios={series.developers}
-            groupKey={`series-developers-${series.id}`}
-          />
-        </GamePropBlock>
+        <PropBlock title='Developers'>
+          {series.developers.length ? (
+            <LinksString
+              baseEndpoint='/games/studios'
+              items={series.developers}
+              groupKey={`series-developers-${series.id}`}
+            />
+          ) : (
+            <span>—</span>
+          )}
+        </PropBlock>
 
-        <GamePropBlock title='Publishers'>
-          <GameStudiosLinks
-            studios={series.publishers}
-            groupKey={`series-publishers-${series.id}`}
-          />
-        </GamePropBlock>
+        <PropBlock title='Publishers'>
+          {series.publishers.length ? (
+            <LinksString
+              baseEndpoint='/games/studios'
+              items={series.publishers}
+              groupKey={`series-publishers-${series.id}`}
+            />
+          ) : (
+            <span>—</span>
+          )}
+        </PropBlock>
 
-        <GamePropBlock title='Games'>
+        <PropBlock title='Games'>
           <span className='colored bold'>{games.length}</span>
           <span>{` (${percent}%)`}</span>
-        </GamePropBlock>
+        </PropBlock>
 
-        <GamePropBlock title='Playtime'>
+        <PropBlock title='Playtime'>
           <span className='colored bold'>{series.hours} h.</span>
-        </GamePropBlock>
+        </PropBlock>
       </div>
 
       <MultipleRating

@@ -56,7 +56,7 @@ const getStudiosByCountry = async (games: GameCore[]) => {
       const studioData = studiosCompareMap.get(studioId);
       studiosCompareMap.set(studioId, {
         count: (studioData?.count ?? 0) + 1,
-        minutes: (studioData?.minutes ?? 0) + game.minutes
+        hours: (studioData?.hours ?? 0) + game.hours
       });
     });
   });
@@ -71,7 +71,7 @@ const getStudiosByCountry = async (games: GameCore[]) => {
     .toArray()
     .sort((a, b) => {
       const countDiff = b[1].count - a[1].count;
-      if (!countDiff) return b[1].minutes - a[1].minutes;
+      if (!countDiff) return b[1].hours - a[1].hours;
       return countDiff;
     })
     .forEach((studio) => {

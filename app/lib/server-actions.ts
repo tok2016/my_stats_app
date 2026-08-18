@@ -5,7 +5,7 @@ import { AxiosRequestConfig } from 'axios';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import Game from '@ts/games/game';
+import Game, { GamesTablePage } from '@ts/games/game';
 import { CountData } from '@ts/games/metric';
 import Country, { CountryIso, CountryResponse } from '@ts/users/country';
 import { ServicesMap } from '@ts/users/service';
@@ -138,10 +138,10 @@ export const getMetricData = async <MetricType>(
 };
 
 export const getGamesMap = async () => {
-  const response = await AxiosInstanse.get<Game[]>(
+  const response = await AxiosInstanse.get<GamesTablePage>(
     '/api/games',
     await getAuthConfig()
   );
-  const gamesMap = new Map(response.data.map((game) => [game.id, game]));
+  const gamesMap = new Map(response.data.games.map((game) => [game.id, game]));
   return gamesMap;
 };

@@ -144,15 +144,15 @@ export const GamesSchema = new Schema<GameInSchema>({
   genresIds: Array<number>,
   developersIds: Array<number>,
   publishersIds: Array<number>,
-  releasedAt: Date,
-  cover: String,
-  minutes: {
+  releasedAt: String,
+  coverId: String,
+  hours: {
     type: Number,
     default: 0
   },
   seriesId: Number,
   rating: Number,
-  playDate: Date
+  playDate: String
 });
 
 export const ApiSchema = new Schema<ApiAccess>({

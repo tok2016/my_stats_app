@@ -187,6 +187,16 @@ export default function PeriodTops<
     }
   }, [periodMetricData, observer]);
 
+  if (isPending || !periodMetricData)
+    return (
+      <PeriodTopsSkeletons
+        metricId={id}
+        periodTopClassName={periodTopClassName}
+        blockWidthRem={blockWidthRem}
+        gapRem={gapRem}
+      />
+    );
+
   return (
     <section id={id} className={`metric ${className}`}>
       <h3 className='select-title'>
@@ -203,56 +213,43 @@ export default function PeriodTops<
 
       <div className='period-tops' ref={scrollRef}>
         <div className='period-tops-groups'>
-          {isPending || !periodMetricData ? (
-            <PeriodTopsSkeletons
-              metricId={id}
-              periodTopClassName={periodTopClassName}
-            />
-          ) : (
-            topsByYear
-              .entries()
-              .toArray()
-              .map(([currentYear, tops], i) => (
-                <PeriodTopsGroup
-                  key={`${currentYear}-group`}
-                  tops={tops}
-                  periodType={periodMetricData.periodType}
-                  listItemContent={listItemContent}
-                  periodTopClassName={periodTopClassName}
-                  blockWidthRem={blockWidthRem}
-                  gapRem={gapRem}
-                  current={i === 0}
-                />
-              ))
-          )}
+          {topsByYear
+            .entries()
+            .toArray()
+            .map(([currentYear, tops], i) => (
+              <PeriodTopsGroup
+                key={`${currentYear}-group`}
+                tops={tops}
+                periodType={periodMetricData.periodType}
+                listItemContent={listItemContent}
+                periodTopClassName={periodTopClassName}
+                blockWidthRem={blockWidthRem}
+                gapRem={gapRem}
+                current={i === 0}
+              />
+            ))}
         </div>
 
         <div
           className={`years ${periodMetricData?.periodType === 'year' ? 'invisible' : ''}`}
         >
-          {isPending || !periodMetricData ? (
-            <Divider rounded className='invisible'>
-              0
-            </Divider>
-          ) : (
-            topsByYear
-              .entries()
-              .toArray()
-              .map(([currentYear, tops]) => (
-                <div
-                  id={`${id}-${currentYear}`}
-                  key={currentYear}
-                  className='year-line'
-                  style={{
-                    width: `calc(${blockWidthRem * tops.length}rem + ${gapRem * (tops.length - 1)}rem)`
-                  }}
-                >
-                  <Divider rounded colored={currentYear === year}>
-                    {currentYear}
-                  </Divider>
-                </div>
-              ))
-          )}
+          {topsByYear
+            .entries()
+            .toArray()
+            .map(([currentYear, tops]) => (
+              <div
+                id={`${id}-${currentYear}`}
+                key={currentYear}
+                className='year-line'
+                style={{
+                  width: `calc(${blockWidthRem * tops.length}rem + ${gapRem * (tops.length - 1)}rem)`
+                }}
+              >
+                <Divider rounded colored={currentYear === year}>
+                  {currentYear}
+                </Divider>
+              </div>
+            ))}
         </div>
       </div>
 

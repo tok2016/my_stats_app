@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const REQUEST_TIMEOUT = 10000;
+const REQUEST_TIMEOUT = 60000;
 const COUNTRIES_API_TIMEOUT = 10000;
 const IGDB_REQUEST_TIMEOUT = 100000;
 

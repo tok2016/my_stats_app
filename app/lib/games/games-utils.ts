@@ -3,9 +3,12 @@ import Game, {
   GameCore,
   GameInSchema,
   GameShort,
-  IgdbGameFull
+  IgdbGameFull,
+  IgdbRecommendedGame,
+  RecommendedGame
 } from '@ts/games/game';
 import { IgdbGenre } from '@ts/games/genre';
+import { IgdbImageSize } from '@ts/games/image';
 import { ItemCompareData } from '@ts/games/metric';
 import { PlatformShort } from '@ts/games/platform';
 import { IgdbSeriesExpanded } from '@ts/games/series';
@@ -15,12 +18,20 @@ import { LiteralType } from '@ts/util-types';
 import { getCredentialsById } from '../auth';
 import { GamesModel } from '../models';
 import { isIgdbItemArray, isIgdbItemBasic } from '../type-guards';
-import { MINUTES, generateErrorResponse, mean } from '../utils';
+import { generateErrorResponse, mean } from '../utils';
 import { getImageUrl, igdbRequest } from './igdb';
 
 type ItemsFields = keyof Omit<GameInSchema, 'userId' | 'storeId'>;
 
 const MAX_SCREENSHOTS = 3;
+
+const AllowedSources: Record<number, string> = {
+  1: 'steam',
+  5: 'gog',
+  11: 'microsoft',
+  13: 'apple',
+  15: 'android'
+};
 
 export const FULL_GAME_FIELDS: Required<IgdbQuery<IgdbGameFull>>['fields'] = [
   'name',
@@ -90,7 +101,9 @@ const igdbPlatfromToPlatformShort = (
 
 export const uniteGameCoreAndIgdb = (
   gameCore: GameCore,
-  igdbGame: IgdbGameFull
+  igdbGame: IgdbGameFull,
+  screenshotSize: IgdbImageSize = 'screenshot_med',
+  screenshotsCount: number = MAX_SCREENSHOTS
 ): Game => ({
   id: gameCore.id,
   name: gameCore.name,
@@ -100,9 +113,9 @@ export const uniteGameCoreAndIgdb = (
     ? Math.round(igdbGame.aggregated_rating)
     : undefined,
   usersRating: igdbGame.rating ? Math.round(igdbGame.rating) : undefined,
-  releasedAt: gameCore.releasedAt ? new Date(gameCore.releasedAt) : undefined,
-  hours: Math.round(gameCore.minutes / MINUTES),
-  playDate: gameCore.playDate ? new Date(gameCore.playDate) : undefined,
+  releasedAt: gameCore.releasedAt,
+  hours: gameCore.hours,
+  playDate: gameCore.playDate,
   developers:
     igdbGame.involved_companies
       ?.filter((studio) => studio.developer)
@@ -120,22 +133,58 @@ export const uniteGameCoreAndIgdb = (
     curr.games.length > prev.games.length ? curr : prev
   ),
   genres: igdbGame.genres,
-  cover: igdbGame.cover?.image_id
+  coverUrl: igdbGame.cover?.image_id
     ? getImageUrl(igdbGame.cover.image_id, 'cover_big')
     : undefined,
   screenshots: igdbGame.screenshots
-    ?.slice(0, MAX_SCREENSHOTS)
-    .map((screenshot) => getImageUrl(screenshot.image_id, 'screenshot_med'))
+    ?.slice(0, screenshotsCount)
+    .map((screenshot) => getImageUrl(screenshot.image_id, screenshotSize))
 });
 
 export const gameCoreToShort = (game: GameCore): GameShort => ({
   id: game.id,
   apiId: game.apiId,
   name: game.name,
-  hours: Math.round(game.minutes / MINUTES),
+  hours: game.hours,
   rating: game.rating,
-  cover: game.cover ? getImageUrl(game.cover, 'cover_big') : undefined
+  coverUrl: game.coverId ? getImageUrl(game.coverId, 'cover_big') : undefined
 });
+
+export const formRecommendedGame = (
+  igdbGame: IgdbRecommendedGame
+): RecommendedGame => {
+  const sources: Record<number, boolean> = {};
+
+  return {
+    id: igdbGame.id,
+    name: igdbGame.name,
+    rating: igdbGame.rating,
+    coverUrl: igdbGame.cover
+      ? getImageUrl(igdbGame.cover.image_id, 'cover_big')
+      : undefined,
+    genres: igdbGame.genres,
+    screenshots: igdbGame.screenshots
+      ?.slice(0, MAX_SCREENSHOTS)
+      .map((screenshot) => getImageUrl(screenshot.image_id, 'screenshot_med')),
+    external: igdbGame.external_games
+      .filter((external) => {
+        if (!sources[external.external_game_source.id]) {
+          sources[external.external_game_source.id] = true;
+          return !!AllowedSources[external.external_game_source.id];
+        }
+
+        return false;
+      })
+      .map((external) => ({
+        id: external.id,
+        url: external.url,
+        source: {
+          id: external.external_game_source.id,
+          name: external.external_game_source.name
+        }
+      }))
+  };
+};
 
 export const getFullGames = async (
   gamesMap: Map<number, GameCore>
@@ -167,9 +216,9 @@ const fieldToEndpoint: Record<ItemsFields, string> = {
   platformId: '/platforms',
   genresIds: '/genres',
   playDate: '/games',
-  minutes: '/games',
+  hours: '/games',
   releasedAt: '/release_dates',
-  cover: '/covers',
+  coverId: '/covers',
   rating: '/games'
 };
 
@@ -228,8 +277,7 @@ export const getAverageRating = <GameType extends object>(
 
 export const getTotalPlaytime = (games: GameCore[]): number =>
   Math.round(
-    games.map((game) => game.minutes).reduce((prev, curr) => prev + curr, 0)
-      / MINUTES
+    games.map((game) => game.hours).reduce((prev, curr) => prev + curr, 0)
   );
 
 const setItemToMap = (

@@ -5,7 +5,7 @@ import Game from '@ts/games/game';
 import GameCover from './GameCover';
 
 type GameTableTitleProps = {
-  game: Pick<Game, 'id' | 'cover' | 'name'>;
+  game: Pick<Game, 'id' | 'coverUrl' | 'name'>;
 };
 
 export default function GameTableTitle({ game }: GameTableTitleProps) {

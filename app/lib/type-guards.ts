@@ -45,3 +45,6 @@ export const isItemArray = <ItemType>(
   itemGuard: (value: unknown) => value is ItemType
 ): value is Array<ItemType> =>
   Array.isArray(value) && value.every((v) => itemGuard(v));
+
+export const isHTMLElement = (value: unknown): value is HTMLElement =>
+  (value as HTMLElement).style !== undefined;

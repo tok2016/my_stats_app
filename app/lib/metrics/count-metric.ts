@@ -7,7 +7,7 @@ import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
 
 const defaultCompareData: CountCompareData = {
   count: 0,
-  minutes: 0
+  hours: 0
 };
 
 const getTopCountData = (
@@ -54,7 +54,7 @@ const getTopCountData = (
         percent: Math.round((count / sum) * 100),
         topSeries: topSeries
           .entries()
-          .reduce((prev, curr) => (curr[1] > prev[1] ? curr : prev))[0]
+          .reduce((prev, curr) => (curr[1] > prev[1] ? curr : prev), [0, 0])[0]
       });
 
       break;
@@ -80,11 +80,11 @@ const getSeriesCount = (games: GameCore[]) => {
     if (!storedSeries)
       series.set(game.seriesId, {
         count: 1,
-        minutes: game.minutes
+        hours: game.hours
       });
     else {
       storedSeries.count++;
-      storedSeries.minutes += game.minutes;
+      storedSeries.hours += game.hours;
     }
   });
 
@@ -115,7 +115,7 @@ const setItemCount = (
     storedItem.topSeries =
       seriesCompare.count > storedSeriesCompare.count
       || (seriesCompare.count === storedSeriesCompare.count
-        && seriesCompare.minutes >= storedSeriesCompare.minutes)
+        && seriesCompare.hours >= storedSeriesCompare.hours)
         ? game.seriesId
         : storedItem.topSeries;
   }

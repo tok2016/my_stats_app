@@ -38,14 +38,16 @@ export function LinksString({
 }: LinksStringProps) {
   return (
     <p className={`link-string ${className}`}>
-      {items.map((item, i) => (
-        <LinkSubstring
-          key={`${groupKey}-${item.id}`}
-          baseEndpoint={baseEndpoint}
-          item={item}
-          last={i === items.length - 1}
-        />
-      ))}
+      {items.length
+        ? items.map((item, i) => (
+            <LinkSubstring
+              key={`${groupKey}-${item.id}`}
+              baseEndpoint={baseEndpoint}
+              item={item}
+              last={i === items.length - 1}
+            />
+          ))
+        : '—'}
     </p>
   );
 }

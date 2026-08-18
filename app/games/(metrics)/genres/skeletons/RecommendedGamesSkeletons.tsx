@@ -1,27 +1,10 @@
-import Skeleton from '@components/Skeleton';
-import GameCollageSkeleton from '@components/data-blocks/GameCollageSkeleton';
 import Metric from '@components/data-blocks/Metric';
+
+import RecommendedGameSkeleton from '@app/games/components/RecommendedGameSkeleton';
 
 import { RecommendationCategories, RecommendationIds } from '../../utils';
 
-type RecommendedGameSkeletonProps = {
-  parentKey: string;
-};
-
 const GAMES_SKELETONS_TO_SHOW = 5;
-
-function RecommendedGameSkeleton({ parentKey }: RecommendedGameSkeletonProps) {
-  return (
-    <div className='data-block recommended-game'>
-      <Skeleton type='h4' />
-
-      <GameCollageSkeleton parentKey={parentKey} />
-
-      <Skeleton type='text' rows={2} fontSize='small' />
-      <Skeleton type='text' rows={2} fontSize='small' />
-    </div>
-  );
-}
 
 export default function RecommendedGamesSkeletons() {
   const ids = Object.values(RecommendationIds);

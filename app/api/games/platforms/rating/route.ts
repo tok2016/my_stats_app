@@ -19,7 +19,7 @@ const getPlatformsRatings = async (games: GameCore[]) => {
         ...platformGenre,
         [genre]: {
           count: (platformGenre?.[genre]?.count ?? 0) + 1,
-          minutes: (platformGenre?.[genre]?.minutes ?? 0) + game.minutes
+          hours: (platformGenre?.[genre]?.hours ?? 0) + game.hours
         }
       });
     });
@@ -36,7 +36,7 @@ const getPlatformsRatings = async (games: GameCore[]) => {
       const platformGenres = genresByPlatforms.get(ratingData.id) ?? {};
       const topGenre = Object.entries(platformGenres).sort((a, b) => {
         const countDiff = b[1].count - a[1].count;
-        if (!countDiff) return b[1].minutes - a[1].minutes;
+        if (!countDiff) return b[1].hours - a[1].hours;
         return countDiff;
       })[0][0];
 

@@ -8,7 +8,7 @@ import { gameEndpoint } from '@lib/endpoint-generators';
 
 type GenreCompareData = {
   count: number;
-  minutes: number;
+  hours: number;
   games: string[];
 };
 
@@ -27,8 +27,11 @@ const getTopLongestGamesByGenre = async (
   const gamesDescending = (
     greatPeriod === 'allTime'
       ? games.slice()
-      : games.filter((game) => game.playDate?.getFullYear() === year)
-  ).sort((a, b) => b.minutes - a.minutes);
+      : games.filter(
+          (game) =>
+            game.playDate && new Date(game.playDate).getFullYear() === year
+        )
+  ).sort((a, b) => b.hours - a.hours);
 
   gamesDescending.forEach((game) => {
     game.genresIds.forEach((genre) => {
@@ -36,12 +39,12 @@ const getTopLongestGamesByGenre = async (
       if (!genreTop) {
         topsByGenre.set(genre, {
           count: 1,
-          minutes: game.minutes,
+          hours: game.hours,
           games: [game.id]
         });
       } else {
         genreTop.count++;
-        genreTop.minutes += game.minutes;
+        genreTop.hours += game.hours;
         if (genreTop.games.length < GAMES_IN_TOP) genreTop.games.push(game.id);
       }
     });
@@ -52,7 +55,7 @@ const getTopLongestGamesByGenre = async (
     .toArray()
     .sort((a, b) => {
       const diff = b[1].count - a[1].count;
-      if (!diff) return b[1].minutes - a[1].minutes;
+      if (!diff) return b[1].hours - a[1].hours;
       return diff;
     })
     .slice(0, GENRES_WITH_TOPS)

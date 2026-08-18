@@ -15,6 +15,7 @@ type FetchImageProps = {
   imageClassName?: string;
   skeletonClassName?: string;
   priority?: boolean;
+  onClick?: () => void;
 };
 
 const IMAGE_DEFAULT_WIDTH = 150;
@@ -27,12 +28,13 @@ export default function FetchImage({
   className,
   imageClassName,
   skeletonClassName,
-  priority
+  priority,
+  onClick
 }: FetchImageProps) {
   const [isPending, setPending] = useState<boolean>(true);
 
   return (
-    <div className={`fetch-image ${className}`}>
+    <div className={`fetch-image ${className}`} onClick={onClick}>
       {!isPending || <Skeleton type='image' className={skeletonClassName} />}
       <Image
         src={src}

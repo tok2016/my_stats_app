@@ -7,6 +7,8 @@ $border-style: 2px solid;
 $border-radius: 6px;
 $gloss-width: 2rem;
 $skeleton-icon-min-width: 2rem;
+$rating-size: 2.75rem;
+$rating-border: $rating-size - 0.5rem;
 
 .divider {
   @include utils.font(utils.$min-size, utils.$regular-font, utils.$tight-font);
@@ -151,6 +153,8 @@ $skeleton-icon-min-width: 2rem;
 
   background-color: utils.$black-alpha;
   text-align: left;
+
+  z-index: 100;
 }
 
 .send-again-timer {
@@ -513,20 +517,20 @@ form .drawer-submenu {
   align-items: center;
   justify-content: center;
 
-  width: 2.75rem;
-  height: 2.75rem;
+  width: $rating-size;
+  height: $rating-size;
 
   border-radius: utils.$max-radius;
 
   .value {
     @include utils.header(3);
 
-    width: 2.25rem;
-    height: 2.25rem;
+    width: $rating-border;
+    height: $rating-border;
     border-radius: utils.$max-radius;
 
     text-align: center;
-    line-height: 2.25rem;
+    line-height: $rating-border;
   }
 }
 
@@ -535,5 +539,36 @@ form .drawer-submenu {
     .value {
       background-color: $bg-color;
     }
+  }
+}
+
+.playtime-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+
+  width: $rating-size;
+  height: $rating-size;
+  border-radius: utils.$small-radius;
+
+  text-align: center;
+  font-family: utils.$ibm-plex;
+  @include utils.font(utils.$small-size, utils.$bold-font, utils.$tight-font);
+
+  .playtime-value {
+    font-size: 1em;
+  }
+
+  .playtime-label {
+    font-size: 0.57em;
+  }
+}
+
+@mixin playtime-rating($bg-color, $text-color) {
+  .playtime-rating {
+    background-color: $bg-color;
+    color: $text-color;
   }
 }

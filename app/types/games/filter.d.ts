@@ -27,4 +27,5 @@ export interface GamesFilter {
   sort?: keyof GameTableData;
   direction?: SortDirection;
   page?: string;
+  limit?: string;
 }

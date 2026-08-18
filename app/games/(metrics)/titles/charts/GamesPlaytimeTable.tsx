@@ -6,8 +6,7 @@ import { GameTableData } from '@ts/games/game';
 
 import Table from '@components/charts/Table';
 import GameTableTitle from '@components/data-blocks/GameTitle';
-
-import { GameStudiosLinks } from '../components/GameStudiosLinks';
+import { LinksString } from '@components/data-blocks/LinksString';
 
 type GamesPlaytimeTableProps = {
   data: GameTableData[];
@@ -31,22 +30,30 @@ export default function GamesPlaytimeTable({ data }: GamesPlaytimeTableProps) {
         },
         developers: {
           title: 'Developer',
-          renderRow: (value) => (
-            <GameStudiosLinks
-              studios={value.developers}
-              groupKey={`game-time-developer-${value.id}`}
-            />
-          ),
+          renderRow: (value) =>
+            value.developers.length ? (
+              <LinksString
+                baseEndpoint='/games/studios'
+                items={value.developers}
+                groupKey={`game-time-developer-${value.id}`}
+              />
+            ) : (
+              <span>—</span>
+            ),
           width: '2fr'
         },
         publishers: {
           title: 'Publisher',
-          renderRow: (value) => (
-            <GameStudiosLinks
-              studios={value.publishers}
-              groupKey={`game-time-publisher-${value.id}`}
-            />
-          ),
+          renderRow: (value) =>
+            value.publishers.length ? (
+              <LinksString
+                baseEndpoint='/games/studios'
+                items={value.publishers}
+                groupKey={`game-time-publisher-${value.id}`}
+              />
+            ) : (
+              <span>—</span>
+            ),
           width: '2fr'
         },
         platform: {

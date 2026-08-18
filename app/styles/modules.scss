@@ -17,6 +17,7 @@ $modules: 'user', 'music', 'games';
   :root:has(> body > .#{$module}) * {
     &::-webkit-scrollbar {
       width: 14px;
+      height: 14px;
     }
 
     &::-webkit-scrollbar-track {
@@ -185,6 +186,11 @@ $modules: 'user', 'music', 'games';
 
     @include components.rating(map.get(utils.$bg-1-colors, $module));
 
+    @include components.playtime-rating(
+      map.get(utils.$active-colors, $module),
+      utils.$white
+    );
+
     @include sidebar.sidebar(
       map.get(utils.$bg-1-colors, $module),
       map.get(utils.$bg-2-colors, $module),
@@ -335,6 +341,13 @@ $modules: 'user', 'music', 'games';
       );
 
       @include components.spinner(map.get(utils.$bg-2-colors, $module));
+
+      @include components.rating(map.get(utils.$text-colors, $module));
+
+      @include components.playtime-rating(
+        map.get(utils.$hover-colors, $module),
+        map.get(utils.$text-colors, $module)
+      );
 
       @include charts.chart(
         map.get(utils.$text-colors, $module),

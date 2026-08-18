@@ -1,10 +1,6 @@
-import { Plus } from '@mynaui/icons-react';
-
-import Link from 'next/link';
-
-import Button from '@components/Button';
 import PageName from '@components/profile-layout/PageName';
 
+import RefreshButtons from './RefreshButtons';
 import './games-metrics.scss';
 
 export default function GamesMetricLayout({
@@ -14,11 +10,7 @@ export default function GamesMetricLayout({
     <>
       <div className='games-page-name'>
         <PageName />
-        <Link href='/games/add-game'>
-          <Button variant='secondary' beforeIcon={<Plus />}>
-            Add Game
-          </Button>
-        </Link>
+        <RefreshButtons />
       </div>
 
       <div className='metrics'>{children}</div>

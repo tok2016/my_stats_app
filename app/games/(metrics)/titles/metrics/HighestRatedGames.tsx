@@ -4,10 +4,10 @@ import { getMetricData } from '@lib/server-actions';
 
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameCollage from '@components/data-blocks/GameCollage';
+import { LinksString } from '@components/data-blocks/LinksString';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
-import GamePropBlock from '../components/GamePropBlock';
-import { GameStudiosLinks } from '../components/GameStudiosLinks';
+import PropBlock from '../../../../components/data-blocks/PropBlock';
 
 type HighestRatedGamesProps = {
   gamesMap: Map<string, Game>;
@@ -25,19 +25,29 @@ function TopGame({ game, index }: TopGameProps) {
       <GameCollage game={game} />
 
       <div className='data-block-grid min'>
-        <GamePropBlock title='Developer'>
-          <GameStudiosLinks
-            studios={game.developers}
-            groupKey={`rated-game-developer-${game.id}`}
-          />
-        </GamePropBlock>
+        <PropBlock title='Developer'>
+          {game.developers.length ? (
+            <LinksString
+              baseEndpoint='/games/studios'
+              items={game.developers}
+              groupKey={`rated-game-developer-${game.id}`}
+            />
+          ) : (
+            <span>—</span>
+          )}
+        </PropBlock>
 
-        <GamePropBlock title='Publisher'>
-          <GameStudiosLinks
-            studios={game.publishers}
-            groupKey={`rated-game-publisher-${game.id}`}
-          />
-        </GamePropBlock>
+        <PropBlock title='Publisher'>
+          {game.publishers.length ? (
+            <LinksString
+              baseEndpoint='/games/studios'
+              items={game.publishers}
+              groupKey={`rated-game-publisher-${game.id}`}
+            />
+          ) : (
+            <span>—</span>
+          )}
+        </PropBlock>
       </div>
 
       <MultipleRating

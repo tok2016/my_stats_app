@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 
-import { NewGame } from '@ts/games/game';
+import { GameUpdate, NewGame } from '@ts/games/game';
 import { SearchGame } from '@ts/games/game';
 import { Option } from '@ts/ui/components-props';
 import { FormAction } from '@ts/ui/form-state';
@@ -11,7 +11,6 @@ import AxiosInstanse from '@lib/axios-instanse';
 import { useRedirectActionForm, useURLSearchParams } from '@lib/hooks';
 import {
   MAX_RATING,
-  MINUTES,
   getErrorFormState,
   getFormDataValue,
   getNumberFormDataValue,
@@ -31,12 +30,8 @@ type GameRatingFormProps = {
   game: SearchGame;
 };
 
-type GameRatingData = Pick<NewGame, 'platformId' | 'playDate' | 'rating'> & {
-  hours: number;
-};
-
 const addNewGame =
-  (game: SearchGame, controller: AbortController): FormAction<GameRatingData> =>
+  (game: SearchGame, controller: AbortController): FormAction<GameUpdate> =>
   async (_state, formData) => {
     const ratingData = Object.fromEntries(formData.entries());
     const newGame: NewGame = {
@@ -45,14 +40,14 @@ const addNewGame =
       genresIds: game.genres.map((genre) => genre.id),
       developersIds: game.developers.map((developer) => developer.id),
       publishersIds: game.publishers.map((publisher) => publisher.id),
-      cover: game.cover,
-      releasedAt: game.releasedAt ? new Date(game.releasedAt) : undefined,
+      coverId: game.cover?.id,
+      releasedAt: game.releasedAt,
       seriesId: game.series?.id,
       platformId: Number(ratingData.platformId),
       playDate: ratingData.playDate
-        ? new Date(ratingData.playDate.toString())
+        ? new Date(ratingData.playDate.toString()).toISOString()
         : undefined,
-      minutes: Number(ratingData.hours ?? '') * MINUTES,
+      hours: Number(ratingData.hours ?? ''),
       rating: parseBooleanString(ratingData.isRated?.toString() ?? '')
         ? Number(ratingData.rating ?? '')
         : undefined
@@ -145,13 +140,15 @@ export default function GameRatingForm({ game }: GameRatingFormProps) {
           />
         </HiddenInput>
 
-        <Button type='submit' variant='primary' loading={isPending}>
-          Add
-        </Button>
+        <div className='buttons-flex-box'>
+          <Button type='submit' variant='primary' loading={isPending}>
+            Add
+          </Button>
 
-        <Button type='reset' variant='outlined' onClick={onReset}>
-          Cancel
-        </Button>
+          <Button type='reset' variant='outlined' onClick={onReset}>
+            Cancel
+          </Button>
+        </div>
       </form>
 
       {state.error && <p className='small error'>{state.message}</p>}
