@@ -18,7 +18,7 @@ import { LiteralType } from '@ts/util-types';
 import { getCredentialsById } from '../auth';
 import { GamesModel } from '../models';
 import { isIgdbItemArray, isIgdbItemBasic } from '../type-guards';
-import { MINUTES, generateErrorResponse, mean } from '../utils';
+import { generateErrorResponse, mean } from '../utils';
 import { getImageUrl, igdbRequest } from './igdb';
 
 type ItemsFields = keyof Omit<GameInSchema, 'userId' | 'storeId'>;
@@ -113,9 +113,9 @@ export const uniteGameCoreAndIgdb = (
     ? Math.round(igdbGame.aggregated_rating)
     : undefined,
   usersRating: igdbGame.rating ? Math.round(igdbGame.rating) : undefined,
-  releasedAt: gameCore.releasedAt ? new Date(gameCore.releasedAt) : undefined,
-  hours: Math.round(gameCore.minutes / MINUTES),
-  playDate: gameCore.playDate ? new Date(gameCore.playDate) : undefined,
+  releasedAt: gameCore.releasedAt,
+  hours: gameCore.hours,
+  playDate: gameCore.playDate,
   developers:
     igdbGame.involved_companies
       ?.filter((studio) => studio.developer)
@@ -133,7 +133,7 @@ export const uniteGameCoreAndIgdb = (
     curr.games.length > prev.games.length ? curr : prev
   ),
   genres: igdbGame.genres,
-  cover: igdbGame.cover?.image_id
+  coverUrl: igdbGame.cover?.image_id
     ? getImageUrl(igdbGame.cover.image_id, 'cover_big')
     : undefined,
   screenshots: igdbGame.screenshots
@@ -145,9 +145,9 @@ export const gameCoreToShort = (game: GameCore): GameShort => ({
   id: game.id,
   apiId: game.apiId,
   name: game.name,
-  hours: Math.round(game.hours / MINUTES),
+  hours: game.hours,
   rating: game.rating,
-  cover: game.cover ? getImageUrl(game.cover, 'cover_big') : undefined
+  coverUrl: game.coverId ? getImageUrl(game.coverId, 'cover_big') : undefined
 });
 
 export const formRecommendedGame = (
@@ -159,7 +159,7 @@ export const formRecommendedGame = (
     id: igdbGame.id,
     name: igdbGame.name,
     rating: igdbGame.rating,
-    cover: igdbGame.cover
+    coverUrl: igdbGame.cover
       ? getImageUrl(igdbGame.cover.image_id, 'cover_big')
       : undefined,
     genres: igdbGame.genres,
@@ -216,9 +216,9 @@ const fieldToEndpoint: Record<ItemsFields, string> = {
   platformId: '/platforms',
   genresIds: '/genres',
   playDate: '/games',
-  minutes: '/games',
+  hours: '/games',
   releasedAt: '/release_dates',
-  cover: '/covers',
+  coverId: '/covers',
   rating: '/games'
 };
 
@@ -277,8 +277,7 @@ export const getAverageRating = <GameType extends object>(
 
 export const getTotalPlaytime = (games: GameCore[]): number =>
   Math.round(
-    games.map((game) => game.minutes).reduce((prev, curr) => prev + curr, 0)
-      / MINUTES
+    games.map((game) => game.hours).reduce((prev, curr) => prev + curr, 0)
   );
 
 const setItemToMap = (

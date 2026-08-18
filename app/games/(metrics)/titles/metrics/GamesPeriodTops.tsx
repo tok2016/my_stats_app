@@ -74,7 +74,7 @@ export default function GamesPeriodTops({ gamesMap }: GamesPeriodTopsProps) {
         name: { name: 'Game' },
         hours: { name: 'Hours' },
         percent: { name: '%' },
-        cover: { name: 'Cover' },
+        coverUrl: { name: 'Cover' },
         apiId: { name: 'ID' },
         rating: { name: 'Rating' }
       }}

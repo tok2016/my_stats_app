@@ -247,15 +247,22 @@ export const parseBooleanString = (value: string) => {
   return !!value && lowercase !== 'false' && lowercase !== 'off';
 };
 
-export const getPeriodDate: Record<PrecisePeriod, (date: Date) => string> = {
-  year: (date) => date.getFullYear().toString(),
+export const getPeriodDate: Record<
+  PrecisePeriod,
+  (date: Date | string) => string
+> = {
+  year: (date) => new Date(date).getFullYear().toString(),
   season: (date) => {
+    const formDate = new Date(date);
     const seasonNumber = Math.floor(
-      ((date.getMonth() % MONTHS_SHIFT) + 1) / MONTHS_IN_QUARTER
+      ((formDate.getMonth() % MONTHS_SHIFT) + 1) / MONTHS_IN_QUARTER
     );
-    return `${date.getFullYear()}-${seasonNumber + 1}`;
+    return `${formDate.getFullYear()}-${seasonNumber + 1}`;
   },
-  month: (date) => `${date.getFullYear()}-${date.getMonth() + 1}`
+  month: (date) => {
+    const formDate = new Date(date);
+    return `${formDate.getFullYear()}-${formDate.getMonth() + 1}`;
+  }
 };
 
 export const mean = (values: number[]) =>

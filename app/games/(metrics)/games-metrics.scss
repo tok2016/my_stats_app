@@ -101,18 +101,14 @@ $series-collage-areas: (
 }
 
 .game-title-rating {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 1fr 2.75rem;
   align-items: center;
-  justify-content: flex-start;
-  gap: 0;
-
-  .game-table-title {
-    flex-grow: 1;
-  }
+  gap: 0.125rem;
 }
 
 .period-platform-title {
+  width: 100%;
   text-align: center;
 }
 

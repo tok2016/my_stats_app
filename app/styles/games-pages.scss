@@ -52,12 +52,13 @@ $rating-block-rating-border: $rating-block-rating-size - 1.5rem;
     'a c';
 
   grid-template-rows: 1fr 1fr;
-  grid-template-columns: 90fr 100fr;
+  grid-template-columns: 92fr 100fr;
 
   align-items: stretch;
-  gap: 0.625rem;
+  gap: 0.5rem;
 
-  aspect-ratio: 124 / 79;
+  aspect-ratio: 200 / 120;
+  height: min-content;
 
   .game-cover {
     grid-area: a;

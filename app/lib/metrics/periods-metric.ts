@@ -2,7 +2,7 @@ import { GameCore } from '@ts/games/game';
 import { MetricMap, PeriodPlaytimeTops, PrecisePeriod } from '@ts/games/metric';
 
 import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
-import { MINUTES, getPeriodDate } from '../utils';
+import { getPeriodDate } from '../utils';
 
 const setPeriodList = (
   item: number | string,
@@ -11,7 +11,7 @@ const setPeriodList = (
   periodLists: Map<string, MetricMap<number>>
 ) => {
   const periodList = periodLists.get(period);
-  const currentGameTime = Math.round(game.minutes / MINUTES);
+  const currentGameTime = game.hours;
 
   periodLists.set(period, {
     ...periodLists.get(period),
@@ -28,7 +28,7 @@ export const getPeriodMetric = (
   const periodLists = new Map<string, MetricMap<number>>();
 
   games.forEach((game) => {
-    if (game.playDate && game.playDate.getTime()) {
+    if (game.playDate) {
       const period = getPeriodDate[periodType](game.playDate);
       if (isNumberOrStringArray(game[dataField]))
         game[dataField].forEach((item) =>

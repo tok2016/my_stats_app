@@ -9,7 +9,7 @@ const TOP_GAMES = 10;
 const getTopGamesByPlaytime = async (games: GameCore[]) => {
   const topGamesIds = games
     .slice()
-    .sort((a, b) => b.minutes - a.minutes)
+    .sort((a, b) => b.hours - a.hours)
     .slice(0, TOP_GAMES)
     .map((game) => game.id);
 

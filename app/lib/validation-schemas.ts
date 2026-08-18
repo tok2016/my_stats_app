@@ -113,46 +113,36 @@ export const NewPasswordValidatior: z.ZodType<NewPassword> =
     })
   );
 
-export const NewGameValidator: z.ZodType<NewGame> = z
-  .object({
-    name: z.string().nonempty(),
-    apiId: z.number().nonnegative().nonoptional(),
-    storeId: z.number().nonnegative().optional(),
-    platformId: z.number().nonnegative().nonoptional(),
-    developersIds: z
-      .array(z.number().nonnegative().nonoptional())
-      .optional()
-      .default([]),
-    publishersIds: z
-      .array(z.number().nonnegative().nonoptional())
-      .optional()
-      .default([]),
-    genresIds: z
-      .array(z.number().nonnegative().nonoptional())
-      .optional()
-      .default([]),
-    hours: z.number().nonnegative().optional().default(0),
-    rating: z.number().nonnegative().optional(),
-    releasedAt: z.string().optional(),
-    playDate: z.string().optional()
-  })
-  .transform((input) => ({
-    ...input,
-    releasedAt: input.releasedAt ? new Date(input.releasedAt) : undefined,
-    playDate: input.playDate ? new Date(input.playDate) : undefined
-  }));
+export const NewGameValidator: z.ZodType<NewGame> = z.object({
+  name: z.string().nonempty(),
+  apiId: z.number().nonnegative().nonoptional(),
+  storeId: z.number().nonnegative().optional(),
+  platformId: z.number().nonnegative().nonoptional(),
+  developersIds: z
+    .array(z.number().nonnegative().nonoptional())
+    .optional()
+    .default([]),
+  publishersIds: z
+    .array(z.number().nonnegative().nonoptional())
+    .optional()
+    .default([]),
+  genresIds: z
+    .array(z.number().nonnegative().nonoptional())
+    .optional()
+    .default([]),
+  hours: z.number().nonnegative().optional().default(0),
+  rating: z.number().nonnegative().optional(),
+  releasedAt: z.string().optional(),
+  playDate: z.string().optional(),
+  coverId: z.string().optional()
+});
 
-export const GameUpdateValidator: z.ZodType<GameUpdate> = z
-  .object({
-    hours: z.number().nonnegative().optional().default(0),
-    rating: z.number().nonnegative().optional(),
-    playDate: z.string().optional(),
-    platformId: z.number().nonnegative().nonoptional()
-  })
-  .transform((input) => ({
-    ...input,
-    playDate: input.playDate ? new Date(input.playDate) : undefined
-  }));
+export const GameUpdateValidator: z.ZodType<GameUpdate> = z.object({
+  hours: z.number().nonnegative().optional().default(0),
+  rating: z.number().nonnegative().optional(),
+  playDate: z.string().optional(),
+  platformId: z.number().nonnegative().nonoptional()
+});
 
 export const validateData = async <
   DataType,

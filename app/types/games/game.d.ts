@@ -80,7 +80,7 @@ export interface IgdbGameTag extends IgdbBasic {
 export interface GameUpdate {
   hours: number;
   rating?: number;
-  playDate?: Date;
+  playDate?: string;
   platformId: number;
 }
 
@@ -92,8 +92,8 @@ export interface NewGame extends GameUpdate {
   developersIds: number[];
   publishersIds: number[];
   seriesId?: number;
-  releasedAt?: Date;
-  cover?: string;
+  releasedAt?: string;
+  coverId?: string;
 }
 
 export interface GameInSchema extends NewGame {
@@ -104,10 +104,10 @@ export interface GameCore extends GameInSchema {
   id: string;
 }
 
-export type GameShort = Pick<
-  GameCore,
-  'id' | 'apiId' | 'name' | 'cover' | 'rating'
-> & { hours: number };
+export type GameShort = Pick<GameCore, 'id' | 'apiId' | 'name' | 'rating'> & {
+  hours: number;
+  coverUrl?: string;
+};
 
 export interface IgdbGameFull extends IgdbBasic {
   first_release_date?: number;
@@ -126,10 +126,13 @@ export interface SearchGame {
   name: string;
   genres: IgdbGenre[];
   platforms: IgdbBasic[];
-  developers: IgdbInvolvedStuioExtended[];
-  publishers: IgdbInvolvedStuioExtended[];
-  releasedAt?: Date;
-  cover?: string;
+  developers: IgdbStudioBase[];
+  publishers: IgdbStudioBase[];
+  releasedAt?: string;
+  cover?: {
+    url: string;
+    id: string;
+  };
   series?: IgdbSeries;
 }
 
@@ -149,16 +152,16 @@ export default interface Game extends ExternalRatings {
   developers: IgdbStudioBase[];
   publishers: IgdbStudioBase[];
   series?: IgdbSeries;
-  cover?: string;
+  coverUrl?: string;
   screenshots?: string[];
   hours: number;
-  releasedAt?: Date;
+  releasedAt?: string;
   rating?: number;
-  playDate?: Date;
+  playDate?: string;
 }
 
 export type RecommendedGame = IgdbBasic & {
-  cover?: string;
+  coverUrl?: string;
   external: {
     id: number;
     url?: string;

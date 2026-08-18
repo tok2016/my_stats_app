@@ -35,7 +35,7 @@ type GenreTopTableData = {
   index: number;
   name: string;
   hours: number;
-  cover?: string;
+  coverUrl?: string;
 };
 
 const greatPeriodsLabels: Record<GreatPeriod, string> = {
@@ -76,7 +76,7 @@ function GenreTopBlock({
       index: i,
       name: game.name,
       hours: game.hours,
-      cover: game.cover
+      coverUrl: game.coverUrl
     }));
 
   return (

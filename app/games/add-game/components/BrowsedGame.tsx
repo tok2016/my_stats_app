@@ -19,7 +19,10 @@ export default function BrowsedGame({ game, onClick }: BrowsedGameProps) {
       className={`browsed-game ${onClick ? 'clickable' : ''}`}
       onClick={onClick}
     >
-      <GameCover className='browsed-game-cover' game={game} />
+      <GameCover
+        className='browsed-game-cover'
+        game={{ coverUrl: game.cover?.url, name: game.name }}
+      />
 
       <div className='browsed-game-data'>
         <p className='small bold browsed-game-name'>

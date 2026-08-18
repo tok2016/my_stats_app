@@ -18,7 +18,7 @@ export type StudioFieldParams = {
 
 export interface CountCompareData {
   count: number;
-  minutes: number;
+  hours: number;
 }
 
 export interface ItemIdCompareData extends CountCompareData {

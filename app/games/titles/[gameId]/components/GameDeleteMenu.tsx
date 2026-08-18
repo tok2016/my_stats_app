@@ -52,10 +52,6 @@ export default function GameDeleteMenu({
     abortController.current.abort();
   };
 
-  const onDeleteClick = () => {
-    action(new FormData());
-  };
-
   const onClose = () => {
     abortController.current.abort();
   };
@@ -71,12 +67,12 @@ export default function GameDeleteMenu({
         deleted and will not be taken into account in charts.
       </p>
 
-      <div className='buttons-flex-box'>
+      <form action={action} className='buttons-flex-box' noValidate>
         <Button
           variant='primary'
           status='error'
+          type='submit'
           loading={isPending}
-          onClick={onDeleteClick}
         >
           Delete
         </Button>
@@ -84,7 +80,7 @@ export default function GameDeleteMenu({
         <Button variant='outlined' onClick={onCancel}>
           Cancel
         </Button>
-      </div>
+      </form>
 
       {state.error && <p className='error'>{state.error}</p>}
     </Popup>

@@ -54,7 +54,11 @@ const getDefaultData = (game: GameDetailed) => {
 };
 
 const updateGame =
-  (gameId: string, controller: AbortController): FormAction<GameUpdate> =>
+  (
+    gameId: string,
+    controller: AbortController,
+    onSuccess: () => void
+  ): FormAction<GameUpdate> =>
   async (_state, formData) => {
     const data = Object.fromEntries(formData.entries());
     const update: GameUpdate = {
@@ -63,7 +67,7 @@ const updateGame =
         ? Number(data['rating'])
         : undefined,
       playDate: data['playDate']
-        ? new Date(data['playDate'].toString())
+        ? new Date(data['playDate'].toString()).toISOString()
         : undefined,
       platformId: Number(data['platformId'])
     };
@@ -74,6 +78,9 @@ const updateGame =
         update,
         { signal: controller.signal }
       );
+
+      onSuccess();
+
       return {
         error: false,
         message: response.statusText,
@@ -97,8 +104,12 @@ export default function GameUpdateForm({
   const abortController = useRef(new AbortController());
   const { togglePopup } = usePopupState();
 
+  const closePopup = () => {
+    togglePopup(popupName);
+  };
+
   const [state, action, isPending] = useRedirectActionForm(
-    updateGame(game.id, abortController.current),
+    updateGame(game.id, abortController.current, closePopup),
     '',
     {
       error: false,

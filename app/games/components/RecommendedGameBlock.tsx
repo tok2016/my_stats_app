@@ -38,7 +38,7 @@ export default function RecommendedGameBlock(game: RecommendedGame) {
         game={{
           id: game.id.toString(),
           name: game.name,
-          cover: game.cover,
+          coverUrl: game.coverUrl,
           screenshots: game.screenshots
         }}
       />

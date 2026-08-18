@@ -37,19 +37,24 @@ export const searchForGames = async (
     platforms: searchedGame.platforms,
     genres: searchedGame.genres,
     developers:
-      searchedGame.involved_companies?.filter((company) => company.developer)
-      ?? [],
+      searchedGame.involved_companies
+        ?.filter((company) => company.developer)
+        .map((company) => company.company) ?? [],
     publishers:
-      searchedGame.involved_companies?.filter((company) => company.publisher)
-      ?? [],
+      searchedGame.involved_companies
+        ?.filter((company) => company.publisher)
+        .map((company) => company.company) ?? [],
     series: searchedGame.collections
       ?.slice()
       .sort((a, b) => b.games.length - a.games.length)[0],
     releasedAt: searchedGame.first_release_date
-      ? new Date(searchedGame.first_release_date * MILLISECONDS)
+      ? new Date(searchedGame.first_release_date * MILLISECONDS).toISOString()
       : undefined,
-    cover: searchedGame.cover?.image_id
-      ? getImageUrl(searchedGame.cover.image_id, 'cover_big')
+    cover: searchedGame.cover
+      ? {
+          url: getImageUrl(searchedGame.cover.image_id, 'cover_big'),
+          id: searchedGame.cover.image_id
+        }
       : undefined
   };
 

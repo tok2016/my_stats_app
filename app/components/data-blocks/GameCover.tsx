@@ -5,14 +5,14 @@ import FetchImage from '@components/FetchImage';
 import EmptyImage from './EmptyImage';
 
 type GameCoverProps = {
-  game: Pick<Game, 'cover' | 'name'>;
+  game: Pick<Game, 'coverUrl' | 'name'>;
   className?: string;
 };
 
 export default function GameCover({ game, className = '' }: GameCoverProps) {
-  return game.cover ? (
+  return game.coverUrl ? (
     <FetchImage
-      src={game.cover}
+      src={game.coverUrl}
       alt={`Cover of ${game.name}`}
       className={`game-cover ${className}`}
     />

@@ -40,12 +40,12 @@ const addNewGame =
       genresIds: game.genres.map((genre) => genre.id),
       developersIds: game.developers.map((developer) => developer.id),
       publishersIds: game.publishers.map((publisher) => publisher.id),
-      cover: game.cover,
-      releasedAt: game.releasedAt ? new Date(game.releasedAt) : undefined,
+      coverId: game.cover?.id,
+      releasedAt: game.releasedAt,
       seriesId: game.series?.id,
       platformId: Number(ratingData.platformId),
       playDate: ratingData.playDate
-        ? new Date(ratingData.playDate.toString())
+        ? new Date(ratingData.playDate.toString()).toISOString()
         : undefined,
       hours: Number(ratingData.hours ?? ''),
       rating: parseBooleanString(ratingData.isRated?.toString() ?? '')

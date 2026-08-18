@@ -63,7 +63,6 @@ export default function ScreenshotsCarousel({
 
   const stopScrollTimeout = useCallback(() => {
     if (timeoutRef.current) {
-      console.log('stop');
       clearTimeout(timeoutRef.current);
       timeoutRef.current = undefined;
     }
@@ -71,14 +70,13 @@ export default function ScreenshotsCarousel({
 
   const waitForSroll = useCallback(() => {
     stopScrollTimeout();
-    console.log('wait');
+
     timeoutRef.current = setTimeout(() => {
       setIndex(index + 1);
     }, SECONDES_TO_SCROLL);
   }, [setIndex, index, stopScrollTimeout]);
 
   useEffect(() => {
-    console.log(index);
     waitForSroll();
     return stopScrollTimeout;
   }, [waitForSroll, stopScrollTimeout, index]);

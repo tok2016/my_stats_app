@@ -6,7 +6,7 @@ import EmptyImage from './EmptyImage';
 import GameCover from './GameCover';
 
 type GameCollageProps = {
-  game: Pick<Game, 'cover' | 'screenshots' | 'name' | 'id'>;
+  game: Pick<Game, 'coverUrl' | 'screenshots' | 'name' | 'id'>;
 };
 
 export const SCREENSHOTS_IN_COLLAGE = 2;

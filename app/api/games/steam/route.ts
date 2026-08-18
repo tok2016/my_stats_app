@@ -7,21 +7,25 @@ import Service from '@ts/users/service';
 import { getGamesByUserId } from '@lib/auth';
 import { AxiosSteamInstanse } from '@lib/axios-instanse';
 import { serviceEndpoint } from '@lib/endpoint-generators';
-import { getImageUrl, igdbRequest } from '@lib/games/igdb';
+import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
 import { isSteamGameObject } from '@lib/type-guards';
-import { MILLISECONDS, generateErrorResponse } from '@lib/utils';
+import { MILLISECONDS, MINUTES, generateErrorResponse } from '@lib/utils';
 
 type SteamGameWithId = SteamGame & { id: string };
 
 const STEAM_IGDB_ID = 1;
 const PC_ID = 6;
 
+const minutesToHours = (minutes: number) => Math.round(minutes / MINUTES);
+
 const updateGamesFromSteam = async (gamesFromSteam: SteamGameWithId[]) => {
   const updatePromises = gamesFromSteam.map((game) =>
     GamesModel.findByIdAndUpdate(game.id, {
-      minutes: game.playtime_forever,
-      playDate: new Date(game.rtime_last_played * MILLISECONDS)
+      minutes: minutesToHours(game.playtime_forever ?? 0),
+      playDate: game.rtime_last_played
+        ? new Date(game.rtime_last_played * MILLISECONDS).toISOString()
+        : undefined
     }).lean()
   );
 
@@ -49,17 +53,15 @@ const uniteSteamAndIgdb = (
         ?.filter((company) => company.publisher)
         .map((company) => company.company) ?? [],
     releasedAt: igdbGame.first_release_date
-      ? new Date(igdbGame.first_release_date * MILLISECONDS)
+      ? new Date(igdbGame.first_release_date * MILLISECONDS).toISOString()
       : undefined,
     seriesId: igdbGame.collections?.reduce((prev, curr) =>
       curr.games.length > prev.games.length ? curr : prev
     ).id,
-    cover: igdbGame?.cover?.image_id
-      ? getImageUrl(igdbGame.cover.image_id, 'cover_big')
-      : undefined,
-    minutes: steamGame?.playtime_forever ?? 0,
-    playDate: steamGame
-      ? new Date(steamGame.rtime_last_played * MILLISECONDS)
+    coverId: igdbGame?.cover ? igdbGame.cover.image_id : undefined,
+    hours: minutesToHours(steamGame?.playtime_forever ?? 0),
+    playDate: steamGame?.rtime_last_played
+      ? new Date(steamGame.rtime_last_played * MILLISECONDS).toISOString()
       : undefined
   };
 };
@@ -140,7 +142,7 @@ const pullGamesFromSteam = async (_req: NextRequest, service?: Service) => {
   steamResponse.data.response.games.forEach((game) => {
     const gameCore = gamesMap[game.appid];
     if (!gameCore) gamesToAdd.push(game);
-    else if (gameCore.minutes !== game.playtime_forever)
+    else if (gameCore.hours !== minutesToHours(game.playtime_forever ?? 0))
       gamesToUpdate.push({ ...game, id: gameCore.id });
   });
 

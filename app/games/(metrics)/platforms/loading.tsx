@@ -9,10 +9,10 @@ export default function PlatformsLoading() {
     <>
       <div className='double-doughnut'>
         <Metric id='platforms-count' title='Your biggest platforms'>
-          <ChartSkeleton type='doughnut' />
+          <ChartSkeleton type='doughnut' className='switchable-chart' />
         </Metric>
         <Metric id='platforms-playtime' title='Your longest used platforms'>
-          <ChartSkeleton type='doughnut' />
+          <ChartSkeleton type='doughnut' className='switchable-chart' />
         </Metric>
       </div>
 
