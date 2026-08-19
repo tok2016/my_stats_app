@@ -11,6 +11,11 @@ $rating-block-rating-border: $rating-block-rating-size - 1.5rem;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 2rem;
+
+  button {
+    min-height: 1rem;
+    height: utils.$h1-size * utils.$wide-font;
+  }
 }
 
 .game-table-title,
@@ -332,7 +337,7 @@ $rating-block-rating-border: $rating-block-rating-size - 1.5rem;
 
   display: flex;
   flex-direction: row;
-  align-items: start;
+  align-items: flex-start;
   gap: 3rem;
 
   overflow-x: auto;

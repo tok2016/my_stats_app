@@ -1,11 +1,15 @@
+import { useEffect } from 'react';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { SidebarOptionProps } from '@ts/ui/components-props';
 
-import Drawer from '@components/Drawer';
-import SidebarButton from './SidebarButton';
 import { useSidebarState } from '@store/sidebar-store';
+
+import Drawer from '@components/Drawer';
+
+import SidebarButton from './SidebarButton';
 
 export default function SidebarOption(sidebarOption: SidebarOptionProps) {
   const { expanded, expand } = useSidebarState();
@@ -19,6 +23,10 @@ export default function SidebarOption(sidebarOption: SidebarOptionProps) {
   const onExpand = () => {
     expand(isExpanded ? '' : sidebarOption.name);
   };
+
+  useEffect(() => {
+    expand(isChoosen ? sidebarOption.name : '');
+  }, [expand, isChoosen, sidebarOption.name]);
 
   if (!sidebarOption.subButtons) {
     return button;

@@ -170,9 +170,11 @@ $sidebar-expanded-width: 16rem;
   }
 
   .choosen {
+    color: $text-active-color;
+
     span,
     svg:not(.input-icon) {
-      color: $text-active-color;
+      color: inherit;
     }
 
     .sidebar-icon.loaded {

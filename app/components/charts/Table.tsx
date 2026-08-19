@@ -37,22 +37,25 @@ export default function Table<DataType extends ChartData>({
   sortDirection,
   onSort
 }: TableProps<DataType>) {
-  const columnsWidths = Object.values(headers)
-    .map((header) => {
-      const width = header.width ?? '1fr';
-      return header.minWidth ? `minmax(${header.minWidth}, ${width})` : width;
-    })
-    .join(' ');
+  const widths: string[] = [];
+  const minWidths: string[] = [];
+
+  Object.values(headers).forEach((header) => {
+    widths.push(header.width ?? '1fr');
+    minWidths.push(header.minWidth ?? header.width ?? '1fr');
+  });
+
+  const columns = widths.join(' ');
 
   return (
     <div
       id={id}
       className={`table ${Object.keys(headers).length < MIN_COLUMNS_TO_SHOW_BORDERS ? 'hide-borders' : ''} ${className}`}
+      style={{
+        minWidth: `calc(${minWidths.join(' + ')})`
+      }}
     >
-      <div
-        className='table-header'
-        style={{ gridTemplateColumns: columnsWidths }}
-      >
+      <div className='table-header' style={{ gridTemplateColumns: columns }}>
         {Object.entries(headers).map(([key, header]) => (
           <div
             key={key}
@@ -83,29 +86,27 @@ export default function Table<DataType extends ChartData>({
         ))}
       </div>
 
-      <div className='table-body'>
-        {data.map((value, i) => (
-          <div
-            key={value.id}
-            className={`table-row ${i === 0 ? 'top-row' : ''}`}
-            style={{
-              animationDelay: `${ROW_ANIMATION_DELAY * i}ms`,
-              gridTemplateColumns: columnsWidths
-            }}
-          >
-            {Object.entries(headers).map(([key, header]) => (
-              <div
-                key={`${value.id}-${key}`}
-                className={`table-cell ${header.bodyCellClassName ?? ''}`}
-              >
-                {header.renderRow
-                  ? header.renderRow(value, i, key)
-                  : value[key as keyof DataType]}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
+      {data.map((value, i) => (
+        <div
+          key={value.id}
+          className={`table-row ${i === 0 ? 'top-row' : ''}`}
+          style={{
+            animationDelay: `${ROW_ANIMATION_DELAY * i}ms`,
+            gridTemplateColumns: columns
+          }}
+        >
+          {Object.entries(headers).map(([key, header]) => (
+            <div
+              key={`${value.id}-${key}`}
+              className={`table-cell ${header.bodyCellClassName ?? ''}`}
+            >
+              {header.renderRow
+                ? header.renderRow(value, i, key)
+                : value[key as keyof DataType]}
+            </div>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }

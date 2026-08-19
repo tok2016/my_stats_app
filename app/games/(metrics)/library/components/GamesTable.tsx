@@ -119,26 +119,26 @@ export default function GamesTable({
           },
           hours: {
             title: 'Hours',
-            width: '4rem',
+            width: '5rem',
             sort: true
           },
           rating: {
             title: 'Your rating',
-            width: '4.5rem',
+            width: '5rem',
             sort: true,
             bodyCellClassName: 'table-cell-rating',
             renderRow: (value) => <Rating value={value.rating} />
           },
           criticsRating: {
             title: 'Critics rating',
-            width: '4.5rem',
+            width: '5rem',
             sort: true,
             bodyCellClassName: 'table-cell-rating',
             renderRow: (value) => <Rating value={value.criticsRating} />
           },
           usersRating: {
             title: 'Users rating',
-            width: '4.5rem',
+            width: '5rem',
             sort: true,
             bodyCellClassName: 'table-cell-rating',
             renderRow: (value) => <Rating value={value.usersRating} />

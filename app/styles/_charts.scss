@@ -62,10 +62,15 @@ $default-color: map.get(utils.$active-colors, 'games');
     height: 100% !important;
   }
 
-  > button {
+  .switch-button {
     position: absolute;
     top: 0;
     right: 0;
+    z-index: 3;
+
+    border-radius: 0;
+    border-bottom-left-radius: 1rem;
+    padding: 0.25rem;
   }
 }
 
@@ -326,6 +331,10 @@ $default-color: map.get(utils.$active-colors, 'games');
     li {
       color: $text-color;
     }
+  }
+
+  .switch-button {
+    background-color: $bg-color !important;
   }
 
   .map {
