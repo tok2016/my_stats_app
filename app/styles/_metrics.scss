@@ -1,20 +1,22 @@
 @use 'utils';
 
-$max-data-rank-width: 3rem;
-$min-data-rank-width: 2rem;
+$max-data-rank-width: 3em;
+$min-data-rank-width: 2em;
 
 .metrics {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 3rem;
+  gap: 3em;
 }
 
 .metric {
+  font-size: utils.$regular-size;
+
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 1.25rem;
+  gap: 1.25em;
 }
 
 .blocks-group {
@@ -22,47 +24,43 @@ $min-data-rank-width: 2rem;
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 3rem;
+  gap: 3em;
 
   overflow-x: auto;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.25em;
 }
 
 .data-block {
+  font-size: utils.$small-size;
+
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.75em;
   align-items: stretch;
 
-  padding: 0.5rem;
+  padding: 0.5em;
 
   border-style: solid;
   border-width: 2px;
-  border-radius: 0.5rem;
+  border-radius: 0.5em;
 
-  max-width: 10rem;
-
-  @include utils.font(utils.$small-size, utils.$regular-font, utils.$fit-font);
+  max-width: 10em;
 }
 
 .period-top {
-  @include utils.font(utils.$small-size, utils.$regular-font, utils.$wide-font);
   box-sizing: border-box;
-  min-width: 11rem;
+  min-width: 11em;
   height: fit-content;
   max-height: 100%;
 
   .data-block-title {
+    font-size: utils.$regular-size;
     box-sizing: content-box;
-    border-bottom: solid 0.125rem;
-    padding-bottom: 0.25rem;
+    border-bottom: solid 0.125em;
+    padding-bottom: 0.25em;
 
     p {
-      @include utils.font(
-        utils.$regular-size,
-        utils.$bold-font,
-        utils.$wide-font
-      );
+      @include utils.font(1em, utils.$bold-font, utils.$wide-font);
       width: 100%;
       text-align: center;
     }
@@ -80,7 +78,7 @@ $min-data-rank-width: 2rem;
     align-items: center;
     gap: 2px;
 
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.75em;
 
     .skeletons {
       width: 100%;
@@ -103,10 +101,10 @@ $min-data-rank-width: 2rem;
 .period-tops {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1em;
   overflow-x: auto;
   overflow-y: hidden;
-  padding-bottom: 0.25rem;
+  padding-bottom: 0.25em;
 }
 
 .period-tops-groups,
@@ -138,8 +136,8 @@ $min-data-rank-width: 2rem;
   align-items: center;
   justify-content: center;
 
-  border-top-left-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
+  border-top-left-radius: 0.5em;
+  border-bottom-right-radius: 0.5em;
 
   @include utils.header(4);
 }
@@ -147,7 +145,7 @@ $min-data-rank-width: 2rem;
 .data-block-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  gap: 0.75em;
 }
 
 @mixin data-block(
@@ -202,15 +200,16 @@ $min-data-rank-width: 2rem;
   justify-content: center;
   gap: 1rem;
 
+  font-size: utils.$regular-size;
   width: 100%;
-  min-height: 7rem;
-  height: 10rem;
+  min-height: 7em;
+  height: 10em;
 
   text-align: center;
 
   svg {
-    width: 5rem;
-    height: 5rem;
+    width: 5em;
+    height: 5em;
   }
 }
 
@@ -219,9 +218,9 @@ $min-data-rank-width: 2rem;
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.5em;
 
-  padding: 0 0.25rem;
+  padding: 0 0.25em;
 
   .rating-source {
     display: flex;
@@ -238,7 +237,7 @@ $min-data-rank-width: 2rem;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: 1em;
   flex-wrap: wrap;
 }
 
@@ -247,10 +246,10 @@ $min-data-rank-width: 2rem;
 
   .card {
     width: 45vw;
-    min-width: 15rem;
+    min-width: 15em;
 
     height: 90vh;
-    min-height: 25rem;
+    min-height: 25em;
   }
 
   h2 {
@@ -260,12 +259,12 @@ $min-data-rank-width: 2rem;
 
 #advance-search {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  column-gap: 1rem;
-  row-gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(15em, 1fr));
+  column-gap: 1em;
+  row-gap: 1em;
 
   overflow-y: auto;
-  padding: 0.25rem;
+  padding: 0.25em;
 }
 
 .library {
@@ -273,5 +272,5 @@ $min-data-rank-width: 2rem;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  gap: 1.25rem;
+  gap: 1.25em;
 }

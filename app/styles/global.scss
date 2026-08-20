@@ -3,9 +3,14 @@
 
 $directions: 'top', 'bottom', 'left', 'right';
 
-:root {
-  font-size: utils.$regular-size;
+:root,
+body {
   font-family: utils.$inter;
+  @include utils.font(
+    utils.$regular-size,
+    utils.$regular-font,
+    utils.$fit-font
+  );
 }
 
 html,
@@ -19,7 +24,6 @@ body {
   color: white;
   padding: 0;
   margin: 0;
-  font-family: utils.$inter;
 
   * {
     &::-webkit-scrollbar-track {
@@ -55,23 +59,24 @@ h4,
 h1,
 h2,
 h3,
-h4 {
-  margin: 0;
-}
-
+h4,
 p,
 a {
-  @include utils.font(
-    utils.$regular-size,
-    utils.$regular-font,
-    utils.$fit-font
-  );
-
-  text-decoration: none;
   margin: 0;
 }
 
+// p,
+// a,
+// span,
+// label,
+// time,
+// div {
+//   margin: 0;
+//   font-size: 1em;
+// }
+
 a {
+  text-decoration: none;
   cursor: pointer;
   transition: color utils.$hover-time;
 
@@ -89,13 +94,7 @@ a.underline {
 }
 
 label {
-  @include utils.font(
-    utils.$regular-size,
-    utils.$regular-font,
-    utils.$wide-font
-  );
-  font-family: utils.$inter;
-  text-align: left;
+  line-height: utils.$wide-font;
 }
 
 .logo {
