@@ -1,33 +1,28 @@
 @use 'sass:map';
 @use 'utils';
 
-$tooltip-radius: 0.5rem;
-$tooltip-padding: 0.625rem;
-$tooltip-badge-min: 2rem;
-$tooltip-badge-max: 3rem;
+$tooltip-radius: 0.5em;
+$tooltip-padding: 0.625em;
+$tooltip-badge-min: 2em;
+$tooltip-badge-max: 3em;
 
-$chart-padding: 1.25rem;
-$chart-padding-right: 2rem;
+$chart-padding: 1.25em;
+$chart-padding-right: 2em;
 $rank-padding: 0.25rem;
 
 $default-color: map.get(utils.$active-colors, 'games');
 
-.test-chart {
-  width: 32rem;
-  height: 20rem;
-}
-
 .chart {
   box-sizing: border-box;
   position: relative;
-  padding: 1.25rem;
+  padding: $chart-padding;
   padding-right: $chart-padding-right;
 
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  gap: 0.25rem;
+  gap: 0.25em;
 }
 
 .chart,
@@ -43,7 +38,7 @@ $default-color: map.get(utils.$active-colors, 'games');
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1em;
   align-items: center;
   flex: 1;
   max-height: 100%;
@@ -69,19 +64,19 @@ $default-color: map.get(utils.$active-colors, 'games');
     z-index: 3;
 
     border-radius: 0;
-    border-bottom-left-radius: 1rem;
+    border-bottom-left-radius: 1em;
     padding: 0.25rem;
   }
 }
 
 .dougnut-chart-table {
-  width: 32rem;
+  width: 32em;
   aspect-ratio: 1.8;
   overflow: hidden;
 }
 
 .doughnut-container {
-  width: 32rem;
+  width: 32em;
   aspect-ratio: 1.8;
 
   .chart-core-wrapper {
@@ -92,7 +87,7 @@ $default-color: map.get(utils.$active-colors, 'games');
   }
 
   .chart-legend-content {
-    gap: 0.5rem;
+    gap: 0.5em;
   }
 }
 
@@ -105,20 +100,20 @@ $default-color: map.get(utils.$active-colors, 'games');
 .period-bar-container,
 .bar-container {
   width: 100%;
-  min-width: 32rem;
-  height: 26rem;
+  min-width: 32em;
+  height: 26em;
 }
 
 .bar-container:has(.horizontal) {
   width: 100%;
-  min-width: 32rem;
-  height: 32rem;
+  min-width: 32em;
+  height: 32em;
 }
 
 .line-container {
   width: 100%;
-  min-width: 32rem;
-  height: 24rem;
+  min-width: 32em;
+  height: 24em;
 }
 
 .map-container,
@@ -132,26 +127,26 @@ $default-color: map.get(utils.$active-colors, 'games');
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1em;
   flex-wrap: wrap;
 
   > * {
-    height: 23rem;
+    height: 23em;
   }
 
   .chart,
   .skeletons:has(> .graph) {
-    padding: 0.5rem;
+    padding: 0.5em;
     flex: 2;
     width: unset;
     height: unset;
-    min-width: 29rem;
+    min-width: 29em;
   }
 
   .table,
   .skeletons:has(> .tablet) {
     flex: 3;
-    min-width: 29rem;
+    min-width: 29em;
   }
 
   .skeletons:has(> .tablet) {
@@ -170,7 +165,7 @@ $default-color: map.get(utils.$active-colors, 'games');
 
   box-sizing: border-box;
   width: max-content;
-  max-width: 18rem;
+  max-width: 18em;
   padding: $tooltip-padding;
   padding-right: $tooltip-badge-max + $tooltip-padding;
 
@@ -182,6 +177,8 @@ $default-color: map.get(utils.$active-colors, 'games');
   flex-direction: column;
   gap: $tooltip-padding;
 
+  font-size: utils.$regular-size;
+
   .colored {
     color: $default-color;
   }
@@ -190,7 +187,7 @@ $default-color: map.get(utils.$active-colors, 'games');
 .tooltip-key {
   display: flex;
   flex-direction: row;
-  gap: 0.25rem;
+  gap: 0.25em;
 
   * {
     overflow-x: hidden;
@@ -241,35 +238,32 @@ $default-color: map.get(utils.$active-colors, 'games');
   list-style: none;
   padding: 0;
   margin: 0;
-  max-width: 13rem;
+  max-width: 13em;
 
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.25em;
 
   max-height: 100%;
   overflow-y: auto;
 
   li {
-    @include utils.font(
-      utils.$regular-size,
-      utils.$regular-font,
-      utils.$wide-font
-    );
+    line-height: utils.$wide-font;
+
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.25em;
 
     .percent {
-      width: 3rem;
+      width: 3em;
       font-weight: utils.$bold-font;
       text-align: right;
     }
 
     .legend-mark {
-      width: 1rem;
-      height: 1rem;
+      width: 1em;
+      height: 1em;
       border-radius: utils.$max-radius;
       background-color: $default-color;
     }

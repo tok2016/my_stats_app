@@ -49,7 +49,7 @@ function TopSeries({ series, gamesMap }: TopSeriesProps) {
         )}
       </div>
 
-      <PropBlock title='Best game'>
+      <PropBlock title='Best game' className='min'>
         {games[0] ? (
           <Link
             href={`/games/titles/${games[0].id}`}
@@ -62,7 +62,7 @@ function TopSeries({ series, gamesMap }: TopSeriesProps) {
         )}
       </PropBlock>
 
-      <div className='data-block-grid'>
+      <div className='data-block-grid min'>
         <PropBlock title='Developers'>
           {series.developers.length ? (
             <LinksString

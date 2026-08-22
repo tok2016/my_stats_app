@@ -16,11 +16,11 @@ export default function RecommendedGameSkeleton({
       <GameCollageSkeleton parentKey={parentKey} />
 
       <PropBlock title='Genres'>
-        <Skeleton type='text' fontSize='small' />
+        <Skeleton />
       </PropBlock>
 
       <PropBlock title='Available at'>
-        <Skeleton type='text' fontSize='small' />
+        <Skeleton />
       </PropBlock>
     </div>
   );

@@ -140,8 +140,8 @@ $tight-font: 1;
 $fit-font: 1.2;
 $wide-font: 1.4;
 
-$input-label-gap: 0.5rem; //8px
-$layout-padding: 3rem;
+$input-label-gap: 0.5em;
+$layout-padding: 3em;
 
 @mixin font($font-size, $font-weight, $line-height) {
   font-size: $font-size;

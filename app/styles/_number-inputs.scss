@@ -1,12 +1,13 @@
 @use 'utils';
 
-$slider-height: 0.5rem;
+$slider-height: 0.5em;
 $circle-diameter: 7.5rem;
 $inner-circle-diameter: 5.5rem;
 
 .double-slider {
+  font-size: 1em;
   position: relative;
-  min-width: 12.5rem;
+  min-width: 12.5em;
   height: $slider-height;
 }
 
@@ -16,10 +17,10 @@ input[type='range'] {
   height: 0;
   top: $slider-height * 0.5;
   left: 0;
-  min-width: 12.5rem;
+  min-width: 12.5em;
   width: 100%;
 
-  border-radius: 0.25rem;
+  border-radius: 0.25em;
   pointer-events: none;
   margin: 0;
 
@@ -47,7 +48,7 @@ input[type='range'].right {
   height: $slider-height;
   top: 0;
   left: 0;
-  border-radius: 0.25rem;
+  border-radius: 0.25em;
 }
 
 .slider-track {
@@ -55,7 +56,7 @@ input[type='range'].right {
   width: 100%;
   height: $slider-height;
   top: 0;
-  border-radius: 0.25rem;
+  border-radius: 0.25em;
   transform-origin: top left;
 }
 
@@ -92,7 +93,7 @@ input[type='range'].right {
 .circle-slider-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.5em;
   align-items: center;
   align-self: center;
 }

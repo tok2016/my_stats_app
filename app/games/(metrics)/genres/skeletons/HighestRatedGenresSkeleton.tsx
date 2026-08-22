@@ -10,8 +10,8 @@ function RatedGameSkeleton() {
       <div className='data-block-content'>
         <span className='min'>Best game:</span>
         <Skeleton type='image' className='game-cover' />
-        <Skeleton type='text' fontSize='small' />
-        <Skeleton type='text' fontSize='min' />
+        <Skeleton />
+        <Skeleton fontSize='min' />
       </div>
     </div>
   );

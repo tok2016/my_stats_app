@@ -3,13 +3,13 @@
 
 $table-gap: 3px;
 $table-body-padding: 2px;
-$table-row-padding-y: 0.625rem;
-$table-row-padding-x: 0.375rem;
+$table-row-padding-y: 0.7em;
+$table-row-padding-x: 0.4em;
 $header-glow: 1px;
 
 .table {
   height: inherit;
-  min-width: 15rem;
+  min-width: 15em;
   overflow: auto;
 
   display: flex;
@@ -24,10 +24,6 @@ $header-glow: 1px;
   position: relative;
 
   @include utils.font(utils.$small-size, utils.$regular-font, utils.$fit-font);
-
-  * {
-    font-size: utils.$small-size;
-  }
 }
 
 .table-header,
@@ -40,7 +36,7 @@ $header-glow: 1px;
   padding: $table-row-padding-y $table-row-padding-x;
 
   > * {
-    padding: 0 0.625rem;
+    padding: 0 0.7em;
 
     &:first-child {
       padding-left: 0;
@@ -79,8 +75,8 @@ $header-glow: 1px;
   flex-wrap: wrap;
 
   svg {
-    width: 1rem;
-    height: 1rem;
+    width: 1em;
+    height: 1em;
 
     * {
       stroke-width: 3px;

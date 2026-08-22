@@ -36,7 +36,7 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
         <GameCover game={topGame} />
 
         <Link
-          href={`/games/title/${topGame.id}`}
+          href={`/games/titles/${topGame.id}`}
           className='underline bold small'
         >
           {topGame.name}

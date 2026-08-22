@@ -1,5 +1,6 @@
 @use 'utils';
 @use 'sass:map';
+@use 'metrics';
 
 $rating-block-rating-size: 9em;
 $rating-block-rating-border: $rating-block-rating-size - 1.5em;
@@ -268,7 +269,7 @@ $rating-block-rating-border: $rating-block-rating-size - 1.5em;
 }
 
 .rating-block {
-  font-size: utils.$regular-size;
+  font-size: 1em;
   box-sizing: border-box;
   min-height: 11em;
 
@@ -285,23 +286,8 @@ $rating-block-rating-border: $rating-block-rating-size - 1.5em;
     text-align: center;
   }
 
-  .rating {
-    width: $rating-block-rating-size;
-    height: $rating-block-rating-size;
-
-    .value {
-      width: $rating-block-rating-border;
-      height: $rating-block-rating-border;
-      font-size: 3em;
-      line-height: $rating-block-rating-border;
-    }
-  }
-
+  .rating,
   .playtime-rating {
-    width: $rating-block-rating-size;
-    height: $rating-block-rating-size;
-    border-radius: utils.$large-radius;
-
     font-size: 3em;
   }
 
@@ -347,6 +333,6 @@ $rating-block-rating-border: $rating-block-rating-size - 1.5em;
 }
 
 .recommended-game {
-  min-width: 15.5em;
+  min-width: 15.5em !important;
   gap: 0.75em;
 }

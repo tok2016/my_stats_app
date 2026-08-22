@@ -18,19 +18,19 @@ function TopGameSkeleton({ parentKey, index }: TopGameSkeletonProps) {
       <GameCollageSkeleton parentKey={parentKey} />
       <div className='data-block-grid min'>
         <PropBlock title='Developer'>
-          <Skeleton fontSize='min' lineHeight='wide' rows={2} />
+          <Skeleton lineHeight='wide' rows={2} />
         </PropBlock>
 
         <PropBlock title='Publisher'>
-          <Skeleton fontSize='min' lineHeight='wide' rows={2} />
+          <Skeleton lineHeight='wide' rows={2} />
         </PropBlock>
 
         <PropBlock title='Platform'>
-          <Skeleton fontSize='min' lineHeight='wide' />
+          <Skeleton lineHeight='wide' />
         </PropBlock>
 
         <PropBlock title='Playtime'>
-          <Skeleton fontSize='min' lineHeight='wide' />
+          <Skeleton lineHeight='wide' />
         </PropBlock>
       </div>
 
