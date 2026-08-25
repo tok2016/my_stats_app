@@ -16,7 +16,7 @@ export default function HighestRatedStudiosSkeleton() {
           <div className='data-block-content'>
             <span className='min'>Best game:</span>
             <Skeleton type='image' className='game-cover' />
-            <Skeleton type='text' fontSize='small' />
+            <Skeleton />
           </div>
 
           <MultipleRating />

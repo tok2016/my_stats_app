@@ -11,13 +11,13 @@ function RatedPlatformSkeleton({ skeletonKey }: RatedPlatformSkeletonProps) {
   return (
     <div className='data-block rated-platform'>
       <Skeleton type='h4' unitClassName='rating-title-skeleton' />
-      <Skeleton fontSize='small' />
+      <Skeleton />
       <span className='min'>Best games: </span>
       <div className='data-block-content'>
         {Array.from({ length: MAX_GAMES }).map((_, i) => (
           <div key={`${skeletonKey}-game-${i}`} className='game-table-title'>
             <Skeleton type='image' className='game-cover game-table-cover' />
-            <Skeleton fontSize='small' className='game-table-name' />
+            <Skeleton className='game-table-name' />
           </div>
         ))}
       </div>

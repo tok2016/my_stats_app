@@ -1,21 +1,21 @@
 @use 'sass:map';
 @use 'utils';
 
-$button-icon-size: 1.25rem;
-$icon-button-width: 2rem;
-$button-padding: 0.75rem;
+$button-icon-size: 1.25em;
+$icon-button-width: 2em;
+$button-padding: 0.75em;
 
 button {
-  @include utils.font(utils.$regular-size, utils.$bold-font, utils.$tight-font);
+  @include utils.font(1em, utils.$bold-font, utils.$tight-font);
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: row;
-  gap: 1rem;
+  gap: 1em;
 
   padding: $button-padding;
   min-height: $button-icon-size + $button-padding * 2;
-  min-width: 6.25rem;
+  min-width: 6.25em;
 
   border-radius: utils.$regular-radius;
   border: none;
@@ -175,21 +175,27 @@ button {
 
     background-color: transparent;
 
-    * {
+    svg {
       filter: drop-shadow(0 0 utils.$spread * 0.5 $main-color);
     }
 
     &:hover,
-    &:focus-visible * {
-      filter: drop-shadow(0 0 2 * utils.$spread * 0.5 $hover-color);
+    &:focus-visible {
+      svg {
+        filter: drop-shadow(0 0 2 * utils.$spread * 0.5 $hover-color);
+      }
     }
 
-    &:active * {
-      filter: drop-shadow(0 0 2 * utils.$spread * 0.5 $active-color);
+    &:active {
+      svg {
+        filter: drop-shadow(0 0 2 * utils.$spread * 0.5 $active-color);
+      }
     }
 
-    &:disabled * {
-      filter: none;
+    &:disabled {
+      svg {
+        filter: none;
+      }
     }
   }
 }
@@ -246,7 +252,7 @@ a button {
   flex-direction: row;
   justify-content: stretch;
   align-items: flex-start;
-  gap: 1.5rem;
+  gap: 1.5em;
 
   > * {
     flex: 1 1;
@@ -262,4 +268,8 @@ button.icon {
   border-radius: utils.$max-radius;
   font-size: $button-icon-size;
   padding: ($icon-button-width - $button-icon-size) * 0.5;
+
+  svg {
+    stroke-width: 0.1em;
+  }
 }

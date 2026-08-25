@@ -205,12 +205,15 @@ $modules: 'user', 'music', 'games';
     );
 
     @include tables.table(
-      map.get(utils.$bg-1-colors, $module),
-      map.get(utils.$active-colors, $module),
-      map.get(utils.$disabled-colors, $module),
       map.get(utils.$text-colors, $module),
-      utils.$text-darker,
-      utils.$white
+      map.get(utils.$bg-1-colors, $module),
+      map.get(utils.$disabled-colors, $module),
+      map.get(utils.$hover-colors, $module),
+      map.get(utils.$active-colors, $module),
+      map.get(utils.$bg-1-colors, $module),
+      map.get(utils.$text-colors, $module),
+      map.get(utils.$disabled-colors, $module),
+      map.get(utils.$active-colors, $module)
     );
 
     @include metrics.data-block(
@@ -355,10 +358,13 @@ $modules: 'user', 'music', 'games';
       );
 
       @include tables.table(
-        map.get(utils.$text-colors, $module),
-        map.get(utils.$active-colors, $module),
-        map.get(utils.$disabled-colors, $module),
         map.get(utils.$bg-2-colors, $module),
+        map.get(utils.$text-colors, $module),
+        map.get(utils.$disabled-colors, $module),
+        map.get(utils.$active-colors, $module),
+        map.get(utils.$highlight-colors, $module),
+        map.get(utils.$text-colors, $module),
+        map.get(utils.$bg-1-colors, $module),
         map.get(utils.$hover-colors, $module),
         map.get(utils.$active-colors, $module)
       );

@@ -2,7 +2,7 @@ import { ChartColumnBigSolid, ImageSolid } from '@mynaui/icons-react';
 
 type SkeletonProps = {
   type?: 'h1' | 'h2' | 'h3' | 'h4' | 'text' | 'image' | 'graph' | 'tablet';
-  fontSize?: 'min' | 'small' | 'regular' | 'large';
+  fontSize?: 'min' | 'small' | 'regular' | 'large' | 'default';
   lineHeight?: 'tight' | 'fit' | 'wide';
   width?: string;
   height?: string;
@@ -13,7 +13,7 @@ type SkeletonProps = {
 
 export default function Skeleton({
   type = 'text',
-  fontSize = 'regular',
+  fontSize = 'default',
   lineHeight = 'fit',
   className = '',
   unitClassName = '',

@@ -33,7 +33,7 @@ function RatedStudio({ ratedStudio, studio }: RatedStudioProps) {
       <div className='data-block-content'>
         <span className='min'>Best game:</span>
         <GameCover game={topGame} />
-        <Link href={`/games/title/${topGame.id}`} className='small underline'>
+        <Link href={`/games/titles/${topGame.id}`} className='small underline'>
           {topGame.name}
         </Link>
       </div>

@@ -2,7 +2,7 @@
 @use 'utils';
 @use 'sidebar';
 
-$avatar-width: 10rem;
+$avatar-width: 10em;
 $frame-border-width: 0.75rem;
 $frame-start-width: 200px;
 
@@ -13,18 +13,18 @@ $frame-start-width: 200px;
 }
 
 .guest-page {
-  margin: 5rem 3.5rem;
+  margin: 5em 3.5em;
 
   .title {
-    width: 37.5rem;
-    margin-bottom: 5.25rem;
+    width: 37.5em;
+    margin-bottom: 5.25em;
   }
 
   .guest-page-form {
-    width: 17.5rem;
+    width: 17.5em;
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.25em;
     align-items: stretch;
   }
 }
@@ -45,7 +45,8 @@ $frame-start-width: 200px;
 
   display: grid;
   grid-template-columns: $avatar-width 1fr min-content;
-  gap: 1rem;
+  gap: 1em;
+  font-size: utils.$regular-size;
 
   background-color: map.get(utils.$bg-1-colors, 'user');
   border-bottom: solid 4px map.get(utils.$bg-2-colors, 'user');
@@ -69,7 +70,7 @@ $frame-start-width: 200px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.5rem;
+  gap: 0.5em;
 }
 
 .profile-meta {
@@ -98,11 +99,11 @@ $frame-start-width: 200px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.5em;
 
   .flag {
-    min-width: 1rem;
-    height: 1rem;
+    min-width: 1em;
+    height: 1em;
 
     img,
     .skeleton {
@@ -118,8 +119,11 @@ $frame-start-width: 200px;
 .avatar-field {
   position: relative;
   align-self: center;
-  width: 13rem;
-  height: 13rem;
+
+  font-size: utils.$regular-font;
+
+  width: 13em;
+  height: 13em;
 
   .avatar {
     width: 100%;
@@ -138,7 +142,7 @@ $frame-start-width: 200px;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.5em;
 
   opacity: 0;
   background-color: utils.$black-alpha;
@@ -172,7 +176,7 @@ $frame-start-width: 200px;
   left: 0;
   width: 100vw;
   height: 100vh;
-  padding: 4rem 8rem;
+  padding: 4em 8em;
   box-sizing: border-box;
 
   background-color: unset;
@@ -182,14 +186,14 @@ $frame-start-width: 200px;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
+  gap: 2em;
 
   .skeleton {
     flex-grow: 1;
   }
 
   .buttons-flex-box {
-    width: 22rem;
+    width: 22em;
     z-index: 12;
   }
 }
@@ -273,7 +277,7 @@ $frame-start-width: 200px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.625rem;
+  gap: 0.625em;
 
   h1,
   h2,
@@ -287,16 +291,16 @@ $frame-start-width: 200px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 2.5rem;
+  gap: 2.5em;
 
   flex: 1;
-  width: 30rem;
+  width: 30em;
 }
 
 .users-search {
   h2,
   .h2 {
-    margin-bottom: 1rem;
+    margin-bottom: 1em;
   }
 }
 
@@ -316,17 +320,17 @@ $frame-start-width: 200px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.5em;
 
   box-sizing: border-box;
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.5em;
 
   color: map.get(utils.$bg-2-colors, 'user') !important;
 
   .avatar {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.5em;
+    height: 2.5em;
   }
 
   .user-credits {
@@ -347,10 +351,10 @@ $frame-start-width: 200px;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 1em;
 
   height: fit-content;
-  padding: 0.5rem;
+  padding: 0.5em;
 
   border-radius: utils.$regular-radius;
   background-color: map.get(utils.$bg-1-colors, 'user');
@@ -369,8 +373,8 @@ $frame-start-width: 200px;
   }
 
   .avatar {
-    width: 5.5rem;
-    height: 5.5rem;
+    width: 5.5em;
+    height: 5.5em;
   }
 
   .user-credits {
@@ -380,7 +384,7 @@ $frame-start-width: 200px;
     flex-direction: column;
     justify-content: space-between;
 
-    gap: 0.5rem;
+    gap: 0.5em;
 
     .skeleton {
       width: 50%;
@@ -393,14 +397,14 @@ $frame-start-width: 200px;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
+  gap: 0.67em;
 
   font-family: utils.$ibm-plex;
   @include utils.font(utils.$h2-size, utils.$regular-font, utils.$fit-font);
 
   svg {
-    width: 5.5rem;
-    height: 5.5rem;
+    width: 5.5em;
+    height: 5.5em;
 
     * {
       stroke-width: 2px;

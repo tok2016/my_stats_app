@@ -9,6 +9,7 @@ type DrawerProps = {
   label: React.ReactNode;
   children: React.ReactNode;
   expandable?: boolean;
+  defaultExpanded?: boolean;
   loading?: boolean;
   className?: string;
   submenuClassName?: string;
@@ -21,12 +22,16 @@ export default function Drawer({
   label,
   children,
   expandable,
+  defaultExpanded = false,
   loading,
   className,
   submenuClassName,
   onExpand
 }: DrawerProps) {
-  const [isExpanded, toggleExpand] = useReducer((value) => !value, false);
+  const [isExpanded, toggleExpand] = useReducer(
+    (value) => !value,
+    defaultExpanded
+  );
 
   const isExpandable = typeof expandable === 'undefined';
   const isMenuExpanded = isExpandable ? isExpanded : expandable;

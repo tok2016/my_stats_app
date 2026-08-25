@@ -70,7 +70,7 @@ export default function StudiosCountChart({
             width: '1fr',
             renderRow: (value) => (
               <Link
-                href={`/games/title/${value.topGame.id}`}
+                href={`/games/titles/${value.topGame.id}`}
                 className='underline'
               >
                 {value.topGame.name}

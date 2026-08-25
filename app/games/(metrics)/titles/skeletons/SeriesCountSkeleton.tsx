@@ -25,25 +25,25 @@ function TopSeriesSkeleton({ parentKey }: TopSeriesSkeletonProps) {
         ))}
       </div>
 
-      <PropBlock title='Best game'>
-        <Skeleton fontSize='min' lineHeight='wide' />
+      <PropBlock title='Best game' className='min'>
+        <Skeleton lineHeight='wide' />
       </PropBlock>
 
-      <div className='data-block-grid'>
+      <div className='data-block-grid min'>
         <PropBlock title='Developers'>
-          <Skeleton fontSize='min' lineHeight='wide' rows={2} />
+          <Skeleton lineHeight='wide' rows={2} />
         </PropBlock>
 
         <PropBlock title='Publishers'>
-          <Skeleton fontSize='min' lineHeight='wide' rows={2} />
+          <Skeleton lineHeight='wide' rows={2} />
         </PropBlock>
 
         <PropBlock title='Games'>
-          <Skeleton fontSize='min' />
+          <Skeleton />
         </PropBlock>
 
         <PropBlock title='Playtime'>
-          <Skeleton fontSize='min' />
+          <Skeleton />
         </PropBlock>
       </div>
 

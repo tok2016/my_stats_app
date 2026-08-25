@@ -10,32 +10,20 @@ $series-collage-areas: (
   4: e
 );
 
-.refresh-buttons {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 1rem;
-
-  height: 2rem;
-
-  button {
-    min-height: 1rem;
-  }
-}
-
 .genres-tops {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 2.5rem;
+  gap: 2.5em;
 
   overflow-x: auto;
 }
 
 .genre-top {
+  font-size: utils.$small-size;
   flex-grow: 1;
-  width: 18.75rem;
+  width: 19em;
 
   .genre-top-title {
     display: flex;
@@ -43,6 +31,8 @@ $series-collage-areas: (
     align-items: center;
     justify-content: center;
     gap: 2px;
+
+    margin-bottom: 0.35em;
   }
 
   .table {
@@ -57,16 +47,16 @@ $series-collage-areas: (
 }
 
 .genre-rating-block {
-  width: 13rem;
+  width: 13em;
 }
 
 .rating-title {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0.375rem;
+  gap: 0.4em;
 
-  max-height: 2.75rem;
+  max-height: 3.2em;
   overflow: hidden;
 
   h4 {
@@ -80,12 +70,12 @@ $series-collage-areas: (
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.5rem;
+  gap: 0.5em;
 }
 
 .recommended-group {
   h3 {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.67rem;
   }
 }
 
@@ -99,25 +89,25 @@ $series-collage-areas: (
 
 .rated-studio {
   .multiple-ratings {
-    padding-top: 0.25rem;
+    padding-top: 0.25em;
     border-top: solid 2px;
     border-color: map.get(utils.$hover-colors, 'games');
   }
 }
 
 .rated-platform {
-  min-width: 18.75rem;
+  min-width: 19em;
 
   .data-block-content {
-    gap: 0.75rem;
+    gap: 0.75em;
   }
 }
 
 .game-title-rating {
   display: grid;
-  grid-template-columns: 1fr 2.75rem;
+  grid-template-columns: 1fr 3em;
   align-items: center;
-  gap: 0.125rem;
+  gap: 0.125em;
 }
 
 .period-platform-title {
@@ -138,13 +128,13 @@ $series-collage-areas: (
 }
 
 .top-game {
-  min-width: 15.5rem;
+  min-width: 15.5em;
   position: relative;
 }
 
 .games-playtime {
   overflow-x: auto;
-  min-width: 50rem;
+  min-width: 50em;
 
   .top-3-games {
     width: 100%;
@@ -153,19 +143,15 @@ $series-collage-areas: (
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 1em;
 
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.5em;
   }
 
   .table,
   .skeleton:has(> .tablet) {
     width: 100%;
   }
-}
-
-.prop-block * {
-  font-size: inherit;
 }
 
 .pre-rank-prop {
@@ -178,14 +164,14 @@ $series-collage-areas: (
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 2em;
 }
 
 .period-game {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.25em;
 }
 
 .top-series {
@@ -194,11 +180,11 @@ $series-collage-areas: (
   align-items: flex-start;
   justify-content: space-around;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 2em;
 }
 
 .series-block {
-  min-width: 19rem;
+  min-width: 19em;
 }
 
 .series-games-collage {
@@ -208,7 +194,7 @@ $series-collage-areas: (
     'a d e';
   grid-template-columns: 91fr 43fr 43fr;
   grid-template-rows: 1fr 1fr;
-  gap: 0.5rem;
+  gap: 0.5em;
 
   align-items: stretch;
 
@@ -231,9 +217,9 @@ $series-collage-areas: (
 
 .games-library {
   width: 100%;
-  min-width: 60rem;
+  min-width: 60em;
 
   .table-cell-rating {
-    align-items: center;
+    justify-content: center;
   }
 }

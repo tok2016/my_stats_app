@@ -5,14 +5,14 @@ import { AxiosRequestConfig } from 'axios';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import Game, { GamesTablePage } from '@ts/games/game';
+import { GamesTablePage } from '@ts/games/game';
 import { CountData } from '@ts/games/metric';
 import Country, { CountryIso, CountryResponse } from '@ts/users/country';
 import { ServicesMap } from '@ts/users/service';
 import { BasicUser, User } from '@ts/users/user';
 
 import AxiosInstanse, { AxiosCountriesInstanse } from './axios-instanse';
-import { defaultCountry } from './utils';
+import { defaultCountry, getErrorFormState } from './utils';
 
 export const logout = async () => {
   const cookiesStorage = await cookies();
@@ -144,4 +144,17 @@ export const getGamesMap = async () => {
   );
   const gamesMap = new Map(response.data.games.map((game) => [game.id, game]));
   return gamesMap;
+};
+
+export const refreshSteamData = async () => {
+  try {
+    const response = await AxiosInstanse.post(
+      '/api/games/steam',
+      '',
+      await getAuthConfig()
+    );
+    return response.statusText;
+  } catch (err) {
+    return getErrorFormState(err).message;
+  }
 };

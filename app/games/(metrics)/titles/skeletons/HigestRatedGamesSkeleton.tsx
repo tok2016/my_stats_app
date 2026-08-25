@@ -19,11 +19,11 @@ function TopGameSkeleton({ parentKey, index }: TopGameSkeletonProps) {
 
       <div className='data-block-grid min'>
         <PropBlock title='Developer'>
-          <Skeleton fontSize='min' lineHeight='wide' rows={2} />
+          <Skeleton lineHeight='wide' rows={2} />
         </PropBlock>
 
         <PropBlock title='Publisher'>
-          <Skeleton fontSize='min' lineHeight='wide' rows={2} />
+          <Skeleton lineHeight='wide' rows={2} />
         </PropBlock>
       </div>
 

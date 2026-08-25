@@ -6,9 +6,9 @@
 $border-style: 2px solid;
 $border-radius: 6px;
 $gloss-width: 2rem;
-$skeleton-icon-min-width: 2rem;
-$rating-size: 2.75rem;
-$rating-border: $rating-size - 0.5rem;
+$skeleton-icon-min-width: 2em;
+$rating-size: 2.75em;
+$rating-border: $rating-size - 0.5em;
 
 .divider {
   @include utils.font(utils.$min-size, utils.$regular-font, utils.$tight-font);
@@ -72,16 +72,14 @@ $rating-border: $rating-size - 0.5rem;
   align-items: flex-start;
   gap: 0.5rem;
 
+  font-size: utils.$regular-size;
+
   button {
-    @include utils.font(
-      utils.$regular-size,
-      utils.$regular-font,
-      utils.$tight-font
-    );
+    line-height: utils.$tight-font;
     width: fit-content;
     min-height: buttons.$button-icon-size;
-    min-width: 2rem;
-    padding: 0.5rem;
+    min-width: 2em;
+    padding: 0.5em;
     text-align: center;
     border-radius: utils.$regular-radius;
   }
@@ -91,19 +89,15 @@ $rating-border: $rating-size - 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 1.5rem;
+  gap: 1.5em;
 
   margin: auto;
 
   position: relative;
   width: 22em;
-  padding: 1rem;
+  padding: 1em;
   border-radius: utils.$regular-radius;
   box-sizing: border-box;
-
-  > * {
-    margin: 0.25rem;
-  }
 
   h1,
   h2,
@@ -111,6 +105,10 @@ $rating-border: $rating-size - 0.5rem;
   h4,
   span {
     text-align: center;
+  }
+
+  > * {
+    margin: 0.25em;
   }
 
   .button-group {
@@ -161,7 +159,7 @@ $rating-border: $rating-size - 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.75em;
 }
 
 .skeletons {
@@ -171,7 +169,7 @@ $rating-border: $rating-size - 0.5rem;
 }
 
 .skeleton {
-  --font-size: #{utils.$regular-size};
+  --font-size: 1em;
   --line-height: #{utils.$fit-font};
 
   display: block;
@@ -197,7 +195,7 @@ $rating-border: $rating-size - 0.5rem;
     min-height: $skeleton-icon-min-width;
     width: 50%;
     height: 50%;
-    stroke-width: 3px;
+    stroke-width: 0.2em;
   }
 }
 
@@ -260,11 +258,14 @@ $rating-border: $rating-size - 0.5rem;
   margin: 0;
 }
 
-.skeleton.tablet {
-  --font-size: calc(
-    #{utils.$regular-size} + #{tables.$table-row-padding-y} * 2
-  );
+.skeleton.tablet,
+.skeleton.header {
+  font-size: utils.$small-size;
+  --font-size: calc(1em + #{tables.$table-row-padding-y} * 2);
   --line-height: #{utils.$tight-font};
+}
+
+.skeleton.tablet {
   margin-top: tables.$table-gap;
 
   &:last-child {
@@ -272,13 +273,8 @@ $rating-border: $rating-size - 0.5rem;
   }
 }
 
-.skeleton.tablet.first-row {
-  margin-top: calc(tables.$table-gap + tables.$table-body-padding);
-}
-
 .skeleton.header {
-  --font-size: #{utils.$min-size};
-  --line-height: 2.23;
+  margin-top: tables.$header-glow;
 }
 
 @keyframes gloss {
@@ -325,18 +321,18 @@ $rating-border: $rating-size - 0.5rem;
   user-select: none;
   -webkit-user-select: none;
 
-  svg * {
-    stroke-width: 3px;
+  svg {
+    stroke-width: 0.2em;
   }
 
   .spinner {
-    width: 1.5rem;
+    width: 1.5em;
   }
 }
 
 .drawer-expand {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.5em;
+  height: 1.5em;
   transition: rotate utils.$active-time;
 }
 
@@ -363,12 +359,12 @@ $rating-border: $rating-size - 0.5rem;
 }
 
 form .drawer-submenu {
-  padding: 0.25rem;
+  padding: 0.25em;
   margin: 0;
 }
 
 .tab {
-  padding: 0.25rem 0;
+  padding: 0.25em 0;
   border-top: solid 2px;
 }
 
@@ -383,7 +379,7 @@ form .drawer-submenu {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
+  gap: 0.67rem;
 
   flex: 1;
   margin: auto;
@@ -391,11 +387,11 @@ form .drawer-submenu {
   @include utils.font(utils.$h2-size, utils.$regular-font, utils.$fit-font);
 
   svg {
-    width: 7rem;
-    height: 7rem;
+    width: 4.5rem;
+    height: 4.5rem;
 
     * {
-      stroke-width: 2px;
+      stroke-width: 0.1em;
     }
   }
 }
@@ -409,7 +405,7 @@ form .drawer-submenu {
     spinning 0.8s infinite linear alternate,
     rotation 1.6s infinite linear;
 
-  width: 1rem;
+  width: 1em;
   aspect-ratio: 1;
 }
 
@@ -521,16 +517,15 @@ form .drawer-submenu {
   height: $rating-size;
 
   border-radius: utils.$max-radius;
+  @include utils.font(1.14em, utils.$bold-font, $rating-border);
 
   .value {
-    @include utils.header(3);
-
     width: $rating-border;
     height: $rating-border;
     border-radius: utils.$max-radius;
 
     text-align: center;
-    line-height: $rating-border;
+    font-style: utils.$ibm-plex;
   }
 }
 
@@ -555,7 +550,7 @@ form .drawer-submenu {
 
   text-align: center;
   font-family: utils.$ibm-plex;
-  @include utils.font(utils.$small-size, utils.$bold-font, utils.$tight-font);
+  @include utils.font(1em, utils.$bold-font, utils.$tight-font);
 
   .playtime-value {
     font-size: 1em;
