@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { GameCore } from '@ts/games/game';
-import { CountCompareData } from '@ts/games/metric';
+import { CountCompareData, MetricMap } from '@ts/games/metric';
 import { PlatformRatingData } from '@ts/games/platform';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
@@ -9,7 +9,7 @@ import { getRatingMetric } from '@lib/metrics/rating-metric';
 import { ITEMS_IN_RATING } from '@lib/utils';
 
 const getPlatformsRatings = async (games: GameCore[]) => {
-  const genresByPlatforms = new Map<number, Record<number, CountCompareData>>();
+  const genresByPlatforms = new Map<number, MetricMap<CountCompareData>>();
 
   games.forEach((game) => {
     game.genresIds.forEach((genre) => {
@@ -18,6 +18,7 @@ const getPlatformsRatings = async (games: GameCore[]) => {
       genresByPlatforms.set(game.platformId, {
         ...platformGenre,
         [genre]: {
+          id: genre,
           count: (platformGenre?.[genre]?.count ?? 0) + 1,
           hours: (platformGenre?.[genre]?.hours ?? 0) + game.hours
         }

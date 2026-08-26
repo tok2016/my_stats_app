@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore, GameCountryMetric } from '@ts/games/game';
+import { GameCore, GameCountryMetric, GameShort } from '@ts/games/game';
 import { IgdbStudioCountry } from '@ts/games/studio';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { gameCoreToShort } from '@lib/games/games-utils';
 import { igdbRequest } from '@lib/games/igdb';
+import ObjectMapArray from '@lib/object-map-array';
 
 const GAMES_IN_COUNTRIES = 3;
+const GameSortKeys: (keyof GameShort)[] = ['hours', 'rating'];
 
 const getGamesByCountries = async (games: GameCore[]) => {
   const developersIds = new Set<number>();
@@ -23,21 +25,25 @@ const getGamesByCountries = async (games: GameCore[]) => {
     limit: developersIds.size
   });
 
-  const developersMap = Object.fromEntries(
+  const developersCountriesMap = new Map<number, number | undefined>(
     developers.map((developer) => [developer.id, developer.country])
   );
 
-  const gamesCountriesMap = new Map<number, GameCountryMetric>();
+  const gamesCountriesMap = new ObjectMapArray<GameCountryMetric, 'country'>(
+    [],
+    'country'
+  );
+
   games.forEach((game) => {
     game.developersIds.forEach((developerId) => {
-      const devCountry = developersMap[developerId];
+      const devCountry = developersCountriesMap.get(developerId);
       if (!devCountry) return;
 
       const gameShort = gameCoreToShort(game);
-      const countryData = gamesCountriesMap.get(devCountry);
+      const countryData = gamesCountriesMap.findByKey(devCountry);
 
       if (!countryData)
-        gamesCountriesMap.set(devCountry, {
+        gamesCountriesMap.push({
           country: devCountry,
           count: 1,
           hours: gameShort.hours,
@@ -52,11 +58,19 @@ const getGamesByCountries = async (games: GameCore[]) => {
   });
 
   const countriesGames: GameCountryMetric[] = gamesCountriesMap
-    .values()
+    .sort((a, b) => {
+      const countDiff = b.count - a.count;
+      if (!countDiff) return b.hours - a.hours;
+      return countDiff;
+    })
     .map((countryData) => {
       const ratingTops = countryData.topGames
-        .sort((a, b) => b.hours - a.hours)
-        .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+        .sort((a, b) =>
+          GameSortKeys.reduce(
+            (prev, curr) => prev + Number(b[curr] ?? 0) - Number(a[curr] ?? 0),
+            0
+          )
+        )
         .slice(0, GAMES_IN_COUNTRIES);
 
       const sortedCountyData: GameCountryMetric = {
@@ -66,12 +80,7 @@ const getGamesByCountries = async (games: GameCore[]) => {
 
       return sortedCountyData;
     })
-    .toArray()
-    .sort((a, b) => {
-      const countDiff = b.count - a.count;
-      if (!countDiff) return b.hours - a.hours;
-      return countDiff;
-    });
+    .toArray();
 
   return NextResponse.json(countriesGames, {
     status: 200,

@@ -3,6 +3,7 @@ import { RatingData } from '@ts/games/metric';
 import { RequiredFields } from '@ts/util-types';
 
 import { gameCoreToShort } from '@lib/games/games-utils';
+import ObjectMapArray from '@lib/object-map-array';
 
 import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
 import { GAMES_IN_METRIC } from '../utils';
@@ -11,17 +12,18 @@ import { mean } from '../utils';
 const setRatingData = (
   item: number | string,
   game: GameShort,
-  map: Map<number | string, RatingData>
+  data: ObjectMapArray<RatingData, 'id'>
 ) => {
-  const currentItemRating = map.get(item);
+  const currentItemRating = data.findByKey(item);
 
-  if (!currentItemRating)
-    map.set(item, {
-      id: Number(item) ?? 0,
+  if (!currentItemRating) {
+    const itemId = Number(item);
+    data.push({
+      id: Number.isNaN(itemId) ? 0 : itemId,
       rating: 0,
       topGames: [game]
     });
-  else currentItemRating.topGames.push(game);
+  } else currentItemRating.topGames.push(game);
 };
 
 export const getRatingMetric = (
@@ -29,20 +31,19 @@ export const getRatingMetric = (
   dataField: keyof GameCore,
   topSize?: number
 ): RatingData[] => {
-  const itemsMap = new Map<number, RatingData>();
+  const itemsRatingData = new ObjectMapArray<RatingData, 'id'>([], 'id');
 
   games.forEach((game) => {
     if (isNumberOrStringArray(game[dataField]))
       game[dataField].forEach((item) =>
-        setRatingData(item, gameCoreToShort(game), itemsMap)
+        setRatingData(item, gameCoreToShort(game), itemsRatingData)
       );
     else if (isNumberOrString(game[dataField]))
-      setRatingData(game[dataField], gameCoreToShort(game), itemsMap);
+      setRatingData(game[dataField], gameCoreToShort(game), itemsRatingData);
   });
 
-  const ratingDataMetric = itemsMap
-    .entries()
-    .map(([item, ratingData]): RatingData | undefined => {
+  const ratingDataMetric = itemsRatingData
+    .map((ratingData): RatingData | undefined => {
       const gamesWithRating = ratingData.topGames.filter(
         (game) => typeof game.rating === 'number'
       ) as RequiredFields<GameShort, 'rating'>[];
@@ -51,7 +52,7 @@ export const getRatingMetric = (
 
       if (!rating) return;
       return {
-        id: item,
+        id: ratingData.id,
         rating,
         topGames: gamesWithRating
           .sort((a, b) => b.rating - a.rating)

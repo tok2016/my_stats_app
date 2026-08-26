@@ -1,5 +1,5 @@
 import { GamesFilter } from '@ts/games/filter';
-import { GameTableData, GamesTablePage } from '@ts/games/game';
+import { GameTableData, GamesTablePageResponse } from '@ts/games/game';
 
 import { getMetricData } from '@lib/server-actions';
 
@@ -19,7 +19,7 @@ export default async function GamesLibrary({
     limit: GAMES_PAGE_LIMIT.toString()
   });
 
-  const gamesPage = await getMetricData<GamesTablePage>(
+  const gamesPage = await getMetricData<GamesTablePageResponse>(
     `/api/games?${urlParams.toString()}`,
     {
       games: [],

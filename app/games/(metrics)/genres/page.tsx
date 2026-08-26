@@ -2,14 +2,11 @@ import { Suspense } from 'react';
 
 import Game from '@ts/games/game';
 
-import { getGamesMap } from '@lib/server-actions';
+import { getGames } from '@lib/server-actions';
 
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import Metric from '@components/data-blocks/Metric';
 
-import { getItemsMap } from '@app/games/lib/actions';
-
-import { isIgdbGenre, isIgdbSeries } from '../utils';
 import GenreTops from './metrics/GenreTops';
 import GenresCount from './metrics/GenresCount';
 import GenresPeriodTops from './metrics/GenresPeriodTops';
@@ -20,16 +17,14 @@ import HighestRatedGenresSkeleton from './skeletons/HighestRatedGenresSkeleton';
 import RecommendedGamesSkeletons from './skeletons/RecommendedGamesSkeletons';
 
 export default async function GamesGenresPage() {
-  const gamesMap = await getGamesMap();
-  const genresMap = await getItemsMap<Game['genres'][number]>(
-    gamesMap,
-    'genres',
-    isIgdbGenre
+  const games = await getGames();
+  const genresMap = games.flatMapByKey<Game['genres'][number], 'id'>(
+    (game) => game.genres,
+    'id'
   );
-  const seriesMap = await getItemsMap<NonNullable<Game['series']>>(
-    gamesMap,
-    'series',
-    isIgdbSeries
+  const seriesMap = games.mapByKey<Game['series'], 'id'>(
+    (game) => game.series,
+    'id'
   );
 
   return (
@@ -41,7 +36,7 @@ export default async function GamesGenresPage() {
               <ChartSkeleton type='doughnut' className='switchable-chart' />
             }
           >
-            <GenresCount genresMap={genresMap} seriesMap={seriesMap} />
+            <GenresCount genres={genresMap} seriesArray={seriesMap} />
           </Suspense>
         </Metric>
 
@@ -51,17 +46,17 @@ export default async function GamesGenresPage() {
               <ChartSkeleton type='doughnut' className='switchable-chart' />
             }
           >
-            <GenresPlaytime genresMap={genresMap} />
+            <GenresPlaytime genres={genresMap} />
           </Suspense>
         </Metric>
       </div>
 
-      <GenresPeriodTops genresMap={genresMap} />
-      <GenreTops genresMap={genresMap} gamesMap={gamesMap} />
+      <GenresPeriodTops genres={genresMap.toArray()} />
+      <GenreTops genres={genresMap.toArray()} games={games.toArray()} />
 
       <Metric id='rated-genres' title='Your highest rated genres'>
         <Suspense fallback={<HighestRatedGenresSkeleton />}>
-          <HighestRatedGenres genresMap={genresMap} />
+          <HighestRatedGenres genres={genresMap} />
         </Suspense>
       </Metric>
 

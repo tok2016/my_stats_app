@@ -7,6 +7,7 @@ import {
   PrecisePeriod
 } from '@ts/games/metric';
 
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import GameTableTitle from '@components/data-blocks/GameTitle';
@@ -16,11 +17,11 @@ import RankIcon from '@components/data-blocks/RankIcon';
 import { GamePeriodTopData } from '../types';
 
 type GamesPeriodTopsProps = {
-  gamesMap: Map<string, Game>;
+  games: Game[];
 };
 
 const getGamesPeriodTops =
-  (gamesMap: Map<string, Game>) =>
+  (games: ObjectMapArray<Game, 'id'>) =>
   async (
     periodType?: PrecisePeriod
   ): Promise<PeriodTopsMetric<GamePeriodTopData>> => {
@@ -41,7 +42,7 @@ const getGamesPeriodTops =
         period: periodTop.period,
         top: periodTop.top
           .map((entry, i) => {
-            const game = gamesMap.get(entry.id.toString());
+            const game = games.findByKey(entry.id.toString());
             if (!game) return undefined;
             return { ...game, index: i };
           })
@@ -57,14 +58,14 @@ const gameItemContent = (value: GamePeriodTopData, i: number) => (
   </div>
 );
 
-export default function GamesPeriodTops({ gamesMap }: GamesPeriodTopsProps) {
+export default function GamesPeriodTops({ games }: GamesPeriodTopsProps) {
   return (
     <PeriodTops
       id='games-periods'
       className='games-period-tops'
       title='Your longest played games'
       blockWidthRem={18.5}
-      getPeriodMetric={getGamesPeriodTops(gamesMap)}
+      getPeriodMetric={getGamesPeriodTops(new ObjectMapArray(games, 'id'))}
       listItemContent={gameItemContent}
       displayFields={['hours']}
       valueField='hours'

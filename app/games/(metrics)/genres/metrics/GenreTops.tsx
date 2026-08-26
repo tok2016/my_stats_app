@@ -8,6 +8,7 @@ import { GreatPeriod } from '@ts/games/metric';
 import { Option } from '@ts/ui/components-props';
 
 import { useAction } from '@lib/hooks';
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 import { GreatPeriods } from '@lib/utils';
 
@@ -19,14 +20,14 @@ import RankIcon from '@components/data-blocks/RankIcon';
 import GenreTopsSkeleton from '../skeletons/GenreTopsSkeleton';
 
 type GenreTopsProps = {
-  gamesMap: Map<number | string, Game>;
-  genresMap: Map<number | string, Game['genres'][number]>;
+  games: Game[];
+  genres: Game['genres'];
 };
 
 type GenreTopBlockProps = {
   top: GenreTop;
-  gamesMap: Map<number | string, Game>;
-  genresMap: Map<number | string, Game['genres'][number]>;
+  games: ObjectMapArray<Game, 'id'>;
+  genres: ObjectMapArray<Game['genres'][number], 'id'>;
   index: number;
 };
 
@@ -59,17 +60,12 @@ const getGenreTops = async (params?: GreatPeriod) => {
   return genresTops;
 };
 
-function GenreTopBlock({
-  top,
-  gamesMap,
-  genresMap,
-  index
-}: GenreTopBlockProps) {
-  const genre = genresMap.get(top.id);
+function GenreTopBlock({ top, games, genres, index }: GenreTopBlockProps) {
+  const genre = genres.findByKey(top.id);
   if (!genre) return;
 
   const tableData: GenreTopTableData[] = top.topGames
-    .map((gameId) => gamesMap.get(gameId))
+    .map((gameId) => games.findByKey(gameId))
     .filter((game) => !!game)
     .map((game, i) => ({
       id: game.id,
@@ -111,7 +107,7 @@ function GenreTopBlock({
   );
 }
 
-export default function GenreTops({ gamesMap, genresMap }: GenreTopsProps) {
+export default function GenreTops({ games, genres }: GenreTopsProps) {
   const [genresTops, updateGenresTops, isPending] = useAction(
     getGenreTops,
     null
@@ -147,8 +143,8 @@ export default function GenreTops({ gamesMap, genresMap }: GenreTopsProps) {
             <GenreTopBlock
               key={`${genreTop.id}-top`}
               top={genreTop}
-              gamesMap={gamesMap}
-              genresMap={genresMap}
+              games={new ObjectMapArray(games, 'id')}
+              genres={new ObjectMapArray(genres, 'id')}
               index={i}
             />
           ))}

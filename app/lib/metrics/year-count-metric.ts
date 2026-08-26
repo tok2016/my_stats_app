@@ -2,6 +2,7 @@ import { GameCore } from '@ts/games/game';
 import { YearCountMetric } from '@ts/games/metric';
 
 import { gameCoreToShort } from '@lib/games/games-utils';
+import ObjectMapArray from '@lib/object-map-array';
 
 import { isDateSource } from '../type-guards';
 import { GAMES_IN_METRIC } from '../utils';
@@ -10,7 +11,7 @@ export const getYearCountMetric = (
   games: GameCore[],
   dateField: keyof GameCore
 ): YearCountMetric[] => {
-  const yearsMap = new Map<number, YearCountMetric>();
+  const yearsMap = new ObjectMapArray<YearCountMetric, 'year'>([], 'year');
 
   games.forEach((game) => {
     if (!isDateSource(game[dateField])) return;
@@ -19,9 +20,9 @@ export const getYearCountMetric = (
     if (!date.getTime()) return;
     const year = date.getFullYear();
 
-    const yearData = yearsMap.get(year);
+    const yearData = yearsMap.findByKey(year);
     if (!yearData)
-      yearsMap.set(year, {
+      yearsMap.push({
         year,
         count: 1,
         topGames: [gameCoreToShort(game)]
@@ -33,17 +34,13 @@ export const getYearCountMetric = (
   });
 
   const yearsMetric: YearCountMetric[] = [];
-  const sortedYears = yearsMap
-    .keys()
-    .toArray()
-    .sort((a, b) => a - b);
+  const sortedYears = yearsMap.sort((a, b) => a.year - b.year);
 
-  for (
-    let year = sortedYears[0] ?? 0;
-    year <= (sortedYears.at(-1) ?? 0);
-    year++
-  ) {
-    const yearCount = yearsMap.get(year);
+  const fromYear = sortedYears.at(0)?.year ?? 0;
+  const toYear = sortedYears.at(-1)?.year ?? 0;
+
+  for (let year = fromYear; year <= toYear; year++) {
+    const yearCount = yearsMap.findByKey(year);
     const top = yearCount?.topGames
       .sort((a, b) => b.hours - a.hours)
       .slice(0, GAMES_IN_METRIC);

@@ -17,6 +17,7 @@ export type StudioFieldParams = {
 };
 
 export interface CountCompareData {
+  id: number;
   count: number;
   hours: number;
 }
@@ -25,11 +26,11 @@ export interface ItemIdCompareData extends CountCompareData {
   id: number;
 }
 
-export interface ItemCompareData<IgdbData extends IgdbBasic = IgdbBasic> {
-  item: IgdbData;
-  count: number;
-  hours: number;
-}
+export type ItemCompareData<IgdbData extends IgdbBasic = IgdbBasic> =
+  IgdbData & {
+    count: number;
+    hours: number;
+  };
 
 export type CountData = {
   id: number | string;

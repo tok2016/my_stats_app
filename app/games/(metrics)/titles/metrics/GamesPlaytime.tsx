@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import Game, { GameTableData } from '@ts/games/game';
 
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import GameCollage from '@components/data-blocks/GameCollage';
@@ -12,7 +13,7 @@ import GamesPlaytimeTable from '../charts/GamesPlaytimeTable';
 import { SPECIAL_GAMES_COUNT } from '../utils';
 
 type GamesPlaytimeProps = {
-  gamesMap: Map<string, Game>;
+  games: ObjectMapArray<Game, 'id'>;
 };
 
 type TopGameBlockProps = {
@@ -72,7 +73,7 @@ function TopGameBlock({ game }: TopGameBlockProps) {
   );
 }
 
-export default async function GamesPlaytime({ gamesMap }: GamesPlaytimeProps) {
+export default async function GamesPlaytime({ games }: GamesPlaytimeProps) {
   const gamesIds = await getMetricData<string[]>(
     '/api/games/titles/playtime',
     []
@@ -80,7 +81,7 @@ export default async function GamesPlaytime({ gamesMap }: GamesPlaytimeProps) {
 
   const topGames = gamesIds
     .map((id, i) => {
-      const game = gamesMap.get(id);
+      const game = games.findByKey(id);
       if (!game) return;
 
       const data: GameTableData = {

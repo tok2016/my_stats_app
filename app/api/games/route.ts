@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { GamesFilter } from '@ts/games/filter';
-import Game, { GameCore, GameTableData, GamesTablePage } from '@ts/games/game';
+import Game, {
+  GameCore,
+  GameTableData,
+  GamesTablePageResponse
+} from '@ts/games/game';
 import Token from '@ts/users/token';
 import { LiteralType } from '@ts/util-types';
 
@@ -9,6 +13,7 @@ import { getCredentialsById } from '@lib/auth';
 import { gameEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
 import { getFullGames } from '@lib/games/games-utils';
 import { GamesModel } from '@lib/models';
+import ObjectMapArray from '@lib/object-map-array';
 import { generateErrorResponse, parseBooleanString } from '@lib/utils';
 import { NewGameValidator, validateData } from '@lib/validation-schemas';
 
@@ -106,11 +111,7 @@ const sortByFilter: Record<keyof GameTableData, (a: Game, b: Game) => number> =
   };
 
 const getGames = async (games: GameCore[], req: NextRequest) => {
-  const gamesMap = new Map<number, GameCore>(
-    games.map((game) => [game.apiId, game])
-  );
-
-  const allGames = await getFullGames(gamesMap);
+  const allGames = await getFullGames(new ObjectMapArray(games, 'apiId'));
   const filters = req.nextUrl.searchParams.entries().toArray();
   let maxHours = 0;
 
@@ -141,18 +142,18 @@ const getGames = async (games: GameCore[], req: NextRequest) => {
   const parsedLimit = parseInt(filtersObj.limit ?? '');
   const limit =
     Number.isNaN(parsedLimit) || !parsedLimit
-      ? !filteredGames.length
+      ? !filteredGames.count
         ? 1
-        : filteredGames.length
+        : filteredGames.count
       : parsedLimit;
 
   const startIndex = (page - 1) * limit;
 
-  const gamesPage: GamesTablePage = {
+  const gamesPage: GamesTablePageResponse = {
     startIndex,
     currentPage: page,
-    games: filteredGames.slice(startIndex, page * limit),
-    pagesCount: Math.ceil(filteredGames.length / limit),
+    games: filteredGames.slice(startIndex, page * limit).toArray(),
+    pagesCount: Math.ceil(filteredGames.count / limit),
     maxHours
   };
 

@@ -2,13 +2,14 @@ import Game, { GameCore } from '@ts/games/game';
 import { PlaytimeData } from '@ts/games/metric';
 import { StudioType } from '@ts/games/studio';
 
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import StudiosCountChart from '../charts/StudiosCountChart';
 import { StudioCountData } from '../types';
 
 type StudiosCountProps = {
-  studiosMap: Map<number | string, Game['developers'][number]>;
+  studios: ObjectMapArray<Game['developers'][number], 'id'>;
   type: StudioType;
 };
 
@@ -18,7 +19,7 @@ const StudiosTypeFields: Record<StudioType, keyof GameCore> = {
 };
 
 export default async function StudiosCount({
-  studiosMap,
+  studios,
   type
 }: StudiosCountProps) {
   const searchParams = new URLSearchParams({ field: StudiosTypeFields[type] });
@@ -31,7 +32,7 @@ export default async function StudiosCount({
     .filter((data) => data.id !== -1)
     .map((data, i) => ({
       id: data.id,
-      name: studiosMap.get(data.id)?.name ?? 'Other',
+      name: studios.findByKey(data.id)?.name ?? 'Other',
       index: i,
       topGame: data.topGame,
       count: data.count,

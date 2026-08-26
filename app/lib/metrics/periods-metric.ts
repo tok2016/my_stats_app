@@ -14,7 +14,7 @@ const setPeriodList = (
   const currentGameTime = game.hours;
 
   periodLists.set(period, {
-    ...periodLists.get(period),
+    ...periodList,
     [item]: (periodList?.[item] ?? 0) + currentGameTime
   });
 };

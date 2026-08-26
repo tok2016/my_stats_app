@@ -22,6 +22,7 @@ import {
 } from '@lib/games/games-utils';
 import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
+import ObjectMapArray from '@lib/object-map-array';
 import { generateErrorResponse } from '@lib/utils';
 import { GameUpdateValidator, validateData } from '@lib/validation-schemas';
 
@@ -78,7 +79,10 @@ const uniteGameAndIgdbDetailed = (
   };
 };
 
-const getDetialedRatings = (game: Game, otherGames: Game[]): Ratings => {
+const getDetialedRatings = (
+  game: Game,
+  otherGames: ObjectMapArray<Game, 'id'>
+): Ratings => {
   const ratings = Object.fromEntries(
     RatingsKeys.map((key): [keyof Ratings, RatingDetialed | undefined] => [
       key,
@@ -119,14 +123,8 @@ const getGameById = async (
   if (!params?.gameId)
     throw generateErrorResponse(400, 'Game ID was not provided');
 
-  const gamesMap = new Map<number, GameCore>();
-  let foundGame: GameCore | undefined;
-
-  games.forEach((game) => {
-    if (game.id === params.gameId) foundGame = game;
-    else gamesMap.set(game.apiId, game);
-  });
-
+  const gamesMapArray = new ObjectMapArray(games, 'apiId');
+  const foundGame = gamesMapArray.find((game) => game.id === params.gameId);
   if (!foundGame) throw generateErrorResponse(404, 'Game was not found');
 
   const foundIgdbGame = (
@@ -139,7 +137,7 @@ const getGameById = async (
   if (!foundIgdbGame)
     throw generateErrorResponse(404, 'Game full data was not found');
 
-  const otherGames = await getFullGames(gamesMap);
+  const otherGames = await getFullGames(gamesMapArray);
   const gameFull = uniteGameCoreAndIgdb(
     foundGame,
     foundIgdbGame,

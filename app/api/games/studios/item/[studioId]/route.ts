@@ -9,15 +9,15 @@ import Token from '@ts/users/token';
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import { getItemById, getTopItem } from '@lib/games/games-utils';
 import { getImageUrl } from '@lib/games/igdb';
+import ObjectMapArray from '@lib/object-map-array';
 
 type StudioParam = {
   studioId?: string;
 };
 
-type SeriesCompareData = {
+type SeriesCompareData = IgdbSeries & {
   count: number;
   hours: number;
-  series: IgdbSeries;
 };
 
 const getStudioById = async (
@@ -42,7 +42,7 @@ const getStudioById = async (
 
   const developed: Game[] = [];
   const published: Game[] = [];
-  const seriesMap = new Map<number, SeriesCompareData>();
+  const seriesMapArray = new ObjectMapArray<SeriesCompareData, 'id'>([], 'id');
 
   basicInfo.games.forEach((game: Game) => {
     if (game.developers.some((developer) => developer.id === basicInfo.id))
@@ -52,13 +52,13 @@ const getStudioById = async (
       published.push(game);
 
     if (!game.series) return;
-    const series = seriesMap.get(game.series.id);
+    const series = seriesMapArray.findByKey(game.series.id);
 
     if (!series)
-      seriesMap.set(game.series.id, {
+      seriesMapArray.push({
+        ...game.series,
         count: 1,
-        hours: game.hours,
-        series: game.series
+        hours: game.hours
       });
     else {
       series.count++;
@@ -66,15 +66,11 @@ const getStudioById = async (
     }
   });
 
-  const series = seriesMap
-    .values()
-    .toArray()
-    .sort((a, b) => {
-      const countDiff = b.count - a.count;
-      if (!countDiff) return b.hours - a.hours;
-      return countDiff;
-    })
-    .map((series) => series.series);
+  seriesMapArray.sort((a, b) => {
+    const countDiff = b.count - a.count;
+    if (!countDiff) return b.hours - a.hours;
+    return countDiff;
+  });
 
   const studio: Studio = {
     id: basicInfo.id,
@@ -85,7 +81,7 @@ const getStudioById = async (
     usersRating: basicInfo.usersRating,
     developed,
     published,
-    series,
+    series: seriesMapArray.toArray(),
     country: igdbStudio.country,
     logo: igdbStudio.logo?.image_id
       ? getImageUrl(igdbStudio.logo.image_id, 'logo_med')
