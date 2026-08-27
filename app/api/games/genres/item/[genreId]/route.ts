@@ -1,26 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import Genre, { IgdbGenre } from '@ts/games/genre';
 import { IgdbSeries } from '@ts/games/series';
-import Token from '@ts/users/token';
+import { ProtectedEndpointAction } from '@ts/requests';
 
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import { getItemById, getTopItem } from '@lib/games/games-utils';
 
-type GenreParams = {
-  genreId?: string;
-};
+const getGenreByApiId: ProtectedEndpointAction<
+  '/api/games/genres/item/[genreId]'
+> = async (_req, params, token) => {
+  const { genreId } = await params;
 
-const getGenreByApiId = async (
-  token: Token,
-  _req: NextRequest,
-  params?: GenreParams
-) => {
   const [basicInfo] = await getItemById<IgdbGenre>(
     token,
     ['genresIds'],
     ['name'],
-    params?.genreId
+    genreId
   );
 
   const genre: Genre = {

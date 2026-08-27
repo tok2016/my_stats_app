@@ -1,17 +1,20 @@
-import { writeFile, unlink } from 'node:fs/promises';
-import { NextRequest, NextResponse } from 'next/server';
-import { v4 } from 'uuid';
+import { unlink, writeFile } from 'node:fs/promises';
 import path from 'path';
+import { v4 } from 'uuid';
 
+import { NextResponse } from 'next/server';
+
+import { CommonUserEndpointAction } from '@ts/requests';
 import Avatar from '@ts/users/avatar';
-import { UserRouteParams } from '@ts/users/user';
 
 import { AVATAR_DIRECTORY } from '@lib/auth';
+import { commonUserEndpoint } from '@lib/endpoint-generators';
 import { UsersModel } from '@lib/models';
 import { generateErrorResponse } from '@lib/utils';
-import { commonUserEndpoint } from '@lib/endpoint-generators';
 
-const postAvatar = async (params: UserRouteParams, req: NextRequest) => {
+const postAvatar: CommonUserEndpointAction<
+  '/api/user/[userId]/avatar'
+> = async (req, params) => {
   const { userId } = await params;
   const user = await UsersModel.findById(userId).lean();
 
@@ -48,7 +51,9 @@ const postAvatar = async (params: UserRouteParams, req: NextRequest) => {
   });
 };
 
-const deleteAvatar = async (params: UserRouteParams) => {
+const deleteAvatar: CommonUserEndpointAction<
+  '/api/user/[userId]/avatar'
+> = async (_req, params) => {
   const { userId } = await params;
   const user = await UsersModel.findById(userId).lean();
 

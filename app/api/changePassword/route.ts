@@ -1,20 +1,21 @@
-import { NextRequest } from 'next/server';
 import bcrypt from 'bcrypt';
 
+import { ProtectedEndpointAction } from '@ts/requests';
 import { PasswordUpdate } from '@ts/users/password';
-import Token from '@ts/users/token';
 
 import {
   generateAccessResponse,
   getCredentialsById,
   hashPassword
 } from '@lib/auth';
-import { PasswordUpdateValidator, validateData } from '@lib/validation-schemas';
+import { protectedEndpoint } from '@lib/endpoint-generators';
 import { CredentialsModel } from '@lib/models';
 import { generateErrorResponse } from '@lib/utils';
-import { protectedEndpoint } from '@lib/endpoint-generators';
+import { PasswordUpdateValidator, validateData } from '@lib/validation-schemas';
 
-const postChangePassword = async (token: Token, req: NextRequest) => {
+const postChangePassword: ProtectedEndpointAction<
+  '/api/changePassword'
+> = async (req, _params, token) => {
   const credentials = await getCredentialsById(token.id);
 
   const passwordUpdate = await validateData<PasswordUpdate>(

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
 import { GenreTop } from '@ts/games/genre';
 import { GreatPeriod } from '@ts/games/metric';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 
@@ -15,10 +15,9 @@ type GenreCompareData = {
 const GENRES_WITH_TOPS = 3;
 const GAMES_IN_TOP = 5;
 
-const getTopLongestGamesByGenre = async (
-  games: GameCore[],
-  req: NextRequest
-) => {
+const getTopLongestGamesByGenre: GameEndpointAction<
+  '/api/games/genres/topGames'
+> = async (req, _params, games) => {
   const greatPeriod =
     (req.nextUrl.searchParams.get('period') as GreatPeriod) ?? 'allTime';
 

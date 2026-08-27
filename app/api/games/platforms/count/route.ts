@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { getCountMetric } from '@lib/metrics/count-metric';
 
-const getPlatformsCount = async (games: GameCore[]) => {
+const getPlatformsCount: GameEndpointAction<
+  '/api/games/platforms/count'
+> = async (_req, _params, games) => {
   const platformsCount = getCountMetric(games, 'platformId');
   return NextResponse.json(platformsCount, {
     status: 200,

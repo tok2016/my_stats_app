@@ -1,18 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import Game from '@ts/games/game';
 import { IgdbGenre } from '@ts/games/genre';
 import { IgdbSeries } from '@ts/games/series';
 import { IgdbStudio, Studio } from '@ts/games/studio';
-import Token from '@ts/users/token';
+import { ProtectedEndpointAction } from '@ts/requests';
 
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import { getItemById, getTopItem } from '@lib/games/games-utils';
 import { getImageUrl } from '@lib/games/igdb';
-
-type StudioParam = {
-  studioId?: string;
-};
 
 type SeriesCompareData = {
   count: number;
@@ -20,11 +16,11 @@ type SeriesCompareData = {
   series: IgdbSeries;
 };
 
-const getStudioById = async (
-  token: Token,
-  _req: NextRequest,
-  params?: StudioParam
-) => {
+const getStudioById: ProtectedEndpointAction<
+  '/api/games/studios/item/[studioId]'
+> = async (_req, params, token) => {
+  const { studioId } = await params;
+
   const [basicInfo, igdbStudio] = await getItemById<IgdbStudio>(
     token,
     ['developersIds', 'publishersIds'],
@@ -37,7 +33,7 @@ const getStudioById = async (
       'published.rating',
       'published.aggregated_rating'
     ],
-    params?.studioId
+    studioId
   );
 
   const developed: Game[] = [];

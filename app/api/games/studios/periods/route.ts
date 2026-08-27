@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
 import { PeriodPlaytimeData, PeriodTop, PrecisePeriod } from '@ts/games/metric';
 import {
   StudioPeriodTop,
   StudioType,
   StudiosPeriodMetric
 } from '@ts/games/studio';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { getPeriodMetric } from '@lib/metrics/periods-metric';
@@ -32,7 +32,9 @@ const setStuioTopByRole = (
     });
 };
 
-const getStudiosPeriods = async (games: GameCore[], req: NextRequest) => {
+const getStudiosPeriods: GameEndpointAction<
+  '/api/games/studios/periods'
+> = async (req, _params, games) => {
   const periodType =
     (req.nextUrl.searchParams.get('period') as PrecisePeriod) ?? 'year';
 

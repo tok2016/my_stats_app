@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { GameCore, IgdbGameRatingsStudios } from '@ts/games/game';
 import { IgdbSeriesExpanded, SeriesCollapsed } from '@ts/games/series';
 import { IgdbStudioBase } from '@ts/games/studio';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import {
@@ -61,7 +62,11 @@ const getSeriesInfo = (
   return fullSeries;
 };
 
-const getTopSeries = async (games: GameCore[]) => {
+const getTopSeries: GameEndpointAction<'/api/games/titles/series'> = async (
+  _req,
+  _params,
+  games
+) => {
   const seriesMap = new Map<number, number>();
   const gamesMap = new Map<number, GameCore>();
 

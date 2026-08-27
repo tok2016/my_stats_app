@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import { getUser } from '@lib/server-actions';
 
 import Sidebar from './SIdebar';
@@ -19,7 +21,9 @@ export default async function ProfileLayout({
 
   return (
     <>
-      <Sidebar user={user} authorized={!!user && !!user.id} />
+      <Suspense>
+        <Sidebar user={user} authorized={!!user && !!user.id} />
+      </Suspense>
       <div className='profile'>{children}</div>
     </>
   );

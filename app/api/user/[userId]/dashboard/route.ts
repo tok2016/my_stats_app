@@ -1,16 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { ZodOptional, ZodType } from 'zod';
 
+import { NextResponse } from 'next/server';
+
+import { CommonUserEndpointAction } from '@ts/requests';
 import { NewDashboard } from '@ts/users/dashboard';
-import { UserRouteParams } from '@ts/users/user';
 
 import { getDashboards } from '@lib/auth';
-import { DashboardValidator, validateData } from '@lib/validation-schemas';
+import { commonUserEndpoint } from '@lib/endpoint-generators';
 import { DashboardsModel } from '@lib/models';
 import { generateErrorResponse } from '@lib/utils';
-import { commonUserEndpoint } from '@lib/endpoint-generators';
+import { DashboardValidator, validateData } from '@lib/validation-schemas';
 
-const getUserDashboards = async (params: UserRouteParams) => {
+const getUserDashboards: CommonUserEndpointAction<
+  '/api/user/[userId]/dashboard'
+> = async (_req, params) => {
   const { userId } = await params;
   const dashboards = await getDashboards(userId);
   return NextResponse.json(dashboards, {
@@ -19,7 +22,9 @@ const getUserDashboards = async (params: UserRouteParams) => {
   });
 };
 
-const postUserDashboard = async (params: UserRouteParams, req: NextRequest) => {
+const postUserDashboard: CommonUserEndpointAction<
+  '/api/user/[userId]/dashboard'
+> = async (req, params) => {
   const { userId } = await params;
   const dashboard = await validateData<NewDashboard>(
     DashboardValidator,
@@ -34,7 +39,9 @@ const postUserDashboard = async (params: UserRouteParams, req: NextRequest) => {
   });
 };
 
-const putUserDashbord = async (params: UserRouteParams, req: NextRequest) => {
+const putUserDashbord: CommonUserEndpointAction<
+  '/api/user/[userId]/dashboard'
+> = async (req, params) => {
   const { userId } = await params;
   const dashboardId = req.nextUrl.searchParams.get('dashboardId');
 
@@ -55,10 +62,9 @@ const putUserDashbord = async (params: UserRouteParams, req: NextRequest) => {
   });
 };
 
-const deleteUserDashboard = async (
-  params: UserRouteParams,
-  req: NextRequest
-) => {
+const deleteUserDashboard: CommonUserEndpointAction<
+  '/api/user/[userId]/dashboard'
+> = async (req, params) => {
   const { userId } = await params;
   const dashboardId = req.nextUrl.searchParams.get('dashboardId');
 

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { SteamApiResponse } from '@ts/games/api-response';
 import { GameCore, GameInSchema, IgdbGame, SteamGame } from '@ts/games/game';
-import Service from '@ts/users/service';
+import { ServiceEndpointAction } from '@ts/requests';
 
 import { getGamesByUserId } from '@lib/auth';
 import { AxiosSteamInstanse } from '@lib/axios-instanse';
@@ -111,7 +111,11 @@ const addGameFromSteam = async (steamGames: SteamGame[], userId: string) => {
   await GamesModel.create(gamesToAdd);
 };
 
-const pullGamesFromSteam = async (_req: NextRequest, service?: Service) => {
+const pullGamesFromSteam: ServiceEndpointAction<'/api/games/steam'> = async (
+  _req,
+  _params,
+  service
+) => {
   if (!service) throw generateErrorResponse(401, `Steam ID wasn't provided`);
 
   const searchParams = new URLSearchParams({
@@ -156,10 +160,3 @@ const pullGamesFromSteam = async (_req: NextRequest, service?: Service) => {
 };
 
 export const POST = serviceEndpoint(pullGamesFromSteam);
-export const DELETE = async () => {
-  await GamesModel.deleteMany();
-
-  return new NextResponse('All games data was deleted', {
-    status: 200
-  });
-};

@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { SteamApiResponse } from '@ts/games/api-response';
 import { SteamGamesList } from '@ts/games/game';
+import { CommonUserEndpointAction } from '@ts/requests';
 import {
   NewService,
   ServiceName,
   ServiceStatus,
   ServicesMap
 } from '@ts/users/service';
-import { UserRouteParams } from '@ts/users/user';
 
 import { AxiosSteamInstanse } from '@lib/axios-instanse';
 import { commonUserEndpoint } from '@lib/endpoint-generators';
@@ -57,7 +57,9 @@ const checkProfile: Record<
   }
 };
 
-const getServiceCredentials = async (params: UserRouteParams) => {
+const getServiceCredentials: CommonUserEndpointAction<
+  '/api/user/[userId]/service'
+> = async (_req, params) => {
   const { userId } = await params;
   const services = await getServicesByUserId(userId);
 
@@ -67,10 +69,9 @@ const getServiceCredentials = async (params: UserRouteParams) => {
   });
 };
 
-const postServiceCredentials = async (
-  params: UserRouteParams,
-  req: NextRequest
-) => {
+const postServiceCredentials: CommonUserEndpointAction<
+  '/api/user/[userId]/service'
+> = async (req, params) => {
   const { userId } = await params;
   const serviceCredentials = await validateData<NewService>(
     ServiceValidator,
@@ -100,10 +101,9 @@ const postServiceCredentials = async (
   });
 };
 
-const deleteServiceCredentials = async (
-  params: UserRouteParams,
-  req: NextRequest
-) => {
+const deleteServiceCredentials: CommonUserEndpointAction<
+  '/api/user/[userId]/service'
+> = async (req, params) => {
   const { userId } = await params;
   const serviceName = req.nextUrl.searchParams.get('service');
 

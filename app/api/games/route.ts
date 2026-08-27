@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { GamesFilter } from '@ts/games/filter';
 import Game, { GameCore, GameTableData, GamesTablePage } from '@ts/games/game';
-import Token from '@ts/users/token';
+import { GameEndpointAction, ProtectedEndpointAction } from '@ts/requests';
 import { LiteralType } from '@ts/util-types';
 
 import { getCredentialsById } from '@lib/auth';
@@ -105,7 +105,11 @@ const sortByFilter: Record<keyof GameTableData, (a: Game, b: Game) => number> =
     screenshots: () => 0
   };
 
-const getGames = async (games: GameCore[], req: NextRequest) => {
+const getGames: GameEndpointAction<'/api/games'> = async (
+  req,
+  _params,
+  games
+) => {
   const gamesMap = new Map<number, GameCore>(
     games.map((game) => [game.apiId, game])
   );
@@ -162,7 +166,11 @@ const getGames = async (games: GameCore[], req: NextRequest) => {
   });
 };
 
-const postNewGame = async (token: Token, req: NextRequest) => {
+const postNewGame: ProtectedEndpointAction<'/api/games'> = async (
+  req,
+  params,
+  token
+) => {
   const credentials = await getCredentialsById(token.id);
   if (!credentials)
     throw generateErrorResponse(404, 'Credentials were not found');

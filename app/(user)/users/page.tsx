@@ -1,9 +1,12 @@
 import { SearchX } from '@mynaui/icons-react';
+import { Suspense } from 'react';
+
+import { getUsers } from '@lib/actions';
+import { getUserCountries } from '@lib/server-actions';
 
 import Pagination from '@components/Pagination';
 import UserSearch from '@components/profile-layout/UserSearch';
-import { getUsers } from '@lib/actions';
-import { getUserCountries } from '@lib/server-actions';
+
 import UserPreview from '../components/UserPreview';
 
 type UsersParams = { query: string; page?: string };
@@ -33,7 +36,9 @@ export default async function UsersPage({
     <div className='users-list'>
       <div className='users-search'>
         <h2>{query ? `"${query}" search results` : 'Users search'}</h2>
-        <UserSearch id='resultsSearch' />
+        <Suspense>
+          <UserSearch id='resultsSearch' />
+        </Suspense>
       </div>
 
       <div className={`no-results ${!query || users.length ? 'hidden' : ''}`}>
@@ -48,7 +53,9 @@ export default async function UsersPage({
       </div>
 
       {users.length <= USER_PER_PAGE || (
-        <Pagination pages={pages} current={parsedPage ?? 1} />
+        <Suspense>
+          <Pagination pages={pages} current={parsedPage ?? 1} />
+        </Suspense>
       )}
     </div>
   );

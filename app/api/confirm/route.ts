@@ -1,23 +1,25 @@
-import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 
+import { ConfirmationEndpointAction } from '@ts/requests';
 import { ConfirmationCode, NewConfirmation } from '@ts/users/confirmation';
 
 import { getCredentials } from '@lib/auth';
+import { confirmationEndpoint } from '@lib/endpoint-generators';
 import { ConfirmationsModel } from '@lib/models';
-import {
-  ConfirmationCodeValidator,
-  NewConfirmationValidator,
-  validateData
-} from '@lib/validation-schemas';
 import {
   CONFIRMATION_TTL,
   generateCode,
   generateErrorResponse
 } from '@lib/utils';
-import { confirmationEndpoint } from '@lib/endpoint-generators';
+import {
+  ConfirmationCodeValidator,
+  NewConfirmationValidator,
+  validateData
+} from '@lib/validation-schemas';
 
-const getConfirmation = async () => {
+const getConfirmation: ConfirmationEndpointAction<
+  '/api/confirm'
+> = async () => {
   const cookiesStore = await cookies();
   const operationId = cookiesStore.get('operation')?.value;
   if (!operationId) throw generateErrorResponse(401, 'Operation was not given');
@@ -34,7 +36,9 @@ const getConfirmation = async () => {
   };
 };
 
-const postConfirmation = async (req: NextRequest) => {
+const postConfirmation: ConfirmationEndpointAction<'/api/confirm'> = async (
+  req
+) => {
   const cookiesStore = await cookies();
   const operationId = cookiesStore.get('operation')?.value;
 
@@ -93,7 +97,9 @@ const postConfirmation = async (req: NextRequest) => {
   };
 };
 
-const putConfirmation = async (req: NextRequest) => {
+const putConfirmation: ConfirmationEndpointAction<'/api/confirm'> = async (
+  req
+) => {
   const confirmationCode = await validateData<ConfirmationCode>(
     ConfirmationCodeValidator,
     await req.json()

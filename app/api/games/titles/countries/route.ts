@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore, GameCountryMetric } from '@ts/games/game';
+import { GameCountryMetric } from '@ts/games/game';
 import { IgdbStudioCountry } from '@ts/games/studio';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { gameCoreToShort } from '@lib/games/games-utils';
@@ -9,7 +10,9 @@ import { igdbRequest } from '@lib/games/igdb';
 
 const GAMES_IN_COUNTRIES = 3;
 
-const getGamesByCountries = async (games: GameCore[]) => {
+const getGamesByCountries: GameEndpointAction<
+  '/api/games/titles/countries'
+> = async (_req, _params, games) => {
   const developersIds = new Set<number>();
   games.forEach((game) => {
     game.developersIds.forEach((developerId) => {

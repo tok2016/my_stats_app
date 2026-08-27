@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { IgdbGameRatingsStudios } from '@ts/games/game';
 import Series, { IgdbSeriesExpanded } from '@ts/games/series';
 import { IgdbStudioBase } from '@ts/games/studio';
-import Token from '@ts/users/token';
+import { ProtectedEndpointAction } from '@ts/requests';
 
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import {
@@ -12,20 +12,15 @@ import {
   getItemById
 } from '@lib/games/games-utils';
 
-type SeriesParams = {
-  seriesId?: string;
-};
-
-const getSeriesById = async (
-  token: Token,
-  _req: NextRequest,
-  params?: SeriesParams
-) => {
+const getSeriesById: ProtectedEndpointAction<
+  '/api/games/titles/series/[seriesId]'
+> = async (_req, params, token) => {
+  const { seriesId } = await params;
   const [basicInfo, igdbSeries] = await getItemById<IgdbSeriesExpanded>(
     token,
     ['seriesId'],
     SERIES_EXPANDED_FIELDS,
-    params?.seriesId
+    seriesId
   );
 
   const developers = new Set<IgdbStudioBase>();

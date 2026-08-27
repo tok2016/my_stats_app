@@ -1,28 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { IgdbGenre } from '@ts/games/genre';
 import Platform, { IgdbPlatform } from '@ts/games/platform';
 import { IgdbSeries } from '@ts/games/series';
-import Token from '@ts/users/token';
+import { ProtectedEndpointAction } from '@ts/requests';
 
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import { getItemById, getTopItem } from '@lib/games/games-utils';
 import { getImageUrl } from '@lib/games/igdb';
 
-type PlatformParams = {
-  platformId?: string;
-};
+const getPlatformById: ProtectedEndpointAction<
+  '/api/games/platforms/item/[platformId]'
+> = async (_req, params, token) => {
+  const { platformId } = await params;
 
-const getPlatformById = async (
-  token: Token,
-  _req: NextRequest,
-  params?: PlatformParams
-) => {
   const [basicInfo, igdbPlatform] = await getItemById<IgdbPlatform>(
     token,
     ['platformId'],
     ['name', 'platform_family.name', 'platform_logo.image_id'],
-    params?.platformId
+    platformId
   );
 
   const platform: Platform = {
