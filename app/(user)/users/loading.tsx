@@ -1,5 +1,8 @@
-import UserSearch from '@components/profile-layout/UserSearch';
+import { Suspense } from 'react';
+
 import Skeleton from '@components/Skeleton';
+import UserSearch from '@components/profile-layout/UserSearch';
+
 import UserPreviewSkeleton from '../components/UserPreviewSkeleton';
 
 const SKELETONS_NUMBER = 3;
@@ -9,7 +12,9 @@ export default function UsersLoading() {
     <div className='users-list'>
       <div className='users-search'>
         <Skeleton type='h2' />
-        <UserSearch id='resultsSearch' />
+        <Suspense>
+          <UserSearch id='resultsSearch' />
+        </Suspense>
       </div>
 
       <div className='found-users'>

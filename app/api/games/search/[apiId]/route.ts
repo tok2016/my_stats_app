@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { IgdbGameFull, SearchGame } from '@ts/games/game';
-import Token from '@ts/users/token';
+import { ProtectedEndpointAction } from '@ts/requests';
 
 import { getCredentialsById } from '@lib/auth';
 import { protectedEndpoint } from '@lib/endpoint-generators';
@@ -9,23 +9,18 @@ import { FULL_GAME_FIELDS } from '@lib/games/games-utils';
 import { getImageUrl, igdbRequest } from '@lib/games/igdb';
 import { MILLISECONDS, generateErrorResponse } from '@lib/utils';
 
-type SearchGameParams = {
-  apiId?: string;
-};
-
-export const searchForGames = async (
-  token: Token,
-  req: NextRequest,
-  params?: SearchGameParams
-) => {
-  if (!params?.apiId) throw generateErrorResponse(400, 'ID was not provided');
+const searchForGameById: ProtectedEndpointAction<
+  '/api/games/search/[apiId]'
+> = async (_req, params, token) => {
+  const { apiId } = await params;
+  if (!apiId) throw generateErrorResponse(400, 'ID was not provided');
 
   await getCredentialsById(token.id);
 
   const searchedGame = (
     await igdbRequest<IgdbGameFull>('/games', {
       fields: FULL_GAME_FIELDS,
-      where: `id = ${params.apiId}`
+      where: `id = ${apiId}`
     })
   )[0];
 
@@ -64,4 +59,4 @@ export const searchForGames = async (
   });
 };
 
-export const GET = protectedEndpoint(searchForGames);
+export const GET = protectedEndpoint(searchForGameById);

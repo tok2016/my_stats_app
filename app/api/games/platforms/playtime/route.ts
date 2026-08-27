@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { getPlaytimeMetric } from '@lib/metrics/playtime-metric';
 
-const getPlatformsPlaytime = async (games: GameCore[]) => {
+const getPlatformsPlaytime: GameEndpointAction<
+  '/api/games/platforms/playtime'
+> = async (_req, _params, games) => {
   const platformsPlaytime = getPlaytimeMetric(games, 'platformId');
   return NextResponse.json(platformsPlaytime, {
     status: 200,

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore, GameCountryMetric, GameShort } from '@ts/games/game';
+import { GameCountryMetric, GameShort } from '@ts/games/game';
 import { IgdbStudioCountry } from '@ts/games/studio';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { gameCoreToShort } from '@lib/games/games-utils';
@@ -11,7 +12,9 @@ import ObjectMapArray from '@lib/object-map-array';
 const GAMES_IN_COUNTRIES = 3;
 const GameSortKeys: (keyof GameShort)[] = ['hours', 'rating'];
 
-const getGamesByCountries = async (games: GameCore[]) => {
+const getGamesByCountries: GameEndpointAction<
+  '/api/games/titles/countries'
+> = async (_req, _params, games) => {
   const developersIds = new Set<number>();
   games.forEach((game) => {
     game.developersIds.forEach((developerId) => {

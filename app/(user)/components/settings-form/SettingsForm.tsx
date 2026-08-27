@@ -4,23 +4,26 @@ import Link from 'next/link';
 
 import { Option } from '@ts/ui/components-props';
 
-import Input from '@components/Input';
-import Tab from '@components/Tab';
-import { useUserState } from '@store/user-store';
-import Button from '@components/Button';
-import PublishInput from '../publish-controlls/PublishInput';
-import SubmitButton from '@components/SubmitButton';
-import AvatarInput from '../avatar-editor/AvatarInput';
-import ServicesSettings from '../service-settings/ServicesSettings';
-import { usePopupState } from '@store/popup-store';
 import { useRedirectActionForm } from '@lib/hooks';
-import { updateProfile } from '../../actions';
 import {
   defaultFormState,
   getFormDataValue,
   parseBooleanString
 } from '@lib/utils';
+
+import { usePopupState } from '@store/popup-store';
+import { useUserState } from '@store/user-store';
+
+import Button from '@components/Button';
+import Input from '@components/Input';
 import SearchSelect from '@components/SearchSelect';
+import SubmitButton from '@components/SubmitButton';
+import Tab from '@components/Tab';
+
+import { updateProfile } from '../../actions';
+import AvatarInput from '../avatar-editor/AvatarInput';
+import PublishInput from '../publish-controlls/PublishInput';
+import ServicesSettings from '../service-settings/ServicesSettings';
 import SettingsFormSkeleton from './SettingsFormSkeleton';
 
 type SettingsFormProps = {
@@ -70,6 +73,7 @@ export default function SettingsForm({
     <form className='card settings' action={action} noValidate>
       <h2>{user.username}</h2>
       <AvatarInput
+        username={user.username}
         avatarId={user.avatarUrl}
         defaultFile={state.data?.get('avatar') as Blob}
       />

@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-import { GameCore, IgdbGameRatings } from '@ts/games/game';
+import { IgdbGameRatings } from '@ts/games/game';
 import { StudioField } from '@ts/games/metric';
 import { StudioRatingMetric } from '@ts/games/studio';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { getAverageRating } from '@lib/games/games-utils';
@@ -10,7 +11,9 @@ import { igdbRequest } from '@lib/games/igdb';
 import { getRatingMetric } from '@lib/metrics/rating-metric';
 import { ITEMS_IN_RATING } from '@lib/utils';
 
-const getStudiosRating = async (games: GameCore[], req: NextRequest) => {
+const getStudiosRating: GameEndpointAction<
+  '/api/games/studios/rating'
+> = async (req, _params, games) => {
   const studioType =
     (req.nextUrl.searchParams.get('field') as StudioField) ?? 'developersIds';
 

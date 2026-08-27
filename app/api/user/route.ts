@@ -1,11 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { unlink } from 'fs/promises';
 import path from 'path';
 
+import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { GeneralEndpointAction, ProtectedEndpointAction } from '@ts/requests';
 import { NewCredentials } from '@ts/users/credentials';
 import { UserUpdate } from '@ts/users/user';
-import Token from '@ts/users/token';
 
 import {
   AVATAR_DIRECTORY,
@@ -15,11 +16,7 @@ import {
   getUserById,
   hashPassword
 } from '@lib/auth';
-import {
-  CredentialsValidator,
-  UserUpdateValidator,
-  validateData
-} from '@lib/validation-schemas';
+import { generalEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
 import {
   ConfirmationsModel,
   CredentialsModel,
@@ -28,9 +25,17 @@ import {
   UsersModel
 } from '@lib/models';
 import { generateErrorResponse, uniteUserData } from '@lib/utils';
-import { generalEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
+import {
+  CredentialsValidator,
+  UserUpdateValidator,
+  validateData
+} from '@lib/validation-schemas';
 
-const getCurrentUser = async (token: Token) => {
+const getCurrentUser: ProtectedEndpointAction<'/api/user'> = async (
+  _req,
+  _params,
+  token
+) => {
   const user = await getUserById(token.id);
 
   return NextResponse.json(user, {
@@ -39,7 +44,9 @@ const getCurrentUser = async (token: Token) => {
   });
 };
 
-const postNewUser = async (req: NextRequest) => {
+const postNewUser: GeneralEndpointAction<'/api/user'> = async (
+  req: NextRequest
+) => {
   const newCredentials = await validateData<NewCredentials>(
     CredentialsValidator,
     await req.json()
@@ -71,7 +78,11 @@ const postNewUser = async (req: NextRequest) => {
   );
 };
 
-const putCurrentUser = async (token: Token, req: NextRequest) => {
+const putCurrentUser: ProtectedEndpointAction<'/api/user'> = async (
+  req,
+  _params,
+  token
+) => {
   const userUpdate = await validateData<UserUpdate>(
     UserUpdateValidator,
     await req.json()
@@ -104,7 +115,11 @@ const putCurrentUser = async (token: Token, req: NextRequest) => {
   });
 };
 
-const deleteCurrentUser = async (token: Token, req: NextRequest) => {
+const deleteCurrentUser: ProtectedEndpointAction<'/api/user'> = async (
+  req,
+  _params,
+  token
+) => {
   const operationId = req.nextUrl.searchParams.get('operationId');
   if (!operationId)
     throw generateErrorResponse(401, 'Operation was not confirmed');

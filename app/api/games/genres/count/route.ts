@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { getCountMetric } from '@lib/metrics/count-metric';
 
-const getGenresCount = async (games: GameCore[]) => {
+const getGenresCount: GameEndpointAction<'/api/games/genres/count'> = async (
+  _req,
+  _params,
+  games
+) => {
   const genresCountMetric = getCountMetric(games, 'genresIds');
 
   return NextResponse.json(genresCountMetric, {

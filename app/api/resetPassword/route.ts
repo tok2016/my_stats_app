@@ -1,15 +1,15 @@
-import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 
+import { GeneralEndpointAction } from '@ts/requests';
 import { NewPassword } from '@ts/users/password';
 
-import { ConfirmationsModel, CredentialsModel } from '@lib/models';
-import { NewPasswordValidatior, validateData } from '@lib/validation-schemas';
 import { generateAccessResponse, hashPassword } from '@lib/auth';
-import { generateErrorResponse } from '@lib/utils';
 import { generalEndpoint } from '@lib/endpoint-generators';
+import { ConfirmationsModel, CredentialsModel } from '@lib/models';
+import { generateErrorResponse } from '@lib/utils';
+import { NewPasswordValidatior, validateData } from '@lib/validation-schemas';
 
-const register = async (req: NextRequest) => {
+const register: GeneralEndpointAction<'/api/resetPassword'> = async (req) => {
   const newPassword = await validateData<NewPassword>(
     NewPasswordValidatior,
     await req.json()

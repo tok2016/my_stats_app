@@ -1,15 +1,15 @@
-import { NextRequest } from 'next/server';
 import bcrypt from 'bcrypt';
 
+import { GeneralEndpointAction } from '@ts/requests';
 import { UserLogin } from '@ts/users/user';
 
-import { UserLoginValidator, validateData } from '@lib/validation-schemas';
-import { CredentialsModel } from '@lib/models';
 import { generateAccessResponse } from '@lib/auth';
-import { generateErrorResponse } from '@lib/utils';
 import { generalEndpoint } from '@lib/endpoint-generators';
+import { CredentialsModel } from '@lib/models';
+import { generateErrorResponse } from '@lib/utils';
+import { UserLoginValidator, validateData } from '@lib/validation-schemas';
 
-const login = async (req: NextRequest) => {
+const login: GeneralEndpointAction<'/api/login'> = async (req) => {
   const userLogin = await validateData<UserLogin>(
     UserLoginValidator,
     await req.json()

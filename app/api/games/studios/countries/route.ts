@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
 import { CountCompareData } from '@ts/games/metric';
 import { IgdbStudioCountry, StudioCountryMetric } from '@ts/games/studio';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { igdbRequest } from '@lib/games/igdb';
@@ -48,7 +48,9 @@ const setCountryData = (
   }
 };
 
-const getStudiosByCountry = async (games: GameCore[]) => {
+const getStudiosByCountry: GameEndpointAction<
+  '/api/games/studios/countries'
+> = async (_req, _params, games) => {
   const studiosCompareData = new ObjectMapArray<CountCompareData, 'id'>(
     [],
     'id'
