@@ -40,11 +40,5 @@ export const isIgdbItemBasic = (value: unknown): value is IgdbBasic =>
 export const isIgdbItemArray = (value: unknown): value is Array<IgdbBasic> =>
   Array.isArray(value) && value.every((v) => isIgdbItemBasic(v));
 
-export const isItemArray = <ItemType>(
-  value: unknown,
-  itemGuard: (value: unknown) => value is ItemType
-): value is Array<ItemType> =>
-  Array.isArray(value) && value.every((v) => itemGuard(v));
-
 export const isHTMLElement = (value: unknown): value is HTMLElement =>
   (value as HTMLElement).style !== undefined;

@@ -1,3 +1,14 @@
+import { ExtractTypeFields } from '@ts/util-types';
+
+const isObjectWithArray = <
+  Original extends object,
+  ExtractedKey extends keyof Original,
+  Result extends Original & Record<ExtractedKey, Array<object | undefined>>
+>(
+  obj: Original,
+  key: ExtractedKey
+): obj is Result => Array.isArray(obj[key]);
+
 export default class ObjectMapArray<
   T extends object,
   IndexKey extends keyof T
@@ -92,8 +103,72 @@ export default class ObjectMapArray<
     );
   }
 
+  flatGroupBy<
+    OriginalIndexKey extends ExtractTypeFields<T, Array<object | undefined>>,
+    TSafe extends T & Record<OriginalIndexKey, Array<object | undefined>>,
+    GroupIndexKey extends keyof TSafe[OriginalIndexKey][number],
+    U extends object & {
+      [key in GroupIndexKey]: TSafe[OriginalIndexKey][number][GroupIndexKey];
+    }
+  >(
+    aggregate: (
+      parentValue: T,
+      value: TSafe[OriginalIndexKey][number],
+      stored: U,
+      index: number
+    ) => U | undefined,
+    defaultValue: U,
+    itemKey: OriginalIndexKey,
+    groupKey: GroupIndexKey
+  ) {
+    const grouped = new ObjectMapArray<U, GroupIndexKey>([], groupKey);
+    this.#array.forEach((parent) => {
+      if (isObjectWithArray(parent, itemKey)) {
+        parent[itemKey].forEach((item, i) => {
+          const groupedItem = grouped.findByKey(
+            item?.[groupKey as keyof object] as never
+          );
+
+          const newValue = aggregate(
+            parent,
+            item,
+            groupedItem ?? defaultValue,
+            i
+          );
+
+          if (newValue) grouped.push(newValue);
+        });
+      }
+    });
+
+    return grouped;
+  }
+
   forEach(callbackfn: (value: T, index: number) => void): void {
     this.#array.forEach(callbackfn);
+  }
+
+  groupBy<
+    OriginalIndexKey extends keyof T,
+    GroupIndexKey extends keyof NonNullable<T[OriginalIndexKey]>,
+    U extends object & {
+      [key in GroupIndexKey]: NonNullable<T[OriginalIndexKey]>[GroupIndexKey];
+    }
+  >(
+    aggregate: (value: T, stored: U, index: number) => U | undefined,
+    defaultValue: U,
+    itemKey: OriginalIndexKey,
+    groupKey: GroupIndexKey
+  ): ObjectMapArray<U, GroupIndexKey> | undefined {
+    const grouped = new ObjectMapArray<U, GroupIndexKey>([], groupKey);
+
+    this.#array.forEach((item, i) => {
+      const groupedItem = grouped.findByKey(item[itemKey]?.[groupKey] as never);
+      const newValue = aggregate(item, groupedItem ?? defaultValue, i);
+      if (newValue) grouped.push(newValue);
+    });
+
+    return grouped;
   }
 
   map<U>(
@@ -133,9 +208,12 @@ export default class ObjectMapArray<
   }
 
   push(value: T): void {
-    if (typeof this.#indexMap.get(value[this.#key]) === 'undefined') {
+    const stored = this.#indexMap.get(value[this.#key]);
+    if (typeof stored === 'undefined') {
       this.#array.push(value);
       this.#indexMap.set(value[this.#key], this.#end++);
+    } else {
+      this.#array[stored] = value;
     }
   }
 

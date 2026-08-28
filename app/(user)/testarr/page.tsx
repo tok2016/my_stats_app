@@ -5,7 +5,7 @@ import ObjectMapArray from '@lib/object-map-array';
 import games from '../../../mock data/games.json';
 
 export default function TestArrPage() {
-  const objArr = new ObjectMapArray<Game, 'id'>(games, 'id');
+  const objArr = new ObjectMapArray<Game, 'id'>(games as Game[], 'id');
   const dropTake = objArr.drop(5).take(5);
 
   const screenshots = objArr.flatMap((game) => game.screenshots ?? []).take(4);
@@ -22,6 +22,35 @@ export default function TestArrPage() {
     .take(2);
 
   const found = objArr.findByKey('6984ae589ef387f573e7dc26');
+  const platformsCount = objArr.groupBy(
+    (game, stored) => {
+      if (!game.platform) return undefined;
+      return {
+        id: game.platform?.id ?? stored.id,
+        count: stored.count + 1,
+        hours: stored.hours + game.hours
+      };
+    },
+    { id: 0, count: 0, hours: 0 },
+    'platform',
+    'id'
+  );
+
+  const developersCount = objArr.flatGroupBy(
+    (game, developer, stored) => {
+      return {
+        id: developer.id,
+        count: stored.count + 1,
+        hours: stored.hours + game.hours
+      };
+    },
+    { id: 0, count: 0, hours: 0 },
+    'developers',
+    'id'
+  );
+
+  console.log(platformsCount);
+  console.log(developersCount);
 
   return (
     <section>
