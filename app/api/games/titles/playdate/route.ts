@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { getYearCountMetric } from '@lib/metrics/year-count-metric';
 
-const getPlayDatesPerYear = async (games: GameCore[]) => {
+const getPlayDatesPerYear: GameEndpointAction<
+  '/api/games/titles/playdate'
+> = async (_req, _params, games) => {
   const playDates = getYearCountMetric(games, 'playDate');
 
   return NextResponse.json(playDates, {

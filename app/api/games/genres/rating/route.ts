@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { getRatingMetric } from '@lib/metrics/rating-metric';
 import { ITEMS_IN_RATING } from '@lib/utils';
 
-const getHighestRatedGenres = async (games: GameCore[]) => {
+const getHighestRatedGenres: GameEndpointAction<
+  '/api/games/genres/rating'
+> = async (_req, _params, games) => {
   const genresRatingMetric = getRatingMetric(
     games,
     'genresIds',

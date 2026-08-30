@@ -1,6 +1,7 @@
 import Game from '@ts/games/game';
 import { PlatformRatingData } from '@ts/games/platform';
 
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import Rating from '@components/Rating';
@@ -8,8 +9,8 @@ import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameTableTitle from '@components/data-blocks/GameTitle';
 
 type HighestRatedPlatformsProps = {
-  platformsMap: Map<number | string, NonNullable<Game['platform']>>;
-  genresMap: Map<number | string, Game['genres'][number]>;
+  platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>;
+  genres: ObjectMapArray<Game['genres'][number], 'id'>;
 };
 
 type RatedPlatformProps = {
@@ -58,8 +59,8 @@ function RatedPlatform({
 }
 
 export default async function HighestRatedPlatforms({
-  platformsMap,
-  genresMap
+  platforms,
+  genres
 }: HighestRatedPlatformsProps) {
   const ratedPlatforms = await getMetricData<PlatformRatingData[]>(
     '/api/games/platforms/rating',
@@ -75,8 +76,8 @@ export default async function HighestRatedPlatforms({
         <RatedPlatform
           key={`${ratedPlatform.id}-rated`}
           ratedPlatform={ratedPlatform}
-          platform={platformsMap.get(ratedPlatform.id)}
-          topGenre={genresMap.get(ratedPlatform.topGenre)}
+          platform={platforms.findByKey(ratedPlatform.id)}
+          topGenre={genres.findByKey(ratedPlatform.topGenre)}
         />
       ))}
     </div>

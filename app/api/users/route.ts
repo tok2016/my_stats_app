@@ -1,14 +1,16 @@
 import { RootFilterQuery } from 'mongoose';
-import { NextRequest, NextResponse } from 'next/server';
 
+import { NextResponse } from 'next/server';
+
+import { GeneralEndpointAction } from '@ts/requests';
 import { CredentialsInSchema } from '@ts/users/credentials';
 import { BasicUser, UserInfo } from '@ts/users/user';
 
+import { generalEndpoint } from '@lib/endpoint-generators';
 import { CredentialsModel, UsersModel } from '@lib/models';
 import { uniteBasicUserData } from '@lib/utils';
-import { generalEndpoint } from '@lib/endpoint-generators';
 
-const getUsers = async (req: NextRequest) => {
+const getUsers: GeneralEndpointAction<'/api/users'> = async (req) => {
   const credentialSearch = req.nextUrl.searchParams.get('credential');
   const limit = parseInt(req.nextUrl.searchParams.get('limit') ?? '0');
 

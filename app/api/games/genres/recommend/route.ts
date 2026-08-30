@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 
 import {
-  GameCore,
   IgdbGameTag,
   IgdbRecommendedGame,
   RecommendedGame
 } from '@ts/games/game';
 import { MetricMap, RecommendedMetric } from '@ts/games/metric';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { formRecommendedGame } from '@lib/games/games-utils';
@@ -67,11 +67,13 @@ const getGamesTags = async (
   return Object.fromEntries(tags.map((tag) => [tag.id, tag.tags]));
 };
 
-const getRecommnededGames = async (games: GameCore[]) => {
+const getRecommnededGames: GameEndpointAction<
+  '/api/games/genres/recommend'
+> = async (_req, _params, games) => {
   const genresCount: MetricMap<number> = {};
   const tagsCount: MetricMap<number> = {};
   const gamesMap: GamesStatusMap = {};
-  const tags = await getGamesTags(games.map((game) => game.apiId));
+  const tags = await getGamesTags(games.map((game) => game.apiId).toArray());
 
   games.forEach((game) => {
     gamesMap[game.apiId] = 'old';

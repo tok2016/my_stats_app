@@ -1,14 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { SteamApiResponse } from '@ts/games/api-response';
-import { GameCore, GameInSchema, IgdbGame, SteamGame } from '@ts/games/game';
-import Service from '@ts/users/service';
+import { GameInSchema, IgdbGame, SteamGame } from '@ts/games/game';
+import { ServiceEndpointAction } from '@ts/requests';
 
 import { getGamesByUserId } from '@lib/auth';
 import { AxiosSteamInstanse } from '@lib/axios-instanse';
 import { serviceEndpoint } from '@lib/endpoint-generators';
 import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
+import ObjectMapArray from '@lib/object-map-array';
 import { isSteamGameObject } from '@lib/type-guards';
 import { MILLISECONDS, MINUTES, generateErrorResponse } from '@lib/utils';
 
@@ -33,7 +34,7 @@ const updateGamesFromSteam = async (gamesFromSteam: SteamGameWithId[]) => {
 };
 
 const uniteSteamAndIgdb = (
-  steamGame: SteamGame,
+  steamGame: SteamGame | undefined,
   igdbGame: IgdbGame,
   userId: string
 ): GameInSchema => {
@@ -67,7 +68,7 @@ const uniteSteamAndIgdb = (
 };
 
 const searchGamesFromIgdb = async (
-  steamGamesIds: string[]
+  steamGamesIds: number[]
 ): Promise<IgdbGame[]> => {
   const igdbGames = await igdbRequest<IgdbGame>('/games', {
     fields: [
@@ -98,20 +99,28 @@ const searchGamesFromIgdb = async (
 };
 
 const addGameFromSteam = async (steamGames: SteamGame[], userId: string) => {
-  const steamGamesMap: Record<number, SteamGame> = Object.fromEntries(
-    steamGames.map((steamGame) => [steamGame.appid, steamGame])
-  );
+  const steamGamesMap = new ObjectMapArray(steamGames, 'appid');
 
-  const igdbGames = await searchGamesFromIgdb(Object.keys(steamGamesMap));
+  const igdbGames = await searchGamesFromIgdb(
+    steamGamesMap.map((steamGame) => steamGame.appid).toArray()
+  );
   const gamesToAdd = igdbGames.map((igdbGame) => {
     const steamAppId = parseInt(igdbGame.external_games?.[0].uid ?? '0');
-    return uniteSteamAndIgdb(steamGamesMap[steamAppId], igdbGame, userId);
+    return uniteSteamAndIgdb(
+      steamGamesMap.findByKey(steamAppId),
+      igdbGame,
+      userId
+    );
   });
 
   await GamesModel.create(gamesToAdd);
 };
 
-const pullGamesFromSteam = async (_req: NextRequest, service?: Service) => {
+const pullGamesFromSteam: ServiceEndpointAction<'/api/games/steam'> = async (
+  _req,
+  _params,
+  service
+) => {
   if (!service) throw generateErrorResponse(401, `Steam ID wasn't provided`);
 
   const searchParams = new URLSearchParams({
@@ -130,17 +139,16 @@ const pullGamesFromSteam = async (_req: NextRequest, service?: Service) => {
     throw generateErrorResponse(401, 'Profile is private');
 
   const savedGames = await getGamesByUserId(service.userId);
-  const gamesMap = new Map<number, GameCore>(
-    savedGames
-      .filter((game) => !!game.storeId)
-      .map((game) => [game.storeId ?? 0, game])
+  const gamesMap = new ObjectMapArray(
+    savedGames.filter((game) => !!game.storeId),
+    'storeId'
   );
 
   const gamesToUpdate: SteamGameWithId[] = [];
   const gamesToAdd: SteamGame[] = [];
 
   steamResponse.data.response.games.forEach((game) => {
-    const gameCore = gamesMap.get(game.appid);
+    const gameCore = gamesMap.findByKey(game.appid);
     if (!gameCore) gamesToAdd.push(game);
     else if (gameCore.hours !== minutesToHours(game.playtime_forever ?? 0))
       gamesToUpdate.push({ ...game, id: gameCore.id });
@@ -156,10 +164,3 @@ const pullGamesFromSteam = async (_req: NextRequest, service?: Service) => {
 };
 
 export const POST = serviceEndpoint(pullGamesFromSteam);
-export const DELETE = async () => {
-  await GamesModel.deleteMany();
-
-  return new NextResponse('All games data was deleted', {
-    status: 200
-  });
-};

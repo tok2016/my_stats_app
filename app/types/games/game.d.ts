@@ -1,5 +1,7 @@
 import { ChartData } from '@ts/ui/charts-data';
 
+import ObjectMapArray from '@lib/object-map-array';
+
 import { IgdbBasic } from './api-response';
 import { IgdbGenre } from './genre';
 import { IgdbImage } from './image';
@@ -204,9 +206,13 @@ export type IgdbGameRatingsStudios = IgdbGameRatings & {
 export type GameTableData = ChartData & Game;
 
 export type GamesTablePage = {
-  games: Game[];
+  games: ObjectMapArray<Game, 'id'>;
   startIndex: number;
   currentPage: number;
   pagesCount: number;
   maxHours: number;
+};
+
+export type GamesTablePageResponse = Omit<GamesTablePage, 'games'> & {
+  games: Game[];
 };

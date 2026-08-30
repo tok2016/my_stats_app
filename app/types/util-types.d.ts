@@ -11,7 +11,3 @@ export type ExtractTypeFields<T, TypeToExtract> = Exclude<
   }[keyof T],
   undefined
 >;
-
-export type ExtractTypeFields1<T, TypeToExtract> = {
-  [P in keyof T as T[P] extends TypeToExtract ? P : never]: T[P];
-};

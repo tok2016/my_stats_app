@@ -1,6 +1,9 @@
 import { LiteralType } from '@ts/util-types';
 
+import ObjectMapArray from '@lib/object-map-array';
+
 import { SortDirection } from './filter';
+import Game from './game';
 import { ExternalRatings } from './rating';
 
 export interface SteamApiResponse<T> {
@@ -44,6 +47,6 @@ export interface IgdbBasic {
 
 export interface IgdbItemInfo extends IgdbBasic, ExternalRatings {
   hours: number;
-  games: Game[];
+  games: ObjectMapArray<Game, 'id'>;
   averageRating?: number;
 }

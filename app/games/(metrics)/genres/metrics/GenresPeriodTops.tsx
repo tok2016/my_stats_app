@@ -7,6 +7,7 @@ import {
   PrecisePeriod
 } from '@ts/games/metric';
 
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
@@ -17,11 +18,11 @@ import { GenresPeriodPlaytimeData } from '../types';
 type Genre = Game['genres'][number];
 
 type GenresPeriodTopsProps = {
-  genresMap: Map<number | string, Genre>;
+  genres: Genre[];
 };
 
 const getGenresPeriodTops =
-  (genresMap: Map<number | string, Genre>) =>
+  (genres: ObjectMapArray<Genre, 'id'>) =>
   async (
     periodType?: PrecisePeriod
   ): Promise<PeriodTopsMetric<GenresPeriodPlaytimeData>> => {
@@ -42,7 +43,7 @@ const getGenresPeriodTops =
         period: periodTop.period,
         top: periodTop.top.map((item, i) => ({
           id: item.id,
-          name: genresMap.get(item.id)?.name ?? 'Other',
+          name: genres.findByKey(item.id)?.name ?? 'Other',
           index: i,
           hours: item.hours
         }))
@@ -57,13 +58,13 @@ const genreItemContent = (genre: GenresPeriodPlaytimeData, i: number) => (
   </>
 );
 
-export default function GenresPeriodTops({ genresMap }: GenresPeriodTopsProps) {
+export default function GenresPeriodTops({ genres }: GenresPeriodTopsProps) {
   return (
     <PeriodTops
       id='genres-periods'
       title='Your most played genres'
       listItemContent={genreItemContent}
-      getPeriodMetric={getGenresPeriodTops(genresMap)}
+      getPeriodMetric={getGenresPeriodTops(new ObjectMapArray(genres, 'id'))}
       displayFields={['hours']}
       valueField='hours'
       showBar

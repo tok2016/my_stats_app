@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Game from '@ts/games/game';
 import { SeriesCollapsed } from '@ts/games/series';
 
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import EmptyImage from '@components/data-blocks/EmptyImage';
@@ -14,19 +15,19 @@ import PropBlock from '../../../../components/data-blocks/PropBlock';
 import { MAX_GAMES_IN_SERIES } from '../utils';
 
 type SeriesCountProps = {
-  gamesMap: Map<string, Game>;
+  games: ObjectMapArray<Game, 'id'>;
 };
 
 type TopSeriesProps = {
   series: SeriesCollapsed;
-  gamesMap: Map<string, Game>;
+  games: ObjectMapArray<Game, 'id'>;
 };
 
-function TopSeries({ series, gamesMap }: TopSeriesProps) {
-  const games = series.games
+function TopSeries({ series, games }: TopSeriesProps) {
+  const seriesGames = series.games
     .slice(0, MAX_GAMES_IN_SERIES)
-    .map((game) => gamesMap.get(game));
-  const percent = Math.round((games.length / series.allGames) * 100);
+    .map((game) => games.findByKey(game));
+  const percent = Math.round((seriesGames.length / series.allGames) * 100);
 
   return (
     <div className='data-block series-block'>
@@ -34,10 +35,10 @@ function TopSeries({ series, gamesMap }: TopSeriesProps) {
 
       <div className='series-games-collage'>
         {Array.from({ length: MAX_GAMES_IN_SERIES }).map((_, i) =>
-          games[i] ? (
+          seriesGames[i] ? (
             <GameCover
               key={`series-game-cover-${i}`}
-              game={games[i]}
+              game={seriesGames[i]}
               className={`series-game-${i}`}
             />
           ) : (
@@ -50,12 +51,12 @@ function TopSeries({ series, gamesMap }: TopSeriesProps) {
       </div>
 
       <PropBlock title='Best game' className='min'>
-        {games[0] ? (
+        {seriesGames[0] ? (
           <Link
-            href={`/games/titles/${games[0].id}`}
+            href={`/games/titles/${seriesGames[0].id}`}
             className='underline wide'
           >
-            {games[0].name}
+            {seriesGames[0].name}
           </Link>
         ) : (
           <span>—</span>
@@ -88,7 +89,7 @@ function TopSeries({ series, gamesMap }: TopSeriesProps) {
         </PropBlock>
 
         <PropBlock title='Games'>
-          <span className='colored bold'>{games.length}</span>
+          <span className='colored bold'>{seriesGames.length}</span>
           <span>{` (${percent}%)`}</span>
         </PropBlock>
 
@@ -106,7 +107,7 @@ function TopSeries({ series, gamesMap }: TopSeriesProps) {
   );
 }
 
-export default async function SeriesCount({ gamesMap }: SeriesCountProps) {
+export default async function SeriesCount({ games }: SeriesCountProps) {
   const seriesData = await getMetricData<SeriesCollapsed[]>(
     '/api/games/titles/series',
     []
@@ -115,11 +116,7 @@ export default async function SeriesCount({ gamesMap }: SeriesCountProps) {
   return (
     <div className='top-series'>
       {seriesData.map((series) => (
-        <TopSeries
-          key={`${series.id}-series`}
-          series={series}
-          gamesMap={gamesMap}
-        />
+        <TopSeries key={`${series.id}-series`} series={series} games={games} />
       ))}
     </div>
   );

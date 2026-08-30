@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 
 const TOP_GAMES = 10;
 
-const getTopGamesByPlaytime = async (games: GameCore[]) => {
+const getTopGamesByPlaytime: GameEndpointAction<
+  '/api/games/titles/playtime'
+> = async (_req, _params, games) => {
   const topGamesIds = games
-    .slice()
     .sort((a, b) => b.hours - a.hours)
     .slice(0, TOP_GAMES)
+    .toArray()
     .map((game) => game.id);
 
   return NextResponse.json(topGamesIds, {

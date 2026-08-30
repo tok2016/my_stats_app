@@ -5,13 +5,14 @@ import { AxiosRequestConfig } from 'axios';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { GamesTablePage } from '@ts/games/game';
+import Game, { GamesTablePageResponse } from '@ts/games/game';
 import { CountData } from '@ts/games/metric';
 import Country, { CountryIso, CountryResponse } from '@ts/users/country';
 import { ServicesMap } from '@ts/users/service';
 import { BasicUser, User } from '@ts/users/user';
 
 import AxiosInstanse, { AxiosCountriesInstanse } from './axios-instanse';
+import ObjectMapArray from './object-map-array';
 import { defaultCountry, getErrorFormState } from './utils';
 
 export const logout = async () => {
@@ -137,13 +138,13 @@ export const getMetricData = async <MetricType>(
   }
 };
 
-export const getGamesMap = async () => {
-  const response = await AxiosInstanse.get<GamesTablePage>(
+export const getGames = async (): Promise<ObjectMapArray<Game, 'id'>> => {
+  const response = await AxiosInstanse.get<GamesTablePageResponse>(
     '/api/games',
     await getAuthConfig()
   );
-  const gamesMap = new Map(response.data.games.map((game) => [game.id, game]));
-  return gamesMap;
+
+  return new ObjectMapArray(response.data.games, 'id');
 };
 
 export const refreshSteamData = async () => {

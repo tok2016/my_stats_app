@@ -12,7 +12,7 @@ type AddGameParams = {
 export default async function AddGamePage({
   searchParams
 }: {
-  searchParams: AddGameParams;
+  searchParams: Promise<AddGameParams>;
 }) {
   const { gameId } = await searchParams;
   const game = gameId

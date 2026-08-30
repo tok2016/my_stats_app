@@ -1,27 +1,28 @@
 import Game from '@ts/games/game';
 import { PlaytimeData } from '@ts/games/metric';
 
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import PlatformsPlaytimeChart from '../charts/PlatformsPlaytimeChart';
 import { PlatformPlaytimeChartData } from '../types';
 
 type PlatformPlaytimeProps = {
-  platformsMap: Map<number | string, NonNullable<Game['platform']>>;
+  platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>;
 };
 
 export default async function PlatformsPlaytime({
-  platformsMap
+  platforms
 }: PlatformPlaytimeProps) {
-  const platforms = await getMetricData<PlaytimeData[]>(
+  const platformsPlaytimeData = await getMetricData<PlaytimeData[]>(
     '/api/games/platforms/playtime',
     []
   );
 
-  const chartData: PlatformPlaytimeChartData[] = platforms.map(
+  const chartData: PlatformPlaytimeChartData[] = platformsPlaytimeData.map(
     (platform, i) => ({
       id: platform.id,
-      name: platformsMap.get(platform.id)?.name ?? 'Other',
+      name: platforms.findByKey(platform.id)?.name ?? 'Other',
       index: i,
       percent: platform.percent,
       topGame: platform.topGame,

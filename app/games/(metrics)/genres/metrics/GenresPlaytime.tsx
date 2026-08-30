@@ -3,18 +3,17 @@
 import Game from '@ts/games/game';
 import { PlaytimeData } from '@ts/games/metric';
 
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import GenresPlaytimeChart from '../charts/GenresPlaytimeChart';
 import { GenresPlaytimeData } from '../types';
 
 type GenresPlaytimeProps = {
-  genresMap: Map<number | string, Game['genres'][number]>;
+  genres: ObjectMapArray<Game['genres'][number], 'id'>;
 };
 
-export default async function GenresPlaytime({
-  genresMap
-}: GenresPlaytimeProps) {
+export default async function GenresPlaytime({ genres }: GenresPlaytimeProps) {
   const playtimeData = await getMetricData<PlaytimeData[]>(
     '/api/games/genres/playtime',
     []
@@ -24,7 +23,7 @@ export default async function GenresPlaytime({
     (value, i) => ({
       ...value,
       id: value.id,
-      name: genresMap.get(value.id)?.name ?? 'Other',
+      name: genres.findByKey(value.id)?.name ?? 'Other',
       index: i
     })
   );

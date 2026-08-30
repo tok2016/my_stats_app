@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import Link from 'next/link';
 
 import Button from '@components/Button';
@@ -18,7 +20,9 @@ export default function Guest() {
 
         <Divider>or</Divider>
 
-        <UserSearch id='guestSearch' />
+        <Suspense>
+          <UserSearch id='guestSearch' />
+        </Suspense>
       </div>
     </div>
   );

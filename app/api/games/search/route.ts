@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { IgdbGameFull, SearchGame, SearchGamesResults } from '@ts/games/game';
-import Token from '@ts/users/token';
+import { ProtectedEndpointAction } from '@ts/requests';
 
 import { getCredentialsById } from '@lib/auth';
 import { protectedEndpoint } from '@lib/endpoint-generators';
@@ -11,7 +11,11 @@ import { MILLISECONDS } from '@lib/utils';
 
 const SEARCHED_GAMES_LIMIT = 10;
 
-export const searchForGames = async (token: Token, req: NextRequest) => {
+const searchForGames: ProtectedEndpointAction<'/api/games/search'> = async (
+  req,
+  _params,
+  token
+) => {
   const query = req.nextUrl.searchParams.get('query');
   const parsedPage = parseInt(req.nextUrl.searchParams.get('page') ?? '1');
   const page = Number.isNaN(parsedPage) ? 1 : parsedPage;

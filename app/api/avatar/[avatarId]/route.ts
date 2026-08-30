@@ -1,16 +1,20 @@
 import { readFile } from 'fs/promises';
-import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { generateErrorResponse } from '@lib/utils';
+import { NextResponse } from 'next/server';
+
+import { GeneralEndpointAction } from '@ts/requests';
+
 import { AVATAR_DIRECTORY } from '@lib/auth';
 import { generalEndpoint } from '@lib/endpoint-generators';
+import { generateErrorResponse } from '@lib/utils';
 
-type AvatarRouteParams = { avatarId: string };
-
-const getAvatarById = async (_req: NextRequest, params?: AvatarRouteParams) => {
-  if (!params) throw generateErrorResponse(400, 'Avatar id was not given');
+const getAvatarById: GeneralEndpointAction<'/api/avatar/[avatarId]'> = async (
+  _req,
+  params
+) => {
   const { avatarId } = await params;
+  if (!avatarId) throw generateErrorResponse(400, 'Avatar id was not given');
 
   try {
     const avatarBuffer = await readFile(path.join(AVATAR_DIRECTORY, avatarId));
@@ -32,4 +36,4 @@ const getAvatarById = async (_req: NextRequest, params?: AvatarRouteParams) => {
   }
 };
 
-export const GET = generalEndpoint<AvatarRouteParams>(getAvatarById);
+export const GET = generalEndpoint(getAvatarById);

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Game from '@ts/games/game';
 import { StudioRatingMetric, StudioType } from '@ts/games/studio';
 
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
@@ -12,7 +13,7 @@ import MultipleRating from '@components/data-blocks/MultipleRatings';
 import { StudiosTypeFields } from '../../utils';
 
 type HighestRatedStudiosProps = {
-  studiosMap: Map<number | string, Game['developers'][number]>;
+  studios: ObjectMapArray<Game['developers'][number], 'id'>;
   type: StudioType;
 };
 
@@ -48,25 +49,25 @@ function RatedStudio({ ratedStudio, studio }: RatedStudioProps) {
 }
 
 export default async function HighestRatedStudios({
-  studiosMap,
+  studios,
   type
 }: HighestRatedStudiosProps) {
   const searchParams = new URLSearchParams({ field: StudiosTypeFields[type] });
-  const studios = await getMetricData<StudioRatingMetric[]>(
+  const studiosRatingData = await getMetricData<StudioRatingMetric[]>(
     `/api/games/studios/rating?${searchParams.toString()}`,
     []
   );
 
-  if (!studios.length)
+  if (!studiosRatingData.length)
     return <EmptyMetric message={`You haven't rated any game yet`} />;
 
   return (
     <div className='blocks-group'>
-      {studios.map((ratedStudio) => (
+      {studiosRatingData.map((ratedStudio) => (
         <RatedStudio
           key={`${ratedStudio.id}-rated`}
           ratedStudio={ratedStudio}
-          studio={studiosMap.get(ratedStudio.id)}
+          studio={studios.findByKey(ratedStudio.id)}
         />
       ))}
     </div>

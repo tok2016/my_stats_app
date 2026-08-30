@@ -1,13 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
 import { PrecisePeriod } from '@ts/games/metric';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { getPeriodMetric } from '@lib/metrics/periods-metric';
 import { TOP_ENTRIES } from '@lib/utils';
 
-const getGamesPeriods = async (games: GameCore[], req: NextRequest) => {
+const getGamesPeriods: GameEndpointAction<'/api/games/titles/periods'> = async (
+  req,
+  _params,
+  games
+) => {
   const periodType =
     (req.nextUrl.searchParams.get('period') as PrecisePeriod) ?? 'year';
 

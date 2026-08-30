@@ -2,12 +2,10 @@ import { Suspense } from 'react';
 
 import Game from '@ts/games/game';
 
-import { getGamesMap } from '@lib/server-actions';
+import { getGames } from '@lib/server-actions';
 
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import Metric from '@components/data-blocks/Metric';
-
-import { getItemsMap } from '@app/games/lib/actions';
 
 import HighestRatedStudios from './metrics/HighestRatedStudios';
 import StudiosCount from './metrics/StudiosCount';
@@ -16,54 +14,45 @@ import StudiosPeriodTops from './metrics/StudiosPeriodTops';
 import HighestRatedStudiosSkeleton from './skeletons/HighestRatedStudiosSkeleton';
 import StudiosCountSkeleton from './skeletons/StudiosCountSkeleton';
 
-const isIgdbStudioBase = (
-  value: unknown
-): value is Game['developers'][number] =>
-  typeof (value as Game['developers'][number])?.name !== 'undefined';
-
 export default async function GamesStudiosPage() {
-  const gamesMap = await getGamesMap();
-
-  const developersMap = await getItemsMap<Game['developers'][number]>(
-    gamesMap,
-    'developers',
-    isIgdbStudioBase
+  const games = await getGames();
+  const developers = games.flatMapByKey<Game['developers'][number], 'id'>(
+    (game) => game.developers,
+    'id'
   );
-
-  const publishersMap = await getItemsMap<Game['publishers'][number]>(
-    gamesMap,
-    'publishers',
-    isIgdbStudioBase
+  const publishers = games.flatMapByKey<Game['publishers'][number], 'id'>(
+    (game) => game.publishers,
+    'id'
   );
 
   return (
     <>
       <Metric id='developers-count' title='Your favorite developers'>
         <Suspense fallback={<StudiosCountSkeleton />}>
-          <StudiosCount studiosMap={developersMap} type='developer' />
+          <StudiosCount studios={developers} type='developer' />
         </Suspense>
       </Metric>
 
       <Metric id='publishers-count' title='Your favorite publishers'>
         <Suspense fallback={<StudiosCountSkeleton />}>
-          <StudiosCount studiosMap={publishersMap} type='publisher' />
+          <StudiosCount studios={publishers} type='publisher' />
         </Suspense>
       </Metric>
 
       <StudiosPeriodTops
-        developersMap={developersMap}
-        publishersMap={publishersMap}
+        developers={developers.toArray()}
+        publishers={publishers.toArray()}
       />
 
       <Metric id='developers-rating' title='Your highest rated developers'>
         <Suspense fallback={<HighestRatedStudiosSkeleton />}>
-          <HighestRatedStudios studiosMap={developersMap} type='developer' />
+          <HighestRatedStudios studios={developers} type='developer' />
         </Suspense>
       </Metric>
 
       <Metric id='publishers-rating' title='Your highest rated publishers'>
         <Suspense fallback={<HighestRatedStudiosSkeleton />}>
-          <HighestRatedStudios studiosMap={publishersMap} type='publisher' />
+          <HighestRatedStudios studios={publishers} type='publisher' />
         </Suspense>
       </Metric>
 
@@ -72,7 +61,7 @@ export default async function GamesStudiosPage() {
         title='Your favorite developers around the world'
       >
         <Suspense fallback={<ChartSkeleton type='map' />}>
-          <StudiosCountries developersMap={developersMap} />
+          <StudiosCountries developers={developers} />
         </Suspense>
       </Metric>
     </>

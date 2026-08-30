@@ -1,20 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { GameCore } from '@ts/games/game';
-import Confirmation, {
-  ConfirmationInfo,
-  ConfirmationRouteParams
-} from '@ts/users/confirmation';
-import Service, { ServicesMap } from '@ts/users/service';
-import Token from '@ts/users/token';
+import {
+  CommonUserEndpointAction,
+  ConfirmationEndpointAction,
+  GameEndpointAction,
+  GeneralEndpointAction,
+  ProtectedEndpointAction,
+  ServiceEndpointAction
+} from '@ts/requests';
+import { ConfirmationInfo } from '@ts/users/confirmation';
+import { ServicesMap } from '@ts/users/service';
 import { UserRouteParams } from '@ts/users/user';
 
+import { AppRouteHandlerRoutes } from '../../.next/types/routes';
 import { checkUserAuthorRights } from './auth';
 import {
   CredentialsModel,
   GamesModel,
   ServiceCredentialsModel
 } from './models';
+import ObjectMapArray from './object-map-array';
 import { extractToken } from './token';
 import { isErrorResponse } from './type-guards';
 import { generateErrorResponse } from './utils';
@@ -73,63 +79,58 @@ const generateAccessError = (error: unknown) => {
 };
 
 export const generalEndpoint =
-  <ParamsType = undefined>(
-    action: (req: NextRequest, params?: ParamsType) => Promise<NextResponse>
+  <Endpoint extends AppRouteHandlerRoutes>(
+    action: GeneralEndpointAction<Endpoint>
   ) =>
-  async (req: NextRequest, context?: { params: Promise<ParamsType> }) => {
+  async (req: NextRequest, context: RouteContext<Endpoint>) => {
     try {
-      const params = await context?.params;
-      return action(req, params);
+      return action(req, context.params);
     } catch (err) {
       return generateAccessError(err);
     }
   };
 
 export const protectedEndpoint =
-  <ParamsType = undefined>(
-    action: (
-      token: Token,
-      req: NextRequest,
-      params?: ParamsType
-    ) => Promise<NextResponse>
+  <Endpoint extends AppRouteHandlerRoutes>(
+    action: ProtectedEndpointAction<Endpoint>
   ) =>
-  async (req: NextRequest, context?: { params: Promise<ParamsType> }) => {
+  async (req: NextRequest, context: RouteContext<Endpoint>) => {
     try {
-      const params = await context?.params;
       const token = await req.headers.get('Authorization');
-
-      return action(await extractToken(token), req, params);
+      return action(req, context.params, await extractToken(token));
     } catch (err) {
       return generateAccessError(err);
     }
   };
 
+const isUserParams = (params: unknown): params is UserRouteParams =>
+  !!(params as UserRouteParams)?.userId;
+
 export const commonUserEndpoint =
-  <ParamsType extends UserRouteParams = UserRouteParams>(
-    action: (params: ParamsType, req: NextRequest) => Promise<NextResponse>
+  <Endpoint extends AppRouteHandlerRoutes>(
+    action: CommonUserEndpointAction<Endpoint>
   ) =>
-  async (req: NextRequest, context?: { params: Promise<ParamsType> }) => {
+  async (req: NextRequest, context: RouteContext<Endpoint>) => {
     try {
       const token = await req.headers.get('Authorization');
-      const params = await context?.params;
+      const params = await context.params;
+      if (!isUserParams(params))
+        throw generateErrorResponse(400, 'User id was not given');
 
-      if (!params) throw generateErrorResponse(400, 'User id was not given');
-
-      await checkUserAuthorRights(params?.userId, token);
-      return action(params, req);
+      await checkUserAuthorRights(params.userId, token);
+      return action(req, context.params);
     } catch (err) {
       return generateAccessError(err);
     }
   };
 
 export const confirmationEndpoint =
-  <ParamsType extends ConfirmationRouteParams = ConfirmationRouteParams>(
-    action: (req: NextRequest, params?: ParamsType) => Promise<Confirmation>
+  <Endpoint extends AppRouteHandlerRoutes>(
+    action: ConfirmationEndpointAction<Endpoint>
   ) =>
-  async (req: NextRequest, context?: { params: Promise<ParamsType> }) => {
+  async (req: NextRequest, context: RouteContext<Endpoint>) => {
     try {
-      const params = await context?.params;
-      const operation = await action(req, params);
+      const operation = await action(req, context.params);
 
       const operationInfo: ConfirmationInfo = {
         id: operation.id,
@@ -148,44 +149,32 @@ export const confirmationEndpoint =
   };
 
 export const serviceEndpoint =
-  <ParamsType = undefined>(
-    action: (
-      req: NextRequest,
-      service?: Service,
-      params?: ParamsType
-    ) => Promise<NextResponse>
+  <Endpoint extends AppRouteHandlerRoutes>(
+    action: ServiceEndpointAction<Endpoint>
   ) =>
-  async (req: NextRequest, context?: { params: Promise<ParamsType> }) => {
+  async (req: NextRequest, context: RouteContext<Endpoint>) => {
     try {
-      const params = await context?.params;
       const tokenRaw = await req.headers.get('Authorization');
-
       const token = await extractToken(tokenRaw);
       const services = await getServicesByCredentialsId(token.id);
 
-      return action(req, services?.steam, params);
+      return action(req, context.params, services?.steam);
     } catch (err) {
       return generateAccessError(err);
     }
   };
 
 export const gameEndpoint =
-  <ParamsType = undefined>(
-    action: (
-      games: GameCore[],
-      req: NextRequest,
-      params?: ParamsType
-    ) => Promise<NextResponse>
+  <Endpoint extends AppRouteHandlerRoutes>(
+    action: GameEndpointAction<Endpoint>
   ) =>
-  async (req: NextRequest, context?: { params: Promise<ParamsType> }) => {
+  async (req: NextRequest, context: RouteContext<Endpoint>) => {
     try {
-      const params = await context?.params;
       const tokenRaw = await req.headers.get('Authorization');
-
       const token = await extractToken(tokenRaw);
       const games = await getGamesByCredentialsId(token.id);
 
-      return action(games, req, params);
+      return action(req, context.params, new ObjectMapArray(games, 'apiId'));
     } catch (err) {
       return generateAccessError(err);
     }

@@ -18,12 +18,6 @@ export interface IgdbSeries {
   games: number[];
 }
 
-export interface ItemSeries {
-  id: number;
-  name: string;
-  itemsMap: Map<number, CountCompareData>;
-}
-
 export type IgdbSeriesExpanded = Omit<IgdbSeries, 'games'> & {
   games: IgdbGameRatingsStudios[];
 };

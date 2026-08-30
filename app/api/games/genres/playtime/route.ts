@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
+import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { getPlaytimeMetric } from '@lib/metrics/playtime-metric';
 
-const getGenresHours = async (games: GameCore[]) => {
+const getGenresHours: GameEndpointAction<'/api/games/genres/playtime'> = async (
+  _req,
+  _params,
+  games
+) => {
   const genresHoursMetric = getPlaytimeMetric(games, 'genresIds');
 
   return NextResponse.json(genresHoursMetric, {

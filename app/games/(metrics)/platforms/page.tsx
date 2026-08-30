@@ -2,30 +2,31 @@ import { Suspense } from 'react';
 
 import Game from '@ts/games/game';
 
-import { getGamesMap } from '@lib/server-actions';
+import { getGames } from '@lib/server-actions';
 
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import Metric from '@components/data-blocks/Metric';
 
-import { getItemsMap } from '@app/games/lib/actions';
-
-import { isIgdbGenre, isIgdbSeries } from '../utils';
 import HighestRatedPlatforms from './metrics/HighestRatedPlatforms';
 import PlatformsCount from './metrics/PlatformsCount';
 import PlatformsPeriodTops from './metrics/PlatformsPertiodTops';
 import PlatformsPlaytime from './metrics/PlatformsPlaytime';
 import HighestRatedPlatformsSkeleton from './skeletons/HighestRatedPlatformsSkeleton';
 
-const isIgdbPlatform = (
-  value: unknown
-): value is NonNullable<Game['platform']> =>
-  typeof (value as Game['platform'])?.name !== 'undefined';
-
 export default async function GamesPlatformsPage() {
-  const gamesMap = await getGamesMap();
-  const platformsMap = await getItemsMap(gamesMap, 'platform', isIgdbPlatform);
-  const seriesMap = await getItemsMap(gamesMap, 'series', isIgdbSeries);
-  const genresMap = await getItemsMap(gamesMap, 'genres', isIgdbGenre);
+  const games = await getGames();
+  const platformsMap = games.mapByKey<Game['platform'], 'id'>(
+    (game) => game.platform,
+    'id'
+  );
+  const seriesMap = games.mapByKey<Game['series'], 'id'>(
+    (game) => game.series,
+    'id'
+  );
+  const genresMap = games.flatMapByKey<Game['genres'][number], 'id'>(
+    (game) => game.genres,
+    'id'
+  );
 
   return (
     <>
@@ -36,7 +37,7 @@ export default async function GamesPlatformsPage() {
               <ChartSkeleton type='doughnut' className='switchable-chart' />
             }
           >
-            <PlatformsCount platformsMap={platformsMap} seriesMap={seriesMap} />
+            <PlatformsCount platforms={platformsMap} seriesArray={seriesMap} />
           </Suspense>
         </Metric>
 
@@ -46,19 +47,16 @@ export default async function GamesPlatformsPage() {
               <ChartSkeleton type='doughnut' className='switchable-chart' />
             }
           >
-            <PlatformsPlaytime platformsMap={platformsMap} />
+            <PlatformsPlaytime platforms={platformsMap} />
           </Suspense>
         </Metric>
       </div>
 
-      <PlatformsPeriodTops platformsMap={platformsMap} />
+      <PlatformsPeriodTops platforms={platformsMap.toArray()} />
 
       <Metric id='rated-platforms' title='Your highest rated platforms'>
         <Suspense fallback={<HighestRatedPlatformsSkeleton />}>
-          <HighestRatedPlatforms
-            platformsMap={platformsMap}
-            genresMap={genresMap}
-          />
+          <HighestRatedPlatforms platforms={platformsMap} genres={genresMap} />
         </Suspense>
       </Metric>
     </>

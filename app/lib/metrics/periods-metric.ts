@@ -1,59 +1,111 @@
 import { GameCore } from '@ts/games/game';
-import { MetricMap, PeriodPlaytimeTops, PrecisePeriod } from '@ts/games/metric';
+import { PeriodPlaytimeTops, PrecisePeriod } from '@ts/games/metric';
+import { ExtractTypeFields } from '@ts/util-types';
 
-import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
+import ObjectMapArray from '@lib/object-map-array';
+import { isKeyOfArrayField } from '@lib/type-guards';
+
 import { getPeriodDate } from '../utils';
 
-const setPeriodList = (
-  item: number | string,
-  game: GameCore,
-  period: string,
-  periodLists: Map<string, MetricMap<number>>
-) => {
-  const periodList = periodLists.get(period);
-  const currentGameTime = game.hours;
+type ItemPeriodPlaytime = {
+  period: string;
+  hours: number;
+};
 
-  periodLists.set(period, {
-    ...periodLists.get(period),
-    [item]: (periodList?.[item] ?? 0) + currentGameTime
-  });
+type ItemPeriodCompare = {
+  id: number | string;
+  periods: ObjectMapArray<ItemPeriodPlaytime, 'period'>;
+};
+
+type ItemPeriodCompareArray = Omit<ItemPeriodCompare, 'periods'> & {
+  periods: ItemPeriodPlaytime[];
+};
+
+type PeriodCompareData = {
+  period: string;
+  itemsCounts: ObjectMapArray<{ id: number | string; hours: number }, 'id'>;
+};
+
+const aggregateItemPeriod =
+  (periodType: PrecisePeriod) =>
+  (game: GameCore, item: number | string, stored?: ItemPeriodCompare) => {
+    const playDate = new Date(game.playDate ?? 0);
+    if (!playDate.getTime()) return undefined;
+
+    const period = getPeriodDate[periodType](playDate);
+    const compareData = {
+      period,
+      hours: game.hours + (stored?.periods.findByKey(period)?.hours ?? 0)
+    };
+
+    if (stored) stored.periods.push(compareData);
+    return {
+      id: item,
+      periods: stored
+        ? stored.periods
+        : new ObjectMapArray([compareData], 'period')
+    };
+  };
+
+const aggregatePeriod = (
+  itemPeriod: ItemPeriodCompareArray,
+  period: ItemPeriodPlaytime,
+  stored?: PeriodCompareData
+): PeriodCompareData | undefined => {
+  const itemPlaytime = { id: itemPeriod.id, hours: period.hours };
+  if (stored) stored.itemsCounts.push(itemPlaytime);
+
+  return {
+    period: period.period,
+    itemsCounts: stored
+      ? stored.itemsCounts
+      : new ObjectMapArray([itemPlaytime], 'id')
+  };
 };
 
 export const getPeriodMetric = (
-  games: GameCore[],
+  games: ObjectMapArray<GameCore, 'apiId'>,
   periodType: PrecisePeriod,
-  dataField: keyof GameCore,
+  itemField: ExtractTypeFields<
+    GameCore,
+    number | string | Array<number | string>
+  >,
   maxTopEntries: number
 ): PeriodPlaytimeTops => {
-  const periodLists = new Map<string, MetricMap<number>>();
+  const itemPeriodLists = (
+    isKeyOfArrayField(itemField, games.at(0))
+      ? games.flatGroupBy(
+          aggregateItemPeriod(periodType),
+          itemField,
+          'id',
+          undefined
+        )
+      : games.groupBy(
+          aggregateItemPeriod(periodType),
+          itemField,
+          'id',
+          undefined
+        )
+  ).mapByKey<ItemPeriodCompareArray, 'id'>(
+    (itemPeriod) => ({
+      id: itemPeriod.id,
+      periods: itemPeriod.periods.toArray()
+    }),
+    'id'
+  );
 
-  games.forEach((game) => {
-    if (game.playDate) {
-      const period = getPeriodDate[periodType](game.playDate);
-      if (isNumberOrStringArray(game[dataField]))
-        game[dataField].forEach((item) =>
-          setPeriodList(item, game, period, periodLists)
-        );
-      else if (isNumberOrString(game[dataField]))
-        setPeriodList(game[dataField], game, period, periodLists);
-    }
-  });
+  const periodTops = itemPeriodLists
+    .flatGroupBy(aggregatePeriod, 'periods', 'period', 'period')
+    .map((periodCompare) => {
+      const top = periodCompare.itemsCounts
+        .sort((a, b) => b.hours - a.hours)
+        .slice(0, maxTopEntries)
+        .toArray();
 
-  const periodTops = periodLists
-    .entries()
-    .map(([period, list]) => {
-      const top = Object.entries(list)
-        .sort((a, b) => b[1] - a[1])
-        .map((entry) => ({
-          id:
-            typeof games[0][dataField] === 'string'
-              ? entry[0]
-              : Number(entry[0]),
-          hours: entry[1]
-        }))
-        .slice(0, maxTopEntries);
-
-      const periodTop: PeriodPlaytimeTops['tops'][number] = { period, top };
+      const periodTop: PeriodPlaytimeTops['tops'][number] = {
+        period: periodCompare.period,
+        top
+      };
       return periodTop;
     })
     .toArray()

@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-import { getGamesMap } from '@lib/server-actions';
+import { getGames } from '@lib/server-actions';
 
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import Metric from '@components/data-blocks/Metric';
@@ -17,23 +17,23 @@ import HighestRatedGamesSkeleton from './skeletons/HigestRatedGamesSkeleton';
 import SeriesCountSkeleton from './skeletons/SeriesCountSkeleton';
 
 export default async function GamesTitlesPage() {
-  const gamesMap = await getGamesMap();
+  const games = await getGames();
 
   return (
     <>
       <Metric id='games-playtime' title='Your longest played games'>
         <Suspense fallback={<GamePlaytimeSkeleton />}>
-          <GamesPlaytime gamesMap={gamesMap} />
+          <GamesPlaytime games={games} />
         </Suspense>
       </Metric>
 
       <Metric id='favorite-games' title='Your favorite games'>
         <Suspense fallback={<HighestRatedGamesSkeleton />}>
-          <HighestRatedGames gamesMap={gamesMap} />
+          <HighestRatedGames games={games} />
         </Suspense>
       </Metric>
 
-      <GamesPeriodTops gamesMap={gamesMap} />
+      <GamesPeriodTops games={games.toArray()} />
 
       <Metric id='game-releases' title='Game releases per year'>
         <Suspense fallback={<ChartSkeleton type='line' />}>
@@ -58,7 +58,7 @@ export default async function GamesTitlesPage() {
 
       <Metric id='top-series' title='Your favorite game series'>
         <Suspense fallback={<SeriesCountSkeleton />}>
-          <SeriesCount gamesMap={gamesMap} />
+          <SeriesCount games={games} />
         </Suspense>
       </Metric>
     </>

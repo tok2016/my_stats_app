@@ -15,9 +15,10 @@ import { IgdbSeriesExpanded } from '@ts/games/series';
 import Token from '@ts/users/token';
 import { LiteralType } from '@ts/util-types';
 
+import ObjectMapArray from '@lib/object-map-array';
+
 import { getCredentialsById } from '../auth';
 import { GamesModel } from '../models';
-import { isIgdbItemArray, isIgdbItemBasic } from '../type-guards';
 import { generateErrorResponse, mean } from '../utils';
 import { getImageUrl, igdbRequest } from './igdb';
 
@@ -187,22 +188,25 @@ export const formRecommendedGame = (
 };
 
 export const getFullGames = async (
-  gamesMap: Map<number, GameCore>
-): Promise<Game[]> => {
-  const apiIds = gamesMap.keys().toArray();
+  games: ObjectMapArray<GameCore, 'apiId'>
+): Promise<ObjectMapArray<Game, 'id'>> => {
+  const apiIds = games.map((game) => game.apiId).toArray();
   const igdbGames = await igdbRequest<IgdbGameFull>('/games', {
     fields: FULL_GAME_FIELDS,
     where: `id = (${apiIds.join(',')})`,
     limit: apiIds.length
   });
 
-  const fullGames = igdbGames
-    .map((igdbGame) => {
-      const game = gamesMap.get(igdbGame.id);
-      if (!game) return;
-      return uniteGameCoreAndIgdb(game, igdbGame);
-    })
-    .filter((game) => !!game);
+  const fullGames = new ObjectMapArray(
+    igdbGames
+      .map((igdbGame) => {
+        const game = games.findByKey(igdbGame.id);
+        if (!game) return;
+        return uniteGameCoreAndIgdb(game, igdbGame);
+      })
+      .filter((game) => !!game),
+    'id'
+  );
 
   return fullGames;
 };
@@ -253,18 +257,21 @@ export const getItemById = async <IgdbDataType extends IgdbBasic>(
     id: igdbItem.id,
     name: igdbItem.name,
     hours: getTotalPlaytime(gamesCore),
-    averageRating: getAverageRating<Game>(fullGames, 'rating'),
-    criticsRating: getAverageRating<Game>(fullGames, 'criticsRating'),
-    usersRating: getAverageRating<Game>(fullGames, 'usersRating'),
+    averageRating: getAverageRating(fullGames, 'rating'),
+    criticsRating: getAverageRating(fullGames, 'criticsRating'),
+    usersRating: getAverageRating(fullGames, 'usersRating'),
     games: fullGames
   };
 
   return [itemInfo, igdbItem] as const;
 };
 
-export const getAverageRating = <GameType extends object>(
-  games: GameType[],
-  field: keyof GameType
+export const getAverageRating = <
+  GameType extends object,
+  RatingField extends keyof GameType
+>(
+  games: ObjectMapArray<GameType, RatingField> | Array<GameType>,
+  field: RatingField
 ) => {
   const values: number[] = [];
   games.forEach((game) => {
@@ -280,54 +287,21 @@ export const getTotalPlaytime = (games: GameCore[]): number =>
     games.map((game) => game.hours).reduce((prev, curr) => prev + curr, 0)
   );
 
-const setItemToMap = (
-  item: IgdbBasic,
-  game: Game,
-  map: Map<number | string, ItemCompareData>
-) => {
-  const currentItem = map.get(item.id);
-  if (!currentItem)
-    map.set(item.id, {
-      item,
-      count: 1,
-      hours: game.hours
-    });
-  else {
-    currentItem.count++;
-    currentItem.hours += game.hours;
-  }
-};
-
 export const getTopItem = <IgdbData extends IgdbBasic>(
-  games: Game[],
-  dataField: keyof Game
-): IgdbData => {
-  const itemsMap = new Map<number | string, ItemCompareData<IgdbData>>();
-
-  games.forEach((game) => {
-    if (isIgdbItemBasic(game?.[dataField]))
-      setItemToMap(game[dataField], game, itemsMap);
-    else if (isIgdbItemArray(game?.[dataField]))
-      game[dataField].forEach((item) => {
-        setItemToMap(item, game, itemsMap);
-      });
-  });
-
-  return itemsMap
-    .values()
-    .toArray()
+  compareData: ObjectMapArray<ItemCompareData<IgdbData>, 'id'>
+): IgdbData | undefined => {
+  return compareData
     .sort((a, b) => {
       const countDiff = b.count - a.count;
       if (!countDiff) return b.hours - a.hours;
       return countDiff;
     })
-    .map((data) => data.item)[0];
+    .at(0);
 };
 
-export const mapGamesByApiId = (games: GameCore[]) => {
-  const gamesMap = new Map<number, GameCore>(
-    games.map((game) => [game.apiId, game])
-  );
-
-  return gamesMap;
+export const mapGamesByApiId = (
+  games: GameCore[]
+): ObjectMapArray<GameCore, 'apiId'> => {
+  const gamesMapArray = new ObjectMapArray(games, 'apiId');
+  return gamesMapArray;
 };

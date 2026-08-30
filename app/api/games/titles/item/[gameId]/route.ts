@@ -1,16 +1,15 @@
 import { Types } from 'mongoose';
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { IgdbBasic } from '@ts/games/api-response';
 import Game, {
-  GameCore,
   GameDetailed,
   IgdbGameFull,
   IgdbRecommendedGame
 } from '@ts/games/game';
 import { RatingDetialed, Ratings } from '@ts/games/rating';
-import Token from '@ts/users/token';
+import { GameEndpointAction, ProtectedEndpointAction } from '@ts/requests';
 
 import { getCredentialsById } from '@lib/auth';
 import { gameEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
@@ -22,12 +21,9 @@ import {
 } from '@lib/games/games-utils';
 import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
+import ObjectMapArray from '@lib/object-map-array';
 import { generateErrorResponse } from '@lib/utils';
 import { GameUpdateValidator, validateData } from '@lib/validation-schemas';
-
-type GameIdParams = {
-  gameId?: string;
-};
 
 type IgdbGameDetailed = IgdbGameFull & {
   themes?: IgdbBasic[];
@@ -78,9 +74,12 @@ const uniteGameAndIgdbDetailed = (
   };
 };
 
-const getDetialedRatings = (game: Game, otherGames: Game[]): Ratings => {
-  const ratings = Object.fromEntries(
-    RatingsKeys.map((key): [keyof Ratings, RatingDetialed | undefined] => [
+const getDetialedRatings = (
+  game: Game,
+  otherGames: ObjectMapArray<Game, 'id'>
+): Ratings => {
+  const ratings = new Map<keyof Ratings, RatingDetialed | undefined>(
+    RatingsKeys.map((key) => [
       key,
       typeof game[key] === 'number'
         ? {
@@ -90,43 +89,34 @@ const getDetialedRatings = (game: Game, otherGames: Game[]): Ratings => {
           }
         : undefined
     ])
-  ) as unknown as Ratings;
+  );
 
   otherGames.forEach((otherGame) => {
     RatingsKeys.forEach((key) => {
+      const rating = ratings.get(key);
       if (
-        !!ratings[key]
+        typeof rating !== 'undefined'
         && typeof otherGame[key] === 'number'
         && typeof game[key] === 'number'
         && otherGame[key] > game[key]
       ) {
-        ratings[key].generalPosition++;
-
+        rating.generalPosition++;
         if (otherGame.series?.id === game.series?.id)
-          ratings[key].seriesPosition = (ratings[key].seriesPosition ?? 1) + 1;
+          rating.seriesPosition = (rating.seriesPosition ?? 1) + 1;
       }
     });
   });
 
-  return ratings;
+  return Object.fromEntries(ratings.entries()) as never as Ratings;
 };
 
-const getGameById = async (
-  games: GameCore[],
-  _req: NextRequest,
-  params?: GameIdParams
-) => {
-  if (!params?.gameId)
-    throw generateErrorResponse(400, 'Game ID was not provided');
+const getGameById: GameEndpointAction<
+  '/api/games/titles/item/[gameId]'
+> = async (_req, params, games) => {
+  const { gameId } = await params;
+  if (!gameId) throw generateErrorResponse(400, 'Game ID was not provided');
 
-  const gamesMap = new Map<number, GameCore>();
-  let foundGame: GameCore | undefined;
-
-  games.forEach((game) => {
-    if (game.id === params.gameId) foundGame = game;
-    else gamesMap.set(game.apiId, game);
-  });
-
+  const foundGame = games.find((game) => game.id === gameId);
   if (!foundGame) throw generateErrorResponse(404, 'Game was not found');
 
   const foundIgdbGame = (
@@ -139,7 +129,7 @@ const getGameById = async (
   if (!foundIgdbGame)
     throw generateErrorResponse(404, 'Game full data was not found');
 
-  const otherGames = await getFullGames(gamesMap);
+  const otherGames = await getFullGames(games);
   const gameFull = uniteGameCoreAndIgdb(
     foundGame,
     foundIgdbGame,
@@ -157,19 +147,17 @@ const getGameById = async (
   );
 };
 
-const putGameChangesById = async (
-  token: Token,
-  req: NextRequest,
-  params?: GameIdParams
-) => {
-  if (!params?.gameId)
-    throw generateErrorResponse(400, 'Game ID was not provided');
+const putGameChangesById: ProtectedEndpointAction<
+  '/api/games/titles/item/[gameId]'
+> = async (req, params, token) => {
+  const { gameId } = await params;
+  if (!gameId) throw generateErrorResponse(400, 'Game ID was not provided');
 
   const credentials = await getCredentialsById(token.id);
   const update = await validateData(GameUpdateValidator, await req.json());
 
   const updatedGame = await GamesModel.updateOne(
-    { userId: credentials.userId, _id: new Types.ObjectId(params.gameId) },
+    { userId: credentials.userId, _id: new Types.ObjectId(gameId) },
     update
   ).lean();
 
@@ -181,18 +169,16 @@ const putGameChangesById = async (
   });
 };
 
-const deleteGameById = async (
-  token: Token,
-  _req: NextRequest,
-  params?: GameIdParams
-) => {
-  if (!params?.gameId)
-    throw generateErrorResponse(400, 'Game ID was not provided');
+const deleteGameById: ProtectedEndpointAction<
+  '/api/games/titles/item/[gameId]'
+> = async (_req, params, token) => {
+  const { gameId } = await params;
+  if (!gameId) throw generateErrorResponse(400, 'Game ID was not provided');
 
   const credentials = await getCredentialsById(token.id);
   const deletedGame = await GamesModel.deleteOne({
     userId: credentials.userId,
-    _id: new Types.ObjectId(params.gameId)
+    _id: new Types.ObjectId(gameId)
   });
 
   if (!deletedGame) throw generateErrorResponse(404, 'Game was not found');

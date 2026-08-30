@@ -1,5 +1,6 @@
 import Game from '@ts/games/game';
 
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
@@ -10,7 +11,7 @@ import MultipleRating from '@components/data-blocks/MultipleRatings';
 import PropBlock from '../../../../components/data-blocks/PropBlock';
 
 type HighestRatedGamesProps = {
-  gamesMap: Map<string, Game>;
+  games: ObjectMapArray<Game, 'id'>;
 };
 
 type TopGameProps = {
@@ -63,7 +64,7 @@ function TopGame({ game, index }: TopGameProps) {
 }
 
 export default async function HighestRatedGames({
-  gamesMap
+  games
 }: HighestRatedGamesProps) {
   const gamesIds = await getMetricData<string[]>(
     '/api/games/titles/rating',
@@ -74,7 +75,7 @@ export default async function HighestRatedGames({
     return <EmptyMetric message={`You haven't rated any game yet`} />;
 
   const topGames = gamesIds
-    .map((id) => gamesMap.get(id))
+    .map((id) => games.findByKey(id))
     .filter((game) => !!game);
 
   return (

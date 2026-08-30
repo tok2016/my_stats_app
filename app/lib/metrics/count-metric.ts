@@ -1,36 +1,35 @@
 import { GameCore } from '@ts/games/game';
 import { CountCompareData, CountData } from '@ts/games/metric';
+import { ExtractTypeFields } from '@ts/util-types';
 
+import ObjectMapArray from '@lib/object-map-array';
+import { isKeyOfArrayField } from '@lib/type-guards';
 import { MAX_ENTRIES_IN_CHART, getPercentThreshold } from '@lib/utils';
 
-import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
-
 const defaultCompareData: CountCompareData = {
+  id: -1,
   count: 0,
   hours: 0
 };
 
 const getTopCountData = (
-  itemsCount: Map<number | string, CountData>
+  itemsCount: ObjectMapArray<CountData, 'id'>
 ): CountData[] => {
   let sum = 0;
   let max = 0;
 
-  const values = itemsCount
-    .values()
-    .toArray()
-    .sort((a, b) => b.count - a.count);
-
-  values.forEach((value) => {
-    sum += value.count;
-    max = value.count > max ? value.count : max;
-  });
+  itemsCount
+    .sort((a, b) => b.count - a.count)
+    .forEach((itemCount) => {
+      sum += itemCount.count;
+      max = itemCount.count > max ? itemCount.count : max;
+    });
 
   const threshold = getPercentThreshold((max / sum) * 100, sum);
   const countData: CountData[] = [];
 
   for (let i = 0; i < MAX_ENTRIES_IN_CHART + 1; i++) {
-    const data = values[i];
+    const data = itemsCount.at(i);
     if (!data) break;
 
     const percent = (data.count / sum) * 100;
@@ -39,7 +38,7 @@ const getTopCountData = (
       let count = 0;
       const topSeries = new Map<number, number>();
 
-      values.slice(i).forEach((restData) => {
+      itemsCount.slice(i).forEach((restData) => {
         count += restData.count;
         if (restData.topSeries)
           topSeries.set(
@@ -71,71 +70,71 @@ const getTopCountData = (
   return countData;
 };
 
-const getSeriesCount = (games: GameCore[]) => {
-  const series = new Map<number, CountCompareData>();
-
-  games.forEach((game) => {
-    if (!game.seriesId) return;
-    const storedSeries = series.get(game.seriesId);
-    if (!storedSeries)
-      series.set(game.seriesId, {
-        count: 1,
-        hours: game.hours
-      });
-    else {
-      storedSeries.count++;
-      storedSeries.hours += game.hours;
-    }
-  });
-
-  return series;
-};
-
-const setItemCount = (
-  id: number | string,
+const aggregateSeriesCountData = (
   game: GameCore,
-  itemsCount: Map<number | string, CountData>,
-  seriesCount: Map<number | string, CountCompareData>
+  seriesId: number | undefined,
+  stored?: CountCompareData
 ) => {
-  const storedItem = itemsCount.get(id);
-  if (!storedItem) {
-    itemsCount.set(id, {
-      id,
-      count: 1,
-      percent: 0,
-      topSeries: game.seriesId
-    });
-  } else {
-    const storedSeriesCompare =
-      seriesCount.get(storedItem.topSeries ?? -1) ?? defaultCompareData;
-    const seriesCompare =
-      seriesCount.get(game.seriesId ?? -1) ?? defaultCompareData;
-
-    storedItem.count++;
-    storedItem.topSeries =
-      seriesCompare.count > storedSeriesCompare.count
-      || (seriesCompare.count === storedSeriesCompare.count
-        && seriesCompare.hours >= storedSeriesCompare.hours)
-        ? game.seriesId
-        : storedItem.topSeries;
-  }
+  if (typeof seriesId === 'undefined') return undefined;
+  return {
+    id: seriesId,
+    count: (stored?.count ?? 0) + 1,
+    hours: (stored?.hours ?? 0) + game.hours
+  };
 };
+
+const aggregateItemData =
+  (seriesCountData: ObjectMapArray<CountCompareData, 'id'>) =>
+  (
+    game: GameCore,
+    item: number | string,
+    stored?: CountData
+  ): CountData | undefined => {
+    const storedSeriesCompare =
+      seriesCountData.findByKey(stored?.topSeries ?? -1) ?? defaultCompareData;
+    const seriesCompare =
+      seriesCountData.findByKey(game.seriesId ?? -1) ?? defaultCompareData;
+
+    return {
+      id: item,
+      count: (stored?.count ?? 0) + 1,
+      percent: 0,
+      topSeries:
+        seriesCompare.count > storedSeriesCompare.count
+        || (seriesCompare.count === storedSeriesCompare.count
+          && seriesCompare.hours >= storedSeriesCompare.hours)
+          ? game.seriesId
+          : stored?.topSeries
+    };
+  };
 
 export const getCountMetric = (
-  games: GameCore[],
-  itemField: keyof GameCore
+  games: ObjectMapArray<GameCore, 'apiId'>,
+  itemField: ExtractTypeFields<
+    GameCore,
+    number | string | Array<number | string>
+  >
 ): CountData[] => {
-  const seriesCount = getSeriesCount(games);
-  const itemsCount = new Map<number, CountData>();
+  const seriesCountData = games.groupBy(
+    aggregateSeriesCountData,
+    'seriesId',
+    'id',
+    undefined
+  );
 
-  games.forEach((game) => {
-    if (isNumberOrStringArray(game[itemField]))
-      game[itemField].forEach((item) =>
-        setItemCount(item, game, itemsCount, seriesCount)
+  const itemsCount = isKeyOfArrayField(itemField, games.at(0))
+    ? games.flatGroupBy(
+        aggregateItemData(seriesCountData),
+        itemField,
+        'id',
+        undefined
+      )
+    : games.groupBy(
+        aggregateItemData(seriesCountData),
+        itemField,
+        'id',
+        undefined
       );
-    else if (isNumberOrString(game[itemField]))
-      setItemCount(game[itemField], game, itemsCount, seriesCount);
-  });
 
   return getTopCountData(itemsCount);
 };

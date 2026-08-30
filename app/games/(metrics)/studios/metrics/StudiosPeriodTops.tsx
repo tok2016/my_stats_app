@@ -6,6 +6,7 @@ import Game from '@ts/games/game';
 import { PeriodTopsMetric, PrecisePeriod } from '@ts/games/metric';
 import { StudioType, StudiosPeriodMetric } from '@ts/games/studio';
 
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
@@ -13,14 +14,14 @@ import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
 import { StudioFullPeriodTopData } from '../types';
 
 type StudiosPeriodTopsProps = {
-  developersMap: Map<number | string, Game['developers'][number]>;
-  publishersMap: Map<number | string, Game['publishers'][number]>;
+  developers: Game['developers'];
+  publishers: Game['publishers'];
 };
 
 const getStudioPeriodMetric =
   (
-    developersMap: Map<number | string, Game['developers'][number]>,
-    publishersMap: Map<number | string, Game['publishers'][number]>
+    developers: ObjectMapArray<Game['developers'][number], 'id'>,
+    publishers: ObjectMapArray<Game['publishers'][number], 'id'>
   ) =>
   async (
     periodType?: PrecisePeriod
@@ -46,8 +47,8 @@ const getStudioPeriodMetric =
           type: entry.type as StudioType,
           index: i,
           name:
-            developersMap.get(entry.id)?.name
-            ?? publishersMap.get(entry.id)?.name
+            developers.findByKey(entry.id)?.name
+            ?? publishers.findByKey(entry.id)?.name
             ?? 'Other'
         }))
       }))
@@ -66,15 +67,18 @@ const studioItemContent = (item: StudioFullPeriodTopData) => (
 );
 
 export default function StudiosPeriodTops({
-  developersMap,
-  publishersMap
+  developers,
+  publishers
 }: StudiosPeriodTopsProps) {
   return (
     <PeriodTops
       id='studios-period'
       title='Your favorite developer & publisher'
       listItemContent={studioItemContent}
-      getPeriodMetric={getStudioPeriodMetric(developersMap, publishersMap)}
+      getPeriodMetric={getStudioPeriodMetric(
+        new ObjectMapArray(developers, 'id'),
+        new ObjectMapArray(publishers, 'id')
+      )}
       displayFields={['hours']}
       valueField='hours'
       fieldsNames={{

@@ -1,30 +1,36 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import Game from '@ts/games/game';
-import { IgdbGenre } from '@ts/games/genre';
+import { ItemCompareData } from '@ts/games/metric';
 import { IgdbSeries } from '@ts/games/series';
 import { IgdbStudio, Studio } from '@ts/games/studio';
-import Token from '@ts/users/token';
+import { ProtectedEndpointAction } from '@ts/requests';
 
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import { getItemById, getTopItem } from '@lib/games/games-utils';
 import { getImageUrl } from '@lib/games/igdb';
+import ObjectMapArray from '@lib/object-map-array';
 
-type StudioParam = {
-  studioId?: string;
-};
-
-type SeriesCompareData = {
+type SeriesCompareData = IgdbSeries & {
   count: number;
   hours: number;
-  series: IgdbSeries;
 };
 
-const getStudioById = async (
-  token: Token,
-  _req: NextRequest,
-  params?: StudioParam
-) => {
+const aggregateGenre = (
+  game: Game,
+  genre: Game['genres'][number],
+  stored?: ItemCompareData<Game['genres'][number]>
+) => ({
+  ...genre,
+  count: (stored?.count ?? 0) + 1,
+  hours: (stored?.hours ?? 0) + game.hours
+});
+
+const getStudioById: ProtectedEndpointAction<
+  '/api/games/studios/item/[studioId]'
+> = async (_req, params, token) => {
+  const { studioId } = await params;
+
   const [basicInfo, igdbStudio] = await getItemById<IgdbStudio>(
     token,
     ['developersIds', 'publishersIds'],
@@ -37,12 +43,12 @@ const getStudioById = async (
       'published.rating',
       'published.aggregated_rating'
     ],
-    params?.studioId
+    studioId
   );
 
   const developed: Game[] = [];
   const published: Game[] = [];
-  const seriesMap = new Map<number, SeriesCompareData>();
+  const seriesMapArray = new ObjectMapArray<SeriesCompareData, 'id'>([], 'id');
 
   basicInfo.games.forEach((game: Game) => {
     if (game.developers.some((developer) => developer.id === basicInfo.id))
@@ -52,29 +58,19 @@ const getStudioById = async (
       published.push(game);
 
     if (!game.series) return;
-    const series = seriesMap.get(game.series.id);
-
-    if (!series)
-      seriesMap.set(game.series.id, {
-        count: 1,
-        hours: game.hours,
-        series: game.series
-      });
-    else {
-      series.count++;
-      series.hours += game.hours;
-    }
+    const series = seriesMapArray.findByKey(game.series.id);
+    seriesMapArray.push({
+      ...game.series,
+      count: (series?.count ?? 0) + 1,
+      hours: (series?.hours ?? 0) + game.hours
+    });
   });
 
-  const series = seriesMap
-    .values()
-    .toArray()
-    .sort((a, b) => {
-      const countDiff = b.count - a.count;
-      if (!countDiff) return b.hours - a.hours;
-      return countDiff;
-    })
-    .map((series) => series.series);
+  seriesMapArray.sort((a, b) => {
+    const countDiff = b.count - a.count;
+    if (!countDiff) return b.hours - a.hours;
+    return countDiff;
+  });
 
   const studio: Studio = {
     id: basicInfo.id,
@@ -85,12 +81,14 @@ const getStudioById = async (
     usersRating: basicInfo.usersRating,
     developed,
     published,
-    series,
+    series: seriesMapArray.toArray(),
     country: igdbStudio.country,
     logo: igdbStudio.logo?.image_id
       ? getImageUrl(igdbStudio.logo.image_id, 'logo_med')
       : undefined,
-    topGenre: getTopItem<IgdbGenre>(basicInfo.games, 'genres')
+    topGenre: getTopItem(
+      basicInfo.games.flatGroupBy(aggregateGenre, 'genres', 'id', 'id')
+    )
   };
 
   return NextResponse.json(studio, {

@@ -1,20 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server';
-
-import { ConfirmationsModel } from '@lib/models';
-import { generateCode, generateErrorResponse } from '@lib/utils';
 import { cookies } from 'next/headers';
-import { ConfirmationRouteParams } from '@ts/users/confirmation';
+import { NextResponse } from 'next/server';
+
+import {
+  ConfirmationEndpointAction,
+  GeneralEndpointAction
+} from '@ts/requests';
+
 import {
   confirmationEndpoint,
   generalEndpoint
 } from '@lib/endpoint-generators';
+import { ConfirmationsModel } from '@lib/models';
+import { generateCode, generateErrorResponse } from '@lib/utils';
 
-const putConfirmationChange = async (
-  _req: NextRequest,
-  params?: ConfirmationRouteParams
-) => {
-  if (!params) throw generateErrorResponse(400, 'Operation id was not given');
+const putConfirmationChange: ConfirmationEndpointAction<
+  '/api/confirm/[operationId]'
+> = async (_req, params) => {
   const { operationId } = await params;
+  if (!operationId)
+    throw generateErrorResponse(400, 'Operation id was not given');
 
   const newCode = generateCode();
   const updatedConfirmation = await ConfirmationsModel.findByIdAndUpdate(
@@ -36,12 +40,12 @@ const putConfirmationChange = async (
   };
 };
 
-const deleteConfirmation = async (
-  _req: NextRequest,
-  params?: ConfirmationRouteParams
-) => {
-  if (!params) throw generateErrorResponse(400, 'Operation id was not given');
+const deleteConfirmation: GeneralEndpointAction<
+  '/api/confirm/[operationId]'
+> = async (_req, params) => {
   const { operationId } = await params;
+  if (!operationId)
+    throw generateErrorResponse(400, 'Operation id was not given');
 
   await ConfirmationsModel.findByIdAndDelete(operationId);
 
@@ -55,6 +59,4 @@ const deleteConfirmation = async (
 };
 
 export const PUT = confirmationEndpoint(putConfirmationChange);
-
-export const DELETE =
-  generalEndpoint<ConfirmationRouteParams>(deleteConfirmation);
+export const DELETE = generalEndpoint(deleteConfirmation);

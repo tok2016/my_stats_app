@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-import { IgdbGameRatingsStudios } from '@ts/games/game';
 import Series, { IgdbSeriesExpanded } from '@ts/games/series';
 import { IgdbStudioBase } from '@ts/games/studio';
-import Token from '@ts/users/token';
+import { ProtectedEndpointAction } from '@ts/requests';
 
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import {
@@ -11,46 +10,36 @@ import {
   getAverageRating,
   getItemById
 } from '@lib/games/games-utils';
+import ObjectMapArray from '@lib/object-map-array';
 
-type SeriesParams = {
-  seriesId?: string;
-};
-
-const getSeriesById = async (
-  token: Token,
-  _req: NextRequest,
-  params?: SeriesParams
-) => {
+const getSeriesById: ProtectedEndpointAction<
+  '/api/games/titles/series/[seriesId]'
+> = async (_req, params, token) => {
+  const { seriesId } = await params;
   const [basicInfo, igdbSeries] = await getItemById<IgdbSeriesExpanded>(
     token,
     ['seriesId'],
     SERIES_EXPANDED_FIELDS,
-    params?.seriesId
+    seriesId
   );
 
-  const developers = new Set<IgdbStudioBase>();
-  const publishers = new Set<IgdbStudioBase>();
+  const developers = new ObjectMapArray<IgdbStudioBase, 'id'>([], 'id');
+  const publishers = new ObjectMapArray<IgdbStudioBase, 'id'>([], 'id');
 
   igdbSeries.games.forEach((game) => {
     game.involved_companies?.forEach((involved) => {
-      if (involved.developer) developers.add(involved.company);
-      if (involved.publisher) publishers.add(involved.company);
+      if (involved.developer) developers.push(involved.company);
+      if (involved.publisher) publishers.push(involved.company);
     });
   });
 
   const series: Series = {
     ...basicInfo,
     allGames: igdbSeries.games.length,
-    developers: developers.values().toArray(),
-    publishers: publishers.values().toArray(),
-    criticsRating: getAverageRating<IgdbGameRatingsStudios>(
-      igdbSeries.games,
-      'aggregated_rating'
-    ),
-    usersRating: getAverageRating<IgdbGameRatingsStudios>(
-      igdbSeries.games,
-      'rating'
-    )
+    developers: developers.toArray(),
+    publishers: publishers.toArray(),
+    criticsRating: getAverageRating(igdbSeries.games, 'aggregated_rating'),
+    usersRating: getAverageRating(igdbSeries.games, 'rating')
   };
 
   return NextResponse.json(series, {

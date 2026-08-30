@@ -1,28 +1,47 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-import { IgdbGenre } from '@ts/games/genre';
+import Game from '@ts/games/game';
+import { ItemCompareData } from '@ts/games/metric';
 import Platform, { IgdbPlatform } from '@ts/games/platform';
-import { IgdbSeries } from '@ts/games/series';
-import Token from '@ts/users/token';
+import { ProtectedEndpointAction } from '@ts/requests';
 
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import { getItemById, getTopItem } from '@lib/games/games-utils';
 import { getImageUrl } from '@lib/games/igdb';
 
-type PlatformParams = {
-  platformId?: string;
+const aggregateSeries = (
+  game: Game,
+  series: Game['series'],
+  stored?: ItemCompareData<NonNullable<Game['series']>>
+) => {
+  if (!series) return undefined;
+  return {
+    ...series,
+    count: (stored?.count ?? 0) + 1,
+    hours: (stored?.hours ?? 0) + game.hours
+  };
 };
 
-const getPlatformById = async (
-  token: Token,
-  _req: NextRequest,
-  params?: PlatformParams
-) => {
+const aggregateGenre = (
+  game: Game,
+  genre: Game['genres'][number],
+  stored?: ItemCompareData<Game['genres'][number]>
+) => ({
+  ...genre,
+  count: (stored?.count ?? 0) + 1,
+  hours: (stored?.hours ?? 0) + game.hours
+});
+
+const getPlatformById: ProtectedEndpointAction<
+  '/api/games/platforms/item/[platformId]'
+> = async (_req, params, token) => {
+  const { platformId } = await params;
+
   const [basicInfo, igdbPlatform] = await getItemById<IgdbPlatform>(
     token,
     ['platformId'],
     ['name', 'platform_family.name', 'platform_logo.image_id'],
-    params?.platformId
+    platformId
   );
 
   const platform: Platform = {
@@ -31,8 +50,12 @@ const getPlatformById = async (
     logo: igdbPlatform.platform_logo?.image_id
       ? getImageUrl(igdbPlatform.platform_logo.image_id, 'logo_med')
       : undefined,
-    topSeries: getTopItem<IgdbSeries>(basicInfo.games, 'series'),
-    topGenre: getTopItem<IgdbGenre>(basicInfo.games, 'genres')
+    topSeries: getTopItem(
+      basicInfo.games.groupBy(aggregateSeries, 'series', 'id', 'id')
+    ),
+    topGenre: getTopItem(
+      basicInfo.games.flatGroupBy(aggregateGenre, 'genres', 'id', 'id')
+    )
   };
 
   return NextResponse.json(platform, {

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Game from '@ts/games/game';
 import { RatingData } from '@ts/games/metric';
 
+import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 import { getSingularOrPlural } from '@lib/utils';
 
@@ -11,7 +12,7 @@ import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameCover from '@components/data-blocks/GameCover';
 
 type HighestRatedGenresProps = {
-  genresMap: Map<number | string, Game['genres'][number]>;
+  genres: ObjectMapArray<Game['genres'][number], 'id'>;
 };
 
 type RatedGenreProps = {
@@ -51,7 +52,7 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
 }
 
 export default async function HighestRatedGenres({
-  genresMap
+  genres: genresMap
 }: HighestRatedGenresProps) {
   const ratingData = await getMetricData<RatingData[]>(
     '/api/games/genres/rating',
@@ -66,7 +67,7 @@ export default async function HighestRatedGenres({
         <RatedGenre
           key={`${data.id}-rating`}
           ratingData={data}
-          genre={genresMap.get(data.id)}
+          genre={genresMap.findByKey(data.id)}
         />
       ))}
     </div>
