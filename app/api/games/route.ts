@@ -9,7 +9,6 @@ import { getCredentialsById } from '@lib/auth';
 import { gameEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
 import { getFullGames } from '@lib/games/games-utils';
 import { GamesModel } from '@lib/models';
-import ObjectMapArray from '@lib/object-map-array';
 import { generateErrorResponse, parseBooleanString } from '@lib/utils';
 import { NewGameValidator, validateData } from '@lib/validation-schemas';
 
@@ -111,7 +110,7 @@ const getGames: GameEndpointAction<'/api/games'> = async (
   _params,
   games
 ) => {
-  const allGames = await getFullGames(new ObjectMapArray(games, 'apiId'));
+  const allGames = await getFullGames(games);
   const filters = req.nextUrl.searchParams.entries().toArray();
   let maxHours = 0;
 

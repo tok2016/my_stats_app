@@ -11,7 +11,10 @@ import { ITEMS_IN_RATING } from '@lib/utils';
 const getPlatformsRatings: GameEndpointAction<
   '/api/games/platforms/rating'
 > = async (_req, _params, games) => {
-  const genresByPlatforms = new Map<number, MetricMap<CountCompareData>>();
+  const genresByPlatforms = new Map<
+    number | string,
+    MetricMap<CountCompareData>
+  >();
 
   games.forEach((game) => {
     game.genresIds.forEach((genre) => {

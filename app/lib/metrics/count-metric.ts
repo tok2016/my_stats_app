@@ -1,10 +1,10 @@
 import { GameCore } from '@ts/games/game';
 import { CountCompareData, CountData } from '@ts/games/metric';
+import { ExtractTypeFields } from '@ts/util-types';
 
 import ObjectMapArray from '@lib/object-map-array';
+import { isKeyOfArrayField } from '@lib/type-guards';
 import { MAX_ENTRIES_IN_CHART, getPercentThreshold } from '@lib/utils';
-
-import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
 
 const defaultCompareData: CountCompareData = {
   id: -1,
@@ -70,73 +70,71 @@ const getTopCountData = (
   return countData;
 };
 
-const getSeriesCountData = (games: GameCore[]) => {
-  const series = new ObjectMapArray<CountCompareData, 'id'>([], 'id');
-
-  games.forEach((game) => {
-    if (!game.seriesId) return;
-
-    const storedSeries = series.findByKey(game.seriesId);
-    if (!storedSeries)
-      series.push({
-        id: game.seriesId,
-        count: 1,
-        hours: game.hours
-      });
-    else {
-      storedSeries.count++;
-      storedSeries.hours += game.hours;
-    }
-  });
-
-  return series;
-};
-
-const setItemCount = (
-  id: number | string,
+const aggregateSeriesCountData = (
   game: GameCore,
-  itemsCount: ObjectMapArray<CountData, 'id'>,
-  seriesCount: ObjectMapArray<CountCompareData, 'id'>
+  seriesId: number | undefined,
+  stored?: CountCompareData
 ) => {
-  const storedItem = itemsCount.findByKey(id);
-  if (!storedItem) {
-    itemsCount.push({
-      id,
-      count: 1,
-      percent: 0,
-      topSeries: game.seriesId
-    });
-  } else {
-    const storedSeriesCompare =
-      seriesCount.findByKey(storedItem.topSeries ?? -1) ?? defaultCompareData;
-    const seriesCompare =
-      seriesCount.findByKey(game.seriesId ?? -1) ?? defaultCompareData;
-
-    storedItem.count++;
-    storedItem.topSeries =
-      seriesCompare.count > storedSeriesCompare.count
-      || (seriesCompare.count === storedSeriesCompare.count
-        && seriesCompare.hours >= storedSeriesCompare.hours)
-        ? game.seriesId
-        : storedItem.topSeries;
-  }
+  if (typeof seriesId === 'undefined') return undefined;
+  return {
+    id: seriesId,
+    count: (stored?.count ?? 0) + 1,
+    hours: (stored?.hours ?? 0) + game.hours
+  };
 };
+
+const aggregateItemData =
+  (seriesCountData: ObjectMapArray<CountCompareData, 'id'>) =>
+  (
+    game: GameCore,
+    item: number | string,
+    stored?: CountData
+  ): CountData | undefined => {
+    const storedSeriesCompare =
+      seriesCountData.findByKey(stored?.topSeries ?? -1) ?? defaultCompareData;
+    const seriesCompare =
+      seriesCountData.findByKey(game.seriesId ?? -1) ?? defaultCompareData;
+
+    return {
+      id: item,
+      count: (stored?.count ?? 0) + 1,
+      percent: 0,
+      topSeries:
+        seriesCompare.count > storedSeriesCompare.count
+        || (seriesCompare.count === storedSeriesCompare.count
+          && seriesCompare.hours >= storedSeriesCompare.hours)
+          ? game.seriesId
+          : stored?.topSeries
+    };
+  };
 
 export const getCountMetric = (
-  games: GameCore[],
-  itemField: keyof GameCore
+  games: ObjectMapArray<GameCore, 'apiId'>,
+  itemField: ExtractTypeFields<
+    GameCore,
+    number | string | Array<number | string>
+  >
 ): CountData[] => {
-  const seriesCountData = getSeriesCountData(games);
-  const itemsCount = new ObjectMapArray<CountData, 'id'>([], 'id');
+  const seriesCountData = games.groupBy(
+    aggregateSeriesCountData,
+    'seriesId',
+    'id',
+    undefined
+  );
 
-  games.forEach((game) => {
-    if (isNumberOrStringArray(game[itemField]))
-      game[itemField].forEach((item) =>
-        setItemCount(item, game, itemsCount, seriesCountData)
+  const itemsCount = isKeyOfArrayField(itemField, games.at(0))
+    ? games.flatGroupBy(
+        aggregateItemData(seriesCountData),
+        itemField,
+        'id',
+        undefined
+      )
+    : games.groupBy(
+        aggregateItemData(seriesCountData),
+        itemField,
+        'id',
+        undefined
       );
-    else if (isNumberOrString(game[itemField]))
-      setItemCount(game[itemField], game, itemsCount, seriesCountData);
-  });
 
   return getTopCountData(itemsCount);
 };

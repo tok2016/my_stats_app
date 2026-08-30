@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import Game from '@ts/games/game';
-import { IgdbGenre } from '@ts/games/genre';
+import { ItemCompareData } from '@ts/games/metric';
 import { IgdbSeries } from '@ts/games/series';
 import { IgdbStudio, Studio } from '@ts/games/studio';
 import { ProtectedEndpointAction } from '@ts/requests';
@@ -15,6 +15,16 @@ type SeriesCompareData = IgdbSeries & {
   count: number;
   hours: number;
 };
+
+const aggregateGenre = (
+  game: Game,
+  genre: Game['genres'][number],
+  stored?: ItemCompareData<Game['genres'][number]>
+) => ({
+  ...genre,
+  count: (stored?.count ?? 0) + 1,
+  hours: (stored?.hours ?? 0) + game.hours
+});
 
 const getStudioById: ProtectedEndpointAction<
   '/api/games/studios/item/[studioId]'
@@ -49,17 +59,11 @@ const getStudioById: ProtectedEndpointAction<
 
     if (!game.series) return;
     const series = seriesMapArray.findByKey(game.series.id);
-
-    if (!series)
-      seriesMapArray.push({
-        ...game.series,
-        count: 1,
-        hours: game.hours
-      });
-    else {
-      series.count++;
-      series.hours += game.hours;
-    }
+    seriesMapArray.push({
+      ...game.series,
+      count: (series?.count ?? 0) + 1,
+      hours: (series?.hours ?? 0) + game.hours
+    });
   });
 
   seriesMapArray.sort((a, b) => {
@@ -82,7 +86,9 @@ const getStudioById: ProtectedEndpointAction<
     logo: igdbStudio.logo?.image_id
       ? getImageUrl(igdbStudio.logo.image_id, 'logo_med')
       : undefined,
-    topGenre: getTopItem<IgdbGenre>(basicInfo.games, 'genres')
+    topGenre: getTopItem(
+      basicInfo.games.flatGroupBy(aggregateGenre, 'genres', 'id', 'id')
+    )
   };
 
   return NextResponse.json(studio, {

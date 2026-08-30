@@ -1,37 +1,42 @@
 import { GameCore } from '@ts/games/game';
 import { YearCountMetric } from '@ts/games/metric';
+import { ExtractTypeFields } from '@ts/util-types';
 
 import { gameCoreToShort } from '@lib/games/games-utils';
 import ObjectMapArray from '@lib/object-map-array';
 
-import { isDateSource } from '../type-guards';
 import { GAMES_IN_METRIC } from '../utils';
 
+type GameCoreYear = GameCore & { year: number };
+
+const DEFAULT_YEAR = new Date(0).getFullYear();
+
+const aggregateYearCount = (
+  game: GameCoreYear,
+  year: number,
+  stored?: YearCountMetric
+) => {
+  if (year === DEFAULT_YEAR) return undefined;
+
+  const gameShort = gameCoreToShort(game);
+  if (stored) stored.topGames.push(gameShort);
+  return {
+    year,
+    count: (stored?.count ?? 0) + 1,
+    topGames: stored ? stored.topGames : [gameShort]
+  };
+};
+
 export const getYearCountMetric = (
-  games: GameCore[],
-  dateField: keyof GameCore
+  games: ObjectMapArray<GameCore, 'apiId'>,
+  dateField: ExtractTypeFields<GameCore, string | undefined>
 ): YearCountMetric[] => {
-  const yearsMap = new ObjectMapArray<YearCountMetric, 'year'>([], 'year');
-
-  games.forEach((game) => {
-    if (!isDateSource(game[dateField])) return;
-    const date = new Date(game[dateField]);
-
-    if (!date.getTime()) return;
-    const year = date.getFullYear();
-
-    const yearData = yearsMap.findByKey(year);
-    if (!yearData)
-      yearsMap.push({
-        year,
-        count: 1,
-        topGames: [gameCoreToShort(game)]
-      });
-    else {
-      yearData.count++;
-      yearData.topGames.push(gameCoreToShort(game));
-    }
-  });
+  const yearsMap = games
+    .mapByKey<
+      GameCoreYear,
+      'apiId'
+    >((game) => ({ ...game, year: new Date(game[dateField] ?? 0).getFullYear() }), 'apiId')
+    .groupBy(aggregateYearCount, 'year', 'year', undefined);
 
   const yearsMetric: YearCountMetric[] = [];
   const sortedYears = yearsMap.sort((a, b) => a.year - b.year);

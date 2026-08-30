@@ -1,10 +1,10 @@
-import { GameCore, GameShort } from '@ts/games/game';
+import { GameCore } from '@ts/games/game';
 import { PlaytimeData } from '@ts/games/metric';
+import { ExtractTypeFields } from '@ts/util-types';
 
-import { gameCoreToShort } from '@lib/games/games-utils';
 import ObjectMapArray from '@lib/object-map-array';
+import { isKeyOfArrayField } from '@lib/type-guards';
 
-import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
 import { MAX_ENTRIES_IN_CHART, getPercentThreshold } from '../utils';
 
 const getTopCountData = (
@@ -63,43 +63,25 @@ const getTopCountData = (
   return countData;
 };
 
-const setPlaytimeData = (
+const aggregatePlaytimeData = (
+  game: GameCore,
   item: number | string,
-  game: GameShort,
-  data: ObjectMapArray<PlaytimeData, 'id'>
-) => {
-  const currentItem = data.findByKey(item);
-
-  if (!currentItem) {
-    const itemId = Number(item);
-    data.push({
-      id: Number.isNaN(itemId) ? 0 : itemId,
-      hours: game.hours,
-      count: 1,
-      percent: 0,
-      topGame: game
-    });
-  } else {
-    currentItem.hours += game.hours;
-    currentItem.count++;
-    currentItem.topGame =
-      game.hours > currentItem.topGame.hours ? game : currentItem.topGame;
-  }
-};
+  stored?: PlaytimeData
+): PlaytimeData | undefined => ({
+  id: item,
+  count: (stored?.count ?? 0) + 1,
+  hours: (stored?.hours ?? 0) + game.hours,
+  percent: 0,
+  topGame: !stored || game.hours > stored.topGame.hours ? game : stored.topGame
+});
 
 export const getPlaytimeMetric = (
-  games: GameCore[],
-  dataField: keyof GameCore
+  games: ObjectMapArray<GameCore, 'apiId'>,
+  itemField: ExtractTypeFields<GameCore, number | string | Array<number>>
 ): PlaytimeData[] => {
-  const itemsMap = new ObjectMapArray<PlaytimeData, 'id'>([], 'id');
-  games.forEach((game) => {
-    if (isNumberOrStringArray(game[dataField]))
-      game[dataField].forEach((item) =>
-        setPlaytimeData(item, gameCoreToShort(game), itemsMap)
-      );
-    else if (isNumberOrString(game[dataField]))
-      setPlaytimeData(game[dataField], gameCoreToShort(game), itemsMap);
-  });
+  const itemsMap = isKeyOfArrayField(itemField, games.at(0))
+    ? games.flatGroupBy(aggregatePlaytimeData, itemField, 'id', undefined)
+    : games.groupBy(aggregatePlaytimeData, itemField, 'id', undefined);
 
   return getTopCountData(itemsMap);
 };

@@ -73,7 +73,7 @@ const getRecommnededGames: GameEndpointAction<
   const genresCount: MetricMap<number> = {};
   const tagsCount: MetricMap<number> = {};
   const gamesMap: GamesStatusMap = {};
-  const tags = await getGamesTags(games.map((game) => game.apiId));
+  const tags = await getGamesTags(games.map((game) => game.apiId).toArray());
 
   games.forEach((game) => {
     gamesMap[game.apiId] = 'old';

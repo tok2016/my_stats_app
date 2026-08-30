@@ -9,6 +9,7 @@ import { gameEndpoint } from '@lib/endpoint-generators';
 import { getAverageRating } from '@lib/games/games-utils';
 import { igdbRequest } from '@lib/games/igdb';
 import { getRatingMetric } from '@lib/metrics/rating-metric';
+import ObjectMapArray from '@lib/object-map-array';
 import { ITEMS_IN_RATING } from '@lib/utils';
 
 const getStudiosRating: GameEndpointAction<
@@ -38,11 +39,11 @@ const getStudiosRating: GameEndpointAction<
     where: `id = (${topGamesIds.join(',')})`
   });
 
-  const gamesRatingsMap = new Map(ratingGames.map((game) => [game.id, game]));
+  const gamesRatingsMap = new ObjectMapArray(ratingGames, 'id');
   const studiosFullRatings: StudioRatingMetric[] = studiosRatings.map(
     (studioRating) => {
       const gamesRatings = studioRating.topGames
-        .map((game) => gamesRatingsMap.get(game.apiId))
+        .map((game) => gamesRatingsMap.findByKey(game.apiId))
         .filter((game) => !!game);
 
       return {

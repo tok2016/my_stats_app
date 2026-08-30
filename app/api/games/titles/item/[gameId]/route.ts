@@ -78,8 +78,8 @@ const getDetialedRatings = (
   game: Game,
   otherGames: ObjectMapArray<Game, 'id'>
 ): Ratings => {
-  const ratings = Object.fromEntries(
-    RatingsKeys.map((key): [keyof Ratings, RatingDetialed | undefined] => [
+  const ratings = new Map<keyof Ratings, RatingDetialed | undefined>(
+    RatingsKeys.map((key) => [
       key,
       typeof game[key] === 'number'
         ? {
@@ -89,25 +89,25 @@ const getDetialedRatings = (
           }
         : undefined
     ])
-  ) as unknown as Ratings;
+  );
 
   otherGames.forEach((otherGame) => {
     RatingsKeys.forEach((key) => {
+      const rating = ratings.get(key);
       if (
-        !!ratings[key]
+        typeof rating !== 'undefined'
         && typeof otherGame[key] === 'number'
         && typeof game[key] === 'number'
         && otherGame[key] > game[key]
       ) {
-        ratings[key].generalPosition++;
-
+        rating.generalPosition++;
         if (otherGame.series?.id === game.series?.id)
-          ratings[key].seriesPosition = (ratings[key].seriesPosition ?? 1) + 1;
+          rating.seriesPosition = (rating.seriesPosition ?? 1) + 1;
       }
     });
   });
 
-  return ratings;
+  return Object.fromEntries(ratings.entries()) as never as Ratings;
 };
 
 const getGameById: GameEndpointAction<
@@ -116,8 +116,7 @@ const getGameById: GameEndpointAction<
   const { gameId } = await params;
   if (!gameId) throw generateErrorResponse(400, 'Game ID was not provided');
 
-  const gamesMapArray = new ObjectMapArray(games, 'apiId');
-  const foundGame = gamesMapArray.find((game) => game.id === gameId);
+  const foundGame = games.find((game) => game.id === gameId);
   if (!foundGame) throw generateErrorResponse(404, 'Game was not found');
 
   const foundIgdbGame = (
@@ -130,7 +129,7 @@ const getGameById: GameEndpointAction<
   if (!foundIgdbGame)
     throw generateErrorResponse(404, 'Game full data was not found');
 
-  const otherGames = await getFullGames(gamesMapArray);
+  const otherGames = await getFullGames(games);
   const gameFull = uniteGameCoreAndIgdb(
     foundGame,
     foundIgdbGame,

@@ -3,6 +3,7 @@ import { isAxiosError as originalAxiosError } from 'axios';
 import { IgdbBasic } from '@ts/games/api-response';
 import { SteamGamesList } from '@ts/games/game';
 import ErrorResponse from '@ts/requests';
+import { ExtractTypeFields } from '@ts/util-types';
 
 const AcceptableMetricTypes = ['number', 'string'];
 
@@ -42,3 +43,9 @@ export const isIgdbItemArray = (value: unknown): value is Array<IgdbBasic> =>
 
 export const isHTMLElement = (value: unknown): value is HTMLElement =>
   (value as HTMLElement).style !== undefined;
+
+export const isKeyOfArrayField = <T extends object, ElementType>(
+  key: keyof T,
+  obj: T | undefined
+): key is ExtractTypeFields<T, Array<ElementType>> =>
+  Array.isArray(obj?.[key]) && isNumberOrString(obj[key][0]);

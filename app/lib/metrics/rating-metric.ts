@@ -1,65 +1,52 @@
-import { GameCore, GameShort } from '@ts/games/game';
+import { GameCore } from '@ts/games/game';
 import { RatingData } from '@ts/games/metric';
-import { RequiredFields } from '@ts/util-types';
+import { ExtractTypeFields } from '@ts/util-types';
 
 import { gameCoreToShort } from '@lib/games/games-utils';
 import ObjectMapArray from '@lib/object-map-array';
+import { isKeyOfArrayField } from '@lib/type-guards';
 
-import { isNumberOrString, isNumberOrStringArray } from '../type-guards';
 import { GAMES_IN_METRIC } from '../utils';
-import { mean } from '../utils';
 
-const setRatingData = (
+type RatingSumData = Omit<RatingData, 'rating'> & { ratingSum: number };
+
+const aggregateRatingData = (
+  game: GameCore,
   item: number | string,
-  game: GameShort,
-  data: ObjectMapArray<RatingData, 'id'>
-) => {
-  const currentItemRating = data.findByKey(item);
+  stored?: RatingSumData
+): RatingSumData | undefined => {
+  const gameShort = gameCoreToShort(game);
+  if (typeof gameShort.rating === 'undefined' || Array.isArray(item))
+    return undefined;
 
-  if (!currentItemRating) {
-    const itemId = Number(item);
-    data.push({
-      id: Number.isNaN(itemId) ? 0 : itemId,
-      rating: 0,
-      topGames: [game]
-    });
-  } else currentItemRating.topGames.push(game);
+  if (stored) stored.topGames.push(gameShort);
+  return {
+    id: item,
+    ratingSum: (stored?.ratingSum ?? 0) + gameShort.rating,
+    topGames: stored ? stored.topGames : [gameShort]
+  };
 };
 
 export const getRatingMetric = (
-  games: GameCore[],
-  dataField: keyof GameCore,
+  games: ObjectMapArray<GameCore, 'apiId'>,
+  itemField: ExtractTypeFields<GameCore, number | string | Array<number>>,
   topSize?: number
 ): RatingData[] => {
-  const itemsRatingData = new ObjectMapArray<RatingData, 'id'>([], 'id');
-
-  games.forEach((game) => {
-    if (isNumberOrStringArray(game[dataField]))
-      game[dataField].forEach((item) =>
-        setRatingData(item, gameCoreToShort(game), itemsRatingData)
-      );
-    else if (isNumberOrString(game[dataField]))
-      setRatingData(game[dataField], gameCoreToShort(game), itemsRatingData);
-  });
-
-  const ratingDataMetric = itemsRatingData
-    .map((ratingData): RatingData | undefined => {
-      const gamesWithRating = ratingData.topGames.filter(
-        (game) => typeof game.rating === 'number'
-      ) as RequiredFields<GameShort, 'rating'>[];
-
-      const rating = mean(gamesWithRating.map((game) => game.rating));
-
-      if (!rating) return;
+  const ratingDataMetric = (
+    isKeyOfArrayField(itemField, games.at(0))
+      ? games.flatGroupBy(aggregateRatingData, itemField, 'id', undefined)
+      : games.groupBy(aggregateRatingData, itemField, 'id', undefined)
+  )
+    .filter((ratingData) => !!ratingData.ratingSum)
+    .map((ratingData): RatingData => {
       return {
         id: ratingData.id,
-        rating,
-        topGames: gamesWithRating
-          .sort((a, b) => b.rating - a.rating)
+        rating: Math.round(ratingData.ratingSum / ratingData.topGames.length),
+        topGames: ratingData.topGames
+          .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
           .slice(0, GAMES_IN_METRIC)
       };
     })
-    .filter((ratingData) => !!ratingData)
     .toArray()
     .sort((a, b) => b.rating - a.rating)
     .slice(0, topSize);

@@ -10,6 +10,7 @@ import {
   getAverageRating,
   getItemById
 } from '@lib/games/games-utils';
+import ObjectMapArray from '@lib/object-map-array';
 
 const getSeriesById: ProtectedEndpointAction<
   '/api/games/titles/series/[seriesId]'
@@ -22,21 +23,21 @@ const getSeriesById: ProtectedEndpointAction<
     seriesId
   );
 
-  const developers = new Set<IgdbStudioBase>();
-  const publishers = new Set<IgdbStudioBase>();
+  const developers = new ObjectMapArray<IgdbStudioBase, 'id'>([], 'id');
+  const publishers = new ObjectMapArray<IgdbStudioBase, 'id'>([], 'id');
 
   igdbSeries.games.forEach((game) => {
     game.involved_companies?.forEach((involved) => {
-      if (involved.developer) developers.add(involved.company);
-      if (involved.publisher) publishers.add(involved.company);
+      if (involved.developer) developers.push(involved.company);
+      if (involved.publisher) publishers.push(involved.company);
     });
   });
 
   const series: Series = {
     ...basicInfo,
     allGames: igdbSeries.games.length,
-    developers: developers.values().toArray(),
-    publishers: publishers.values().toArray(),
+    developers: developers.toArray(),
+    publishers: publishers.toArray(),
     criticsRating: getAverageRating(igdbSeries.games, 'aggregated_rating'),
     usersRating: getAverageRating(igdbSeries.games, 'rating')
   };

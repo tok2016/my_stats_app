@@ -13,6 +13,7 @@ const getHighestRatedGames: GameEndpointAction<
     .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
     .filter((game) => typeof game.rating === 'number')
     .slice(0, TOP_RATING_GAMES)
+    .toArray()
     .map((game) => game.id);
 
   return NextResponse.json(topGamesIds, {

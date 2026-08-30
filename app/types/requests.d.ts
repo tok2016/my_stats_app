@@ -2,6 +2,8 @@ import { $ZodIssue } from 'zod/v4/core';
 
 import { NextRequest } from 'next/server';
 
+import ObjectMapArray from '@lib/object-map-array';
+
 import { AppRouteHandlerRoutes } from '../../.next/types/routes';
 import { GameCore } from './games/game';
 
@@ -44,5 +46,5 @@ export type ServiceEndpointAction<Endpoint extends AppRouteHandlerRoutes> = (
 export type GameEndpointAction<Endpoint extends AppRouteHandlerRoutes> = (
   req: NextRequest,
   params: RouteContext<Endpoint>['params'],
-  games: GameCore[]
+  games: ObjectMapArray<GameCore, 'apiId'>
 ) => Promise<NextResponse>;

@@ -20,6 +20,7 @@ import {
   GamesModel,
   ServiceCredentialsModel
 } from './models';
+import ObjectMapArray from './object-map-array';
 import { extractToken } from './token';
 import { isErrorResponse } from './type-guards';
 import { generateErrorResponse } from './utils';
@@ -173,7 +174,7 @@ export const gameEndpoint =
       const token = await extractToken(tokenRaw);
       const games = await getGamesByCredentialsId(token.id);
 
-      return action(req, context.params, games);
+      return action(req, context.params, new ObjectMapArray(games, 'apiId'));
     } catch (err) {
       return generateAccessError(err);
     }

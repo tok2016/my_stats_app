@@ -23,9 +23,7 @@ const getSeriesInfo = (
       .map((game) => games.findByKey(game.id))
       .filter((game) => !!game),
     'id'
-  );
-
-  ownedGames.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  ).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
 
   if (typeof ownedGames.at(0)?.rating !== 'number')
     ownedGames.sort((a, b) => b.hours - a.hours);
@@ -41,10 +39,8 @@ const getSeriesInfo = (
 
   igdbSeries.games.forEach((game) => {
     game.involved_companies?.forEach((involved) => {
-      if (involved.developer && !developers.findByKey(involved.company.id))
-        developers.push(involved.company);
-      if (involved.publisher && !publishers.findByKey(involved.company.id))
-        publishers.push(involved.company);
+      if (involved.developer) developers.push(involved.company);
+      if (involved.publisher) publishers.push(involved.company);
     });
   });
 
@@ -70,13 +66,11 @@ const getTopSeries: GameEndpointAction<'/api/games/titles/series'> = async (
   games
 ) => {
   const seriesCountMap = new Map<number, number>();
-  const gamesMapArray = new ObjectMapArray<GameCore, 'apiId'>([], 'apiId');
 
   games.forEach((game) => {
     if (!game.seriesId) return;
     const seriesCount = seriesCountMap.get(game.seriesId) ?? 0;
     seriesCountMap.set(game.seriesId, seriesCount + 1);
-    gamesMapArray.push(game);
   });
 
   const topSeries = seriesCountMap
@@ -94,7 +88,7 @@ const getTopSeries: GameEndpointAction<'/api/games/titles/series'> = async (
   });
 
   const series: SeriesCollapsed[] = allIgdbSeries
-    .map((igdbSeries) => getSeriesInfo(igdbSeries, gamesMapArray))
+    .map((igdbSeries) => getSeriesInfo(igdbSeries, games))
     .sort((a, b) => b.games.length - a.games.length);
 
   return NextResponse.json(series, {

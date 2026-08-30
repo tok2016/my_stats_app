@@ -48,7 +48,7 @@ export type PlaytimeData = {
 };
 
 export type RatingData = {
-  id: number;
+  id: number | string;
   rating: number;
   topGames: GameShort[];
 };

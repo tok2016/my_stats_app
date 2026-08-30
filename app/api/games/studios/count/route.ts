@@ -14,8 +14,9 @@ const getStudiosCount: GameEndpointAction<'/api/games/studios/count'> = async (
   const studioType =
     (req.nextUrl.searchParams.get('field') as StudioField) ?? 'developersIds';
 
-  const playtimeStudios = getPlaytimeMetric(games, studioType);
-  playtimeStudios.sort((a, b) => b.count - a.count);
+  const playtimeStudios = getPlaytimeMetric(games, studioType)
+    .filter((playtime) => playtime.id !== -1)
+    .sort((a, b) => b.count - a.count);
 
   return NextResponse.json(playtimeStudios, {
     status: 200,

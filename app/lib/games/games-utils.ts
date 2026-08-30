@@ -19,7 +19,6 @@ import ObjectMapArray from '@lib/object-map-array';
 
 import { getCredentialsById } from '../auth';
 import { GamesModel } from '../models';
-import { isIgdbItemArray, isIgdbItemBasic } from '../type-guards';
 import { generateErrorResponse, mean } from '../utils';
 import { getImageUrl, igdbRequest } from './igdb';
 
@@ -288,43 +287,10 @@ export const getTotalPlaytime = (games: GameCore[]): number =>
     games.map((game) => game.hours).reduce((prev, curr) => prev + curr, 0)
   );
 
-const setItemToMap = (
-  item: IgdbBasic,
-  game: Game,
-  map: ObjectMapArray<ItemCompareData<IgdbBasic>, 'id'>
-) => {
-  const currentItem = map.findByKey(item.id);
-  if (!currentItem)
-    map.push({
-      ...item,
-      count: 1,
-      hours: game.hours
-    });
-  else {
-    currentItem.count++;
-    currentItem.hours += game.hours;
-  }
-};
-
 export const getTopItem = <IgdbData extends IgdbBasic>(
-  games: ObjectMapArray<Game, 'id'> | Array<Game>,
-  dataField: keyof Game
+  compareData: ObjectMapArray<ItemCompareData<IgdbData>, 'id'>
 ): IgdbData | undefined => {
-  const itemsCompareData = new ObjectMapArray<ItemCompareData<IgdbData>, 'id'>(
-    [],
-    'id'
-  );
-
-  games.forEach((game) => {
-    if (isIgdbItemBasic(game?.[dataField]))
-      setItemToMap(game[dataField], game, itemsCompareData);
-    else if (isIgdbItemArray(game?.[dataField]))
-      game[dataField].forEach((item) => {
-        setItemToMap(item, game, itemsCompareData);
-      });
-  });
-
-  return itemsCompareData
+  return compareData
     .sort((a, b) => {
       const countDiff = b.count - a.count;
       if (!countDiff) return b.hours - a.hours;

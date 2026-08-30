@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { GameCore } from '@ts/games/game';
 import { CountCompareData } from '@ts/games/metric';
 import { IgdbStudioCountry, StudioCountryMetric } from '@ts/games/studio';
 import { GameEndpointAction } from '@ts/requests';
@@ -9,82 +10,89 @@ import { igdbRequest } from '@lib/games/igdb';
 import ObjectMapArray from '@lib/object-map-array';
 import { MAX_ENTRIES_IN_CHART, TOP_ENTRIES } from '@lib/utils';
 
-const getCountriesOfStudios = async (studiosIds: number[]) => {
+type CountyStudioCountCompare = CountCompareData & { country?: number };
+
+const getCountriesOfStudios = async (
+  studiosCompareData: ObjectMapArray<CountCompareData, 'id'>
+) => {
+  const ids = studiosCompareData
+    .toArray()
+    .map((data) => data.id)
+    .join(',');
+
+  const studiosCompareWithCountries = new ObjectMapArray<
+    CountyStudioCountCompare,
+    'id'
+  >([], 'id');
+
+  if (!ids) return studiosCompareWithCountries;
+
   const studiosWithCountry = await igdbRequest<IgdbStudioCountry>(
     '/companies',
     {
       fields: ['country'],
-      where: `id = (${studiosIds.join(',')})`,
-      limit: studiosIds.length
+      where: `id = (${ids})`,
+      limit: studiosCompareData.count
     }
   );
 
-  const studioCountryMap = new Map<number, number>();
   studiosWithCountry.forEach((studioCountry) => {
-    if (studioCountry.country)
-      studioCountryMap.set(studioCountry.id, studioCountry.country);
+    const studioCompare = studiosCompareData.findByKey(studioCountry.id);
+    if (studioCompare)
+      studiosCompareWithCountries.push({
+        ...studioCompare,
+        country: studioCountry.country
+      });
   });
 
-  return studioCountryMap;
+  return studiosCompareWithCountries;
 };
 
-const setCountryData = (
-  studioCompareData: CountCompareData,
-  countriesMetricMap: ObjectMapArray<StudioCountryMetric, 'country'>,
-  country?: number
-) => {
-  if (!country || !studioCompareData) return;
+const aggregateStudioCompare = (
+  game: GameCore,
+  developerId: number,
+  stored?: CountCompareData
+) => ({
+  id: developerId,
+  count: (stored?.count ?? 0) + 1,
+  hours: (stored?.hours ?? 0) + game.hours
+});
 
-  const countryData = countriesMetricMap.findByKey(country);
-  if (!countryData)
-    countriesMetricMap.push({
-      country: country,
-      gamesCount: studioCompareData.count,
-      developers: [studioCompareData.id]
-    });
-  else if (countryData.developers.length < TOP_ENTRIES) {
-    countryData.gamesCount += studioCompareData.count;
-    countryData.developers.push(studioCompareData.id);
-  }
+const aggregateCountryData = (
+  studioCompareData: CountCompareData,
+  country?: number,
+  stored?: StudioCountryMetric
+) => {
+  if (!country) return undefined;
+  if (stored && stored.developers.length < TOP_ENTRIES)
+    stored.developers.push(studioCompareData.id);
+
+  return {
+    country,
+    gamesCount: (stored?.gamesCount ?? 0) + studioCompareData.count,
+    developers: stored ? stored.developers : [studioCompareData.id]
+  };
 };
 
 const getStudiosByCountry: GameEndpointAction<
   '/api/games/studios/countries'
 > = async (_req, _params, games) => {
-  const studiosCompareData = new ObjectMapArray<CountCompareData, 'id'>(
-    [],
-    'id'
+  const studiosCompareData = games.flatGroupBy(
+    aggregateStudioCompare,
+    'developersIds',
+    'id',
+    undefined
   );
 
-  games.forEach((game) => {
-    game.developersIds.forEach((studioId) => {
-      const studioData = studiosCompareData.findByKey(studioId);
-      studiosCompareData.push({
-        id: studioId,
-        count: (studioData?.count ?? 0) + 1,
-        hours: (studioData?.hours ?? 0) + game.hours
-      });
-    });
+  const studiosWithCountries = await getCountriesOfStudios(studiosCompareData);
+  studiosWithCountries.sort((a, b) => {
+    const diff = b.count - a.count;
+    if (!diff) return b.hours - a.hours;
+    return diff;
   });
 
-  const studioCountryMap = await getCountriesOfStudios(
-    studiosCompareData.map((compareData) => compareData.id).toArray()
-  );
-
-  const countriesMetricData = new ObjectMapArray<
-    StudioCountryMetric,
-    'country'
-  >([], 'country');
-
-  studiosCompareData.forEach((studio) => {
-    setCountryData(
-      studio,
-      countriesMetricData,
-      studioCountryMap.get(studio.id)
-    );
-  });
-
-  const countries = countriesMetricData
+  const countries = studiosWithCountries
+    .groupBy(aggregateCountryData, 'country', 'country', undefined)
     .sort((a, b) => {
       const countDiff = b.gamesCount - a.gamesCount;
       if (!countDiff) return b.developers.length - a.developers.length;
