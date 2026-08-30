@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+
 import Password from './password';
 
 interface BaseCredentials {
@@ -12,7 +13,7 @@ export type NewCredentials = BaseCredentials & Password;
 export default interface Credentials extends BaseCredentials {
   id: string;
   userId: string;
-  createdAt: Date;
+  createdAt: string;
 }
 
 export type CredentialsInSchema = Omit<Credentials, 'id'> & {

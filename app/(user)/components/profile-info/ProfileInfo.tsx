@@ -20,7 +20,7 @@ type ProfileInfoProps = {
   loading?: boolean;
 };
 
-const formatBirthdate = (birthdate: Date) => {
+const formatBirthdate = (birthdate: Date | string) => {
   const date = new Date(birthdate);
   const localeDate = date.toLocaleDateString('en-US', {
     year: 'numeric',

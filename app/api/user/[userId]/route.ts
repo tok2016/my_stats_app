@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 
 import { GeneralEndpointAction } from '@ts/requests';
 
-import { getDashboards } from '@lib/auth';
 import { generalEndpoint } from '@lib/endpoint-generators';
 import { CredentialsModel, UsersModel } from '@lib/models';
 import { generateErrorResponse, uniteUserData } from '@lib/utils';
@@ -22,9 +21,7 @@ const getUser: GeneralEndpointAction<'/api/user/[userId]'> = async (
 
   if (!userInfo.isPublic) throw generateErrorResponse(403, 'Forbidden');
 
-  const dashboards = await getDashboards(userId);
-
-  return NextResponse.json(uniteUserData(credentials, userInfo, dashboards), {
+  return NextResponse.json(uniteUserData(credentials, userInfo), {
     status: 200,
     statusText: `User ${credentials.username} was found`
   });

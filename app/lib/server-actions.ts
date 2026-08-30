@@ -9,7 +9,7 @@ import Game, { GamesTablePageResponse } from '@ts/games/game';
 import { CountData } from '@ts/games/metric';
 import Country, { CountryIso, CountryResponse } from '@ts/users/country';
 import { ServicesMap } from '@ts/users/service';
-import { BasicUser, User } from '@ts/users/user';
+import { User } from '@ts/users/user';
 
 import AxiosInstanse, { AxiosCountriesInstanse } from './axios-instanse';
 import ObjectMapArray from './object-map-array';
@@ -87,7 +87,7 @@ export const getCountries = async (): Promise<CountryIso[]> => {
 };
 
 export const getUserCountries = async (
-  users: BasicUser[]
+  users: User[]
 ): Promise<Record<string, Country | undefined>> => {
   if (!process.env.COUNTRIES_API) {
     return {};

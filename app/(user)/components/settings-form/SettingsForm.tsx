@@ -32,7 +32,7 @@ type SettingsFormProps = {
   deletePopupName: string;
 };
 
-const getDataValue = (date?: string | Date) => {
+const getDateValue = (date?: string | Date) => {
   if (!date) return '';
 
   const dateObject = new Date(date);
@@ -95,7 +95,7 @@ export default function SettingsForm({
         name='birthdate'
         label='Birthdate'
         placeholder='01/01/2000'
-        defaultValue={getDataValue(
+        defaultValue={getDateValue(
           getFormDataValue('birthdate', state.data)
             ?? user.birthdate?.toString()
         )}

@@ -5,9 +5,8 @@ import FormState from '@ts/ui/form-state';
 import { ConfirmationInfo } from '@ts/users/confirmation';
 import Country from '@ts/users/country';
 import { CredentialsInSchema } from '@ts/users/credentials';
-import Dashboard from '@ts/users/dashboard';
 import { NewPassword } from '@ts/users/password';
-import { BasicUser, User, UserInfoInSchema } from '@ts/users/user';
+import { User, UserInfoInSchema } from '@ts/users/user';
 
 import { isAxiosError, isErrorResponse } from './type-guards';
 
@@ -37,8 +36,6 @@ export const MAX_RATING = 100;
 
 const SUCCESS_CODE_START = 200;
 const SUCCESS_CODE_END = 300;
-
-export const DashboardTypes = ['metric', 'media', 'text'] as const;
 
 export const ServiceNames = ['spotify', 'steam'] as const;
 
@@ -113,8 +110,8 @@ export const defaultUser: User = {
   id: '',
   username: '',
   email: '',
-  createdAt: new Date(),
-  dashboards: [],
+  createdAt: new Date().toISOString(),
+  metrics: [],
   isPublic: false
 };
 
@@ -136,22 +133,15 @@ export const isExpired = (date: Date | string | number) =>
 export const isSuccess = (status: number) =>
   status >= SUCCESS_CODE_START && status < SUCCESS_CODE_END;
 
-export const uniteBasicUserData = (
-  credentials: CredentialsInSchema,
-  userInfo: UserInfoInSchema
-): BasicUser => ({
-  ...credentials,
-  ...userInfo,
-  id: userInfo._id.toString()
-});
-
 export const uniteUserData = (
   credentials: CredentialsInSchema,
-  userInfo: UserInfoInSchema,
-  dashboards: Dashboard[]
+  userInfo: UserInfoInSchema
 ): User => ({
-  ...uniteBasicUserData(credentials, userInfo),
-  dashboards
+  id: userInfo._id.toString(),
+  username: credentials.username,
+  email: credentials.email,
+  createdAt: credentials.createdAt,
+  ...userInfo
 });
 
 export const generateCode = () =>

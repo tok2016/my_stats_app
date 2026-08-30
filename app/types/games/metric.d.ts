@@ -1,7 +1,10 @@
+import { MetricsId } from '@lib/metrics/metrics-id';
 import { GreatPeriods, PrecisePeriods } from '@lib/utils';
 
 import { IgdbBasic } from './api-response';
 import { GameCore, GameShort, RecommendedGame } from './game';
+
+export type MetricId = (typeof MetricsId)[number];
 
 export type PrecisePeriod = (typeof PrecisePeriods)[number];
 export type GreatPeriod = (typeof GreatPeriods)[number];

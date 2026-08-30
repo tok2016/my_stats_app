@@ -1,14 +1,14 @@
 import Link from 'next/link';
 
 import Country from '@ts/users/country';
-import { BasicUser } from '@ts/users/user';
+import { User } from '@ts/users/user';
 
 import Avatar from '@components/profile-layout/Avatar';
 
 import CountryData from './country/CountryData';
 
 type UserPreviewProps = {
-  user: BasicUser;
+  user: User;
   country?: Country;
 };
 

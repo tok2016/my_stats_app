@@ -4,11 +4,11 @@ import { NextResponse } from 'next/server';
 
 import { GeneralEndpointAction } from '@ts/requests';
 import { CredentialsInSchema } from '@ts/users/credentials';
-import { BasicUser, UserInfo } from '@ts/users/user';
+import { User, UserInfo } from '@ts/users/user';
 
 import { generalEndpoint } from '@lib/endpoint-generators';
 import { CredentialsModel, UsersModel } from '@lib/models';
-import { uniteBasicUserData } from '@lib/utils';
+import { uniteUserData } from '@lib/utils';
 
 const getUsers: GeneralEndpointAction<'/api/users'> = async (req) => {
   const credentialSearch = req.nextUrl.searchParams.get('credential');
@@ -40,8 +40,8 @@ const getUsers: GeneralEndpointAction<'/api/users'> = async (req) => {
     ? await UsersModel.find(usersQuery).limit(limit).lean()
     : await UsersModel.find(usersQuery).lean();
 
-  const unitedUsers: BasicUser[] = usersInfo.map((userInfo) =>
-    uniteBasicUserData(credentialsMap[userInfo._id.toString()], userInfo)
+  const unitedUsers: User[] = usersInfo.map((userInfo) =>
+    uniteUserData(credentialsMap[userInfo._id.toString()], userInfo)
   );
 
   return NextResponse.json(unitedUsers, {
