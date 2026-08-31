@@ -2,6 +2,7 @@
 
 import Game from '@ts/games/game';
 import {
+  MetricContentProps,
   PeriodPlaytimeTops,
   PeriodTopsMetric,
   PrecisePeriod
@@ -16,10 +17,6 @@ import RankIcon from '@components/data-blocks/RankIcon';
 import { GenresPeriodPlaytimeData } from '../types';
 
 type Genre = Game['genres'][number];
-
-type GenresPeriodTopsProps = {
-  genres: Genre[];
-};
 
 const getGenresPeriodTops =
   (genres: ObjectMapArray<Genre, 'id'>) =>
@@ -58,13 +55,17 @@ const genreItemContent = (genre: GenresPeriodPlaytimeData, i: number) => (
   </>
 );
 
-export default function GenresPeriodTops({ genres }: GenresPeriodTopsProps) {
+export default function GenresPeriodTops({
+  metricId,
+  games
+}: MetricContentProps) {
+  const genres = games.flatMapByKey<Genre, 'id'>((game) => game.genres, 'id');
+
   return (
     <PeriodTops
-      id='genres-periods'
-      title='Your most played genres'
+      id={metricId}
       listItemContent={genreItemContent}
-      getPeriodMetric={getGenresPeriodTops(new ObjectMapArray(genres, 'id'))}
+      getPeriodMetric={getGenresPeriodTops(genres)}
       displayFields={['hours']}
       valueField='hours'
       showBar

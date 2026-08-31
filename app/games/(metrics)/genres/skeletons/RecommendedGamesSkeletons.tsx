@@ -1,22 +1,12 @@
-import Metric from '@components/data-blocks/Metric';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import RecommendedGameSkeleton from '@app/games/components/RecommendedGameSkeleton';
-
-import { RecommendationCategories, RecommendationIds } from '../../utils';
 
 const GAMES_SKELETONS_TO_SHOW = 5;
 
 export default function RecommendedGamesSkeletons() {
-  const ids = Object.values(RecommendationIds);
-  const categories = Object.values(RecommendationCategories);
-
-  return Array.from({ length: 2 }).map((_, i) => (
-    <Metric
-      key={`recommend-skeletons-${i}`}
-      id={ids[i]}
-      title={categories[i]}
-      className='recommended-group'
-    >
+  return (
+    <MetricWrapper id='recommended-games'>
       <div className='recommended-games'>
         {Array.from({ length: GAMES_SKELETONS_TO_SHOW }).map((_, i) => (
           <RecommendedGameSkeleton
@@ -25,6 +15,6 @@ export default function RecommendedGamesSkeletons() {
           />
         ))}
       </div>
-    </Metric>
-  ));
+    </MetricWrapper>
+  );
 }

@@ -5,15 +5,13 @@ import {
   IgdbRecommendedGame,
   RecommendedGame
 } from '@ts/games/game';
-import { MetricMap, RecommendedMetric } from '@ts/games/metric';
+import { MetricMap } from '@ts/games/metric';
 import { GameEndpointAction } from '@ts/requests';
 
 import { gameEndpoint } from '@lib/endpoint-generators';
 import { formRecommendedGame } from '@lib/games/games-utils';
 import { igdbRequest } from '@lib/games/igdb';
 import { TOP_ENTRIES } from '@lib/utils';
-
-type GamesStatusMap = Record<number, 'new' | 'old'>;
 
 const MAX_TAGS = 5;
 const RECOMMENDED_GAMES = 10;
@@ -72,12 +70,9 @@ const getRecommnededGames: GameEndpointAction<
 > = async (_req, _params, games) => {
   const genresCount: MetricMap<number> = {};
   const tagsCount: MetricMap<number> = {};
-  const gamesMap: GamesStatusMap = {};
   const tags = await getGamesTags(games.map((game) => game.apiId).toArray());
 
   games.forEach((game) => {
-    gamesMap[game.apiId] = 'old';
-
     game.genresIds.forEach((genre) => {
       genresCount[genre] = (genresCount[genre] ?? 0) + 1;
     });
@@ -88,7 +83,7 @@ const getRecommnededGames: GameEndpointAction<
   });
 
   const platforms = new Set(games.map((game) => game.platformId))
-    .keys()
+    .values()
     .toArray()
     .join(',');
 
@@ -102,28 +97,14 @@ const getRecommnededGames: GameEndpointAction<
     .map(([tag]) => tag)
     .join(',');
 
-  const recommendedFavorite = await getGamesByGenres(
-    Object.keys(gamesMap),
+  const recommendedGames = await getGamesByGenres(
+    games.map((game) => game.id).toArray(),
     sortedGenres.slice(0, TOP_ENTRIES),
     favoriteTags,
     platforms
   );
 
-  recommendedFavorite.forEach((game) => {
-    gamesMap[game.id] = 'new';
-  });
-
-  const recommendations: RecommendedMetric = {
-    favorite: recommendedFavorite,
-    other: await getGamesByGenres(
-      Object.keys(gamesMap),
-      sortedGenres.slice(-TOP_ENTRIES),
-      favoriteTags,
-      platforms
-    )
-  };
-
-  return NextResponse.json(recommendations, {
+  return NextResponse.json(recommendedGames, {
     status: 200,
     statusText: 'Recommendations were calculated'
   });

@@ -5,7 +5,7 @@ import Game from '@ts/games/game';
 import { getGames } from '@lib/server-actions';
 
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
-import Metric from '@components/data-blocks/Metric';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import HighestRatedPlatforms from './metrics/HighestRatedPlatforms';
 import PlatformsCount from './metrics/PlatformsCount';
@@ -31,7 +31,7 @@ export default async function GamesPlatformsPage() {
   return (
     <>
       <div className='double-doughnut'>
-        <Metric id='platforms-count' title='Your biggest platforms'>
+        <MetricWrapper id='platforms-count' title='Your biggest platforms'>
           <Suspense
             fallback={
               <ChartSkeleton type='doughnut' className='switchable-chart' />
@@ -39,9 +39,12 @@ export default async function GamesPlatformsPage() {
           >
             <PlatformsCount platforms={platformsMap} seriesArray={seriesMap} />
           </Suspense>
-        </Metric>
+        </MetricWrapper>
 
-        <Metric id='platforms-playtime' title='Your longest used platforms'>
+        <MetricWrapper
+          id='platforms-playtime'
+          title='Your longest used platforms'
+        >
           <Suspense
             fallback={
               <ChartSkeleton type='doughnut' className='switchable-chart' />
@@ -49,16 +52,16 @@ export default async function GamesPlatformsPage() {
           >
             <PlatformsPlaytime platforms={platformsMap} />
           </Suspense>
-        </Metric>
+        </MetricWrapper>
       </div>
 
       <PlatformsPeriodTops platforms={platformsMap.toArray()} />
 
-      <Metric id='rated-platforms' title='Your highest rated platforms'>
+      <MetricWrapper id='rated-platforms' title='Your highest rated platforms'>
         <Suspense fallback={<HighestRatedPlatformsSkeleton />}>
           <HighestRatedPlatforms platforms={platformsMap} genres={genresMap} />
         </Suspense>
-      </Metric>
+      </MetricWrapper>
     </>
   );
 }

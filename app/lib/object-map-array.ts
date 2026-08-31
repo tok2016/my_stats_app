@@ -21,7 +21,7 @@ export default class ObjectMapArray<
     return this.#end;
   }
 
-  constructor(array: Array<T>, key: IndexKey) {
+  constructor(array: Array<T> | ObjectMapArray<T, IndexKey>, key: IndexKey) {
     super();
     this.#array = [];
     this.#indexMap = new Map();

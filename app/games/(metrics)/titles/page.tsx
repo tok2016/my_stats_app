@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { getGames } from '@lib/server-actions';
 
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
-import Metric from '@components/data-blocks/Metric';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import GamePlaydates from './metrics/GamePlayDates';
 import GameReleases from './metrics/GameReleases';
@@ -21,46 +21,46 @@ export default async function GamesTitlesPage() {
 
   return (
     <>
-      <Metric id='games-playtime' title='Your longest played games'>
+      <MetricWrapper id='games-playtime' title='Your longest played games'>
         <Suspense fallback={<GamePlaytimeSkeleton />}>
           <GamesPlaytime games={games} />
         </Suspense>
-      </Metric>
+      </MetricWrapper>
 
-      <Metric id='favorite-games' title='Your favorite games'>
+      <MetricWrapper id='favorite-games' title='Your favorite games'>
         <Suspense fallback={<HighestRatedGamesSkeleton />}>
           <HighestRatedGames games={games} />
         </Suspense>
-      </Metric>
+      </MetricWrapper>
 
       <GamesPeriodTops games={games.toArray()} />
 
-      <Metric id='game-releases' title='Game releases per year'>
+      <MetricWrapper id='game-releases' title='Game releases per year'>
         <Suspense fallback={<ChartSkeleton type='line' />}>
           <GameReleases />
         </Suspense>
-      </Metric>
+      </MetricWrapper>
 
-      <Metric id='game-playdates' title='Your played games per year'>
+      <MetricWrapper id='game-playdates' title='Your played games per year'>
         <Suspense fallback={<ChartSkeleton type='line' />}>
           <GamePlaydates />
         </Suspense>
-      </Metric>
+      </MetricWrapper>
 
-      <Metric
+      <MetricWrapper
         id='countries-by-games'
         title='Your favorite games around the world'
       >
         <Suspense fallback={<ChartSkeleton type='map' />}>
           <GamesCountries />
         </Suspense>
-      </Metric>
+      </MetricWrapper>
 
-      <Metric id='top-series' title='Your favorite game series'>
+      <MetricWrapper id='top-series' title='Your favorite game series'>
         <Suspense fallback={<SeriesCountSkeleton />}>
           <SeriesCount games={games} />
         </Suspense>
-      </Metric>
+      </MetricWrapper>
     </>
   );
 }

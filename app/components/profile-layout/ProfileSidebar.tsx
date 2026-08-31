@@ -7,7 +7,7 @@ import {
   SidebarModuleProps,
   SidebarOptionProps
 } from '@ts/ui/components-props';
-import { User } from '@ts/users/user';
+import { UserSet } from '@ts/users/user';
 
 import { logout } from '@lib/server-actions';
 import { ModulesPaths, defaultUser } from '@lib/utils';
@@ -19,7 +19,7 @@ import SidebarOption from './SidebarOption';
 import UserSearch from './UserSearch';
 
 type AuthorizedSidebarProps = SidebarModuleProps & {
-  user: User;
+  user: UserSet;
 };
 
 const SidebarOptions: SidebarOptionProps[] = [

@@ -1,17 +1,17 @@
 import FormState, { FormAction } from '@ts/ui/form-state';
-import { User, UserClientUpdate, UserUpdate } from '@ts/users/user';
-import { ConfirmationBaseAction } from '@ts/users/confirmation';
 import { AvatarState } from '@ts/users/avatar';
+import { ConfirmationBaseAction } from '@ts/users/confirmation';
 import { NewService, ServiceName } from '@ts/users/service';
+import { User, UserClientUpdate, UserUpdate } from '@ts/users/user';
 
+import { confirmByCode } from '@lib/actions';
 import AxiosInstanse from '@lib/axios-instanse';
 import {
+  ServiceNames,
   getErrorFormState,
   getFormDataValue,
-  parseBooleanString,
-  ServiceNames
+  parseBooleanString
 } from '@lib/utils';
-import { confirmByCode } from '@lib/actions';
 
 const STEAM_ID_REGEX = /(?<=\/profiles\/)[a-zA-Z0-9]+/;
 

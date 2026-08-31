@@ -1,5 +1,3 @@
-'use server';
-
 import Game from '@ts/games/game';
 import { CountData } from '@ts/games/metric';
 

@@ -6,7 +6,7 @@ import { ConfirmationInfo } from '@ts/users/confirmation';
 import Country from '@ts/users/country';
 import { CredentialsInSchema } from '@ts/users/credentials';
 import { NewPassword } from '@ts/users/password';
-import { User, UserInfoInSchema } from '@ts/users/user';
+import { User, UserInfoInSchema, UserSet } from '@ts/users/user';
 
 import { isAxiosError, isErrorResponse } from './type-guards';
 
@@ -106,12 +106,12 @@ export const defaultNewPassword: NewPassword = {
   repeatPassword: ''
 };
 
-export const defaultUser: User = {
+export const defaultUser: UserSet = {
   id: '',
   username: '',
   email: '',
   createdAt: new Date().toISOString(),
-  metrics: [],
+  metrics: new Set(),
   isPublic: false
 };
 

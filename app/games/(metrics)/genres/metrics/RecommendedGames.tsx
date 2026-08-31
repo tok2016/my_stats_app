@@ -1,34 +1,37 @@
-import { RecommendedMetric } from '@ts/games/metric';
+import { Suspense } from 'react';
+
+import { RecommendedGame } from '@ts/games/game';
+import { MetricContentProps, MetricId } from '@ts/games/metric';
 
 import { getMetricData } from '@lib/server-actions';
 
-import Metric from '@components/data-blocks/Metric';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import RecommendedGameBlock from '@app/games/components/RecommendedGameBlock';
 
-import { RecommendationCategories, RecommendationIds } from '../../utils';
+import RecommendedGamesSkeletons from '../skeletons/RecommendedGamesSkeletons';
 
-export default async function RecommendedGames() {
-  const recommendations = await getMetricData<RecommendedMetric>(
+async function RecommendedGamesList({ metricId }: { metricId: MetricId }) {
+  const recommendations = await getMetricData<RecommendedGame[]>(
     '/api/games/genres/recommend',
-    {
-      favorite: [],
-      other: []
-    }
+    []
   );
 
-  return Object.entries(recommendations).map(([key, games]) => (
-    <Metric
-      key={key}
-      id={RecommendationIds[key as keyof RecommendedMetric]}
-      title={RecommendationCategories[key as keyof RecommendedMetric]}
-      className='recommended-group'
-    >
+  return (
+    <MetricWrapper id={metricId} className='recommended-group'>
       <div className='recommended-games'>
-        {games.map((game) => (
+        {recommendations.map((game) => (
           <RecommendedGameBlock key={game.id} {...game} />
         ))}
       </div>
-    </Metric>
-  ));
+    </MetricWrapper>
+  );
+}
+
+export default function RecommendedGames({ metricId }: MetricContentProps) {
+  return (
+    <Suspense fallback={<RecommendedGamesSkeletons />}>
+      <RecommendedGamesList metricId={metricId} />
+    </Suspense>
+  );
 }

@@ -1,5 +1,5 @@
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
-import Metric from '@components/data-blocks/Metric';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import PeriodTopsSkeletons from '@components/data-blocks/PeriodTopsSkeletons';
 
 import HighestRatedStudiosSkeleton from './skeletons/HighestRatedStudiosSkeleton';
@@ -8,30 +8,36 @@ import StudiosCountSkeleton from './skeletons/StudiosCountSkeleton';
 export default function GameStudiosLoading() {
   return (
     <>
-      <Metric id='developers-count' title='Your favorite developers'>
+      <MetricWrapper id='developers-count' title='Your favorite developers'>
         <StudiosCountSkeleton />
-      </Metric>
+      </MetricWrapper>
 
-      <Metric id='publishers-count' title='Your favorite publishers'>
+      <MetricWrapper id='publishers-count' title='Your favorite publishers'>
         <StudiosCountSkeleton />
-      </Metric>
+      </MetricWrapper>
 
       <PeriodTopsSkeletons metricId='studios-periods' />
 
-      <Metric id='developers-rating' title='Your highest rated developers'>
+      <MetricWrapper
+        id='developers-rating'
+        title='Your highest rated developers'
+      >
         <HighestRatedStudiosSkeleton />
-      </Metric>
+      </MetricWrapper>
 
-      <Metric id='publishers-rating' title='Your highest rated publishers'>
+      <MetricWrapper
+        id='publishers-rating'
+        title='Your highest rated publishers'
+      >
         <HighestRatedStudiosSkeleton />
-      </Metric>
+      </MetricWrapper>
 
-      <Metric
+      <MetricWrapper
         id='developers-countries'
         title='Your favorite developers around the world'
       >
         <ChartSkeleton type='map' />
-      </Metric>
+      </MetricWrapper>
     </>
   );
 }

@@ -1,3 +1,5 @@
+import { MetricId } from '@ts/games/metric';
+
 import {
   DEFAULT_PERIOD_BLOCKS_GAP,
   DEFAULT_PERIOD_BLOCK_WIDTH
@@ -7,7 +9,7 @@ import Divider from '@components/Divider';
 import Skeleton from '@components/Skeleton';
 
 type PeriodTopsSkeletonsProps = {
-  metricId: string;
+  metricId: MetricId;
   blockWidthRem?: number;
   gapRem?: number;
   periodTopClassName?: string;

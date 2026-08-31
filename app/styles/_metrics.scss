@@ -10,13 +10,40 @@ $min-data-rank-width: 2em;
   gap: 3em;
 }
 
-.metric {
+.metric,
+.submetric {
   font-size: utils.$regular-size;
 
   display: flex;
   flex-direction: column;
   align-items: stretch;
+}
+
+.metric {
   gap: 1.25em;
+}
+
+.submetric {
+  gap: 0.625em;
+}
+
+.metric-title {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1em;
+
+  button {
+    font-size: 0.85em;
+    width: 1.75em;
+    height: 1.75em;
+    padding: 0.2em;
+
+    svg {
+      stroke-width: 0.2em;
+    }
+  }
 }
 
 .blocks-group {

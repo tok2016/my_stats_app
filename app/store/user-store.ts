@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 
-import { User } from '@ts/users/user';
 import { FetchStatus } from '@ts/ui/fetch-status';
+import { UserSet } from '@ts/users/user';
 
 import { defaultUser } from '@lib/utils';
 
 type UserState = {
-  user: User;
+  user: UserSet;
   status: FetchStatus;
 };
 

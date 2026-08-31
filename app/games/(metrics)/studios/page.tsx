@@ -5,7 +5,7 @@ import Game from '@ts/games/game';
 import { getGames } from '@lib/server-actions';
 
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
-import Metric from '@components/data-blocks/Metric';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import HighestRatedStudios from './metrics/HighestRatedStudios';
 import StudiosCount from './metrics/StudiosCount';
@@ -27,43 +27,49 @@ export default async function GamesStudiosPage() {
 
   return (
     <>
-      <Metric id='developers-count' title='Your favorite developers'>
+      <MetricWrapper id='developers-count' title='Your favorite developers'>
         <Suspense fallback={<StudiosCountSkeleton />}>
           <StudiosCount studios={developers} type='developer' />
         </Suspense>
-      </Metric>
+      </MetricWrapper>
 
-      <Metric id='publishers-count' title='Your favorite publishers'>
+      <MetricWrapper id='publishers-count' title='Your favorite publishers'>
         <Suspense fallback={<StudiosCountSkeleton />}>
           <StudiosCount studios={publishers} type='publisher' />
         </Suspense>
-      </Metric>
+      </MetricWrapper>
 
       <StudiosPeriodTops
         developers={developers.toArray()}
         publishers={publishers.toArray()}
       />
 
-      <Metric id='developers-rating' title='Your highest rated developers'>
+      <MetricWrapper
+        id='developers-rating'
+        title='Your highest rated developers'
+      >
         <Suspense fallback={<HighestRatedStudiosSkeleton />}>
           <HighestRatedStudios studios={developers} type='developer' />
         </Suspense>
-      </Metric>
+      </MetricWrapper>
 
-      <Metric id='publishers-rating' title='Your highest rated publishers'>
+      <MetricWrapper
+        id='publishers-rating'
+        title='Your highest rated publishers'
+      >
         <Suspense fallback={<HighestRatedStudiosSkeleton />}>
           <HighestRatedStudios studios={publishers} type='publisher' />
         </Suspense>
-      </Metric>
+      </MetricWrapper>
 
-      <Metric
+      <MetricWrapper
         id='developers-countries'
         title='Your favorite developers around the world'
       >
         <Suspense fallback={<ChartSkeleton type='map' />}>
           <StudiosCountries developers={developers} />
         </Suspense>
-      </Metric>
+      </MetricWrapper>
     </>
   );
 }

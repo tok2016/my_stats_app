@@ -1,5 +1,5 @@
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
-import Metric from '@components/data-blocks/Metric';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import PeriodTopsSkeletons from '@components/data-blocks/PeriodTopsSkeletons';
 
 import HighestRatedPlatformsSkeleton from './skeletons/HighestRatedPlatformsSkeleton';
@@ -8,19 +8,22 @@ export default function PlatformsLoading() {
   return (
     <>
       <div className='double-doughnut'>
-        <Metric id='platforms-count' title='Your biggest platforms'>
+        <MetricWrapper id='platforms-count' title='Your biggest platforms'>
           <ChartSkeleton type='doughnut' className='switchable-chart' />
-        </Metric>
-        <Metric id='platforms-playtime' title='Your longest used platforms'>
+        </MetricWrapper>
+        <MetricWrapper
+          id='platforms-playtime'
+          title='Your longest used platforms'
+        >
           <ChartSkeleton type='doughnut' className='switchable-chart' />
-        </Metric>
+        </MetricWrapper>
       </div>
 
       <PeriodTopsSkeletons metricId='platform-periods' />
 
-      <Metric id='rated-platforms' title='Your highest rated platforms'>
+      <MetricWrapper id='rated-platforms' title='Your highest rated platforms'>
         <HighestRatedPlatformsSkeleton />
-      </Metric>
+      </MetricWrapper>
     </>
   );
 }

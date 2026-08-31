@@ -9,7 +9,7 @@ import Game, { GamesTablePageResponse } from '@ts/games/game';
 import { CountData } from '@ts/games/metric';
 import Country, { CountryIso, CountryResponse } from '@ts/users/country';
 import { ServicesMap } from '@ts/users/service';
-import { User } from '@ts/users/user';
+import { User, UserSet } from '@ts/users/user';
 
 import AxiosInstanse, { AxiosCountriesInstanse } from './axios-instanse';
 import ObjectMapArray from './object-map-array';
@@ -37,13 +37,13 @@ const getAuthConfig = async (): Promise<AxiosRequestConfig | undefined> => {
   };
 };
 
-export const getUser = async (): Promise<User> => {
+export const getUserSet = async (): Promise<UserSet> => {
   const response = await AxiosInstanse.get<User>(
     '/api/user',
     await getAuthConfig()
   );
 
-  return response.data;
+  return { ...response.data, metrics: new Set(response.data.metrics) };
 };
 
 export const getServices = async (userId?: string): Promise<ServicesMap> => {

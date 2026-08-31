@@ -1,10 +1,24 @@
-import { MetricsId } from '@lib/metrics/metrics-id';
+import {
+  GameGenresMetricsIds,
+  GameTitlesMetricsIds,
+  PlatformsMetricsIds,
+  StudiosMetricsIds,
+  SubmetricsId
+} from '@lib/metrics/metrics-id';
+import ObjectMapArray from '@lib/object-map-array';
 import { GreatPeriods, PrecisePeriods } from '@lib/utils';
 
 import { IgdbBasic } from './api-response';
-import { GameCore, GameShort, RecommendedGame } from './game';
+import Game, { GameCore, GameShort } from './game';
 
-export type MetricId = (typeof MetricsId)[number];
+export type GameMetricId =
+  | (typeof GameGenresMetricsIds)[number]
+  | (typeof StudiosMetricsIds)[number]
+  | (typeof PlatformsMetricsIds)[number]
+  | (typeof GameTitlesMetricsIds)[number];
+
+export type MetricId = GameMetricId;
+export type SubmetricId = (typeof SubmetricsId)[number];
 
 export type PrecisePeriod = (typeof PrecisePeriods)[number];
 export type GreatPeriod = (typeof GreatPeriods)[number];
@@ -75,13 +89,20 @@ export type PeriodTopsMetric<MetricData> = {
 
 export type PeriodPlaytimeTops = PeriodTopsMetric<PeriodPlaytimeData>;
 
-export type RecommendedMetric = {
-  favorite: RecommendedGame[];
-  other: RecommendedGame[];
-};
-
 export interface YearCountMetric {
   year: number;
   count: number;
   topGames: GameShort[];
 }
+
+export type MetricContentProps = {
+  metricId: MetricId;
+  games: ObjectMapArray<Game, 'id'>;
+};
+
+export type MetricWrapperProps = {
+  id: MetricId;
+  renderTitle?: (title: string) => React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+};

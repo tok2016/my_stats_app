@@ -2,7 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { PeriodTop, PeriodTopsMetric, PrecisePeriod } from '@ts/games/metric';
+import {
+  MetricId,
+  PeriodTop,
+  PeriodTopsMetric,
+  PrecisePeriod
+} from '@ts/games/metric';
 import {
   ChartData,
   ChartValueField,
@@ -23,6 +28,7 @@ import Select from '@components/Select';
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import { ChartClasses } from '@components/charts/chart-styles';
 
+import MetricWrapper from './MetricWrapper';
 import PeriodBarChart from './PeriodBarChart';
 import PeriodTopsSkeletons from './PeriodTopsSkeletons';
 import PeriodTopsGroup from './PeriosTopsGroup';
@@ -34,8 +40,7 @@ type PeriodTopsProps<
   className?: string;
   periodTopClassName?: string;
   barClassName?: string;
-  id: string;
-  title: string;
+  id: MetricId;
   blockWidthRem?: number;
   gapRem?: number;
   showBar?: boolean;
@@ -103,7 +108,6 @@ export default function PeriodTops<
   className = '',
   periodTopClassName = '',
   id,
-  title,
   blockWidthRem = DEFAULT_PERIOD_BLOCK_WIDTH,
   gapRem = DEFAULT_PERIOD_BLOCKS_GAP,
   listItemContent,
@@ -198,19 +202,23 @@ export default function PeriodTops<
     );
 
   return (
-    <section id={id} className={`metric ${className}`}>
-      <h3 className='select-title'>
-        {title}
-        <Select
-          id={`${id}-select`}
-          name={`${id}-select`}
-          defaultValue='month'
-          variant='text'
-          options={periodTypeOptions}
-          onSelect={onPeriodSelect}
-        />
-      </h3>
-
+    <MetricWrapper
+      id={id}
+      className={className}
+      renderTitle={(title) => (
+        <span className='select-title'>
+          {title}
+          <Select
+            id={`${id}-select`}
+            name={`${id}-select`}
+            defaultValue='month'
+            variant='text'
+            options={periodTypeOptions}
+            onSelect={onPeriodSelect}
+          />
+        </span>
+      )}
+    >
       <div className='period-tops' ref={scrollRef}>
         <div className='period-tops-groups'>
           {topsByYear
@@ -274,6 +282,6 @@ export default function PeriodTops<
             valueField={valueField}
           />
         ))}
-    </section>
+    </MetricWrapper>
   );
 }

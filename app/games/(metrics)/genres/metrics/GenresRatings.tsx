@@ -1,7 +1,9 @@
+import { Suspense } from 'react';
+
 import Link from 'next/link';
 
 import Game from '@ts/games/game';
-import { RatingData } from '@ts/games/metric';
+import { MetricContentProps, MetricId, RatingData } from '@ts/games/metric';
 
 import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
@@ -10,8 +12,12 @@ import { getSingularOrPlural } from '@lib/utils';
 import Rating from '@components/Rating';
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameCover from '@components/data-blocks/GameCover';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
+
+import GenresRatingsSkeleton from '../skeletons/GenresRatingsSkeleton';
 
 type HighestRatedGenresProps = {
+  metricId: MetricId;
   genres: ObjectMapArray<Game['genres'][number], 'id'>;
 };
 
@@ -51,25 +57,43 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
   );
 }
 
-export default async function HighestRatedGenres({
-  genres: genresMap
+async function HighestRatedGenres({
+  genres,
+  metricId
 }: HighestRatedGenresProps) {
   const ratingData = await getMetricData<RatingData[]>(
     '/api/games/genres/rating',
     []
   );
 
-  return !ratingData.length ? (
-    <EmptyMetric message={`You haven't rated any game yet`} />
-  ) : (
-    <div className='blocks-group'>
-      {ratingData.map((data) => (
-        <RatedGenre
-          key={`${data.id}-rating`}
-          ratingData={data}
-          genre={genresMap.findByKey(data.id)}
-        />
-      ))}
-    </div>
+  return (
+    <MetricWrapper id={metricId}>
+      {!ratingData.length ? (
+        <EmptyMetric message={`You haven't rated any game yet`} />
+      ) : (
+        <div className='blocks-group'>
+          {ratingData.map((data) => (
+            <RatedGenre
+              key={`${data.id}-rating`}
+              ratingData={data}
+              genre={genres.findByKey(data.id)}
+            />
+          ))}
+        </div>
+      )}
+    </MetricWrapper>
+  );
+}
+
+export default function GamesRatings({ metricId, games }: MetricContentProps) {
+  const genres = games.flatMapByKey<Game['genres'][number], 'id'>(
+    (game) => game.genres,
+    'id'
+  );
+
+  return (
+    <Suspense fallback={<GenresRatingsSkeleton />}>
+      <HighestRatedGenres genres={genres} metricId={metricId} />
+    </Suspense>
   );
 }

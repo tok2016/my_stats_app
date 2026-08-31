@@ -1,5 +1,5 @@
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
-import Metric from '@components/data-blocks/Metric';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import PeriodTopsSkeletons from '@components/data-blocks/PeriodTopsSkeletons';
 
 import GamePlaytimeSkeleton from './skeletons/GamesPlaytimeSkeleton';
@@ -9,34 +9,34 @@ import SeriesCountSkeleton from './skeletons/SeriesCountSkeleton';
 export default function GameTitlesLoading() {
   return (
     <>
-      <Metric id='games-playtime' title='Your longest played games'>
+      <MetricWrapper id='games-playtime' title='Your longest played games'>
         <GamePlaytimeSkeleton />
-      </Metric>
+      </MetricWrapper>
 
-      <Metric id='favorite-games' title='Your favorite games'>
+      <MetricWrapper id='favorite-games' title='Your favorite games'>
         <HighestRatedGamesSkeleton />
-      </Metric>
+      </MetricWrapper>
 
       <PeriodTopsSkeletons metricId='games-periods' />
 
-      <Metric id='game-releases' title='Game releases per year'>
+      <MetricWrapper id='game-releases' title='Game releases per year'>
         <ChartSkeleton type='line' />
-      </Metric>
+      </MetricWrapper>
 
-      <Metric id='game-playdates' title='Your played games per year'>
+      <MetricWrapper id='game-playdates' title='Your played games per year'>
         <ChartSkeleton type='line' />
-      </Metric>
+      </MetricWrapper>
 
-      <Metric
+      <MetricWrapper
         id='countries-by-games'
         title='Your favorite games around the world'
       >
         <ChartSkeleton type='map' />
-      </Metric>
+      </MetricWrapper>
 
-      <Metric id='top-series' title='Your favorite game series'>
+      <MetricWrapper id='top-series' title='Your favorite game series'>
         <SeriesCountSkeleton />
-      </Metric>
+      </MetricWrapper>
     </>
   );
 }

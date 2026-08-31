@@ -3,7 +3,7 @@ import { GameDetailed } from '@ts/games/game';
 import { getMetricData } from '@lib/server-actions';
 
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
-import Metric from '@components/data-blocks/Metric';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import RecommendedGameBlock from '@app/games/components/RecommendedGameBlock';
 
@@ -36,13 +36,13 @@ export default async function GameInfoPage({
       <div className='game-page-content'>
         <GameDetails game={game} />
         <GameRatings game={game} />
-        <Metric id='similar-games' title='Similar games'>
+        <MetricWrapper id='similar-games' title='Similar games'>
           <div className='recommended-games'>
             {game.similarGames.map((similarGame) => (
               <RecommendedGameBlock key={similarGame.id} {...similarGame} />
             ))}
           </div>
-        </Metric>
+        </MetricWrapper>
       </div>
     </>
   );
