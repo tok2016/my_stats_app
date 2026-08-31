@@ -3,7 +3,11 @@
 import { CodeCircleSolid, EarthSolid } from '@mynaui/icons-react';
 
 import Game from '@ts/games/game';
-import { PeriodTopsMetric, PrecisePeriod } from '@ts/games/metric';
+import {
+  MetricContentProps,
+  PeriodTopsMetric,
+  PrecisePeriod
+} from '@ts/games/metric';
 import { StudioType, StudiosPeriodMetric } from '@ts/games/studio';
 
 import ObjectMapArray from '@lib/object-map-array';
@@ -12,11 +16,6 @@ import { getMetricData } from '@lib/server-actions';
 import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
 
 import { StudioFullPeriodTopData } from '../types';
-
-type StudiosPeriodTopsProps = {
-  developers: Game['developers'];
-  publishers: Game['publishers'];
-};
 
 const getStudioPeriodMetric =
   (
@@ -67,18 +66,23 @@ const studioItemContent = (item: StudioFullPeriodTopData) => (
 );
 
 export default function StudiosPeriodTops({
-  developers,
-  publishers
-}: StudiosPeriodTopsProps) {
+  metricId,
+  games
+}: MetricContentProps) {
+  const developers = games.flatMapByKey<Game['developers'][number], 'id'>(
+    (game) => game.developers,
+    'id'
+  );
+  const publishers = games.flatMapByKey<Game['publishers'][number], 'id'>(
+    (game) => game.publishers,
+    'id'
+  );
+
   return (
     <PeriodTops
-      id='studios-period'
-      title='Your favorite developer & publisher'
+      id={metricId}
       listItemContent={studioItemContent}
-      getPeriodMetric={getStudioPeriodMetric(
-        new ObjectMapArray(developers, 'id'),
-        new ObjectMapArray(publishers, 'id')
-      )}
+      getPeriodMetric={getStudioPeriodMetric(developers, publishers)}
       displayFields={['hours']}
       valueField='hours'
       fieldsNames={{

@@ -8,6 +8,8 @@ import {
 import Divider from '@components/Divider';
 import Skeleton from '@components/Skeleton';
 
+import MetricWrapper from './MetricWrapper';
+
 type PeriodTopsSkeletonsProps = {
   metricId: MetricId;
   blockWidthRem?: number;
@@ -74,9 +76,10 @@ export default function PeriodTopsSkeletons({
   periodTopClassName
 }: PeriodTopsSkeletonsProps) {
   return (
-    <section className='metric' id={metricId}>
-      <Skeleton type='h3' width='50%' />
-
+    <MetricWrapper
+      id={metricId}
+      renderTitle={() => <Skeleton type='h3' width='50%' />}
+    >
       <div className='period-tops'>
         <div className='period-tops-in-group' style={{ gap: `${gapRem}rem` }}>
           {Array.from({ length: SKELETONS_COUNT }, (_v, k) => (
@@ -93,6 +96,6 @@ export default function PeriodTopsSkeletons({
           </Divider>
         </div>
       </div>
-    </section>
+    </MetricWrapper>
   );
 }

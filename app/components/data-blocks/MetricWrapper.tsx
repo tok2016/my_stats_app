@@ -7,7 +7,13 @@ const MetricTitles: Record<MetricId, string> = {
   'genres-periods': 'Your most played genres',
   'top-genres-games': 'Your top-5 games by genre',
   'genres-rating': 'Your highest rated genres',
-  'recommended-games': 'You might also like'
+  'recommended-games': 'You might also like',
+  'developers-playtime': 'Your favorite developers',
+  'publishers-playtime': 'Your favorite publishers',
+  'studios-periods': 'Your favorite developer & publisher',
+  'developers-rating': 'Your highest rated developers',
+  'publishers-rating': 'Your highest rated publishers',
+  'developers-countries': 'Your favorite developers around the world'
 };
 
 export default function MetricWrapper({

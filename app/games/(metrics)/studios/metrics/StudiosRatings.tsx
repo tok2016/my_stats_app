@@ -1,6 +1,9 @@
+import { Suspense } from 'react';
+
 import Link from 'next/link';
 
 import Game from '@ts/games/game';
+import { MetricId } from '@ts/games/metric';
 import { StudioRatingMetric, StudioType } from '@ts/games/studio';
 
 import ObjectMapArray from '@lib/object-map-array';
@@ -8,11 +11,15 @@ import { getMetricData } from '@lib/server-actions';
 
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameCover from '@components/data-blocks/GameCover';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
-import { StudiosTypeFields } from '../../utils';
+import { StudiosGameCoreFields, StudiosGameFields } from '../../utils';
+import StudiosRatingSkeleton from '../skeletons/StudiosRatingsSkeleton';
+import { StudiosMetricContentProps } from '../types';
 
 type HighestRatedStudiosProps = {
+  metricId: MetricId;
   studios: ObjectMapArray<Game['developers'][number], 'id'>;
   type: StudioType;
 };
@@ -48,28 +55,51 @@ function RatedStudio({ ratedStudio, studio }: RatedStudioProps) {
   );
 }
 
-export default async function HighestRatedStudios({
+async function HighestRatedStudios({
+  metricId,
   studios,
   type
 }: HighestRatedStudiosProps) {
-  const searchParams = new URLSearchParams({ field: StudiosTypeFields[type] });
+  const searchParams = new URLSearchParams({
+    field: StudiosGameCoreFields[type]
+  });
   const studiosRatingData = await getMetricData<StudioRatingMetric[]>(
     `/api/games/studios/rating?${searchParams.toString()}`,
     []
   );
 
-  if (!studiosRatingData.length)
-    return <EmptyMetric message={`You haven't rated any game yet`} />;
+  return (
+    <MetricWrapper id={metricId}>
+      {!studiosRatingData.length ? (
+        <EmptyMetric message={`You haven't rated any game yet`} />
+      ) : (
+        <div className='blocks-group'>
+          {studiosRatingData.map((ratedStudio) => (
+            <RatedStudio
+              key={`${ratedStudio.id}-rated`}
+              ratedStudio={ratedStudio}
+              studio={studios.findByKey(ratedStudio.id)}
+            />
+          ))}
+        </div>
+      )}
+    </MetricWrapper>
+  );
+}
+
+export default function StudiosRatings({
+  games,
+  metricId,
+  type
+}: StudiosMetricContentProps) {
+  const studios = games.flatMapByKey<Game['developers'][number], 'id'>(
+    (game) => game[StudiosGameFields[type]],
+    'id'
+  );
 
   return (
-    <div className='blocks-group'>
-      {studiosRatingData.map((ratedStudio) => (
-        <RatedStudio
-          key={`${ratedStudio.id}-rated`}
-          ratedStudio={ratedStudio}
-          studio={studios.findByKey(ratedStudio.id)}
-        />
-      ))}
-    </div>
+    <Suspense fallback={<StudiosRatingSkeleton metricId={metricId} />}>
+      <HighestRatedStudios type={type} metricId={metricId} studios={studios} />
+    </Suspense>
   );
 }

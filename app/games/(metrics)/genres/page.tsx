@@ -1,7 +1,7 @@
 import { GameGenresMetricsIds } from '@lib/metrics/metrics-id';
 import { getGames } from '@lib/server-actions';
 
-import Metric from '../FetchMetric';
+import Metric from '../Metric';
 
 export default async function GamesGenresPage() {
   const games = await getGames();
