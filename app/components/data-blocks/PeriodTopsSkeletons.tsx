@@ -1,3 +1,5 @@
+import { MetricId } from '@ts/games/metric';
+
 import {
   DEFAULT_PERIOD_BLOCKS_GAP,
   DEFAULT_PERIOD_BLOCK_WIDTH
@@ -5,12 +7,18 @@ import {
 
 import Divider from '@components/Divider';
 import Skeleton from '@components/Skeleton';
+import { ChartSkeleton } from '@components/charts/ChartSkeleton';
+import { ChartClasses } from '@components/charts/chart-styles';
+
+import MetricWrapper from './MetricWrapper';
 
 type PeriodTopsSkeletonsProps = {
-  metricId: string;
+  metricId: MetricId;
   blockWidthRem?: number;
   gapRem?: number;
   periodTopClassName?: string;
+  barClassName?: string;
+  showBar?: boolean;
 };
 
 const SKELETONS_COUNT = 10;
@@ -69,12 +77,15 @@ export default function PeriodTopsSkeletons({
   metricId,
   blockWidthRem = DEFAULT_PERIOD_BLOCK_WIDTH,
   gapRem = DEFAULT_PERIOD_BLOCKS_GAP,
-  periodTopClassName
+  periodTopClassName = '',
+  showBar,
+  barClassName = ''
 }: PeriodTopsSkeletonsProps) {
   return (
-    <section className='metric' id={metricId}>
-      <Skeleton type='h3' width='50%' />
-
+    <MetricWrapper
+      id={metricId}
+      renderTitle={() => <Skeleton type='h3' width='50%' />}
+    >
       <div className='period-tops'>
         <div className='period-tops-in-group' style={{ gap: `${gapRem}rem` }}>
           {Array.from({ length: SKELETONS_COUNT }, (_v, k) => (
@@ -91,6 +102,13 @@ export default function PeriodTopsSkeletons({
           </Divider>
         </div>
       </div>
-    </section>
+
+      {showBar && (
+        <ChartSkeleton
+          type='periodBar'
+          className={`${ChartClasses.periodBar.container} ${barClassName}`}
+        />
+      )}
+    </MetricWrapper>
   );
 }

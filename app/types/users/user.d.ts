@@ -1,9 +1,10 @@
 import { Types } from 'mongoose';
 
-import Credentials from './credentials';
-import Dashboard from './dashboard';
-import { ServicesLogins } from './service';
+import { MetricId } from '@ts/games/metric';
+
 import { AvatarState } from './avatar';
+import Credentials from './credentials';
+import { ServicesLogins } from './service';
 
 export interface UserAccess {
   access: string;
@@ -14,13 +15,16 @@ export interface UserAccess {
 export interface UserInfo {
   id: string;
   avatarUrl?: string | null;
-  birthdate?: Date | null;
+  birthdate?: string | null;
   country?: string | null;
   isPublic: boolean;
-  unblockDate?: Date | null;
+  unblockDate?: string | null;
+  metrics: MetricId[];
 }
 
-export type UserInfoInSchema = Omit<UserInfo, 'id'> & { _id: Types.ObjectId };
+export type UserInfoInSchema = Omit<UserInfo, 'id'> & {
+  _id: Types.ObjectId;
+};
 
 export interface UserLogin {
   credential: string;
@@ -28,7 +32,7 @@ export interface UserLogin {
 }
 
 export type UserUpdate = Partial<
-  Omit<UserInfo, 'id' | 'dashboards' | 'avatarUrl'> & Pick<Credentials, 'email'>
+  Omit<UserInfo, 'id' | 'metrics' | 'avatarUrl'> & Pick<Credentials, 'email'>
 >;
 
 export type UserClientUpdate = UserUpdate
@@ -37,11 +41,7 @@ export type UserClientUpdate = UserUpdate
     avatarState?: AvatarState;
   };
 
-export type BasicUser = UserInfo
-  & Omit<Credentials, 'password' | 'userId' | 'id'>;
-
-export type User = BasicUser & {
-  dashboards: Dashboard[];
-};
+export type User = UserInfo & Omit<Credentials, 'password' | 'userId' | 'id'>;
+export type UserSet = Omit<User, 'metrics'> & { metrics: Set<MetricId> };
 
 export type UserRouteParams = Pick<Credentials, 'userId'>;

@@ -1,18 +1,17 @@
-import Game from '@ts/games/game';
+import { Suspense } from 'react';
 
-import ObjectMapArray from '@lib/object-map-array';
+import Game from '@ts/games/game';
+import { MetricContentProps } from '@ts/games/metric';
+
 import { getMetricData } from '@lib/server-actions';
 
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameCollage from '@components/data-blocks/GameCollage';
-import { LinksString } from '@components/data-blocks/LinksString';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
 import PropBlock from '../../../../components/data-blocks/PropBlock';
-
-type HighestRatedGamesProps = {
-  games: ObjectMapArray<Game, 'id'>;
-};
+import GamesRatingsSkeleton from '../skeletons/GamesRatingsSkeleton';
 
 type TopGameProps = {
   game: Game;
@@ -27,27 +26,15 @@ function TopGame({ game, index }: TopGameProps) {
 
       <div className='data-block-grid min'>
         <PropBlock title='Developer'>
-          {game.developers.length ? (
-            <LinksString
-              baseEndpoint='/games/studios'
-              items={game.developers}
-              groupKey={`rated-game-developer-${game.id}`}
-            />
-          ) : (
-            <span>—</span>
-          )}
+          {game.developers.length
+            ? game.developers.map((dev) => dev.name).join(', ')
+            : '—'}
         </PropBlock>
 
         <PropBlock title='Publisher'>
-          {game.publishers.length ? (
-            <LinksString
-              baseEndpoint='/games/studios'
-              items={game.publishers}
-              groupKey={`rated-game-publisher-${game.id}`}
-            />
-          ) : (
-            <span>—</span>
-          )}
+          {game.publishers.length
+            ? game.publishers.map((pub) => pub.name).join(', ')
+            : '—'}
         </PropBlock>
       </div>
 
@@ -63,12 +50,15 @@ function TopGame({ game, index }: TopGameProps) {
   );
 }
 
-export default async function HighestRatedGames({
-  games
-}: HighestRatedGamesProps) {
+async function HighestRatedGames({
+  metricId,
+  games,
+  userId
+}: MetricContentProps) {
   const gamesIds = await getMetricData<string[]>(
     '/api/games/titles/rating',
-    []
+    [],
+    userId
   );
 
   if (!gamesIds.length)
@@ -79,10 +69,20 @@ export default async function HighestRatedGames({
     .filter((game) => !!game);
 
   return (
-    <div className='top-games-grid'>
-      {topGames.map((game, i) => (
-        <TopGame key={`${game.id}-rating`} game={game} index={i} />
-      ))}
-    </div>
+    <MetricWrapper id={metricId}>
+      <div className='top-games-grid'>
+        {topGames.map((game, i) => (
+          <TopGame key={`${game.id}-rating`} game={game} index={i} />
+        ))}
+      </div>
+    </MetricWrapper>
+  );
+}
+
+export default function GamesRatings(props: MetricContentProps) {
+  return (
+    <Suspense fallback={<GamesRatingsSkeleton />}>
+      <HighestRatedGames {...props} />
+    </Suspense>
   );
 }

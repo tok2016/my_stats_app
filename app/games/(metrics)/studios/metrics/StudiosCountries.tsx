@@ -1,24 +1,34 @@
 import countries from 'i18n-iso-countries';
+import { Suspense } from 'react';
 
 import Game from '@ts/games/game';
+import { MetricContentProps, MetricId } from '@ts/games/metric';
 import { StudioCountryMetric } from '@ts/games/studio';
 
 import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
+
 import StudiosMapChart from '../charts/StuidosMapChart';
+import StudiosCountriesSkeleton from '../skeletons/StudiosCountriesSkeleton';
 import { CountryStudioChartData } from '../types';
 
-type StudiosCountriesProps = {
+type FetchStudiosCountries = {
   developers: ObjectMapArray<Game['developers'][number], 'id'>;
+  metricId: MetricId;
+  userId: string;
 };
 
-export default async function StudiosCountries({
-  developers
-}: StudiosCountriesProps) {
+async function FetchStudiosCountries({
+  metricId,
+  developers,
+  userId
+}: FetchStudiosCountries) {
   const countriesData = await getMetricData<StudioCountryMetric[]>(
     '/api/games/studios/countries',
-    []
+    [],
+    userId
   );
 
   const countriesChartData: CountryStudioChartData[] = countriesData
@@ -33,5 +43,30 @@ export default async function StudiosCountries({
     }))
     .filter((country) => !!country.name);
 
-  return <StudiosMapChart data={countriesChartData} />;
+  return (
+    <MetricWrapper id={metricId}>
+      <StudiosMapChart data={countriesChartData} />
+    </MetricWrapper>
+  );
+}
+
+export default async function StudiosCountries({
+  games,
+  metricId,
+  userId
+}: MetricContentProps) {
+  const developers = games.flatMapByKey<Game['developers'][number], 'id'>(
+    (game) => game.developers,
+    'id'
+  );
+
+  return (
+    <Suspense fallback={<StudiosCountriesSkeleton />}>
+      <FetchStudiosCountries
+        developers={developers}
+        metricId={metricId}
+        userId={userId}
+      />
+    </Suspense>
+  );
 }

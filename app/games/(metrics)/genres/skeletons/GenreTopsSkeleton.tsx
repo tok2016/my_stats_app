@@ -1,4 +1,5 @@
 import Skeleton from '@components/Skeleton';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 const SKELETONS_COUNT = 3;
 const TABLE_ROWS_COUNT = 5;
@@ -18,7 +19,10 @@ function GenreTopSkeleton() {
 
 export default function GenreTopsSkeleton() {
   return (
-    <section className='metric'>
+    <MetricWrapper
+      id='top-genres-games'
+      renderTitle={() => <Skeleton type='h3' width='50%' />}
+    >
       <Skeleton type='h3' width='50%' />
 
       <div className='genres-tops'>
@@ -26,6 +30,6 @@ export default function GenreTopsSkeleton() {
           <GenreTopSkeleton key={`genre-top-skeleton-${i}`} />
         ))}
       </div>
-    </section>
+    </MetricWrapper>
   );
 }

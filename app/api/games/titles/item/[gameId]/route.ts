@@ -12,7 +12,10 @@ import { RatingDetialed, Ratings } from '@ts/games/rating';
 import { GameEndpointAction, ProtectedEndpointAction } from '@ts/requests';
 
 import { getCredentialsById } from '@lib/auth';
-import { gameEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
+import {
+  gameProtectedEndpoint,
+  protectedEndpoint
+} from '@lib/endpoint-generators';
 import {
   FULL_GAME_FIELDS,
   formRecommendedGame,
@@ -189,6 +192,6 @@ const deleteGameById: ProtectedEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getGameById);
+export const GET = gameProtectedEndpoint(getGameById);
 export const PUT = protectedEndpoint(putGameChangesById);
 export const DELETE = protectedEndpoint(deleteGameById);

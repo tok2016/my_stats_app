@@ -3,14 +3,13 @@ import z from 'zod';
 import { GameUpdate, NewGame } from '@ts/games/game';
 import { ConfirmationCode, NewConfirmation } from '@ts/users/confirmation';
 import { NewCredentials } from '@ts/users/credentials';
-import { NewDashboard } from '@ts/users/dashboard';
 import Password, { NewPassword, PasswordUpdate } from '@ts/users/password';
 import { NewService } from '@ts/users/service';
 import { UserLogin, UserUpdate } from '@ts/users/user';
 
+import { MetricsIds } from './metrics/metrics-id';
 import {
   ConfirmationActions,
-  DashboardTypes,
   ServiceNames,
   generateErrorResponse
 } from './utils';
@@ -51,29 +50,13 @@ export const CredentialsValidator: z.ZodType<NewCredentials> =
     })
   );
 
-export const DashboardValidator: z.ZodType<NewDashboard> = z.object({
-  object: z.string().nonempty(),
-  type: z.enum(DashboardTypes).default('text'),
-  x: z.number().default(0),
-  y: z.number().default(0),
-  width: z.number().default(0),
-  height: z.number().default(0),
-  service: z.enum(ServiceNames).default('steam')
+export const UserUpdateValidator: z.ZodType<UserUpdate> = z.object({
+  email: z.email().optional(),
+  birthdate: z.string().nullish().default(null),
+  country: z.string().nullish().default(null),
+  isPublic: z.boolean().default(false),
+  unblockDate: z.string().nullish().default(null)
 });
-
-export const UserUpdateValidator: z.ZodType<UserUpdate> = z
-  .object({
-    email: z.email().optional(),
-    birthdate: z.string().nullish().default(null),
-    country: z.string().nullish().default(null),
-    isPublic: z.boolean().default(false),
-    unblockDate: z.string().nullish().default(null)
-  })
-  .transform((input) => ({
-    ...input,
-    birthdate: input.birthdate ? new Date(input.birthdate) : null,
-    unblockDate: input.unblockDate ? new Date(input.unblockDate) : null
-  }));
 
 export const UserLoginValidator: z.ZodType<UserLogin> = z.object({
   credential: z.string().nonempty(),
@@ -112,6 +95,8 @@ export const NewPasswordValidatior: z.ZodType<NewPassword> =
       operationId: z.string().nonempty()
     })
   );
+
+export const DashboardValidator = z.enum(MetricsIds);
 
 export const NewGameValidator: z.ZodType<NewGame> = z.object({
   name: z.string().nonempty(),

@@ -7,7 +7,7 @@ import { refreshSteamData } from '@lib/server-actions';
 import Button from '@components/Button';
 import PageName from '@components/profile-layout/PageName';
 
-import './games-metrics.scss';
+import '@styles/games-metrics.scss';
 
 export default async function GamesMetricLayout({
   children

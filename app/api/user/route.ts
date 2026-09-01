@@ -12,7 +12,6 @@ import {
   AVATAR_DIRECTORY,
   checkUserExistance,
   generateAccessResponse,
-  getDashboards,
   getUserById,
   hashPassword
 } from '@lib/auth';
@@ -20,7 +19,7 @@ import { generalEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
 import {
   ConfirmationsModel,
   CredentialsModel,
-  DashboardsModel,
+  GamesModel,
   ServiceCredentialsModel,
   UsersModel
 } from '@lib/models';
@@ -67,7 +66,7 @@ const postNewUser: GeneralEndpointAction<'/api/user'> = async (
   const credentials = await CredentialsModel.create({
     ...newCredentials,
     password: hashedPassword,
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     userId: user._id.toString()
   });
 
@@ -107,9 +106,7 @@ const putCurrentUser: ProtectedEndpointAction<'/api/user'> = async (
 
   if (!userInfo) throw generateErrorResponse(404, 'User data was not found');
 
-  const dashboards = await getDashboards(credentials.userId);
-
-  return NextResponse.json(uniteUserData(credentials, userInfo, dashboards), {
+  return NextResponse.json(uniteUserData(credentials, userInfo), {
     status: 200,
     statusText: 'User data was updated successfully'
   });
@@ -142,8 +139,8 @@ const deleteCurrentUser: ProtectedEndpointAction<'/api/user'> = async (
 
   const userInfo = await UsersModel.findByIdAndDelete(credentials.userId);
   await ServiceCredentialsModel.deleteMany({ userId: credentials.userId });
-  await DashboardsModel.deleteMany({ userId: credentials.userId });
   await ConfirmationsModel.findByIdAndDelete(operationId);
+  await GamesModel.deleteMany({ userId: credentials.userId });
 
   if (userInfo && userInfo.avatarUrl) {
     await unlink(path.join(AVATAR_DIRECTORY, userInfo.avatarUrl));

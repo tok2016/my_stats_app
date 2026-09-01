@@ -8,7 +8,6 @@ import { useURLSearchParams } from '@lib/hooks';
 import Rating from '@components/Rating';
 import Table from '@components/charts/Table';
 import GameTableTitle from '@components/data-blocks/GameTitle';
-import { LinksString } from '@components/data-blocks/LinksString';
 
 type GamesTableProps = {
   games: GameTableData[];
@@ -51,7 +50,7 @@ export default function GamesTable({
             width: '3fr',
             minWidth: '13rem',
             sort: true,
-            renderRow: (value) => <GameTableTitle game={value} />
+            renderRow: (value) => <GameTableTitle showLink game={value} />
           },
           developers: {
             title: 'Developers',
@@ -59,15 +58,9 @@ export default function GamesTable({
             minWidth: '8.5rem',
             sort: true,
             renderRow: (value) =>
-              value.developers.length ? (
-                <LinksString
-                  items={value.developers}
-                  groupKey={`${value.id}-developers`}
-                  baseEndpoint='/games/studios'
-                />
-              ) : (
-                <span>—</span>
-              )
+              value.developers.length
+                ? value.developers.map((dev) => dev.name).join(', ')
+                : '—'
           },
           platform: {
             title: 'Platform',
@@ -92,15 +85,9 @@ export default function GamesTable({
             minWidth: '8.5rem',
             sort: true,
             renderRow: (value) =>
-              value.genres.length ? (
-                <LinksString
-                  items={value.genres}
-                  groupKey={`${value.id}-genres`}
-                  baseEndpoint='/games/genres'
-                />
-              ) : (
-                <span>—</span>
-              )
+              value.genres.length
+                ? value.genres.map((genre) => genre.name).join(', ')
+                : '—'
           },
           releasedAt: {
             title: 'Released date',

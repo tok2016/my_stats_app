@@ -1,14 +1,29 @@
-import { YearCountMetric } from '@ts/games/metric';
+import { Suspense } from 'react';
+
+import {
+  MetricContentProps,
+  MetricId,
+  YearCountMetric
+} from '@ts/games/metric';
 
 import { getMetricData } from '@lib/server-actions';
 
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
+
 import GamesLineChart from '../charts/GamesLineChart';
+import GameYearsSkeleton from '../skeletons/GameYearsSkeleton';
 import { GameYearChartData } from '../types';
 
-export default async function GameReleases() {
+type FetchGameReleasesProps = {
+  metricId: MetricId;
+  userId: string;
+};
+
+async function FetchGameReleases({ metricId, userId }: FetchGameReleasesProps) {
   const years = await getMetricData<YearCountMetric[]>(
     '/api/games/titles/release',
-    []
+    [],
+    userId
   );
 
   const chartData: GameYearChartData[] = years.map((year) => ({
@@ -20,5 +35,17 @@ export default async function GameReleases() {
     topGame: year.topGames[0]?.name ?? 'no'
   }));
 
-  return <GamesLineChart data={chartData} chartId='games-releases-line' />;
+  return (
+    <MetricWrapper id={metricId}>
+      <GamesLineChart data={chartData} chartId='games-releases-line' />
+    </MetricWrapper>
+  );
+}
+
+export default function GameReleases({ metricId, userId }: MetricContentProps) {
+  return (
+    <Suspense fallback={<GameYearsSkeleton metricId={metricId} />}>
+      <FetchGameReleases metricId={metricId} userId={userId} />
+    </Suspense>
+  );
 }

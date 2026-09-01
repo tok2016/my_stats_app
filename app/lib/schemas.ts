@@ -4,7 +4,6 @@ import { ApiAccess } from '@ts/games/api-response';
 import { GameInSchema } from '@ts/games/game';
 import { ConfirmationInSchema } from '@ts/users/confirmation';
 import { CredentialsInSchema } from '@ts/users/credentials';
-import { DashboardInSchema } from '@ts/users/dashboard';
 import { ServiceInSchema } from '@ts/users/service';
 import { UserInfoInSchema } from '@ts/users/user';
 
@@ -26,54 +25,23 @@ export const CredentialsSchema = new Schema<CredentialsInSchema>({
     required: true
   },
   createdAt: {
-    type: Date,
+    type: String,
     required: true
   }
 });
 
 export const UsersSchema = new Schema<UserInfoInSchema>({
   avatarUrl: String,
-  birthdate: Date,
+  birthdate: String,
   country: String,
   isPublic: {
     type: Boolean,
     default: false
   },
-  unblockDate: Date
-});
-
-export const DashboardsSchema = new Schema<DashboardInSchema>({
-  object: {
-    type: String,
-    required: true
-  },
-  type: {
-    type: String,
-    default: 'text'
-  },
-  x: {
-    type: Number,
-    default: 0
-  },
-  y: {
-    type: Number,
-    default: 0
-  },
-  width: {
-    type: Number,
-    default: 0
-  },
-  height: {
-    type: Number,
-    default: 0
-  },
-  service: {
-    type: String,
-    default: 'spotify'
-  },
-  userId: {
-    type: String,
-    required: true
+  unblockDate: String,
+  metrics: {
+    type: [String],
+    default: []
   }
 });
 

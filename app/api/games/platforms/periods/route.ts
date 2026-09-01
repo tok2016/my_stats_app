@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { PrecisePeriod } from '@ts/games/metric';
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getPeriodMetric } from '@lib/metrics/periods-metric';
 
 const PLATFORMS_IN_PERIOD = 1;
@@ -27,4 +27,4 @@ const getPlatformsPeriods: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getPlatformsPeriods);
+export const GET = gameMetricEndpoint(getPlatformsPeriods);

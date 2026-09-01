@@ -1,7 +1,25 @@
+import {
+  GameGenresMetricsIds,
+  GameTitlesMetricsIds,
+  MetricsIds,
+  PlatformsMetricsIds,
+  StudiosMetricsIds,
+  SubmetricsId
+} from '@lib/metrics/metrics-id';
+import ObjectMapArray from '@lib/object-map-array';
 import { GreatPeriods, PrecisePeriods } from '@lib/utils';
 
 import { IgdbBasic } from './api-response';
-import { GameCore, GameShort, RecommendedGame } from './game';
+import Game, { GameCore, GameShort } from './game';
+
+export type GameMetricId =
+  | (typeof GameGenresMetricsIds)[number]
+  | (typeof StudiosMetricsIds)[number]
+  | (typeof PlatformsMetricsIds)[number]
+  | (typeof GameTitlesMetricsIds)[number];
+
+export type MetricId = (typeof MetricsIds)[number];
+export type SubmetricId = (typeof SubmetricsId)[number];
 
 export type PrecisePeriod = (typeof PrecisePeriods)[number];
 export type GreatPeriod = (typeof GreatPeriods)[number];
@@ -72,13 +90,25 @@ export type PeriodTopsMetric<MetricData> = {
 
 export type PeriodPlaytimeTops = PeriodTopsMetric<PeriodPlaytimeData>;
 
-export type RecommendedMetric = {
-  favorite: RecommendedGame[];
-  other: RecommendedGame[];
-};
-
 export interface YearCountMetric {
   year: number;
   count: number;
   topGames: GameShort[];
 }
+
+export type MetricContentProps = {
+  metricId: MetricId;
+  userId: string;
+  games: ObjectMapArray<Game, 'id'>;
+};
+
+export type MetricClientContentProps = Omit<MetricContentProps, 'games'> & {
+  games: Game[];
+};
+
+export type MetricWrapperProps = {
+  id: MetricId;
+  renderTitle?: (title: string) => React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+};

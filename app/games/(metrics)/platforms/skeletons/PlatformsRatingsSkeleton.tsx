@@ -1,4 +1,5 @@
 import Skeleton from '@components/Skeleton';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 const MAX_PLATFORMS = 5;
 const MAX_GAMES = 5;
@@ -25,15 +26,17 @@ function RatedPlatformSkeleton({ skeletonKey }: RatedPlatformSkeletonProps) {
   );
 }
 
-export default function HighestRatedPlatformsSkeleton({}) {
+export default function PlatformsRatingsSkeleton({}) {
   return (
-    <div className='blocks-group'>
-      {Array.from({ length: MAX_PLATFORMS }).map((_, i) => (
-        <RatedPlatformSkeleton
-          key={`rated-platform-skeleton-${i}`}
-          skeletonKey={`rated-platform-skeleton-${i}`}
-        />
-      ))}
-    </div>
+    <MetricWrapper id='platforms-rating'>
+      <div className='blocks-group'>
+        {Array.from({ length: MAX_PLATFORMS }).map((_, i) => (
+          <RatedPlatformSkeleton
+            key={`rated-platform-skeleton-${i}`}
+            skeletonKey={`rated-platform-skeleton-${i}`}
+          />
+        ))}
+      </div>
+    </MetricWrapper>
   );
 }

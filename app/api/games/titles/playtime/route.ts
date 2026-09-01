@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 
 const TOP_GAMES = 10;
 
@@ -21,4 +21,4 @@ const getTopGamesByPlaytime: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getTopGamesByPlaytime);
+export const GET = gameMetricEndpoint(getTopGamesByPlaytime);

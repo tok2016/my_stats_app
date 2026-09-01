@@ -1,5 +1,6 @@
 import Skeleton from '@components/Skeleton';
 import GameCollageSkeleton from '@components/data-blocks/GameCollageSkeleton';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import PropBlock from '../../../../components/data-blocks/PropBlock';
 import { SPECIAL_GAMES_COUNT } from '../utils';
@@ -39,24 +40,26 @@ function TopGameSkeleton({ parentKey, index }: TopGameSkeletonProps) {
   );
 }
 
-export default function GamePlaytimeSkeleton() {
+export default function GamesPlaytimeSkeleton() {
   return (
-    <div className='games-playtime'>
-      <div className='top-3-games'>
-        {Array.from({ length: SPECIAL_GAMES_COUNT }).map((_, i) => (
-          <TopGameSkeleton
-            key={`game-playtime-skeleton-${i}`}
-            parentKey={`game-playtime-skeleton-${i}`}
-            index={i}
-          />
-        ))}
-      </div>
+    <MetricWrapper id='games-playtime'>
+      <div className='games-playtime'>
+        <div className='top-3-games'>
+          {Array.from({ length: SPECIAL_GAMES_COUNT }).map((_, i) => (
+            <TopGameSkeleton
+              key={`game-playtime-skeleton-${i}`}
+              parentKey={`game-playtime-skeleton-${i}`}
+              index={i}
+            />
+          ))}
+        </div>
 
-      <Skeleton
-        type='tablet'
-        unitClassName='game-row-skeleton'
-        rows={PLAYTIME_TABLE_ROWS}
-      />
-    </div>
+        <Skeleton
+          type='tablet'
+          unitClassName='game-row-skeleton'
+          rows={PLAYTIME_TABLE_ROWS}
+        />
+      </div>
+    </MetricWrapper>
   );
 }

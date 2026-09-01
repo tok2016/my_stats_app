@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import Game from '@ts/games/game';
 import { GenreTop } from '@ts/games/genre';
-import { GreatPeriod } from '@ts/games/metric';
+import { GreatPeriod, MetricClientContentProps } from '@ts/games/metric';
 import { Option } from '@ts/ui/components-props';
 
 import { useAction } from '@lib/hooks';
@@ -15,14 +15,10 @@ import { GreatPeriods } from '@lib/utils';
 import Select from '@components/Select';
 import Table from '@components/charts/Table';
 import GameTableTitle from '@components/data-blocks/GameTitle';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import RankIcon from '@components/data-blocks/RankIcon';
 
 import GenreTopsSkeleton from '../skeletons/GenreTopsSkeleton';
-
-type GenreTopsProps = {
-  games: Game[];
-  genres: Game['genres'];
-};
 
 type GenreTopBlockProps = {
   top: GenreTop;
@@ -50,11 +46,12 @@ const greatPeriodOptions: Option[] = GreatPeriods.map((period) => ({
   key: period
 }));
 
-const getGenreTops = async (params?: GreatPeriod) => {
+const getGenreTops = (userId: string) => async (params?: GreatPeriod) => {
   const searchParams = new URLSearchParams({ period: params ?? '' });
   const genresTops = await getMetricData<GenreTop[]>(
     `/api/games/genres/topGames?${searchParams.toString()}`,
-    []
+    [],
+    userId
   );
 
   return genresTops;
@@ -107,10 +104,24 @@ function GenreTopBlock({ top, games, genres, index }: GenreTopBlockProps) {
   );
 }
 
-export default function GenreTops({ games, genres }: GenreTopsProps) {
+export default function GenreTops({
+  metricId,
+  games,
+  userId
+}: MetricClientContentProps) {
   const [genresTops, updateGenresTops, isPending] = useAction(
-    getGenreTops,
+    getGenreTops(userId),
     null
+  );
+
+  const gamesMapArray = useMemo(() => new ObjectMapArray(games, 'id'), [games]);
+  const genres = useMemo(
+    () =>
+      gamesMapArray.flatMapByKey<Game['genres'][number], 'id'>(
+        (gamesMapArray) => gamesMapArray.genres,
+        'id'
+      ),
+    [gamesMapArray]
   );
 
   const onPeriodSelect = (value: string) => {
@@ -121,35 +132,36 @@ export default function GenreTops({ games, genres }: GenreTopsProps) {
     updateGenresTops('allTime');
   }, [updateGenresTops]);
 
-  return (
-    <section className='metric'>
-      <h3 className='select-title'>
-        Your top-5 games by genre
-        <Select
-          id='genres-top-period'
-          name='genres-top-period'
-          defaultValue='allTime'
-          variant='text'
-          options={greatPeriodOptions}
-          onSelect={onPeriodSelect}
-        />
-      </h3>
-
-      {isPending || !genresTops ? (
-        <GenreTopsSkeleton />
-      ) : (
-        <div className='genres-tops'>
-          {genresTops.map((genreTop, i) => (
-            <GenreTopBlock
-              key={`${genreTop.id}-top`}
-              top={genreTop}
-              games={new ObjectMapArray(games, 'id')}
-              genres={new ObjectMapArray(genres, 'id')}
-              index={i}
-            />
-          ))}
-        </div>
+  return isPending || !genresTops ? (
+    <GenreTopsSkeleton />
+  ) : (
+    <MetricWrapper
+      id={metricId}
+      renderTitle={(title) => (
+        <span className='select-title'>
+          {title}
+          <Select
+            id='genres-top-period'
+            name='genres-top-period'
+            defaultValue='allTime'
+            variant='text'
+            options={greatPeriodOptions}
+            onSelect={onPeriodSelect}
+          />
+        </span>
       )}
-    </section>
+    >
+      <div className='genres-tops'>
+        {genresTops.map((genreTop, i) => (
+          <GenreTopBlock
+            key={`${genreTop.id}-top`}
+            top={genreTop}
+            games={gamesMapArray}
+            genres={genres}
+            index={i}
+          />
+        ))}
+      </div>
+    </MetricWrapper>
   );
 }

@@ -1,11 +1,11 @@
 import Link from 'next/link';
 
-import { BasicUser } from '@ts/users/user';
+import { User } from '@ts/users/user';
 
 import Avatar from './Avatar';
 
 type UserOptionProps = {
-  user: BasicUser;
+  user: User;
 };
 
 export default function UserOption({ user }: UserOptionProps) {

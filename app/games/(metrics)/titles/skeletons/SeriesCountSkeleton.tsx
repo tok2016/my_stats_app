@@ -1,4 +1,5 @@
 import Skeleton from '@components/Skeleton';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
 import PropBlock from '../../../../components/data-blocks/PropBlock';
@@ -54,13 +55,15 @@ function TopSeriesSkeleton({ parentKey }: TopSeriesSkeletonProps) {
 
 export default function SeriesCountSkeleton() {
   return (
-    <div className='top-series'>
-      {Array.from({ length: MAX_SERIES_SKELETONS }).map((_, i) => (
-        <TopSeriesSkeleton
-          key={`top-series-skeleton-${i}`}
-          parentKey={`top-series-skeleton-${i}`}
-        />
-      ))}
-    </div>
+    <MetricWrapper id='top-series'>
+      <div className='top-series'>
+        {Array.from({ length: MAX_SERIES_SKELETONS }).map((_, i) => (
+          <TopSeriesSkeleton
+            key={`top-series-skeleton-${i}`}
+            parentKey={`top-series-skeleton-${i}`}
+          />
+        ))}
+      </div>
+    </MetricWrapper>
   );
 }

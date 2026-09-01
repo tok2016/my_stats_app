@@ -1,37 +1,9 @@
-import { ChartSkeleton } from '@components/charts/ChartSkeleton';
-import Metric from '@components/data-blocks/Metric';
-import PeriodTopsSkeletons from '@components/data-blocks/PeriodTopsSkeletons';
+import { StudiosMetricsIds } from '@lib/metrics/metrics-id';
 
-import HighestRatedStudiosSkeleton from './skeletons/HighestRatedStudiosSkeleton';
-import StudiosCountSkeleton from './skeletons/StudiosCountSkeleton';
+import { GameMetricsSkeletons } from '../GameMetrics';
 
 export default function GameStudiosLoading() {
   return (
-    <>
-      <Metric id='developers-count' title='Your favorite developers'>
-        <StudiosCountSkeleton />
-      </Metric>
-
-      <Metric id='publishers-count' title='Your favorite publishers'>
-        <StudiosCountSkeleton />
-      </Metric>
-
-      <PeriodTopsSkeletons metricId='studios-periods' />
-
-      <Metric id='developers-rating' title='Your highest rated developers'>
-        <HighestRatedStudiosSkeleton />
-      </Metric>
-
-      <Metric id='publishers-rating' title='Your highest rated publishers'>
-        <HighestRatedStudiosSkeleton />
-      </Metric>
-
-      <Metric
-        id='developers-countries'
-        title='Your favorite developers around the world'
-      >
-        <ChartSkeleton type='map' />
-      </Metric>
-    </>
+    <>{StudiosMetricsIds.map((metricId) => GameMetricsSkeletons[metricId])}</>
   );
 }

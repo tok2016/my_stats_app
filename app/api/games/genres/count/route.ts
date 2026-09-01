@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getCountMetric } from '@lib/metrics/count-metric';
 
 const getGenresCount: GameEndpointAction<'/api/games/genres/count'> = async (
@@ -18,4 +18,4 @@ const getGenresCount: GameEndpointAction<'/api/games/genres/count'> = async (
   });
 };
 
-export const GET = gameEndpoint(getGenresCount);
+export const GET = gameMetricEndpoint(getGenresCount);

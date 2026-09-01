@@ -2,6 +2,7 @@
 
 import Game from '@ts/games/game';
 import {
+  MetricClientContentProps,
   PeriodPlaytimeTops,
   PeriodTopsMetric,
   PrecisePeriod
@@ -16,23 +17,20 @@ import RankIcon from '@components/data-blocks/RankIcon';
 
 import { GamePeriodTopData } from '../types';
 
-type GamesPeriodTopsProps = {
-  games: Game[];
-};
-
 const getGamesPeriodTops =
-  (games: ObjectMapArray<Game, 'id'>) =>
+  (games: ObjectMapArray<Game, 'id'>, userId: string) =>
   async (
     periodType?: PrecisePeriod
   ): Promise<PeriodTopsMetric<GamePeriodTopData>> => {
-    const searchParams = new URLSearchParams({
-      period: periodType ?? 'season'
-    });
     const gamesTops = await getMetricData<PeriodPlaytimeTops>(
-      `/api/games/titles/periods?${searchParams.toString()}`,
+      '/api/games/titles/periods',
       {
         periodType: 'season',
         tops: []
+      },
+      userId,
+      {
+        period: periodType ?? 'season'
       }
     );
 
@@ -52,20 +50,25 @@ const getGamesPeriodTops =
   };
 
 const gameItemContent = (value: GamePeriodTopData, i: number) => (
-  <div className='period-game'>
+  <div className='ranked-entry'>
     <RankIcon rank={i} />
     <GameTableTitle game={value} />
   </div>
 );
 
-export default function GamesPeriodTops({ games }: GamesPeriodTopsProps) {
+export default function GamesPeriodTops({
+  metricId,
+  games,
+  userId
+}: MetricClientContentProps) {
+  const gamesMapArray = new ObjectMapArray(games, 'id');
+
   return (
     <PeriodTops
-      id='games-periods'
+      id={metricId}
       className='games-period-tops'
-      title='Your longest played games'
       blockWidthRem={18.5}
-      getPeriodMetric={getGamesPeriodTops(new ObjectMapArray(games, 'id'))}
+      getPeriodMetric={getGamesPeriodTops(gamesMapArray, userId)}
       listItemContent={gameItemContent}
       displayFields={['hours']}
       valueField='hours'

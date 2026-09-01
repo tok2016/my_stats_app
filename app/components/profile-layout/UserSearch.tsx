@@ -1,13 +1,16 @@
 'use client';
 
 import { useRef } from 'react';
+
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { SearchBaseProps } from '@ts/ui/components-props';
-import { BasicUser } from '@ts/users/user';
+import { User } from '@ts/users/user';
+
+import { getUsers } from '@lib/actions';
 
 import Search from '@components/Search';
-import { getUsers } from '@lib/actions';
+
 import UserOption from './UserOption';
 
 type UserSearchProps = Omit<SearchBaseProps, 'name'>;
@@ -16,7 +19,7 @@ const MAX_USERS_OPTIONS = 4;
 
 const getUsersWithKeys =
   (signal: AbortSignal) =>
-  async (credential?: string): Promise<(BasicUser & { key: string })[]> => {
+  async (credential?: string): Promise<(User & { key: string })[]> => {
     const users = await getUsers(credential, MAX_USERS_OPTIONS, signal);
     return users.map((user) => ({ ...user, key: user.username }));
   };

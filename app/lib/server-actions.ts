@@ -6,10 +6,10 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import Game, { GamesTablePageResponse } from '@ts/games/game';
-import { CountData } from '@ts/games/metric';
+import { CountData, MetricId } from '@ts/games/metric';
 import Country, { CountryIso, CountryResponse } from '@ts/users/country';
 import { ServicesMap } from '@ts/users/service';
-import { BasicUser, User } from '@ts/users/user';
+import { User, UserSet } from '@ts/users/user';
 
 import AxiosInstanse, { AxiosCountriesInstanse } from './axios-instanse';
 import ObjectMapArray from './object-map-array';
@@ -37,13 +37,13 @@ const getAuthConfig = async (): Promise<AxiosRequestConfig | undefined> => {
   };
 };
 
-export const getUser = async (): Promise<User> => {
+export const getUserSet = async (): Promise<UserSet> => {
   const response = await AxiosInstanse.get<User>(
     '/api/user',
     await getAuthConfig()
   );
 
-  return response.data;
+  return { ...response.data, metrics: new Set(response.data.metrics) };
 };
 
 export const getServices = async (userId?: string): Promise<ServicesMap> => {
@@ -87,7 +87,7 @@ export const getCountries = async (): Promise<CountryIso[]> => {
 };
 
 export const getUserCountries = async (
-  users: BasicUser[]
+  users: User[]
 ): Promise<Record<string, Country | undefined>> => {
   if (!process.env.COUNTRIES_API) {
     return {};
@@ -123,12 +123,29 @@ export const getGenresCount = async (): Promise<CountData[]> => {
   }
 };
 
-export const getMetricData = async <MetricType>(
-  url: string,
-  defaultValue: MetricType
-): Promise<MetricType> => {
+export const getUserDashboard = async (
+  userId?: string
+): Promise<MetricId[]> => {
+  const url = userId ? `/api/user/${userId}/dashboard` : '/api/dashboard';
+
   try {
-    const response = await AxiosInstanse.get<MetricType>(
+    const response = await AxiosInstanse.get<MetricId[]>(
+      url,
+      await getAuthConfig()
+    );
+
+    return response.data;
+  } catch {
+    return [];
+  }
+};
+
+export const getData = async <DataType>(
+  url: string,
+  defaultValue: DataType
+): Promise<DataType> => {
+  try {
+    const response = await AxiosInstanse.get<DataType>(
       url,
       await getAuthConfig()
     );
@@ -138,13 +155,37 @@ export const getMetricData = async <MetricType>(
   }
 };
 
-export const getGames = async (): Promise<ObjectMapArray<Game, 'id'>> => {
-  const response = await AxiosInstanse.get<GamesTablePageResponse>(
-    '/api/games',
-    await getAuthConfig()
-  );
+export const getMetricData = async <MetricType>(
+  url: string,
+  defaultValue: MetricType,
+  userId: string,
+  searchParams?: Record<string, string>
+): Promise<MetricType> => {
+  const params = new URLSearchParams({ user: userId, ...searchParams });
+  try {
+    const response = await AxiosInstanse.get<MetricType>(
+      `${url}?${params.toString()}`,
+      await getAuthConfig()
+    );
+    return response.data;
+  } catch {
+    return defaultValue;
+  }
+};
 
-  return new ObjectMapArray(response.data.games, 'id');
+export const getGames = async (
+  userId: string
+): Promise<ObjectMapArray<Game, 'id'>> => {
+  try {
+    const response = await AxiosInstanse.get<GamesTablePageResponse>(
+      `/api/games?user=${userId}`,
+      await getAuthConfig()
+    );
+
+    return new ObjectMapArray(response.data.games, 'id');
+  } catch {
+    return new ObjectMapArray<Game, 'id'>([], 'id');
+  }
 };
 
 export const refreshSteamData = async () => {

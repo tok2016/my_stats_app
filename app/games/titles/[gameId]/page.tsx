@@ -1,9 +1,8 @@
 import { GameDetailed } from '@ts/games/game';
 
-import { getMetricData } from '@lib/server-actions';
+import { getData } from '@lib/server-actions';
 
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
-import Metric from '@components/data-blocks/Metric';
 
 import RecommendedGameBlock from '@app/games/components/RecommendedGameBlock';
 
@@ -17,7 +16,7 @@ export default async function GameInfoPage({
   params: Promise<{ gameId: string }>;
 }) {
   const { gameId } = await params;
-  const game = await getMetricData<GameDetailed | null>(
+  const game = await getData<GameDetailed | null>(
     `/api/games/titles/item/${gameId}`,
     null
   );
@@ -36,13 +35,14 @@ export default async function GameInfoPage({
       <div className='game-page-content'>
         <GameDetails game={game} />
         <GameRatings game={game} />
-        <Metric id='similar-games' title='Similar games'>
+        <div className='metric similar-games'>
+          <h3>Similar games</h3>
           <div className='recommended-games'>
             {game.similarGames.map((similarGame) => (
               <RecommendedGameBlock key={similarGame.id} {...similarGame} />
             ))}
           </div>
-        </Metric>
+        </div>
       </div>
     </>
   );

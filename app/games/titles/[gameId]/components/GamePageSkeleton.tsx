@@ -1,6 +1,5 @@
 import Rating from '@components/Rating';
 import Skeleton from '@components/Skeleton';
-import Metric from '@components/data-blocks/Metric';
 import PropBlock from '@components/data-blocks/PropBlock';
 
 import PlaytimeRating from '@app/games/components/PlaytimeRating';
@@ -133,7 +132,8 @@ export default function GamePageSkeleton() {
       <div className='game-page-content'>
         <GameDetailsSkeleton />
         <GameRatingsSkeleton />
-        <Metric id='similar-games' title='Similar games'>
+        <div className='similar-games'>
+          <h3>Similar games</h3>
           <div className='recommended-games'>
             {Array.from({ length: RECOMMENDED_GAMES_SKELETONS }).map((_, i) => (
               <RecommendedGameSkeleton
@@ -142,7 +142,7 @@ export default function GamePageSkeleton() {
               />
             ))}
           </div>
-        </Metric>
+        </div>
       </div>
     </>
   );

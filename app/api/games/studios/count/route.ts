@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { StudioField } from '@ts/games/metric';
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getPlaytimeMetric } from '@lib/metrics/playtime-metric';
 
 const getStudiosCount: GameEndpointAction<'/api/games/studios/count'> = async (
@@ -24,4 +24,4 @@ const getStudiosCount: GameEndpointAction<'/api/games/studios/count'> = async (
   });
 };
 
-export const GET = gameEndpoint(getStudiosCount);
+export const GET = gameMetricEndpoint(getStudiosCount);

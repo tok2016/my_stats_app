@@ -1,7 +1,7 @@
-import Link from 'next/link';
+import { Suspense } from 'react';
 
 import Game from '@ts/games/game';
-import { RatingData } from '@ts/games/metric';
+import { MetricContentProps, MetricId, RatingData } from '@ts/games/metric';
 
 import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
@@ -10,9 +10,14 @@ import { getSingularOrPlural } from '@lib/utils';
 import Rating from '@components/Rating';
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameCover from '@components/data-blocks/GameCover';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
+
+import GenresRatingsSkeleton from '../skeletons/GenresRatingsSkeleton';
 
 type HighestRatedGenresProps = {
+  metricId: MetricId;
   genres: ObjectMapArray<Game['genres'][number], 'id'>;
+  userId: string;
 };
 
 type RatedGenreProps = {
@@ -36,12 +41,7 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
 
         <GameCover game={topGame} />
 
-        <Link
-          href={`/games/titles/${topGame.id}`}
-          className='underline bold small'
-        >
-          {topGame.name}
-        </Link>
+        <p className='bold small'>{topGame.name}</p>
 
         <span className='min'>
           {topGame.hours} {getSingularOrPlural(topGame.hours, 'hour', 'hours')}
@@ -51,25 +51,49 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
   );
 }
 
-export default async function HighestRatedGenres({
-  genres: genresMap
+async function HighestRatedGenres({
+  genres,
+  metricId,
+  userId
 }: HighestRatedGenresProps) {
   const ratingData = await getMetricData<RatingData[]>(
     '/api/games/genres/rating',
-    []
+    [],
+    userId
   );
 
-  return !ratingData.length ? (
-    <EmptyMetric message={`You haven't rated any game yet`} />
-  ) : (
-    <div className='blocks-group'>
-      {ratingData.map((data) => (
-        <RatedGenre
-          key={`${data.id}-rating`}
-          ratingData={data}
-          genre={genresMap.findByKey(data.id)}
-        />
-      ))}
-    </div>
+  return (
+    <MetricWrapper id={metricId}>
+      {!ratingData.length ? (
+        <EmptyMetric message={`You haven't rated any game yet`} />
+      ) : (
+        <div className='blocks-group'>
+          {ratingData.map((data) => (
+            <RatedGenre
+              key={`${data.id}-rating`}
+              ratingData={data}
+              genre={genres.findByKey(data.id)}
+            />
+          ))}
+        </div>
+      )}
+    </MetricWrapper>
+  );
+}
+
+export default function GenresRatings({
+  metricId,
+  games,
+  userId
+}: MetricContentProps) {
+  const genres = games.flatMapByKey<Game['genres'][number], 'id'>(
+    (game) => game.genres,
+    'id'
+  );
+
+  return (
+    <Suspense fallback={<GenresRatingsSkeleton />}>
+      <HighestRatedGenres genres={genres} metricId={metricId} userId={userId} />
+    </Suspense>
   );
 }

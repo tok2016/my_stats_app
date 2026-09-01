@@ -5,7 +5,7 @@ import { GenreTop } from '@ts/games/genre';
 import { GreatPeriod } from '@ts/games/metric';
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 
 type GenreCompareData = {
   id: number;
@@ -74,4 +74,4 @@ const getTopLongestGamesByGenre: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getTopLongestGamesByGenre);
+export const GET = gameMetricEndpoint(getTopLongestGamesByGenre);

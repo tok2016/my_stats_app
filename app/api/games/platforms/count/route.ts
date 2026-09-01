@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getCountMetric } from '@lib/metrics/count-metric';
 
 const getPlatformsCount: GameEndpointAction<
@@ -15,4 +15,4 @@ const getPlatformsCount: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getPlatformsCount);
+export const GET = gameMetricEndpoint(getPlatformsCount);

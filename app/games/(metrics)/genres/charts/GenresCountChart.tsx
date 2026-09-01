@@ -2,8 +2,6 @@
 
 import { ChartPieSolid, TableSolid } from '@mynaui/icons-react';
 
-import Link from 'next/link';
-
 import { FieldsInfo } from '@ts/ui/charts-data';
 
 import Chart from '@components/charts/Chart';
@@ -69,12 +67,7 @@ export default function GenresCountChart({ data }: GenresCountChartProps) {
                   title: 'Genre',
                   width: '5fr',
                   renderRow: (value) => (
-                    <Link
-                      href={`/games/genres/${value.id}`}
-                      className='colored'
-                    >
-                      {value.name}
-                    </Link>
+                    <span className='colored'>{value.name}</span>
                   )
                 },
                 count: {
@@ -85,16 +78,7 @@ export default function GenresCountChart({ data }: GenresCountChartProps) {
                   title: 'Biggest series',
                   width: '5fr',
                   renderRow: (value) =>
-                    value.topSeries ? (
-                      <Link
-                        href={`/games/series/${value.topSeries.id}`}
-                        className='underline'
-                      >
-                        {value.topSeries.name}
-                      </Link>
-                    ) : (
-                      <span>—</span>
-                    )
+                    value.topSeries ? value.topSeries.name : '—'
                 }
               }}
             />

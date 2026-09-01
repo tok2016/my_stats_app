@@ -1,20 +1,17 @@
-import Link from 'next/link';
+import { Suspense } from 'react';
 
-import Game, { GameTableData } from '@ts/games/game';
+import { GameTableData } from '@ts/games/game';
+import { MetricContentProps } from '@ts/games/metric';
 
-import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import GameCollage from '@components/data-blocks/GameCollage';
-import { LinksString } from '@components/data-blocks/LinksString';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import PropBlock from '../../../../components/data-blocks/PropBlock';
 import GamesPlaytimeTable from '../charts/GamesPlaytimeTable';
+import GamesPlaytimeSkeleton from '../skeletons/GamesPlaytimeSkeleton';
 import { SPECIAL_GAMES_COUNT } from '../utils';
-
-type GamesPlaytimeProps = {
-  games: ObjectMapArray<Game, 'id'>;
-};
 
 type TopGameBlockProps = {
   game: GameTableData;
@@ -27,40 +24,19 @@ function TopGameBlock({ game }: TopGameBlockProps) {
       <GameCollage game={game} />
       <div className='data-block-grid min'>
         <PropBlock title='Developer'>
-          {game.developers.length ? (
-            <LinksString
-              baseEndpoint='/games/studios'
-              items={game.developers}
-              groupKey={`game-time-developer-${game.id}`}
-            />
-          ) : (
-            <span>—</span>
-          )}
+          {game.developers.length
+            ? game.developers.map((dev) => dev.name).join(', ')
+            : '—'}
         </PropBlock>
 
         <PropBlock title='Publisher'>
-          {game.publishers ? (
-            <LinksString
-              baseEndpoint='/games/studios'
-              items={game.publishers}
-              groupKey={`game-time-publisher-${game.id}`}
-            />
-          ) : (
-            <span>—</span>
-          )}
+          {game.publishers.length
+            ? game.publishers.map((dev) => dev.name).join(', ')
+            : '—'}
         </PropBlock>
 
         <PropBlock title='Platform'>
-          {game.platform ? (
-            <Link
-              href={`/games/platforms/${game.platform.id}`}
-              className='underline'
-            >
-              {game.platform.name}
-            </Link>
-          ) : (
-            <span>—</span>
-          )}
+          {game.platform ? game.platform.name : '—'}
         </PropBlock>
 
         <PropBlock title='Playtime'>
@@ -73,10 +49,15 @@ function TopGameBlock({ game }: TopGameBlockProps) {
   );
 }
 
-export default async function GamesPlaytime({ games }: GamesPlaytimeProps) {
+async function TopGamesPlaytime({
+  metricId,
+  games,
+  userId
+}: MetricContentProps) {
   const gamesIds = await getMetricData<string[]>(
     '/api/games/titles/playtime',
-    []
+    [],
+    userId
   );
 
   const topGames = gamesIds
@@ -94,14 +75,24 @@ export default async function GamesPlaytime({ games }: GamesPlaytimeProps) {
     .filter((game) => !!game);
 
   return (
-    <div className='games-playtime'>
-      <div className='top-3-games'>
-        {topGames.slice(0, SPECIAL_GAMES_COUNT).map((game) => (
-          <TopGameBlock game={game} key={`${game.id}-playtime`} />
-        ))}
-      </div>
+    <MetricWrapper id={metricId}>
+      <div className='games-playtime'>
+        <div className='top-3-games'>
+          {topGames.slice(0, SPECIAL_GAMES_COUNT).map((game) => (
+            <TopGameBlock game={game} key={`${game.id}-playtime`} />
+          ))}
+        </div>
 
-      <GamesPlaytimeTable data={topGames.slice(SPECIAL_GAMES_COUNT)} />
-    </div>
+        <GamesPlaytimeTable data={topGames.slice(SPECIAL_GAMES_COUNT)} />
+      </div>
+    </MetricWrapper>
+  );
+}
+
+export default function GamesPlaytime(props: MetricContentProps) {
+  return (
+    <Suspense fallback={<GamesPlaytimeSkeleton />}>
+      <TopGamesPlaytime {...props} />
+    </Suspense>
   );
 }

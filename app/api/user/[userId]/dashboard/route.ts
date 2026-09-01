@@ -1,89 +1,76 @@
-import { ZodOptional, ZodType } from 'zod';
-
 import { NextResponse } from 'next/server';
 
 import { CommonUserEndpointAction } from '@ts/requests';
-import { NewDashboard } from '@ts/users/dashboard';
 
-import { getDashboards } from '@lib/auth';
 import { commonUserEndpoint } from '@lib/endpoint-generators';
-import { DashboardsModel } from '@lib/models';
+import { UsersModel } from '@lib/models';
 import { generateErrorResponse } from '@lib/utils';
 import { DashboardValidator, validateData } from '@lib/validation-schemas';
 
-const getUserDashboards: CommonUserEndpointAction<
+const getDashboard: CommonUserEndpointAction<
   '/api/user/[userId]/dashboard'
 > = async (_req, params) => {
   const { userId } = await params;
-  const dashboards = await getDashboards(userId);
-  return NextResponse.json(dashboards, {
+  const user = await UsersModel.findById(userId).lean();
+
+  if (!user) throw generateErrorResponse(404, 'User was not found');
+  return NextResponse.json(user.metrics, {
     status: 200,
-    statusText: 'Dashboards were found'
+    statusText: 'Dashboard metrics were found'
   });
 };
 
-const postUserDashboard: CommonUserEndpointAction<
+const postNewMetric: CommonUserEndpointAction<
   '/api/user/[userId]/dashboard'
 > = async (req, params) => {
   const { userId } = await params;
-  const dashboard = await validateData<NewDashboard>(
-    DashboardValidator,
-    await req.json()
-  );
-  await DashboardsModel.create({ ...dashboard, userId });
+  const metricId = await validateData(DashboardValidator, await req.text());
 
-  const dashboards = await getDashboards(userId);
-  return NextResponse.json(dashboards, {
+  const updatedUser = await UsersModel.findByIdAndUpdate(
+    userId,
+    { $addToSet: { metrics: metricId } },
+    { new: true }
+  ).lean();
+
+  if (!updatedUser) throw generateErrorResponse(404, 'User was not found');
+  return NextResponse.json(updatedUser.metrics, {
     status: 201,
-    statusText: 'Dashboard was created successfully'
+    statusText: 'New metric was added to dashboard'
   });
 };
 
-const putUserDashbord: CommonUserEndpointAction<
+const deleteMetric: CommonUserEndpointAction<
   '/api/user/[userId]/dashboard'
 > = async (req, params) => {
   const { userId } = await params;
-  const dashboardId = req.nextUrl.searchParams.get('dashboardId');
+  const metricId = await validateData(DashboardValidator, await req.text());
 
-  if (!dashboardId)
-    throw generateErrorResponse(400, 'Dashboard id was not given');
+  const updatedUser = await UsersModel.findByIdAndUpdate(
+    userId,
+    { $pull: { metrics: metricId } },
+    { new: true }
+  ).lean();
 
-  const dashboard = await validateData<
-    NewDashboard,
-    ZodOptional<ZodType<NewDashboard>>
-  >(DashboardValidator.optional(), await req.json());
-
-  await DashboardsModel.findByIdAndUpdate(dashboardId, dashboard);
-
-  const dashboards = await getDashboards(userId);
-  return NextResponse.json(dashboards, {
-    status: 200,
-    statusText: 'Dashboard was updated successfully'
+  if (!updatedUser) throw generateErrorResponse(404, 'User was not found');
+  return NextResponse.json(updatedUser.metrics, {
+    status: 201,
+    statusText: 'Metric was removed from dashboard'
   });
 };
 
-const deleteUserDashboard: CommonUserEndpointAction<
+const deleteDashboard: CommonUserEndpointAction<
   '/api/user/[userId]/dashboard'
-> = async (req, params) => {
+> = async (_req, params) => {
   const { userId } = await params;
-  const dashboardId = req.nextUrl.searchParams.get('dashboardId');
-
-  if (!dashboardId) {
-    await DashboardsModel.deleteMany({ userId });
-    return new NextResponse('All user dashboards were deleted', {
-      status: 200,
-      statusText: 'All user dashboards were deleted successfully'
-    });
-  }
-
-  await DashboardsModel.findByIdAndDelete(dashboardId);
-  return new NextResponse('', {
-    status: 200,
-    statusText: 'Dashboard was deleted successfully'
+  const user = await UsersModel.findByIdAndUpdate(userId, {
+    metrics: []
   });
+
+  if (!user) throw generateErrorResponse(404, 'User was not found');
+  return new NextResponse('All dashboard metrics were deleted');
 };
 
-export const GET = commonUserEndpoint(getUserDashboards);
-export const POST = commonUserEndpoint(postUserDashboard);
-export const PUT = commonUserEndpoint(putUserDashbord);
-export const DELETE = commonUserEndpoint(deleteUserDashboard);
+export const GET = commonUserEndpoint(getDashboard);
+export const POST = commonUserEndpoint(postNewMetric);
+export const PUT = commonUserEndpoint(deleteMetric);
+export const DELETE = commonUserEndpoint(deleteDashboard);

@@ -1,5 +1,6 @@
 import Skeleton from '@components/Skeleton';
 import GameCollageSkeleton from '@components/data-blocks/GameCollageSkeleton';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
 import PropBlock from '../../../../components/data-blocks/PropBlock';
@@ -33,16 +34,18 @@ function TopGameSkeleton({ parentKey, index }: TopGameSkeletonProps) {
   );
 }
 
-export default function HighestRatedGamesSkeleton() {
+export default function GamesRatingsSkeleton() {
   return (
-    <div className='top-games-grid'>
-      {Array.from({ length: TOP_GAMES_SKELETONS }).map((_, i) => (
-        <TopGameSkeleton
-          key={`top-game-skeleton-${i}`}
-          parentKey={`top-game-skeleton-${i}`}
-          index={i}
-        />
-      ))}
-    </div>
+    <MetricWrapper id='games-rating'>
+      <div className='top-games-grid'>
+        {Array.from({ length: TOP_GAMES_SKELETONS }).map((_, i) => (
+          <TopGameSkeleton
+            key={`top-game-skeleton-${i}`}
+            parentKey={`top-game-skeleton-${i}`}
+            index={i}
+          />
+        ))}
+      </div>
+    </MetricWrapper>
   );
 }

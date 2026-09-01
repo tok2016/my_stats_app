@@ -2,8 +2,6 @@
 
 import { ChartPieSolid, TableSolid } from '@mynaui/icons-react';
 
-import Link from 'next/link';
-
 import { FieldsInfo } from '@ts/ui/charts-data';
 
 import Chart from '@components/charts/Chart';
@@ -71,12 +69,7 @@ export default function PlatformsPlaytimeChart({
                   title: 'Platform',
                   width: '5fr',
                   renderRow: (value) => (
-                    <Link
-                      href={`/games/platforms/${value.id}`}
-                      className='colored'
-                    >
-                      {value.name}
-                    </Link>
+                    <span className='colored'>{value.name}</span>
                   )
                 },
                 hours: {
@@ -86,14 +79,7 @@ export default function PlatformsPlaytimeChart({
                 topGame: {
                   title: 'Biggest game',
                   width: '5fr',
-                  renderRow: (value) => (
-                    <Link
-                      href={`/games/series/${value.topGame.id}`}
-                      className='underline'
-                    >
-                      {value.topGame.name}
-                    </Link>
-                  )
+                  renderRow: (value) => value.topGame.name
                 }
               }}
             />

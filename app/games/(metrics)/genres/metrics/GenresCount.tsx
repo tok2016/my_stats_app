@@ -1,5 +1,3 @@
-'use server';
-
 import Game from '@ts/games/game';
 import { CountData } from '@ts/games/metric';
 
@@ -12,15 +10,18 @@ import { GenresCountData } from '../types';
 type GenresCountProps = {
   seriesArray: ObjectMapArray<NonNullable<Game['series']>, 'id'>;
   genres: ObjectMapArray<Game['genres'][number], 'id'>;
+  userId: string;
 };
 
 export default async function GenresCount({
   seriesArray,
-  genres
+  genres,
+  userId
 }: GenresCountProps) {
   const countData = await getMetricData<CountData[]>(
     '/api/games/genres/count',
-    []
+    [],
+    userId
   );
 
   const genresCount: GenresCountData[] = countData.map((data, i) => ({

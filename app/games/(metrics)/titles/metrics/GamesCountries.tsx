@@ -1,16 +1,30 @@
 import countries from 'i18n-iso-countries';
+import { Suspense } from 'react';
 
 import { GameCountryMetric } from '@ts/games/game';
+import { MetricContentProps, MetricId } from '@ts/games/metric';
 
 import { getMetricData } from '@lib/server-actions';
 
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
+
 import GamesCountriesChart from '../charts/GamesCountriesChart';
+import GamesCountriesSkeleton from '../skeletons/GamesCountriesSkeleton';
 import { GameCountryChartData } from '../types';
 
-export default async function GamesCountries() {
+type FetchGamesCountriesProps = {
+  metricId: MetricId;
+  userId: string;
+};
+
+async function FetchGamesCountries({
+  metricId,
+  userId
+}: FetchGamesCountriesProps) {
   const countriesData = await getMetricData<GameCountryMetric[]>(
     '/api/games/titles/countries',
-    []
+    [],
+    userId
   );
 
   const chartData: GameCountryChartData[] = countriesData.map((country, i) => ({
@@ -23,5 +37,20 @@ export default async function GamesCountries() {
     index: i
   }));
 
-  return <GamesCountriesChart data={chartData} />;
+  return (
+    <MetricWrapper id={metricId}>
+      <GamesCountriesChart data={chartData} />
+    </MetricWrapper>
+  );
+}
+
+export default function GamesCountries({
+  metricId,
+  userId
+}: MetricContentProps) {
+  return (
+    <Suspense fallback={<GamesCountriesSkeleton />}>
+      <FetchGamesCountries metricId={metricId} userId={userId} />
+    </Suspense>
+  );
 }

@@ -2,6 +2,7 @@
 
 import Game from '@ts/games/game';
 import {
+  MetricClientContentProps,
   PeriodPlaytimeTops,
   PeriodTopsMetric,
   PrecisePeriod
@@ -14,24 +15,23 @@ import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
 
 import { PlatformPeriodPlaytimeData } from '../types';
 
-type PlatformsPeriodTopsProps = {
-  platforms: NonNullable<Game['platform']>[];
-};
-
 const getPlatformsPeriods =
-  (platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>) =>
+  (
+    platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>,
+    userId: string
+  ) =>
   async (
     periodType?: PrecisePeriod
   ): Promise<PeriodTopsMetric<PlatformPeriodPlaytimeData>> => {
-    const searchParams = new URLSearchParams({
-      period: periodType ?? 'season'
-    });
-
     const periodTops = await getMetricData<PeriodPlaytimeTops>(
-      `/api/games/platforms/periods?${searchParams.toString()}`,
+      '/api/games/platforms/periods',
       {
         periodType: 'season',
         tops: []
+      },
+      userId,
+      {
+        period: periodType ?? 'season'
       }
     );
 
@@ -55,13 +55,19 @@ const platformItemContent = (value: PlatformPeriodPlaytimeData) => (
 );
 
 export default function PlatformsPeriodTops({
-  platforms
-}: PlatformsPeriodTopsProps) {
+  metricId,
+  games,
+  userId
+}: MetricClientContentProps) {
+  const platforms = new ObjectMapArray(games, 'id').mapByKey<
+    Game['platform'],
+    'id'
+  >((game) => game.platform, 'id');
+
   return (
     <PeriodTops
-      id='platform-periods'
-      title='Your favorite platform'
-      getPeriodMetric={getPlatformsPeriods(new ObjectMapArray(platforms, 'id'))}
+      id={metricId}
+      getPeriodMetric={getPlatformsPeriods(platforms, userId)}
       listItemContent={platformItemContent}
       displayFields={['hours']}
       valueField='hours'

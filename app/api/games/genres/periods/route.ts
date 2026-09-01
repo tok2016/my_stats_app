@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { PrecisePeriod } from '@ts/games/metric';
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getPeriodMetric } from '@lib/metrics/periods-metric';
 
 const GENRES_IN_PERIOD = 3;
@@ -27,4 +27,4 @@ const getTopGenresByPeriod: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getTopGenresByPeriod);
+export const GET = gameMetricEndpoint(getTopGenresByPeriod);

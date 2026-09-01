@@ -18,7 +18,8 @@ import { checkUserAuthorRights } from './auth';
 import {
   CredentialsModel,
   GamesModel,
-  ServiceCredentialsModel
+  ServiceCredentialsModel,
+  UsersModel
 } from './models';
 import ObjectMapArray from './object-map-array';
 import { extractToken } from './token';
@@ -46,26 +47,16 @@ const getServicesByCredentialsId = async (id: string): Promise<ServicesMap> => {
   return Object.fromEntries(entries);
 };
 
-const getGamesByCredentialsId = async (id: string): Promise<GameCore[]> => {
-  const credentials = await CredentialsModel.findById(id).lean();
-
-  if (!credentials)
-    throw generateErrorResponse(404, 'Credentials were not found');
-
-  const games = await GamesModel.find({ userId: credentials.userId }).lean();
-  return games.map((game) => ({
-    ...game,
-    id: game._id.toString()
-  }));
-};
-
 const generateAccessError = (error: unknown) => {
   if (isErrorResponse(error)) {
+    console.log('fine');
     return NextResponse.json(error, {
       status: error.status,
       statusText: error.message
     });
   }
+
+  console.log('bad');
 
   const errorResponse = generateErrorResponse(
     500,
@@ -84,7 +75,7 @@ export const generalEndpoint =
   ) =>
   async (req: NextRequest, context: RouteContext<Endpoint>) => {
     try {
-      return action(req, context.params);
+      return await action(req, context.params);
     } catch (err) {
       return generateAccessError(err);
     }
@@ -97,7 +88,7 @@ export const protectedEndpoint =
   async (req: NextRequest, context: RouteContext<Endpoint>) => {
     try {
       const token = await req.headers.get('Authorization');
-      return action(req, context.params, await extractToken(token));
+      return await action(req, context.params, await extractToken(token));
     } catch (err) {
       return generateAccessError(err);
     }
@@ -118,7 +109,7 @@ export const commonUserEndpoint =
         throw generateErrorResponse(400, 'User id was not given');
 
       await checkUserAuthorRights(params.userId, token);
-      return action(req, context.params);
+      return await action(req, context.params);
     } catch (err) {
       return generateAccessError(err);
     }
@@ -158,13 +149,13 @@ export const serviceEndpoint =
       const token = await extractToken(tokenRaw);
       const services = await getServicesByCredentialsId(token.id);
 
-      return action(req, context.params, services?.steam);
+      return await action(req, context.params, services?.steam);
     } catch (err) {
       return generateAccessError(err);
     }
   };
 
-export const gameEndpoint =
+export const gameProtectedEndpoint =
   <Endpoint extends AppRouteHandlerRoutes>(
     action: GameEndpointAction<Endpoint>
   ) =>
@@ -172,9 +163,59 @@ export const gameEndpoint =
     try {
       const tokenRaw = await req.headers.get('Authorization');
       const token = await extractToken(tokenRaw);
-      const games = await getGamesByCredentialsId(token.id);
 
-      return action(req, context.params, new ObjectMapArray(games, 'apiId'));
+      const credentials = await CredentialsModel.findById(token.id).lean();
+
+      if (!credentials)
+        throw generateErrorResponse(404, 'Credentials were not found');
+
+      const games: GameCore[] = (
+        await GamesModel.find({
+          userId: credentials.userId
+        }).lean()
+      ).map((game) => ({
+        ...game,
+        id: game._id.toString()
+      }));
+
+      return await action(
+        req,
+        context.params,
+        new ObjectMapArray(games, 'apiId')
+      );
+    } catch (err) {
+      return generateAccessError(err);
+    }
+  };
+
+export const gameMetricEndpoint =
+  <Endpoint extends AppRouteHandlerRoutes>(
+    action: GameEndpointAction<Endpoint>
+  ) =>
+  async (req: NextRequest, context: RouteContext<Endpoint>) => {
+    try {
+      const userId = req.nextUrl.searchParams.get('user');
+
+      if (!userId) throw generateErrorResponse(400, 'User ID was not given');
+
+      const user = await UsersModel.findById(userId).lean();
+
+      if (!user) throw generateErrorResponse(404, 'User was not found');
+      else if (user._id.toString() !== userId && !user.isPublic)
+        throw generateErrorResponse(403, 'Forbidden');
+
+      const games: GameCore[] = (
+        await GamesModel.find({ userId: userId }).lean()
+      ).map((game) => ({
+        ...game,
+        id: game._id.toString()
+      }));
+
+      return await action(
+        req,
+        context.params,
+        new ObjectMapArray(games, 'apiId')
+      );
     } catch (err) {
       return generateAccessError(err);
     }

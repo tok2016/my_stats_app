@@ -1,4 +1,5 @@
 import Skeleton from '@components/Skeleton';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 const RATED_GENRES_COUNT = 5;
 
@@ -17,16 +18,14 @@ function RatedGameSkeleton() {
   );
 }
 
-export default function HighestRatedGenresSkeleton() {
+export default function GenresRatingsSkeleton() {
   return (
-    <section className='metric'>
-      <Skeleton type='h3' width='50%' />
-
+    <MetricWrapper id='genres-rating'>
       <div className='blocks-group'>
         {Array.from({ length: RATED_GENRES_COUNT }).map((_, i) => (
           <RatedGameSkeleton key={`rated-genre-skeleton-${i}`} />
         ))}
       </div>
-    </section>
+    </MetricWrapper>
   );
 }

@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-import { getUser } from '@lib/server-actions';
+import { getUserSet } from '@lib/server-actions';
 
 import Sidebar from './SIdebar';
 
@@ -14,7 +14,7 @@ export default async function ProfileLayout({
   let user = undefined;
 
   try {
-    user = await getUser();
+    user = await getUserSet();
   } catch (err) {
     if (authorizedOnly) throw err;
   }

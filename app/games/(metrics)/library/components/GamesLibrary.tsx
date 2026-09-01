@@ -1,7 +1,7 @@
 import { GamesFilter } from '@ts/games/filter';
 import { GameTableData, GamesTablePageResponse } from '@ts/games/game';
 
-import { getMetricData } from '@lib/server-actions';
+import { getData, getUserSet } from '@lib/server-actions';
 
 import GamesFilterMenu from './GamesFilterMenu';
 import GamesTable from './GamesTable';
@@ -14,12 +14,14 @@ export default async function GamesLibrary({
 }: {
   filters: GamesFilter;
 }) {
+  const user = await getUserSet();
   const urlParams = new URLSearchParams({
     ...filters,
-    limit: GAMES_PAGE_LIMIT.toString()
+    limit: GAMES_PAGE_LIMIT.toString(),
+    user: user.id
   });
 
-  const gamesPage = await getMetricData<GamesTablePageResponse>(
+  const gamesPage = await getData<GamesTablePageResponse>(
     `/api/games?${urlParams.toString()}`,
     {
       games: [],

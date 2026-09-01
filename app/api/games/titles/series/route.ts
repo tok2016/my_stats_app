@@ -4,7 +4,7 @@ import { GameCore } from '@ts/games/game';
 import { IgdbSeriesExpanded, SeriesCollapsed } from '@ts/games/series';
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import {
   SERIES_EXPANDED_FIELDS,
   getAverageRating
@@ -97,4 +97,4 @@ const getTopSeries: GameEndpointAction<'/api/games/titles/series'> = async (
   });
 };
 
-export const GET = gameEndpoint(getTopSeries);
+export const GET = gameMetricEndpoint(getTopSeries);

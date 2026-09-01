@@ -1,23 +1,18 @@
 import bcrypt from 'bcrypt';
 import path from 'path';
+
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
+import { GameCore } from '@ts/games/game';
+import Confirmation, { ConfirmationInfo } from '@ts/users/confirmation';
+import Credentials, { CredentialsInSchema } from '@ts/users/credentials';
 import { User } from '@ts/users/user';
 import { UserAccess } from '@ts/users/user';
-import Credentials, { CredentialsInSchema } from '@ts/users/credentials';
-import Dashboard from '@ts/users/dashboard';
-import Confirmation, { ConfirmationInfo } from '@ts/users/confirmation';
 
-import {
-  CredentialsModel,
-  DashboardsModel,
-  GamesModel,
-  UsersModel
-} from './models';
-import { uniteUserData, generateErrorResponse } from './utils';
-import { ACCESS_TTL, extractToken, generateToken, REFRESH_TTL } from './token';
-import { GameCore } from '@ts/games/game';
+import { CredentialsModel, GamesModel, UsersModel } from './models';
+import { ACCESS_TTL, REFRESH_TTL, extractToken, generateToken } from './token';
+import { generateErrorResponse, uniteUserData } from './utils';
 
 export const AVATAR_DIRECTORY = path.join(process.cwd(), 'avatars');
 
@@ -110,13 +105,12 @@ export const getCredentials = async (
 export const getUserById = async (id: string): Promise<User> => {
   const credentials = await getCredentialsById(id);
   const userInfo = await UsersModel.findById(credentials.userId).lean();
-  const dashboards = await getDashboards(credentials.userId);
 
   if (!userInfo) {
     throw generateErrorResponse(404, 'User data was not found');
   }
 
-  return uniteUserData(credentials, userInfo, dashboards);
+  return uniteUserData(credentials, userInfo);
 };
 
 export const checkUserAuthorRights = async (
@@ -133,14 +127,6 @@ export const checkUserAuthorRights = async (
   if (credentials.userId !== userId) {
     throw generateErrorResponse(403, 'Forbidden');
   }
-};
-
-export const getDashboards = async (userId: string): Promise<Dashboard[]> => {
-  const dashboards = await DashboardsModel.find({ userId }).lean();
-  return dashboards.map((dashboard) => ({
-    ...dashboard,
-    id: dashboard._id.toString()
-  }));
 };
 
 export const generateConfirmationResponse = (operation: Confirmation) => {

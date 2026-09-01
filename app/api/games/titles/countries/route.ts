@@ -4,7 +4,7 @@ import { GameCore, GameCountryMetric, GameShort } from '@ts/games/game';
 import { IgdbStudioCountry } from '@ts/games/studio';
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { gameCoreToShort } from '@lib/games/games-utils';
 import { igdbRequest } from '@lib/games/igdb';
 import { MAX_ENTRIES_IN_CHART } from '@lib/utils';
@@ -100,4 +100,4 @@ const getGamesByCountries: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getGamesByCountries);
+export const GET = gameMetricEndpoint(getGamesByCountries);

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getRatingMetric } from '@lib/metrics/rating-metric';
 import { ITEMS_IN_RATING } from '@lib/utils';
 
@@ -20,4 +20,4 @@ const getHighestRatedGenres: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getHighestRatedGenres);
+export const GET = gameMetricEndpoint(getHighestRatedGenres);

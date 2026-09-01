@@ -1,26 +1,9 @@
-import { ChartSkeleton } from '@components/charts/ChartSkeleton';
-import Metric from '@components/data-blocks/Metric';
-import PeriodTopsSkeletons from '@components/data-blocks/PeriodTopsSkeletons';
+import { PlatformsMetricsIds } from '@lib/metrics/metrics-id';
 
-import HighestRatedPlatformsSkeleton from './skeletons/HighestRatedPlatformsSkeleton';
+import { GameMetricsSkeletons } from '../GameMetrics';
 
 export default function PlatformsLoading() {
   return (
-    <>
-      <div className='double-doughnut'>
-        <Metric id='platforms-count' title='Your biggest platforms'>
-          <ChartSkeleton type='doughnut' className='switchable-chart' />
-        </Metric>
-        <Metric id='platforms-playtime' title='Your longest used platforms'>
-          <ChartSkeleton type='doughnut' className='switchable-chart' />
-        </Metric>
-      </div>
-
-      <PeriodTopsSkeletons metricId='platform-periods' />
-
-      <Metric id='rated-platforms' title='Your highest rated platforms'>
-        <HighestRatedPlatformsSkeleton />
-      </Metric>
-    </>
+    <>{PlatformsMetricsIds.map((metricId) => GameMetricsSkeletons[metricId])}</>
   );
 }

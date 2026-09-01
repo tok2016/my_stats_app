@@ -1,16 +1,18 @@
 'use client';
 
 import { memo, useReducer } from 'react';
+
 import { usePathname } from 'next/navigation';
 
-import { User } from '@ts/users/user';
+import { UserSet } from '@ts/users/user';
 
 import { defaultUser } from '@lib/utils';
-import ProfileSidebar from './ProfileSidebar';
+
 import GuestSidebar from './GuestSidebar';
+import ProfileSidebar from './ProfileSidebar';
 
 type SidebarProps = {
-  user?: User;
+  user?: UserSet;
   authorized?: boolean;
 };
 

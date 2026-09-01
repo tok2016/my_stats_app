@@ -4,7 +4,7 @@ import { CountCompareData, MetricMap } from '@ts/games/metric';
 import { PlatformRatingData } from '@ts/games/platform';
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getRatingMetric } from '@lib/metrics/rating-metric';
 import { ITEMS_IN_RATING } from '@lib/utils';
 
@@ -59,4 +59,4 @@ const getPlatformsRatings: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getPlatformsRatings);
+export const GET = gameMetricEndpoint(getPlatformsRatings);

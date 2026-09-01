@@ -6,7 +6,10 @@ import { GameEndpointAction, ProtectedEndpointAction } from '@ts/requests';
 import { LiteralType } from '@ts/util-types';
 
 import { getCredentialsById } from '@lib/auth';
-import { gameEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
+import {
+  gameMetricEndpoint,
+  protectedEndpoint
+} from '@lib/endpoint-generators';
 import { getFullGames } from '@lib/games/games-utils';
 import { GamesModel } from '@lib/models';
 import { generateErrorResponse, parseBooleanString } from '@lib/utils';
@@ -110,6 +113,12 @@ const getGames: GameEndpointAction<'/api/games'> = async (
   _params,
   games
 ) => {
+  if (!games.count)
+    return NextResponse.json([], {
+      status: 200,
+      statusText: 'User has no games'
+    });
+
   const allGames = await getFullGames(games);
   const filters = req.nextUrl.searchParams.entries().toArray();
   let maxHours = 0;
@@ -118,7 +127,8 @@ const getGames: GameEndpointAction<'/api/games'> = async (
   const filteredGames = allGames.filter((game) => {
     maxHours = game.hours > maxHours ? game.hours : maxHours;
     return filters.every(
-      ([key, value]) => !value || filterByField[key]?.(game, value)
+      ([key, value]) =>
+        !value || !filterByField[key] || filterByField[key](game, value)
     );
   });
 
@@ -185,5 +195,5 @@ const postNewGame: ProtectedEndpointAction<'/api/games'> = async (
   });
 };
 
-export const GET = gameEndpoint(getGames);
+export const GET = gameMetricEndpoint(getGames);
 export const POST = protectedEndpoint(postNewGame);
