@@ -1,4 +1,7 @@
+import { Suspense } from 'react';
+
 import Game from '@ts/games/game';
+import { MetricContentProps, MetricId } from '@ts/games/metric';
 import { PlatformRatingData } from '@ts/games/platform';
 
 import ObjectMapArray from '@lib/object-map-array';
@@ -7,8 +10,12 @@ import { getMetricData } from '@lib/server-actions';
 import Rating from '@components/Rating';
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameTableTitle from '@components/data-blocks/GameTitle';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
+
+import PlatformsRatingsSkeleton from '../skeletons/PlatformsRatingsSkeleton';
 
 type HighestRatedPlatformsProps = {
+  metricId: MetricId;
   platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>;
   genres: ObjectMapArray<Game['genres'][number], 'id'>;
 };
@@ -58,7 +65,8 @@ function RatedPlatform({
   );
 }
 
-export default async function HighestRatedPlatforms({
+async function HighestRatedPlatforms({
+  metricId,
   platforms,
   genres
 }: HighestRatedPlatformsProps) {
@@ -67,19 +75,46 @@ export default async function HighestRatedPlatforms({
     []
   );
 
-  if (!ratedPlatforms.length)
-    return <EmptyMetric message={`You haven't rated any game yet`} />;
+  return (
+    <MetricWrapper id={metricId}>
+      {!ratedPlatforms.length ? (
+        <EmptyMetric message={`You haven't rated any game yet`} />
+      ) : (
+        <div className='blocks-group'>
+          {ratedPlatforms.map((ratedPlatform) => (
+            <RatedPlatform
+              key={`${ratedPlatform.id}-rated`}
+              ratedPlatform={ratedPlatform}
+              platform={platforms.findByKey(ratedPlatform.id)}
+              topGenre={genres.findByKey(ratedPlatform.topGenre)}
+            />
+          ))}
+        </div>
+      )}
+    </MetricWrapper>
+  );
+}
+
+export default function PlatformsRatings({
+  games,
+  metricId
+}: MetricContentProps) {
+  const platforms = games.mapByKey<Game['platform'], 'id'>(
+    (game) => game.platform,
+    'id'
+  );
+  const genres = games.flatMapByKey<Game['genres'][number], 'id'>(
+    (game) => game.genres,
+    'id'
+  );
 
   return (
-    <div className='blocks-group'>
-      {ratedPlatforms.map((ratedPlatform) => (
-        <RatedPlatform
-          key={`${ratedPlatform.id}-rated`}
-          ratedPlatform={ratedPlatform}
-          platform={platforms.findByKey(ratedPlatform.id)}
-          topGenre={genres.findByKey(ratedPlatform.topGenre)}
-        />
-      ))}
-    </div>
+    <Suspense fallback={<PlatformsRatingsSkeleton />}>
+      <HighestRatedPlatforms
+        metricId={metricId}
+        platforms={platforms}
+        genres={genres}
+      />
+    </Suspense>
   );
 }

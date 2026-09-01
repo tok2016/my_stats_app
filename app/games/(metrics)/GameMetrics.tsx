@@ -11,6 +11,11 @@ import GenreTopsSkeleton from './genres/skeletons/GenreTopsSkeleton';
 import GenresCountPlaytimeSkeleton from './genres/skeletons/GenresCountPlaytimeSkeleton';
 import GenresRatingsSkeleton from './genres/skeletons/GenresRatingsSkeleton';
 import RecommendedGamesSkeletons from './genres/skeletons/RecommendedGamesSkeletons';
+import PlatformsCountPlaytime from './platforms/metrics/PlatformsCountPlaytime';
+import PlatformsPeriodTops from './platforms/metrics/PlatformsPertiodTops';
+import PlatformsRatings from './platforms/metrics/PlatformsRatings';
+import PlatformsCountPlaytimeSkeleton from './platforms/skeletons/PlatformsCountPlaytimeSkeleton';
+import PlatformsRatingsSkeleton from './platforms/skeletons/PlatformsRatingsSkeleton';
 import StudiosCountPlaytime from './studios/metrics/StudiosCountPlaytime';
 import StudiosCountries from './studios/metrics/StudiosCountries';
 import StudiosPeriodTops from './studios/metrics/StudiosPeriodTops';
@@ -40,7 +45,10 @@ export const GameMetrics: Record<GameMetricId, MetricFunc> = {
   'publishers-rating': (props) => (
     <StudiosRatings {...props} type='publisher' />
   ),
-  'developers-countries': (props) => <StudiosCountries {...props} />
+  'developers-countries': (props) => <StudiosCountries {...props} />,
+  'platforms-count-playtime': (props) => <PlatformsCountPlaytime {...props} />,
+  'platforms-periods': (props) => <PlatformsPeriodTops {...props} />,
+  'platforms-rating': (props) => <PlatformsRatings {...props} />
 };
 
 export const GameMetricsSkeletons: Record<GameMetricId, React.ReactNode> = {
@@ -58,5 +66,8 @@ export const GameMetricsSkeletons: Record<GameMetricId, React.ReactNode> = {
   'studios-periods': <PeriodTopsSkeletons metricId='studios-periods' />,
   'developers-rating': <StudiosRatingsSkeleton metricId='developers-rating' />,
   'publishers-rating': <StudiosRatingsSkeleton metricId='publishers-rating' />,
-  'developers-countries': <StudiosCountriesSkeleton />
+  'developers-countries': <StudiosCountriesSkeleton />,
+  'platforms-count-playtime': <PlatformsCountPlaytimeSkeleton />,
+  'platforms-periods': <PeriodTopsSkeletons metricId='platforms-periods' />,
+  'platforms-rating': <PlatformsRatingsSkeleton />
 };

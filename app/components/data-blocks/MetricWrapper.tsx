@@ -13,7 +13,10 @@ const MetricTitles: Record<MetricId, string> = {
   'studios-periods': 'Your favorite developer & publisher',
   'developers-rating': 'Your highest rated developers',
   'publishers-rating': 'Your highest rated publishers',
-  'developers-countries': 'Your favorite developers around the world'
+  'developers-countries': 'Your favorite developers around the world',
+  'platforms-count-playtime': 'Your biggest platforms',
+  'platforms-periods': 'Your favorite platform',
+  'platforms-rating': 'Your highest rated platforms'
 };
 
 export default function MetricWrapper({

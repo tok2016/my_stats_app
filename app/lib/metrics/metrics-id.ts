@@ -17,7 +17,6 @@ export const StudiosMetricsIds = [
 
 export const PlatformsMetricsIds = [
   'platforms-count-playtime',
-  'platforms-playtime',
   'platforms-periods',
   'platforms-rating'
 ] as const;
