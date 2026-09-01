@@ -39,7 +39,7 @@ function TopGameSkeleton({ parentKey, index }: TopGameSkeletonProps) {
   );
 }
 
-export default function GamePlaytimeSkeleton() {
+export default function GamesPlaytimeSkeleton() {
   return (
     <div className='games-playtime'>
       <div className='top-3-games'>

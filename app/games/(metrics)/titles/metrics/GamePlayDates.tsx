@@ -1,11 +1,22 @@
-import { YearCountMetric } from '@ts/games/metric';
+import { Suspense } from 'react';
+
+import {
+  MetricContentProps,
+  MetricId,
+  YearCountMetric
+} from '@ts/games/metric';
 
 import { getMetricData } from '@lib/server-actions';
 
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
+
 import GamesLineChart from '../charts/GamesLineChart';
+import GameYearsSkeleton from '../skeletons/GameYearsSkeleton';
 import { GameYearChartData } from '../types';
 
-export default async function GamePlaydates() {
+type FetchGamePlayDatesProps = { metricId: MetricId };
+
+async function FetchGamePlayDates({ metricId }: FetchGamePlayDatesProps) {
   const years = await getMetricData<YearCountMetric[]>(
     '/api/games/titles/playdate',
     []
@@ -20,5 +31,17 @@ export default async function GamePlaydates() {
     topGame: year.topGames[0].name
   }));
 
-  return <GamesLineChart data={chartData} chartId='game-playdates-line' />;
+  return (
+    <MetricWrapper id={metricId}>
+      <GamesLineChart data={chartData} chartId='game-playdates-line' />
+    </MetricWrapper>
+  );
+}
+
+export default function GamePlayDates({ metricId }: MetricContentProps) {
+  return (
+    <Suspense fallback={<GameYearsSkeleton metricId={metricId} />}>
+      <FetchGamePlayDates metricId={metricId} />
+    </Suspense>
+  );
 }

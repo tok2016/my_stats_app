@@ -1,18 +1,18 @@
-import Game from '@ts/games/game';
+import { Suspense } from 'react';
 
-import ObjectMapArray from '@lib/object-map-array';
+import Game from '@ts/games/game';
+import { MetricContentProps } from '@ts/games/metric';
+
 import { getMetricData } from '@lib/server-actions';
 
 import EmptyMetric from '@components/data-blocks/EmptyMetric';
 import GameCollage from '@components/data-blocks/GameCollage';
 import { LinksString } from '@components/data-blocks/LinksString';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
 import PropBlock from '../../../../components/data-blocks/PropBlock';
-
-type HighestRatedGamesProps = {
-  games: ObjectMapArray<Game, 'id'>;
-};
+import GamesRatingsSkeleton from '../skeletons/GamesRatingsSkeleton';
 
 type TopGameProps = {
   game: Game;
@@ -63,9 +63,7 @@ function TopGame({ game, index }: TopGameProps) {
   );
 }
 
-export default async function HighestRatedGames({
-  games
-}: HighestRatedGamesProps) {
+async function HighestRatedGames({ metricId, games }: MetricContentProps) {
   const gamesIds = await getMetricData<string[]>(
     '/api/games/titles/rating',
     []
@@ -79,10 +77,20 @@ export default async function HighestRatedGames({
     .filter((game) => !!game);
 
   return (
-    <div className='top-games-grid'>
-      {topGames.map((game, i) => (
-        <TopGame key={`${game.id}-rating`} game={game} index={i} />
-      ))}
-    </div>
+    <MetricWrapper id={metricId}>
+      <div className='top-games-grid'>
+        {topGames.map((game, i) => (
+          <TopGame key={`${game.id}-rating`} game={game} index={i} />
+        ))}
+      </div>
+    </MetricWrapper>
+  );
+}
+
+export default function GamesRatings(props: MetricContentProps) {
+  return (
+    <Suspense fallback={<GamesRatingsSkeleton />}>
+      <HighestRatedGames {...props} />
+    </Suspense>
   );
 }

@@ -2,6 +2,7 @@
 
 import Game from '@ts/games/game';
 import {
+  MetricContentProps,
   PeriodPlaytimeTops,
   PeriodTopsMetric,
   PrecisePeriod
@@ -15,10 +16,6 @@ import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
 import RankIcon from '@components/data-blocks/RankIcon';
 
 import { GamePeriodTopData } from '../types';
-
-type GamesPeriodTopsProps = {
-  games: Game[];
-};
 
 const getGamesPeriodTops =
   (games: ObjectMapArray<Game, 'id'>) =>
@@ -58,14 +55,16 @@ const gameItemContent = (value: GamePeriodTopData, i: number) => (
   </div>
 );
 
-export default function GamesPeriodTops({ games }: GamesPeriodTopsProps) {
+export default function GamesPeriodTops({
+  metricId,
+  games
+}: MetricContentProps) {
   return (
     <PeriodTops
-      id='games-periods'
+      id={metricId}
       className='games-period-tops'
-      title='Your longest played games'
       blockWidthRem={18.5}
-      getPeriodMetric={getGamesPeriodTops(new ObjectMapArray(games, 'id'))}
+      getPeriodMetric={getGamesPeriodTops(games)}
       listItemContent={gameItemContent}
       displayFields={['hours']}
       valueField='hours'

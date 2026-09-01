@@ -6,6 +6,7 @@ import GenreTops from './genres/metrics/GenreTops';
 import GenresCountPlaytime from './genres/metrics/GenresCountPlaytime';
 import GenresPeriodTops from './genres/metrics/GenresPeriodTops';
 import HighestRatedGenres from './genres/metrics/GenresRatings';
+import GamesRatings from './genres/metrics/GenresRatings';
 import RecommendedGames from './genres/metrics/RecommendedGames';
 import GenreTopsSkeleton from './genres/skeletons/GenreTopsSkeleton';
 import GenresCountPlaytimeSkeleton from './genres/skeletons/GenresCountPlaytimeSkeleton';
@@ -23,6 +24,17 @@ import StudiosRatings from './studios/metrics/StudiosRatings';
 import StudiosCountPlaytimeSkeleton from './studios/skeletons/StudiosCountSkeleton';
 import StudiosCountriesSkeleton from './studios/skeletons/StudiosCountriesSkeleton';
 import StudiosRatingsSkeleton from './studios/skeletons/StudiosRatingsSkeleton';
+import GamePlayDates from './titles/metrics/GamePlayDates';
+import GameReleases from './titles/metrics/GameReleases';
+import GamesCountries from './titles/metrics/GamesCountries';
+import GamesPeriodTops from './titles/metrics/GamesPeriodTops';
+import GamesPlaytime from './titles/metrics/GamesPlaytime';
+import SeriesCount from './titles/metrics/SeriesCount';
+import GameYearsSkeleton from './titles/skeletons/GameYearsSkeleton';
+import GamesCountriesSkeleton from './titles/skeletons/GamesCountriesSkeleton';
+import GamesPlaytimeSkeleton from './titles/skeletons/GamesPlaytimeSkeleton';
+import GamesRatingsSkeleton from './titles/skeletons/GamesRatingsSkeleton';
+import SeriesCountSkeleton from './titles/skeletons/SeriesCountSkeleton';
 
 type MetricFunc = (props: MetricContentProps) => React.ReactNode;
 
@@ -48,7 +60,14 @@ export const GameMetrics: Record<GameMetricId, MetricFunc> = {
   'developers-countries': (props) => <StudiosCountries {...props} />,
   'platforms-count-playtime': (props) => <PlatformsCountPlaytime {...props} />,
   'platforms-periods': (props) => <PlatformsPeriodTops {...props} />,
-  'platforms-rating': (props) => <PlatformsRatings {...props} />
+  'platforms-rating': (props) => <PlatformsRatings {...props} />,
+  'games-playtime': (props) => <GamesPlaytime {...props} />,
+  'games-rating': (props) => <GamesRatings {...props} />,
+  'games-periods': (props) => <GamesPeriodTops {...props} />,
+  'games-playdate': (props) => <GamePlayDates {...props} />,
+  'games-release': (props) => <GameReleases {...props} />,
+  'games-countries': (props) => <GamesCountries {...props} />,
+  'top-series': (props) => <SeriesCount {...props} />
 };
 
 export const GameMetricsSkeletons: Record<GameMetricId, React.ReactNode> = {
@@ -69,5 +88,12 @@ export const GameMetricsSkeletons: Record<GameMetricId, React.ReactNode> = {
   'developers-countries': <StudiosCountriesSkeleton />,
   'platforms-count-playtime': <PlatformsCountPlaytimeSkeleton />,
   'platforms-periods': <PeriodTopsSkeletons metricId='platforms-periods' />,
-  'platforms-rating': <PlatformsRatingsSkeleton />
+  'platforms-rating': <PlatformsRatingsSkeleton />,
+  'games-playtime': <GamesPlaytimeSkeleton />,
+  'games-rating': <GamesRatingsSkeleton />,
+  'games-periods': <PeriodTopsSkeletons metricId='games-periods' />,
+  'games-playdate': <GameYearsSkeleton metricId='games-playdate' />,
+  'games-release': <GameYearsSkeleton metricId='games-release' />,
+  'games-countries': <GamesCountriesSkeleton />,
+  'top-series': <SeriesCountSkeleton />
 };

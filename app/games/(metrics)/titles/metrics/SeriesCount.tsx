@@ -1,6 +1,9 @@
+import { Suspense } from 'react';
+
 import Link from 'next/link';
 
 import Game from '@ts/games/game';
+import { MetricContentProps } from '@ts/games/metric';
 import { SeriesCollapsed } from '@ts/games/series';
 
 import ObjectMapArray from '@lib/object-map-array';
@@ -9,14 +12,12 @@ import { getMetricData } from '@lib/server-actions';
 import EmptyImage from '@components/data-blocks/EmptyImage';
 import GameCover from '@components/data-blocks/GameCover';
 import { LinksString } from '@components/data-blocks/LinksString';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
 import PropBlock from '../../../../components/data-blocks/PropBlock';
+import SeriesCountSkeleton from '../skeletons/SeriesCountSkeleton';
 import { MAX_GAMES_IN_SERIES } from '../utils';
-
-type SeriesCountProps = {
-  games: ObjectMapArray<Game, 'id'>;
-};
 
 type TopSeriesProps = {
   series: SeriesCollapsed;
@@ -107,17 +108,31 @@ function TopSeries({ series, games }: TopSeriesProps) {
   );
 }
 
-export default async function SeriesCount({ games }: SeriesCountProps) {
+async function FetchSeriesCount({ metricId, games }: MetricContentProps) {
   const seriesData = await getMetricData<SeriesCollapsed[]>(
     '/api/games/titles/series',
     []
   );
 
   return (
-    <div className='top-series'>
-      {seriesData.map((series) => (
-        <TopSeries key={`${series.id}-series`} series={series} games={games} />
-      ))}
-    </div>
+    <MetricWrapper id={metricId}>
+      <div className='top-series'>
+        {seriesData.map((series) => (
+          <TopSeries
+            key={`${series.id}-series`}
+            series={series}
+            games={games}
+          />
+        ))}
+      </div>
+    </MetricWrapper>
+  );
+}
+
+export default function SeriesCount(props: MetricContentProps) {
+  return (
+    <Suspense fallback={<SeriesCountSkeleton />}>
+      <FetchSeriesCount {...props} />
+    </Suspense>
   );
 }

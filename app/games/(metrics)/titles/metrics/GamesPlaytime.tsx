@@ -1,20 +1,20 @@
+import { Suspense } from 'react';
+
 import Link from 'next/link';
 
-import Game, { GameTableData } from '@ts/games/game';
+import { GameTableData } from '@ts/games/game';
+import { MetricContentProps } from '@ts/games/metric';
 
-import ObjectMapArray from '@lib/object-map-array';
 import { getMetricData } from '@lib/server-actions';
 
 import GameCollage from '@components/data-blocks/GameCollage';
 import { LinksString } from '@components/data-blocks/LinksString';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import PropBlock from '../../../../components/data-blocks/PropBlock';
 import GamesPlaytimeTable from '../charts/GamesPlaytimeTable';
+import GamesPlaytimeSkeleton from '../skeletons/GamesPlaytimeSkeleton';
 import { SPECIAL_GAMES_COUNT } from '../utils';
-
-type GamesPlaytimeProps = {
-  games: ObjectMapArray<Game, 'id'>;
-};
 
 type TopGameBlockProps = {
   game: GameTableData;
@@ -73,7 +73,7 @@ function TopGameBlock({ game }: TopGameBlockProps) {
   );
 }
 
-export default async function GamesPlaytime({ games }: GamesPlaytimeProps) {
+async function TopGamesPlaytime({ metricId, games }: MetricContentProps) {
   const gamesIds = await getMetricData<string[]>(
     '/api/games/titles/playtime',
     []
@@ -94,14 +94,24 @@ export default async function GamesPlaytime({ games }: GamesPlaytimeProps) {
     .filter((game) => !!game);
 
   return (
-    <div className='games-playtime'>
-      <div className='top-3-games'>
-        {topGames.slice(0, SPECIAL_GAMES_COUNT).map((game) => (
-          <TopGameBlock game={game} key={`${game.id}-playtime`} />
-        ))}
-      </div>
+    <MetricWrapper id={metricId}>
+      <div className='games-playtime'>
+        <div className='top-3-games'>
+          {topGames.slice(0, SPECIAL_GAMES_COUNT).map((game) => (
+            <TopGameBlock game={game} key={`${game.id}-playtime`} />
+          ))}
+        </div>
 
-      <GamesPlaytimeTable data={topGames.slice(SPECIAL_GAMES_COUNT)} />
-    </div>
+        <GamesPlaytimeTable data={topGames.slice(SPECIAL_GAMES_COUNT)} />
+      </div>
+    </MetricWrapper>
+  );
+}
+
+export default function GamesPlaytime(props: MetricContentProps) {
+  return (
+    <Suspense fallback={<GamesPlaytimeSkeleton />}>
+      <TopGamesPlaytime {...props} />
+    </Suspense>
   );
 }
