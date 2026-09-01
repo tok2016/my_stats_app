@@ -1,7 +1,5 @@
 import { Suspense } from 'react';
 
-import Link from 'next/link';
-
 import Game from '@ts/games/game';
 import { MetricId } from '@ts/games/metric';
 import { StudioRatingMetric, StudioType } from '@ts/games/studio';
@@ -22,6 +20,7 @@ type HighestRatedStudiosProps = {
   metricId: MetricId;
   studios: ObjectMapArray<Game['developers'][number], 'id'>;
   type: StudioType;
+  userId: string;
 };
 
 type RatedStudioProps = {
@@ -41,9 +40,7 @@ function RatedStudio({ ratedStudio, studio }: RatedStudioProps) {
       <div className='data-block-content'>
         <span className='min'>Best game:</span>
         <GameCover game={topGame} />
-        <Link href={`/games/titles/${topGame.id}`} className='small underline'>
-          {topGame.name}
-        </Link>
+        <span className='small underline'>{topGame.name}</span>
       </div>
 
       <MultipleRating
@@ -58,14 +55,16 @@ function RatedStudio({ ratedStudio, studio }: RatedStudioProps) {
 async function HighestRatedStudios({
   metricId,
   studios,
-  type
+  type,
+  userId
 }: HighestRatedStudiosProps) {
-  const searchParams = new URLSearchParams({
-    field: StudiosGameCoreFields[type]
-  });
   const studiosRatingData = await getMetricData<StudioRatingMetric[]>(
-    `/api/games/studios/rating?${searchParams.toString()}`,
-    []
+    '/api/games/studios/rating',
+    [],
+    userId,
+    {
+      field: StudiosGameCoreFields[type]
+    }
   );
 
   return (
@@ -90,7 +89,8 @@ async function HighestRatedStudios({
 export default function StudiosRatings({
   games,
   metricId,
-  type
+  type,
+  userId
 }: StudiosMetricContentProps) {
   const studios = games.flatMapByKey<Game['developers'][number], 'id'>(
     (game) => game[StudiosGameFields[type]],
@@ -99,7 +99,12 @@ export default function StudiosRatings({
 
   return (
     <Suspense fallback={<StudiosRatingSkeleton metricId={metricId} />}>
-      <HighestRatedStudios type={type} metricId={metricId} studios={studios} />
+      <HighestRatedStudios
+        type={type}
+        metricId={metricId}
+        studios={studios}
+        userId={userId}
+      />
     </Suspense>
   );
 }

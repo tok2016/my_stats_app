@@ -18,6 +18,7 @@ type HighestRatedPlatformsProps = {
   metricId: MetricId;
   platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>;
   genres: ObjectMapArray<Game['genres'][number], 'id'>;
+  userId: string;
 };
 
 type RatedPlatformProps = {
@@ -68,11 +69,13 @@ function RatedPlatform({
 async function HighestRatedPlatforms({
   metricId,
   platforms,
-  genres
+  genres,
+  userId
 }: HighestRatedPlatformsProps) {
   const ratedPlatforms = await getMetricData<PlatformRatingData[]>(
     '/api/games/platforms/rating',
-    []
+    [],
+    userId
   );
 
   return (
@@ -97,7 +100,8 @@ async function HighestRatedPlatforms({
 
 export default function PlatformsRatings({
   games,
-  metricId
+  metricId,
+  userId
 }: MetricContentProps) {
   const platforms = games.mapByKey<Game['platform'], 'id'>(
     (game) => game.platform,
@@ -114,6 +118,7 @@ export default function PlatformsRatings({
         metricId={metricId}
         platforms={platforms}
         genres={genres}
+        userId={userId}
       />
     </Suspense>
   );

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getPlaytimeMetric } from '@lib/metrics/playtime-metric';
 
 const getPlatformsPlaytime: GameEndpointAction<
@@ -15,4 +15,4 @@ const getPlatformsPlaytime: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getPlatformsPlaytime);
+export const GET = gameMetricEndpoint(getPlatformsPlaytime);

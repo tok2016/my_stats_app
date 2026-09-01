@@ -1,6 +1,6 @@
 @use 'sass:map';
-@use '../../styles/utils';
-@use '../../styles/metrics';
+@use 'utils';
+@use 'metrics';
 
 $series-collage-areas: (
   0: a,
@@ -165,13 +165,6 @@ $series-collage-areas: (
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 2em;
-}
-
-.period-game {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.25em;
 }
 
 .top-series {

@@ -35,13 +35,9 @@ $frame-start-width: 200px;
 }
 
 .profile-info {
-  position: absolute;
-  top: 0;
-  left: 0;
-
   box-sizing: border-box;
-  width: 100vw;
-  padding: utils.$layout-padding;
+  width: 100%;
+  padding: 1.5em;
 
   display: grid;
   grid-template-columns: $avatar-width 1fr min-content;
@@ -49,7 +45,8 @@ $frame-start-width: 200px;
   font-size: utils.$regular-size;
 
   background-color: map.get(utils.$bg-1-colors, 'user');
-  border-bottom: solid 4px map.get(utils.$bg-2-colors, 'user');
+  border-bottom: solid 3px map.get(utils.$text-colors, 'user');
+  border-radius: 1em;
 
   .avatar {
     width: $avatar-width;
@@ -86,13 +83,6 @@ $frame-start-width: 200px;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-}
-
-.profile {
-  .profile-info {
-    padding-left: utils.$layout-padding + sidebar.$sidebar-icon-width +
-      sidebar.$sidebar-padding-x * 2;
-  }
 }
 
 .country {

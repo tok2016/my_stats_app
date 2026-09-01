@@ -7,6 +7,8 @@ import {
 
 import Divider from '@components/Divider';
 import Skeleton from '@components/Skeleton';
+import { ChartSkeleton } from '@components/charts/ChartSkeleton';
+import { ChartClasses } from '@components/charts/chart-styles';
 
 import MetricWrapper from './MetricWrapper';
 
@@ -15,6 +17,8 @@ type PeriodTopsSkeletonsProps = {
   blockWidthRem?: number;
   gapRem?: number;
   periodTopClassName?: string;
+  barClassName?: string;
+  showBar?: boolean;
 };
 
 const SKELETONS_COUNT = 10;
@@ -73,7 +77,9 @@ export default function PeriodTopsSkeletons({
   metricId,
   blockWidthRem = DEFAULT_PERIOD_BLOCK_WIDTH,
   gapRem = DEFAULT_PERIOD_BLOCKS_GAP,
-  periodTopClassName
+  periodTopClassName = '',
+  showBar,
+  barClassName = ''
 }: PeriodTopsSkeletonsProps) {
   return (
     <MetricWrapper
@@ -96,6 +102,13 @@ export default function PeriodTopsSkeletons({
           </Divider>
         </div>
       </div>
+
+      {showBar && (
+        <ChartSkeleton
+          type='periodBar'
+          className={`${ChartClasses.periodBar.container} ${barClassName}`}
+        />
+      )}
     </MetricWrapper>
   );
 }

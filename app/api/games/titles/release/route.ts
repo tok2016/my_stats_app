@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getYearCountMetric } from '@lib/metrics/year-count-metric';
 
 const getReleasesPerYear: GameEndpointAction<
@@ -16,4 +16,4 @@ const getReleasesPerYear: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getReleasesPerYear);
+export const GET = gameMetricEndpoint(getReleasesPerYear);

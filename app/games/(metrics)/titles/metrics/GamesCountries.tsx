@@ -14,12 +14,17 @@ import { GameCountryChartData } from '../types';
 
 type FetchGamesCountriesProps = {
   metricId: MetricId;
+  userId: string;
 };
 
-async function FetchGamesCountries({ metricId }: FetchGamesCountriesProps) {
+async function FetchGamesCountries({
+  metricId,
+  userId
+}: FetchGamesCountriesProps) {
   const countriesData = await getMetricData<GameCountryMetric[]>(
     '/api/games/titles/countries',
-    []
+    [],
+    userId
   );
 
   const chartData: GameCountryChartData[] = countriesData.map((country, i) => ({
@@ -39,10 +44,13 @@ async function FetchGamesCountries({ metricId }: FetchGamesCountriesProps) {
   );
 }
 
-export default function GamesCountries({ metricId }: MetricContentProps) {
+export default function GamesCountries({
+  metricId,
+  userId
+}: MetricContentProps) {
   return (
     <Suspense fallback={<GamesCountriesSkeleton />}>
-      <FetchGamesCountries metricId={metricId} />
+      <FetchGamesCountries metricId={metricId} userId={userId} />
     </Suspense>
   );
 }

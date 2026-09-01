@@ -4,7 +4,7 @@ import { useEffect, useMemo } from 'react';
 
 import Game from '@ts/games/game';
 import { GenreTop } from '@ts/games/genre';
-import { GreatPeriod, MetricContentProps } from '@ts/games/metric';
+import { GreatPeriod, MetricClientContentProps } from '@ts/games/metric';
 import { Option } from '@ts/ui/components-props';
 
 import { useAction } from '@lib/hooks';
@@ -46,11 +46,12 @@ const greatPeriodOptions: Option[] = GreatPeriods.map((period) => ({
   key: period
 }));
 
-const getGenreTops = async (params?: GreatPeriod) => {
+const getGenreTops = (userId: string) => async (params?: GreatPeriod) => {
   const searchParams = new URLSearchParams({ period: params ?? '' });
   const genresTops = await getMetricData<GenreTop[]>(
     `/api/games/genres/topGames?${searchParams.toString()}`,
-    []
+    [],
+    userId
   );
 
   return genresTops;
@@ -103,19 +104,24 @@ function GenreTopBlock({ top, games, genres, index }: GenreTopBlockProps) {
   );
 }
 
-export default function GenreTops({ metricId, games }: MetricContentProps) {
+export default function GenreTops({
+  metricId,
+  games,
+  userId
+}: MetricClientContentProps) {
   const [genresTops, updateGenresTops, isPending] = useAction(
-    getGenreTops,
+    getGenreTops(userId),
     null
   );
 
+  const gamesMapArray = useMemo(() => new ObjectMapArray(games, 'id'), [games]);
   const genres = useMemo(
     () =>
-      games.flatMapByKey<Game['genres'][number], 'id'>(
-        (game) => game.genres,
+      gamesMapArray.flatMapByKey<Game['genres'][number], 'id'>(
+        (gamesMapArray) => gamesMapArray.genres,
         'id'
       ),
-    [games]
+    [gamesMapArray]
   );
 
   const onPeriodSelect = (value: string) => {
@@ -150,7 +156,7 @@ export default function GenreTops({ metricId, games }: MetricContentProps) {
           <GenreTopBlock
             key={`${genreTop.id}-top`}
             top={genreTop}
-            games={games}
+            games={gamesMapArray}
             genres={genres}
             index={i}
           />

@@ -4,7 +4,7 @@ import { Share, Wrench } from '@mynaui/icons-react';
 
 import Link from 'next/link';
 
-import { User } from '@ts/users/user';
+import { UserSet } from '@ts/users/user';
 
 import IconButton from '@components/IconButton';
 import Logo from '@components/Logo';
@@ -15,7 +15,7 @@ import PublishButton from '../publish-controlls/PublishButton';
 import ProfileCreditsSkeleton from './ProfileCreditsSkeleton';
 
 type ProfileInfoProps = {
-  user: User;
+  user: UserSet;
   authorized?: boolean;
   loading?: boolean;
 };
@@ -84,10 +84,9 @@ export default function ProfileInfo({
         </div>
       )}
 
-      <div className='profile-meta'>
-        <Logo />
-
-        {!authorized || (
+      {authorized && (
+        <div className='profile-meta'>
+          <Logo />
           <div className='profile-controlls'>
             <PublishButton isPublic={user.isPublic} loading={loading} />
 
@@ -102,8 +101,8 @@ export default function ProfileInfo({
               <IconButton icon={<Wrench />} />
             </Link>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

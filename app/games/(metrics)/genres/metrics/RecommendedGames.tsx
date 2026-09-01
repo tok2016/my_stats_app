@@ -11,10 +11,19 @@ import RecommendedGameBlock from '@app/games/components/RecommendedGameBlock';
 
 import RecommendedGamesSkeletons from '../skeletons/RecommendedGamesSkeletons';
 
-async function RecommendedGamesList({ metricId }: { metricId: MetricId }) {
+type RecommendedGamesListProps = {
+  metricId: MetricId;
+  userId: string;
+};
+
+async function RecommendedGamesList({
+  metricId,
+  userId
+}: RecommendedGamesListProps) {
   const recommendations = await getMetricData<RecommendedGame[]>(
     '/api/games/genres/recommend',
-    []
+    [],
+    userId
   );
 
   return (
@@ -28,10 +37,13 @@ async function RecommendedGamesList({ metricId }: { metricId: MetricId }) {
   );
 }
 
-export default function RecommendedGames({ metricId }: MetricContentProps) {
+export default function RecommendedGames({
+  metricId,
+  userId
+}: MetricContentProps) {
   return (
     <Suspense fallback={<RecommendedGamesSkeletons />}>
-      <RecommendedGamesList metricId={metricId} />
+      <RecommendedGamesList metricId={metricId} userId={userId} />
     </Suspense>
   );
 }

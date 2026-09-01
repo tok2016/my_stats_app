@@ -12,7 +12,8 @@ import GenresPlaytime from './GenresPlaytime';
 
 export default function GenresCountPlaytime({
   metricId,
-  games
+  games,
+  userId
 }: MetricContentProps) {
   const series = games.mapByKey<Game['series'], 'id'>(
     (game) => game.series,
@@ -27,27 +28,25 @@ export default function GenresCountPlaytime({
   return (
     <MetricWrapper id={metricId}>
       <div className='double-doughnut'>
-        <div className='double-doughnut'>
-          <Submetric id='genres-count'>
-            <Suspense
-              fallback={
-                <ChartSkeleton type='doughnut' className='switchable-chart' />
-              }
-            >
-              <GenresCount genres={genres} seriesArray={series} />
-            </Suspense>
-          </Submetric>
+        <Submetric id='genres-count'>
+          <Suspense
+            fallback={
+              <ChartSkeleton type='doughnut' className='switchable-chart' />
+            }
+          >
+            <GenresCount genres={genres} seriesArray={series} userId={userId} />
+          </Suspense>
+        </Submetric>
 
-          <Submetric id='genres-playtime'>
-            <Suspense
-              fallback={
-                <ChartSkeleton type='doughnut' className='switchable-chart' />
-              }
-            >
-              <GenresPlaytime genres={genres} />
-            </Suspense>
-          </Submetric>
-        </div>
+        <Submetric id='genres-playtime'>
+          <Suspense
+            fallback={
+              <ChartSkeleton type='doughnut' className='switchable-chart' />
+            }
+          >
+            <GenresPlaytime genres={genres} userId={userId} />
+          </Suspense>
+        </Submetric>
       </div>
     </MetricWrapper>
   );

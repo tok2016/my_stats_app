@@ -14,12 +14,16 @@ import GamesLineChart from '../charts/GamesLineChart';
 import GameYearsSkeleton from '../skeletons/GameYearsSkeleton';
 import { GameYearChartData } from '../types';
 
-type FetchGamePlayDatesProps = { metricId: MetricId };
+type FetchGamePlayDatesProps = { metricId: MetricId; userId: string };
 
-async function FetchGamePlayDates({ metricId }: FetchGamePlayDatesProps) {
+async function FetchGamePlayDates({
+  metricId,
+  userId
+}: FetchGamePlayDatesProps) {
   const years = await getMetricData<YearCountMetric[]>(
     '/api/games/titles/playdate',
-    []
+    [],
+    userId
   );
 
   const chartData: GameYearChartData[] = years.map((year) => ({
@@ -38,10 +42,13 @@ async function FetchGamePlayDates({ metricId }: FetchGamePlayDatesProps) {
   );
 }
 
-export default function GamePlayDates({ metricId }: MetricContentProps) {
+export default function GamePlayDates({
+  metricId,
+  userId
+}: MetricContentProps) {
   return (
     <Suspense fallback={<GameYearsSkeleton metricId={metricId} />}>
-      <FetchGamePlayDates metricId={metricId} />
+      <FetchGamePlayDates metricId={metricId} userId={userId} />
     </Suspense>
   );
 }

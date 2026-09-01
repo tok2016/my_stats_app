@@ -1,15 +1,16 @@
 import { GameGenresMetricsIds } from '@lib/metrics/metrics-id';
-import { getGames } from '@lib/server-actions';
+import { getGames, getUserSet } from '@lib/server-actions';
 
 import Metric from '../Metric';
 
 export default async function GamesGenresPage() {
-  const games = await getGames();
+  const user = await getUserSet();
+  const games = await getGames(user.id);
 
   return (
     <>
-      {GameGenresMetricsIds.forEach((metricId) => (
-        <Metric id={metricId} games={games} key={metricId} />
+      {GameGenresMetricsIds.map((metricId) => (
+        <Metric id={metricId} games={games} key={metricId} userId={user.id} />
       ))}
     </>
   );

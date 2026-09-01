@@ -118,6 +118,17 @@ $min-data-rank-width: 2em;
   }
 }
 
+.ranked-entry {
+  display: grid;
+  grid-template-columns: 1.25em 1fr;
+  align-items: center;
+  gap: 2px;
+
+  > svg {
+    font-size: 1.25em;
+  }
+}
+
 .select-title {
   display: flex;
   align-items: flex-end;

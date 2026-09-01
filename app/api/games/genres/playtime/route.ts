@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getPlaytimeMetric } from '@lib/metrics/playtime-metric';
 
 const getGenresHours: GameEndpointAction<'/api/games/genres/playtime'> = async (
@@ -18,4 +18,4 @@ const getGenresHours: GameEndpointAction<'/api/games/genres/playtime'> = async (
   });
 };
 
-export const GET = gameEndpoint(getGenresHours);
+export const GET = gameMetricEndpoint(getGenresHours);

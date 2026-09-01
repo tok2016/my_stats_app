@@ -5,7 +5,7 @@ import { StudioField } from '@ts/games/metric';
 import { StudioRatingMetric } from '@ts/games/studio';
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getAverageRating } from '@lib/games/games-utils';
 import { igdbRequest } from '@lib/games/igdb';
 import { getRatingMetric } from '@lib/metrics/rating-metric';
@@ -62,4 +62,4 @@ const getStudiosRating: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getStudiosRating);
+export const GET = gameMetricEndpoint(getStudiosRating);

@@ -8,7 +8,7 @@ import {
 } from '@ts/games/studio';
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getPeriodMetric } from '@lib/metrics/periods-metric';
 
 const STUDIOS_IN_PERIOD = 1;
@@ -77,4 +77,4 @@ const getStudiosPeriods: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getStudiosPeriods);
+export const GET = gameMetricEndpoint(getStudiosPeriods);

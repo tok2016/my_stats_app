@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-
 import { StudioType } from '@ts/games/studio';
 
 import AdjacentChart from '@components/charts/AdjacentChart';
@@ -48,13 +46,9 @@ export default function StudiosCountChart({
             title: StudioTypeTitles[type],
             width: '1fr',
             renderRow: (value) => (
-              <Link
-                href={`/games/studios/${value.id}`}
-                data-rank={value.index}
-                className='bold colored'
-              >
+              <span data-rank={value.index} className='bold colored'>
                 {value.name}
-              </Link>
+              </span>
             )
           },
           count: {
@@ -68,14 +62,7 @@ export default function StudiosCountChart({
           topGame: {
             title: 'Longest played game',
             width: '1fr',
-            renderRow: (value) => (
-              <Link
-                href={`/games/titles/${value.topGame.id}`}
-                className='underline'
-              >
-                {value.topGame.name}
-              </Link>
-            )
+            renderRow: (value) => value.topGame.name
           }
         }}
       />

@@ -8,7 +8,7 @@ import {
 import { MetricMap } from '@ts/games/metric';
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { formRecommendedGame } from '@lib/games/games-utils';
 import { igdbRequest } from '@lib/games/igdb';
 import { TOP_ENTRIES } from '@lib/utils';
@@ -19,7 +19,7 @@ const MIN_RATING = 75;
 const MIN_RATINGS_COUNT = 100;
 
 const getGamesByGenres = async (
-  gamesApiIds: string[],
+  gamesApiIds: number[],
   genres: string[],
   tags: string,
   platforms: string
@@ -98,7 +98,7 @@ const getRecommnededGames: GameEndpointAction<
     .join(',');
 
   const recommendedGames = await getGamesByGenres(
-    games.map((game) => game.id).toArray(),
+    games.map((game) => game.apiId).toArray(),
     sortedGenres.slice(0, TOP_ENTRIES),
     favoriteTags,
     platforms
@@ -110,4 +110,4 @@ const getRecommnededGames: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getRecommnededGames);
+export const GET = gameMetricEndpoint(getRecommnededGames);

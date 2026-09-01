@@ -1,14 +1,11 @@
 import { Suspense } from 'react';
 
-import Link from 'next/link';
-
 import { GameTableData } from '@ts/games/game';
 import { MetricContentProps } from '@ts/games/metric';
 
 import { getMetricData } from '@lib/server-actions';
 
 import GameCollage from '@components/data-blocks/GameCollage';
-import { LinksString } from '@components/data-blocks/LinksString';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import PropBlock from '../../../../components/data-blocks/PropBlock';
@@ -27,40 +24,19 @@ function TopGameBlock({ game }: TopGameBlockProps) {
       <GameCollage game={game} />
       <div className='data-block-grid min'>
         <PropBlock title='Developer'>
-          {game.developers.length ? (
-            <LinksString
-              baseEndpoint='/games/studios'
-              items={game.developers}
-              groupKey={`game-time-developer-${game.id}`}
-            />
-          ) : (
-            <span>—</span>
-          )}
+          {game.developers.length
+            ? game.developers.map((dev) => dev.name).join(', ')
+            : '—'}
         </PropBlock>
 
         <PropBlock title='Publisher'>
-          {game.publishers ? (
-            <LinksString
-              baseEndpoint='/games/studios'
-              items={game.publishers}
-              groupKey={`game-time-publisher-${game.id}`}
-            />
-          ) : (
-            <span>—</span>
-          )}
+          {game.publishers.length
+            ? game.publishers.map((dev) => dev.name).join(', ')
+            : '—'}
         </PropBlock>
 
         <PropBlock title='Platform'>
-          {game.platform ? (
-            <Link
-              href={`/games/platforms/${game.platform.id}`}
-              className='underline'
-            >
-              {game.platform.name}
-            </Link>
-          ) : (
-            <span>—</span>
-          )}
+          {game.platform ? game.platform.name : '—'}
         </PropBlock>
 
         <PropBlock title='Playtime'>
@@ -73,10 +49,15 @@ function TopGameBlock({ game }: TopGameBlockProps) {
   );
 }
 
-async function TopGamesPlaytime({ metricId, games }: MetricContentProps) {
+async function TopGamesPlaytime({
+  metricId,
+  games,
+  userId
+}: MetricContentProps) {
   const gamesIds = await getMetricData<string[]>(
     '/api/games/titles/playtime',
-    []
+    [],
+    userId
   );
 
   const topGames = gamesIds

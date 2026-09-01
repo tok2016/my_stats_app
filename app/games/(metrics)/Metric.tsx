@@ -8,11 +8,13 @@ import { GameMetrics } from './GameMetrics';
 type MetricProps = {
   id: GameMetricId;
   games: ObjectMapArray<Game, 'id'> | Array<Game>;
+  userId: string;
 };
 
-export default function Metric({ id, games }: MetricProps) {
+export default function Metric({ id, games, userId }: MetricProps) {
   return GameMetrics[id]({
     games: Array.isArray(games) ? new ObjectMapArray(games, 'id') : games,
-    metricId: id
+    metricId: id,
+    userId
   });
 }

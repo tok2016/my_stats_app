@@ -14,7 +14,7 @@ const renderDevelopersTop = (data?: CountryStudioChartData) =>
     <ol className='data-block-list'>
       {data.developers.map((developer, i) => (
         <li
-          className={`data-block-item ${i === 0 && 'colored bold'}`}
+          className={`data-block-item ${i === 0 && 'colored bold'} ranked-entry`}
           key={`${developer}-${data.id}`}
         >
           <RankIcon rank={i} />

@@ -16,12 +16,14 @@ import { GameYearChartData } from '../types';
 
 type FetchGameReleasesProps = {
   metricId: MetricId;
+  userId: string;
 };
 
-async function FetchGameReleases({ metricId }: FetchGameReleasesProps) {
+async function FetchGameReleases({ metricId, userId }: FetchGameReleasesProps) {
   const years = await getMetricData<YearCountMetric[]>(
     '/api/games/titles/release',
-    []
+    [],
+    userId
   );
 
   const chartData: GameYearChartData[] = years.map((year) => ({
@@ -40,10 +42,10 @@ async function FetchGameReleases({ metricId }: FetchGameReleasesProps) {
   );
 }
 
-export default function GameReleases({ metricId }: MetricContentProps) {
+export default function GameReleases({ metricId, userId }: MetricContentProps) {
   return (
     <Suspense fallback={<GameYearsSkeleton metricId={metricId} />}>
-      <FetchGameReleases metricId={metricId} />
+      <FetchGameReleases metricId={metricId} userId={userId} />
     </Suspense>
   );
 }

@@ -3,7 +3,6 @@
 import { Check, Plus } from '@mynaui/icons-react';
 
 import { MetricId } from '@ts/games/metric';
-import { User, UserUpdate } from '@ts/users/user';
 
 import AxiosInstanse from '@lib/axios-instanse';
 import { useAction } from '@lib/hooks';
@@ -25,17 +24,20 @@ const toggleMetric =
   async (metricId?: MetricId) => {
     if (!metricId) return 'Metric ID was not given';
 
-    const updatedMetrics = new Set(user.metrics);
-    if (updatedMetrics.has(metricId)) updatedMetrics.delete(metricId);
-    else updatedMetrics.add(metricId);
-
-    const userUpdate: UserUpdate = {
-      metrics: updatedMetrics.values().toArray()
-    };
+    const isStored = user.metrics.has(metricId);
 
     try {
-      const response = await AxiosInstanse.put<User>('/api/user', userUpdate);
-      updateUser({ user: { ...response.data, metrics: updatedMetrics } });
+      const response = isStored
+        ? await AxiosInstanse.put<MetricId[]>(
+            `/api/user/${user.id}/dashboard`,
+            metricId
+          )
+        : await AxiosInstanse.post<MetricId[]>(
+            `/api/user/${user.id}/dashboard`,
+            metricId
+          );
+
+      updateUser({ user: { ...user, metrics: new Set(response.data) } });
       return response.statusText;
     } catch (err) {
       return getErrorFormState(err).message;

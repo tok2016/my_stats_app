@@ -4,7 +4,7 @@ import { CodeCircleSolid, EarthSolid } from '@mynaui/icons-react';
 
 import Game from '@ts/games/game';
 import {
-  MetricContentProps,
+  MetricClientContentProps,
   PeriodTopsMetric,
   PrecisePeriod
 } from '@ts/games/metric';
@@ -20,19 +20,21 @@ import { StudioFullPeriodTopData } from '../types';
 const getStudioPeriodMetric =
   (
     developers: ObjectMapArray<Game['developers'][number], 'id'>,
-    publishers: ObjectMapArray<Game['publishers'][number], 'id'>
+    publishers: ObjectMapArray<Game['publishers'][number], 'id'>,
+    userId: string
   ) =>
   async (
     periodType?: PrecisePeriod
   ): Promise<PeriodTopsMetric<StudioFullPeriodTopData>> => {
-    const searchParams = new URLSearchParams({
-      period: periodType ?? 'season'
-    });
     const periodMetric = await getMetricData<StudiosPeriodMetric>(
-      `/api/games/studios/periods?${searchParams.toString()}`,
+      '/api/games/studios/periods',
       {
         periodType: 'season',
         tops: []
+      },
+      userId,
+      {
+        period: periodType ?? 'season'
       }
     );
 
@@ -67,22 +69,24 @@ const studioItemContent = (item: StudioFullPeriodTopData) => (
 
 export default function StudiosPeriodTops({
   metricId,
-  games
-}: MetricContentProps) {
-  const developers = games.flatMapByKey<Game['developers'][number], 'id'>(
-    (game) => game.developers,
+  games,
+  userId
+}: MetricClientContentProps) {
+  const gamesMapArray = new ObjectMapArray(games, 'id');
+  const developers = gamesMapArray.flatMapByKey<
+    Game['developers'][number],
     'id'
-  );
-  const publishers = games.flatMapByKey<Game['publishers'][number], 'id'>(
-    (game) => game.publishers,
+  >((game) => game.developers, 'id');
+  const publishers = gamesMapArray.flatMapByKey<
+    Game['publishers'][number],
     'id'
-  );
+  >((game) => game.publishers, 'id');
 
   return (
     <PeriodTops
       id={metricId}
       listItemContent={studioItemContent}
-      getPeriodMetric={getStudioPeriodMetric(developers, publishers)}
+      getPeriodMetric={getStudioPeriodMetric(developers, publishers, userId)}
       displayFields={['hours']}
       valueField='hours'
       fieldsNames={{

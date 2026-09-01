@@ -32,8 +32,7 @@ export interface UserLogin {
 }
 
 export type UserUpdate = Partial<
-  Omit<UserInfo, 'id' | 'metrics' | 'avatarUrl'>
-    & Pick<Credentials, 'email'> & { metrics: MetricId[] }
+  Omit<UserInfo, 'id' | 'metrics' | 'avatarUrl'> & Pick<Credentials, 'email'>
 >;
 
 export type UserClientUpdate = UserUpdate

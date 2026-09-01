@@ -4,6 +4,6 @@ import { GameMetricsSkeletons } from '../GameMetrics';
 
 export default function GenresLoading() {
   return (
-    <>{GameGenresMetricsIds.forEach((genre) => GameMetricsSkeletons[genre])}</>
+    <>{GameGenresMetricsIds.map((genre) => GameMetricsSkeletons[genre])}</>
   );
 }

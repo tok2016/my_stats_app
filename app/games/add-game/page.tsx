@@ -1,6 +1,6 @@
 import { SearchGame } from '@ts/games/game';
 
-import { getMetricData } from '@lib/server-actions';
+import { getData } from '@lib/server-actions';
 
 import GameRatingForm from './components/GameRatingForm';
 import SearchGameForm from './components/SearchGameForm';
@@ -16,10 +16,7 @@ export default async function AddGamePage({
 }) {
   const { gameId } = await searchParams;
   const game = gameId
-    ? await getMetricData<SearchGame | null>(
-        `/api/games/search/${gameId}`,
-        null
-      )
+    ? await getData<SearchGame | null>(`/api/games/search/${gameId}`, null)
     : undefined;
 
   if (!game) return <SearchGameForm />;

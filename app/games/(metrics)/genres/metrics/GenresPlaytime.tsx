@@ -11,12 +11,17 @@ import { GenresPlaytimeData } from '../types';
 
 type GenresPlaytimeProps = {
   genres: ObjectMapArray<Game['genres'][number], 'id'>;
+  userId: string;
 };
 
-export default async function GenresPlaytime({ genres }: GenresPlaytimeProps) {
+export default async function GenresPlaytime({
+  genres,
+  userId
+}: GenresPlaytimeProps) {
   const playtimeData = await getMetricData<PlaytimeData[]>(
     '/api/games/genres/playtime',
-    []
+    [],
+    userId
   );
 
   const genresPlaytimeData: GenresPlaytimeData[] = playtimeData.map(

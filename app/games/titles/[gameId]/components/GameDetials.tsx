@@ -1,9 +1,6 @@
-import Link from 'next/link';
-
 import { GameDetailed } from '@ts/games/game';
 
 import GameCover from '@components/data-blocks/GameCover';
-import { LinksString } from '@components/data-blocks/LinksString';
 import PropBlock from '@components/data-blocks/PropBlock';
 
 import ScreenshotsCarousel from './ScreenshotsCarousel';
@@ -30,16 +27,7 @@ export default function GameDetails({ game }: GameDetailsProps) {
       <div className='game-detials-info'>
         <div className='game-details-info-block'>
           <PropBlock title='Platfrom'>
-            {game.platform ? (
-              <Link
-                href={`/games/platforms/${game.platform.id}`}
-                className='underline'
-              >
-                {game.platform.name}
-              </Link>
-            ) : (
-              <span>—</span>
-            )}
+            {game.platform ? game.platform.name : '—'}
           </PropBlock>
 
           <PropBlock title='Release date'>
@@ -72,54 +60,27 @@ export default function GameDetails({ game }: GameDetailsProps) {
 
         <div className='game-details-info-block'>
           <PropBlock title='Developers'>
-            {game.developers.length ? (
-              <LinksString
-                baseEndpoint='/games/studios'
-                items={game.developers}
-                groupKey='developers'
-              />
-            ) : (
-              <span>—</span>
-            )}
+            {game.developers.length
+              ? game.developers.map((dev) => dev.name).join(', ')
+              : '—'}
           </PropBlock>
 
           <PropBlock title='Publishers'>
-            {game.publishers.length ? (
-              <LinksString
-                baseEndpoint='/games/studios'
-                items={game.publishers}
-                groupKey='publishers'
-              />
-            ) : (
-              <span>—</span>
-            )}
+            {game.publishers.length
+              ? game.publishers.map((pub) => pub.name).join(', ')
+              : '—'}
           </PropBlock>
 
           <PropBlock title='Series'>
-            {game.series ? (
-              <Link
-                href={`/games/series/${game.series.id}`}
-                className='underline'
-              >
-                {game.series.name}
-              </Link>
-            ) : (
-              <span>—</span>
-            )}
+            {game.series ? game.series.name : '—'}
           </PropBlock>
         </div>
 
         <div className='game-details-info-block'>
           <PropBlock title='Genres'>
-            {game.genres.length ? (
-              <LinksString
-                baseEndpoint='/games/genres'
-                items={game.genres}
-                groupKey='genres'
-              />
-            ) : (
-              <span>—</span>
-            )}
+            {game.genres.length
+              ? game.genres.map((genre) => genre.name).join(', ')
+              : '—'}
           </PropBlock>
 
           <PropBlock title='Themes'>

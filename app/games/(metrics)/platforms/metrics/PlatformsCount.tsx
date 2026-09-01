@@ -10,15 +10,18 @@ import { PlatformCountChartData } from '../types';
 type PlatformsCountProps = {
   platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>;
   seriesArray: ObjectMapArray<NonNullable<Game['series']>, 'id'>;
+  userId: string;
 };
 
 export default async function PlatformsCount({
   platforms,
-  seriesArray
+  seriesArray,
+  userId
 }: PlatformsCountProps) {
   const platformsCountData = await getMetricData<CountData[]>(
     '/api/games/platforms/count',
-    []
+    [],
+    userId
   );
 
   const chartData: PlatformCountChartData[] = platformsCountData.map(

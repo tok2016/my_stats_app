@@ -25,8 +25,6 @@ import {
 
 import Divider from '@components/Divider';
 import Select from '@components/Select';
-import { ChartSkeleton } from '@components/charts/ChartSkeleton';
-import { ChartClasses } from '@components/charts/chart-styles';
 
 import MetricWrapper from './MetricWrapper';
 import PeriodBarChart from './PeriodBarChart';
@@ -171,7 +169,7 @@ export default function PeriodTops<
     }, [periodMetricData]);
 
   useEffect(() => {
-    updatePeriodMetric('month');
+    updatePeriodMetric('season');
   }, [updatePeriodMetric]);
 
   useEffect(() => {
@@ -198,6 +196,8 @@ export default function PeriodTops<
         periodTopClassName={periodTopClassName}
         blockWidthRem={blockWidthRem}
         gapRem={gapRem}
+        showBar={showBar}
+        barClassName={barClassName}
       />
     );
 
@@ -211,7 +211,7 @@ export default function PeriodTops<
           <Select
             id={`${id}-select`}
             name={`${id}-select`}
-            defaultValue='month'
+            defaultValue={periodMetricData.periodType}
             variant='text'
             options={periodTypeOptions}
             onSelect={onPeriodSelect}
@@ -261,27 +261,21 @@ export default function PeriodTops<
         </div>
       </div>
 
-      {showBar
-        && (!periodMetricData ? (
-          <ChartSkeleton
-            type='periodBar'
-            className={`${ChartClasses.periodBar.container} ${barClassName}`}
-          />
-        ) : (
-          <PeriodBarChart
-            year={year}
-            className={barClassName}
-            periodType={periodMetricData.periodType}
-            chartId={`${id}-bar`}
-            data={setTopsIndexes(
-              periodMetricData.periodType,
-              periodMetricData.tops
-            )}
-            displayFields={displayFields}
-            fieldsNames={fieldsNames}
-            valueField={valueField}
-          />
-        ))}
+      {showBar && (
+        <PeriodBarChart
+          year={year}
+          className={barClassName}
+          periodType={periodMetricData.periodType}
+          chartId={`${id}-bar`}
+          data={setTopsIndexes(
+            periodMetricData.periodType,
+            periodMetricData.tops
+          )}
+          displayFields={displayFields}
+          fieldsNames={fieldsNames}
+          valueField={valueField}
+        />
+      )}
     </MetricWrapper>
   );
 }

@@ -18,6 +18,7 @@ type FetchStudiosCountPlaytimeProps = {
   metricId: MetricId;
   studios: ObjectMapArray<Game['developers'][number], 'id'>;
   type: StudioType;
+  userId: string;
 };
 
 const StudiosTypeFields: Record<StudioType, keyof GameCore> = {
@@ -28,12 +29,14 @@ const StudiosTypeFields: Record<StudioType, keyof GameCore> = {
 async function FetchtudiosCountPlaytime({
   studios,
   type,
-  metricId
+  metricId,
+  userId
 }: FetchStudiosCountPlaytimeProps) {
-  const searchParams = new URLSearchParams({ field: StudiosTypeFields[type] });
   const playtimeData = await getMetricData<PlaytimeData[]>(
-    `/api/games/studios/count?${searchParams.toString()}`,
-    []
+    '/api/games/studios/count',
+    [],
+    userId,
+    { field: StudiosTypeFields[type] }
   );
 
   const chartData: StudioCountData[] = playtimeData
@@ -58,7 +61,8 @@ async function FetchtudiosCountPlaytime({
 export default async function StudiosCountPlaytime({
   metricId,
   games,
-  type
+  type,
+  userId
 }: StudiosMetricContentProps) {
   const studios = games.flatMapByKey<Game['developers'][number], 'id'>(
     (game) => game[StudiosGameFields[type]],
@@ -71,6 +75,7 @@ export default async function StudiosCountPlaytime({
         metricId={metricId}
         type={type}
         studios={studios}
+        userId={userId}
       />
     </Suspense>
   );

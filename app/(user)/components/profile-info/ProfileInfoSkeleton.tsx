@@ -16,10 +16,12 @@ export default function ProfileInfoSkeleton({
       <Avatar username='' loading />
       <ProfileCreditsSkeleton />
 
-      <div className='profile-meta'>
-        <Logo />
-        {!authorized || <ProfileControlsSkeleton />}
-      </div>
+      {authorized && (
+        <div className='profile-meta'>
+          <Logo />
+          <ProfileControlsSkeleton />
+        </div>
+      )}
     </div>
   );
 }

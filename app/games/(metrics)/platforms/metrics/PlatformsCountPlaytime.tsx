@@ -12,7 +12,8 @@ import PlatformsPlaytime from './PlatformsPlaytime';
 
 export default function PlatformsCountPlaytime({
   metricId,
-  games
+  games,
+  userId
 }: MetricContentProps) {
   const series = games.mapByKey<Game['series'], 'id'>(
     (game) => game.series,
@@ -26,25 +27,29 @@ export default function PlatformsCountPlaytime({
   return (
     <MetricWrapper id={metricId}>
       <div className='double-doughnut'>
-        <Suspense
-          fallback={
-            <ChartSkeleton type='doughnut' className='switchable-chart' />
-          }
-        >
-          <Submetric id='platforms-count'>
-            <PlatformsCount platforms={platforms} seriesArray={series} />
-          </Submetric>
-        </Suspense>
+        <Submetric id='platforms-count'>
+          <Suspense
+            fallback={
+              <ChartSkeleton type='doughnut' className='switchable-chart' />
+            }
+          >
+            <PlatformsCount
+              platforms={platforms}
+              seriesArray={series}
+              userId={userId}
+            />
+          </Suspense>
+        </Submetric>
 
-        <Suspense
-          fallback={
-            <ChartSkeleton type='doughnut' className='switchable-chart' />
-          }
-        >
-          <Submetric id='platforms-playtime'>
-            <PlatformsPlaytime platforms={platforms} />
-          </Submetric>
-        </Suspense>
+        <Submetric id='platforms-playtime'>
+          <Suspense
+            fallback={
+              <ChartSkeleton type='doughnut' className='switchable-chart' />
+            }
+          >
+            <PlatformsPlaytime platforms={platforms} userId={userId} />
+          </Suspense>
+        </Submetric>
       </div>
     </MetricWrapper>
   );

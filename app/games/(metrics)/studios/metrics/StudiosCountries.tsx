@@ -17,15 +17,18 @@ import { CountryStudioChartData } from '../types';
 type FetchStudiosCountries = {
   developers: ObjectMapArray<Game['developers'][number], 'id'>;
   metricId: MetricId;
+  userId: string;
 };
 
 async function FetchStudiosCountries({
   metricId,
-  developers
+  developers,
+  userId
 }: FetchStudiosCountries) {
   const countriesData = await getMetricData<StudioCountryMetric[]>(
     '/api/games/studios/countries',
-    []
+    [],
+    userId
   );
 
   const countriesChartData: CountryStudioChartData[] = countriesData
@@ -49,7 +52,8 @@ async function FetchStudiosCountries({
 
 export default async function StudiosCountries({
   games,
-  metricId
+  metricId,
+  userId
 }: MetricContentProps) {
   const developers = games.flatMapByKey<Game['developers'][number], 'id'>(
     (game) => game.developers,
@@ -58,7 +62,11 @@ export default async function StudiosCountries({
 
   return (
     <Suspense fallback={<StudiosCountriesSkeleton />}>
-      <FetchStudiosCountries developers={developers} metricId={metricId} />
+      <FetchStudiosCountries
+        developers={developers}
+        metricId={metricId}
+        userId={userId}
+      />
     </Suspense>
   );
 }

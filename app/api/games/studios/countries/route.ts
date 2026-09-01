@@ -5,7 +5,7 @@ import { CountCompareData } from '@ts/games/metric';
 import { IgdbStudioCountry, StudioCountryMetric } from '@ts/games/studio';
 import { GameEndpointAction } from '@ts/requests';
 
-import { gameEndpoint } from '@lib/endpoint-generators';
+import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { igdbRequest } from '@lib/games/igdb';
 import ObjectMapArray from '@lib/object-map-array';
 import { MAX_ENTRIES_IN_CHART, TOP_ENTRIES } from '@lib/utils';
@@ -107,4 +107,4 @@ const getStudiosByCountry: GameEndpointAction<
   });
 };
 
-export const GET = gameEndpoint(getStudiosByCountry);
+export const GET = gameMetricEndpoint(getStudiosByCountry);

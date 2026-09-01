@@ -1,6 +1,7 @@
 import {
   GameGenresMetricsIds,
   GameTitlesMetricsIds,
+  MetricsIds,
   PlatformsMetricsIds,
   StudiosMetricsIds,
   SubmetricsId
@@ -17,7 +18,7 @@ export type GameMetricId =
   | (typeof PlatformsMetricsIds)[number]
   | (typeof GameTitlesMetricsIds)[number];
 
-export type MetricId = GameMetricId;
+export type MetricId = (typeof MetricsIds)[number];
 export type SubmetricId = (typeof SubmetricsId)[number];
 
 export type PrecisePeriod = (typeof PrecisePeriods)[number];
@@ -97,7 +98,12 @@ export interface YearCountMetric {
 
 export type MetricContentProps = {
   metricId: MetricId;
+  userId: string;
   games: ObjectMapArray<Game, 'id'>;
+};
+
+export type MetricClientContentProps = Omit<MetricContentProps, 'games'> & {
+  games: Game[];
 };
 
 export type MetricWrapperProps = {

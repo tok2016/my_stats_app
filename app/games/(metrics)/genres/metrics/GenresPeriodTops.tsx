@@ -2,7 +2,7 @@
 
 import Game from '@ts/games/game';
 import {
-  MetricContentProps,
+  MetricClientContentProps,
   PeriodPlaytimeTops,
   PeriodTopsMetric,
   PrecisePeriod
@@ -19,18 +19,19 @@ import { GenresPeriodPlaytimeData } from '../types';
 type Genre = Game['genres'][number];
 
 const getGenresPeriodTops =
-  (genres: ObjectMapArray<Genre, 'id'>) =>
+  (genres: ObjectMapArray<Genre, 'id'>, userId: string) =>
   async (
     periodType?: PrecisePeriod
   ): Promise<PeriodTopsMetric<GenresPeriodPlaytimeData>> => {
-    const searchParams = new URLSearchParams({
-      period: periodType ?? 'season'
-    });
     const periodTops = await getMetricData<PeriodPlaytimeTops>(
-      `/api/games/genres/periods?${searchParams.toString()}`,
+      '/api/games/genres/periods',
       {
         periodType: 'season',
         tops: []
+      },
+      userId,
+      {
+        period: periodType ?? 'season'
       }
     );
 
@@ -49,23 +50,27 @@ const getGenresPeriodTops =
   };
 
 const genreItemContent = (genre: GenresPeriodPlaytimeData, i: number) => (
-  <>
+  <div className='ranked-entry'>
     <RankIcon rank={i} />
     <span>{genre.name}</span>
-  </>
+  </div>
 );
 
 export default function GenresPeriodTops({
   metricId,
-  games
-}: MetricContentProps) {
-  const genres = games.flatMapByKey<Genre, 'id'>((game) => game.genres, 'id');
+  games,
+  userId
+}: MetricClientContentProps) {
+  const genres = new ObjectMapArray(games, 'id').flatMapByKey<Genre, 'id'>(
+    (game) => game.genres,
+    'id'
+  );
 
   return (
     <PeriodTops
       id={metricId}
       listItemContent={genreItemContent}
-      getPeriodMetric={getGenresPeriodTops(genres)}
+      getPeriodMetric={getGenresPeriodTops(genres, userId)}
       displayFields={['hours']}
       valueField='hours'
       showBar

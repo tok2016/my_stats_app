@@ -9,14 +9,17 @@ import { PlatformPlaytimeChartData } from '../types';
 
 type PlatformPlaytimeProps = {
   platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>;
+  userId: string;
 };
 
 export default async function PlatformsPlaytime({
-  platforms
+  platforms,
+  userId
 }: PlatformPlaytimeProps) {
   const platformsPlaytimeData = await getMetricData<PlaytimeData[]>(
     '/api/games/platforms/playtime',
-    []
+    [],
+    userId
   );
 
   const chartData: PlatformPlaytimeChartData[] = platformsPlaytimeData.map(

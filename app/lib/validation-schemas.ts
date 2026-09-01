@@ -7,7 +7,7 @@ import Password, { NewPassword, PasswordUpdate } from '@ts/users/password';
 import { NewService } from '@ts/users/service';
 import { UserLogin, UserUpdate } from '@ts/users/user';
 
-import { MetricsId } from './metrics/metrics-id';
+import { MetricsIds } from './metrics/metrics-id';
 import {
   ConfirmationActions,
   ServiceNames,
@@ -55,8 +55,7 @@ export const UserUpdateValidator: z.ZodType<UserUpdate> = z.object({
   birthdate: z.string().nullish().default(null),
   country: z.string().nullish().default(null),
   isPublic: z.boolean().default(false),
-  unblockDate: z.string().nullish().default(null),
-  metrics: z.array(z.enum(MetricsId)).optional()
+  unblockDate: z.string().nullish().default(null)
 });
 
 export const UserLoginValidator: z.ZodType<UserLogin> = z.object({
@@ -96,6 +95,8 @@ export const NewPasswordValidatior: z.ZodType<NewPassword> =
       operationId: z.string().nonempty()
     })
   );
+
+export const DashboardValidator = z.enum(MetricsIds);
 
 export const NewGameValidator: z.ZodType<NewGame> = z.object({
   name: z.string().nonempty(),

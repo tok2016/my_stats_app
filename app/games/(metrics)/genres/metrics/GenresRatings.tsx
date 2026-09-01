@@ -1,7 +1,5 @@
 import { Suspense } from 'react';
 
-import Link from 'next/link';
-
 import Game from '@ts/games/game';
 import { MetricContentProps, MetricId, RatingData } from '@ts/games/metric';
 
@@ -19,6 +17,7 @@ import GenresRatingsSkeleton from '../skeletons/GenresRatingsSkeleton';
 type HighestRatedGenresProps = {
   metricId: MetricId;
   genres: ObjectMapArray<Game['genres'][number], 'id'>;
+  userId: string;
 };
 
 type RatedGenreProps = {
@@ -42,12 +41,7 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
 
         <GameCover game={topGame} />
 
-        <Link
-          href={`/games/titles/${topGame.id}`}
-          className='underline bold small'
-        >
-          {topGame.name}
-        </Link>
+        <p className='bold small'>{topGame.name}</p>
 
         <span className='min'>
           {topGame.hours} {getSingularOrPlural(topGame.hours, 'hour', 'hours')}
@@ -59,11 +53,13 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
 
 async function HighestRatedGenres({
   genres,
-  metricId
+  metricId,
+  userId
 }: HighestRatedGenresProps) {
   const ratingData = await getMetricData<RatingData[]>(
     '/api/games/genres/rating',
-    []
+    [],
+    userId
   );
 
   return (
@@ -85,7 +81,11 @@ async function HighestRatedGenres({
   );
 }
 
-export default function GamesRatings({ metricId, games }: MetricContentProps) {
+export default function GenresRatings({
+  metricId,
+  games,
+  userId
+}: MetricContentProps) {
   const genres = games.flatMapByKey<Game['genres'][number], 'id'>(
     (game) => game.genres,
     'id'
@@ -93,7 +93,7 @@ export default function GamesRatings({ metricId, games }: MetricContentProps) {
 
   return (
     <Suspense fallback={<GenresRatingsSkeleton />}>
-      <HighestRatedGenres genres={genres} metricId={metricId} />
+      <HighestRatedGenres genres={genres} metricId={metricId} userId={userId} />
     </Suspense>
   );
 }

@@ -37,3 +37,10 @@ export const SubmetricsId = [
   'platforms-count',
   'platforms-playtime'
 ] as const;
+
+export const MetricsIds = [
+  ...GameGenresMetricsIds,
+  ...StudiosMetricsIds,
+  ...PlatformsMetricsIds,
+  ...GameTitlesMetricsIds
+] as const;
