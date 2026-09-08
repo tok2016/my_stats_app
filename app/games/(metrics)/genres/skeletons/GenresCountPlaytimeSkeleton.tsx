@@ -1,19 +1,16 @@
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
-import Submetric from '@components/data-blocks/Submetric';
 
 export default function GenresCountPlaytimeSkeleton() {
   return (
-    <MetricWrapper id='genres-count-playtime'>
-      <div className='double-doughnut'>
-        <Submetric id='genres-count'>
-          <ChartSkeleton type='doughnut' className='switchable-chart' />
-        </Submetric>
+    <div className='double-doughnut'>
+      <MetricWrapper id='genres-count' submetric>
+        <ChartSkeleton type='doughnut' className='switchable-chart' />
+      </MetricWrapper>
 
-        <Submetric id='genres-playtime'>
-          <ChartSkeleton type='doughnut' className='switchable-chart' />
-        </Submetric>
-      </div>
-    </MetricWrapper>
+      <MetricWrapper id='genres-playtime' submetric>
+        <ChartSkeleton type='doughnut' className='switchable-chart' />
+      </MetricWrapper>
+    </div>
   );
 }

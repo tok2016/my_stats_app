@@ -8,7 +8,7 @@ import { User, UserInfo } from '@ts/users/user';
 
 import { generalEndpoint } from '@lib/endpoint-generators';
 import { CredentialsModel, UsersModel } from '@lib/models';
-import { uniteUserData } from '@lib/utils';
+import { generateErrorResponse, uniteUserData } from '@lib/utils';
 
 const getUsers: GeneralEndpointAction<'/api/users'> = async (req) => {
   const credentialSearch = req.nextUrl.searchParams.get('credential');
@@ -39,6 +39,14 @@ const getUsers: GeneralEndpointAction<'/api/users'> = async (req) => {
   const usersInfo = limit
     ? await UsersModel.find(usersQuery).limit(limit).lean()
     : await UsersModel.find(usersQuery).lean();
+
+  if (!usersInfo.length) {
+    throw generateErrorResponse(
+      404,
+      `Users with ${credentialSearch} username or email were not found`,
+      'Users were not found'
+    );
+  }
 
   const unitedUsers: User[] = usersInfo.map((userInfo) =>
     uniteUserData(credentialsMap[userInfo._id.toString()], userInfo)

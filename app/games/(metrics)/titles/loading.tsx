@@ -1,11 +1,17 @@
 import { GameTitlesMetricsIds } from '@lib/metrics/metrics-id';
 
-import { GameMetricsSkeletons } from '../GameMetrics';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
+
+import { GameMetricsSkeletons } from '../components/GameMetrics';
 
 export default function GameTitlesLoading() {
   return (
     <>
-      {GameTitlesMetricsIds.map((metricId) => GameMetricsSkeletons[metricId])}
+      {GameTitlesMetricsIds.map((metricId) => (
+        <MetricWrapper id={metricId} key={metricId}>
+          {GameMetricsSkeletons[metricId]}
+        </MetricWrapper>
+      ))}
     </>
   );
 }

@@ -10,11 +10,15 @@ import Token from './users/token';
 
 export type ValidationIssue = $ZodIssue;
 
-export default interface ErrorResponse {
+export default interface ErrorResponse extends Error {
   status: number;
-  message: string;
   issues: ValidationIssue[];
 }
+
+export type MetricResponse<MetricData> = {
+  error?: ErrorResponse;
+  data?: MetricData;
+};
 
 export type GeneralEndpointAction<Endpoint extends AppRouteHandlerRoutes> = (
   req: NextRequest,

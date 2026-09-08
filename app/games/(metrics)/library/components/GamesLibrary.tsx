@@ -1,7 +1,9 @@
 import { GamesFilter } from '@ts/games/filter';
-import { GameTableData, GamesTablePageResponse } from '@ts/games/game';
+import { GameTableData } from '@ts/games/game';
 
-import { getData, getUserSet } from '@lib/server-actions';
+import { getCurrentUser, getGames } from '@lib/server-actions';
+
+import ErrorMessage from '@components/ErrorMessage';
 
 import GamesFilterMenu from './GamesFilterMenu';
 import GamesTable from './GamesTable';
@@ -14,45 +16,38 @@ export default async function GamesLibrary({
 }: {
   filters: GamesFilter;
 }) {
-  const user = await getUserSet();
-  const urlParams = new URLSearchParams({
-    ...filters,
-    limit: GAMES_PAGE_LIMIT.toString(),
-    user: user.id
-  });
+  try {
+    const user = await getCurrentUser();
+    const gamesPage = await getGames({
+      ...filters,
+      limit: GAMES_PAGE_LIMIT.toString(),
+      userId: user.id
+    });
 
-  const gamesPage = await getData<GamesTablePageResponse>(
-    `/api/games?${urlParams.toString()}`,
-    {
-      games: [],
-      startIndex: 0,
-      pagesCount: 0,
-      currentPage: 0,
-      maxHours: 1000
-    }
-  );
+    const gamesTableData: GameTableData[] = gamesPage.games.map((game, i) => ({
+      ...game,
+      index: gamesPage.startIndex + i
+    }));
 
-  const gamesTableData: GameTableData[] = gamesPage.games.map((game, i) => ({
-    ...game,
-    index: gamesPage.startIndex + i
-  }));
+    return (
+      <>
+        <GamesFilterMenu maxHours={gamesPage.maxHours} filters={filters} />
 
-  return (
-    <>
-      <GamesFilterMenu maxHours={gamesPage.maxHours} filters={filters} />
+        <GamesTable
+          games={gamesTableData}
+          sortField={filters.sort}
+          sortDirection={filters.direction}
+        />
 
-      <GamesTable
-        games={gamesTableData}
-        sortField={filters.sort}
-        sortDirection={filters.direction}
-      />
-
-      <GamesTablePagination
-        currentPage={gamesPage.currentPage}
-        pagesCount={gamesPage.pagesCount}
-        startIndex={gamesPage.startIndex}
-        gamesCount={gamesTableData.length}
-      />
-    </>
-  );
+        <GamesTablePagination
+          currentPage={gamesPage.currentPage}
+          pagesCount={gamesPage.pagesCount}
+          startIndex={gamesPage.startIndex}
+          gamesCount={gamesTableData.length}
+        />
+      </>
+    );
+  } catch (err) {
+    return <ErrorMessage error={err} className='stretch-error' />;
+  }
 }

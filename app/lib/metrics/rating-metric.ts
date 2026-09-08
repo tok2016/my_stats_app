@@ -6,7 +6,7 @@ import { gameCoreToShort } from '@lib/games/games-utils';
 import ObjectMapArray from '@lib/object-map-array';
 import { isKeyOfArrayField } from '@lib/type-guards';
 
-import { GAMES_IN_METRIC } from '../utils';
+import { GAMES_IN_METRIC, generateErrorResponse } from '../utils';
 
 type RatingSumData = Omit<RatingData, 'rating'> & { ratingSum: number };
 
@@ -36,8 +36,12 @@ export const getRatingMetric = (
     isKeyOfArrayField(itemField, games.at(0))
       ? games.flatGroupBy(aggregateRatingData, itemField, 'id', undefined)
       : games.groupBy(aggregateRatingData, itemField, 'id', undefined)
-  )
-    .filter((ratingData) => !!ratingData.ratingSum)
+  ).filter((ratingData) => !!ratingData.ratingSum);
+
+  if (!ratingDataMetric.count)
+    throw generateErrorResponse(404, 'No game was ranked');
+
+  return ratingDataMetric
     .map((ratingData): RatingData => {
       return {
         id: ratingData.id,
@@ -50,6 +54,4 @@ export const getRatingMetric = (
     .toArray()
     .sort((a, b) => b.rating - a.rating)
     .slice(0, topSize);
-
-  return ratingDataMetric;
 };

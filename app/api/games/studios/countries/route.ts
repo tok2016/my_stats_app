@@ -1,3 +1,5 @@
+import countries from 'i18n-iso-countries';
+
 import { NextResponse } from 'next/server';
 
 import { GameCore } from '@ts/games/game';
@@ -69,6 +71,7 @@ const aggregateCountryData = (
 
   return {
     country,
+    name: countries.getName(country, 'en', { select: 'alias' }) ?? '',
     gamesCount: (stored?.gamesCount ?? 0) + studioCompareData.count,
     developers: stored ? stored.developers : [studioCompareData.id]
   };

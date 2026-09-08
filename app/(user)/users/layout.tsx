@@ -9,6 +9,7 @@ export default function UsersLayout({
   return (
     <>
       <ProfileLayout authorizedOnly={false}>{children}</ProfileLayout>
+
       <Logo variant='h1' className='top right' />
     </>
   );

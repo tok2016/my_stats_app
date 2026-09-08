@@ -2,14 +2,16 @@
 
 import Game from '@ts/games/game';
 import {
-  MetricClientContentProps,
+  FetchPeriodTopsMetricParams,
+  MetricContentProps,
   PeriodPlaytimeTops,
   PeriodTopsMetric,
   PrecisePeriod
 } from '@ts/games/metric';
+import { MetricResponse } from '@ts/requests';
 
+import { getMetricClient } from '@lib/actions';
 import ObjectMapArray from '@lib/object-map-array';
-import { getMetricData } from '@lib/server-actions';
 
 import GameTableTitle from '@components/data-blocks/GameTitle';
 import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
@@ -17,35 +19,33 @@ import RankIcon from '@components/data-blocks/RankIcon';
 
 import { GamePeriodTopData } from '../types';
 
-const getGamesPeriodTops =
-  (games: ObjectMapArray<Game, 'id'>, userId: string) =>
+const fetchGamesPeriodTops =
+  (games: ObjectMapArray<Game, 'id'>) =>
   async (
-    periodType?: PrecisePeriod
-  ): Promise<PeriodTopsMetric<GamePeriodTopData>> => {
-    const gamesTops = await getMetricData<PeriodPlaytimeTops>(
+    params: FetchPeriodTopsMetricParams
+  ): Promise<MetricResponse<PeriodTopsMetric<GamePeriodTopData>>> => {
+    const gamesTops = await getMetricClient<PeriodPlaytimeTops>(
       '/api/games/titles/periods',
-      {
-        periodType: 'season',
-        tops: []
-      },
-      userId,
-      {
-        period: periodType ?? 'season'
-      }
+      params
     );
 
     return {
-      periodType: gamesTops.periodType as PrecisePeriod,
-      tops: gamesTops.tops.map((periodTop) => ({
-        period: periodTop.period,
-        top: periodTop.top
-          .map((entry, i) => {
-            const game = games.findByKey(entry.id.toString());
-            if (!game) return undefined;
-            return { ...game, index: i };
-          })
-          .filter((game) => !!game)
-      }))
+      error: gamesTops.error,
+      data: !gamesTops.data
+        ? undefined
+        : {
+            periodType: gamesTops.data.periodType as PrecisePeriod,
+            tops: gamesTops.data.tops.map((periodTop) => ({
+              period: periodTop.period,
+              top: periodTop.top
+                .map((entry, i) => {
+                  const game = games.findByKey(entry.id.toString());
+                  if (!game) return undefined;
+                  return { ...game, index: i };
+                })
+                .filter((game) => !!game)
+            }))
+          }
     };
   };
 
@@ -60,15 +60,14 @@ export default function GamesPeriodTops({
   metricId,
   games,
   userId
-}: MetricClientContentProps) {
-  const gamesMapArray = new ObjectMapArray(games, 'id');
-
+}: MetricContentProps) {
   return (
     <PeriodTops
       id={metricId}
+      userId={userId}
       className='games-period-tops'
       blockWidthRem={18.5}
-      getPeriodMetric={getGamesPeriodTops(gamesMapArray, userId)}
+      fetchPeriodMetric={fetchGamesPeriodTops(games)}
       listItemContent={gameItemContent}
       displayFields={['hours']}
       valueField='hours'

@@ -9,7 +9,10 @@ export const isIgdbSeries = (
 ): value is NonNullable<Game['series']> =>
   typeof (value as Game['series'])?.games !== 'undefined';
 
-export const StudiosGameCoreFields: Record<StudioType, keyof GameCore> = {
+export const StudiosGameCoreFields: Record<
+  StudioType,
+  Extract<keyof GameCore, 'developersIds' | 'publishersIds'>
+> = {
   developer: 'developersIds',
   publisher: 'publishersIds'
 };

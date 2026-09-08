@@ -1,32 +1,26 @@
-import { Suspense } from 'react';
+'use client';
 
 import Game from '@ts/games/game';
-import { MetricId } from '@ts/games/metric';
-import { StudioRatingMetric, StudioType } from '@ts/games/studio';
+import { StudioRatingMetric } from '@ts/games/studio';
+import { MetricResponse } from '@ts/requests';
 
-import ObjectMapArray from '@lib/object-map-array';
-import { getMetricData } from '@lib/server-actions';
+import { getMetricClient } from '@lib/actions';
 
-import EmptyMetric from '@components/data-blocks/EmptyMetric';
+import Skeleton from '@components/Skeleton';
 import GameCover from '@components/data-blocks/GameCover';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
+import FetchMetric from '../../components/FetchMetric';
 import { StudiosGameCoreFields, StudiosGameFields } from '../../utils';
-import StudiosRatingSkeleton from '../skeletons/StudiosRatingsSkeleton';
-import { StudiosMetricContentProps } from '../types';
-
-type HighestRatedStudiosProps = {
-  metricId: MetricId;
-  studios: ObjectMapArray<Game['developers'][number], 'id'>;
-  type: StudioType;
-  userId: string;
-};
+import { FetchStudiosParams, StudiosMetricContentProps } from '../types';
 
 type RatedStudioProps = {
   ratedStudio: StudioRatingMetric;
   studio?: Game['developers'][number];
 };
+
+const MAX_SKELETONS_BLOCKS = 5;
 
 function RatedStudio({ ratedStudio, studio }: RatedStudioProps) {
   if (!studio) return;
@@ -52,37 +46,40 @@ function RatedStudio({ ratedStudio, studio }: RatedStudioProps) {
   );
 }
 
-async function HighestRatedStudios({
-  metricId,
-  studios,
-  type,
-  userId
-}: HighestRatedStudiosProps) {
-  const studiosRatingData = await getMetricData<StudioRatingMetric[]>(
+const fetchStudiosRatings = async (
+  params: FetchStudiosParams
+): Promise<MetricResponse<StudioRatingMetric[]>> => {
+  const studiosRatingData = await getMetricClient<StudioRatingMetric[]>(
     '/api/games/studios/rating',
-    [],
-    userId,
-    {
-      field: StudiosGameCoreFields[type]
-    }
+    params
   );
 
+  return {
+    error: studiosRatingData.error,
+    data: studiosRatingData.data
+  };
+};
+
+export function StudiosRatingsSkeleton() {
   return (
-    <MetricWrapper id={metricId}>
-      {!studiosRatingData.length ? (
-        <EmptyMetric message={`You haven't rated any game yet`} />
-      ) : (
-        <div className='blocks-group'>
-          {studiosRatingData.map((ratedStudio) => (
-            <RatedStudio
-              key={`${ratedStudio.id}-rated`}
-              ratedStudio={ratedStudio}
-              studio={studios.findByKey(ratedStudio.id)}
-            />
-          ))}
+    <div className='blocks-group'>
+      {Array.from({ length: MAX_SKELETONS_BLOCKS }).map((_, i) => (
+        <div
+          key={`$rated-studio-skeleton-${i}`}
+          className='data-block rated-studio'
+        >
+          <Skeleton type='h3' />
+
+          <div className='data-block-content'>
+            <span className='min'>Best game:</span>
+            <Skeleton type='image' className='game-cover' />
+            <Skeleton />
+          </div>
+
+          <MultipleRating />
         </div>
-      )}
-    </MetricWrapper>
+      ))}
+    </div>
   );
 }
 
@@ -98,13 +95,23 @@ export default function StudiosRatings({
   );
 
   return (
-    <Suspense fallback={<StudiosRatingSkeleton metricId={metricId} />}>
-      <HighestRatedStudios
-        type={type}
-        metricId={metricId}
-        studios={studios}
-        userId={userId}
+    <MetricWrapper id={metricId}>
+      <FetchMetric
+        fetchMetricData={fetchStudiosRatings}
+        metric={(data) => (
+          <div className='blocks-group'>
+            {data.map((ratedStudio) => (
+              <RatedStudio
+                key={`${ratedStudio.id}-rated`}
+                ratedStudio={ratedStudio}
+                studio={studios.findByKey(ratedStudio.id)}
+              />
+            ))}
+          </div>
+        )}
+        fallback={<StudiosRatingsSkeleton />}
+        params={{ userId, field: StudiosGameCoreFields[type] }}
       />
-    </Suspense>
+    </MetricWrapper>
   );
 }

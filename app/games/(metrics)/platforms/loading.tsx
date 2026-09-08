@@ -1,9 +1,17 @@
 import { PlatformsMetricsIds } from '@lib/metrics/metrics-id';
 
-import { GameMetricsSkeletons } from '../GameMetrics';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
+
+import { GameMetricsSkeletons } from '../components/GameMetrics';
 
 export default function PlatformsLoading() {
   return (
-    <>{PlatformsMetricsIds.map((metricId) => GameMetricsSkeletons[metricId])}</>
+    <>
+      {PlatformsMetricsIds.map((metricId) => (
+        <MetricWrapper id={metricId} key={metricId}>
+          {GameMetricsSkeletons[metricId]}
+        </MetricWrapper>
+      ))}
+    </>
   );
 }

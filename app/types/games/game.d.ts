@@ -189,6 +189,7 @@ export type GameDetailed = Omit<
 
 export interface GameCountryMetric {
   country: number;
+  name: string;
   count: number;
   hours: number;
   topGames: GameShort[];

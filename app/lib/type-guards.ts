@@ -16,7 +16,7 @@ export const isNumberOrStringArray = (
   Array.isArray(value) && value.every((v) => isNumberOrString(v));
 
 export const isErrorResponse = (value: unknown): value is ErrorResponse =>
-  (value as ErrorResponse)?.message !== undefined;
+  (value as ErrorResponse)?.issues !== undefined;
 
 export const isSteamGameObject = (value: unknown): value is SteamGamesList =>
   (value as SteamGamesList).games !== undefined;

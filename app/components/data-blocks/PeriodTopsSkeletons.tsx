@@ -10,8 +10,6 @@ import Skeleton from '@components/Skeleton';
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import { ChartClasses } from '@components/charts/chart-styles';
 
-import MetricWrapper from './MetricWrapper';
-
 type PeriodTopsSkeletonsProps = {
   metricId: MetricId;
   blockWidthRem?: number;
@@ -82,10 +80,7 @@ export default function PeriodTopsSkeletons({
   barClassName = ''
 }: PeriodTopsSkeletonsProps) {
   return (
-    <MetricWrapper
-      id={metricId}
-      renderTitle={() => <Skeleton type='h3' width='50%' />}
-    >
+    <>
       <div className='period-tops'>
         <div className='period-tops-in-group' style={{ gap: `${gapRem}rem` }}>
           {Array.from({ length: SKELETONS_COUNT }, (_v, k) => (
@@ -109,6 +104,6 @@ export default function PeriodTopsSkeletons({
           className={`${ChartClasses.periodBar.container} ${barClassName}`}
         />
       )}
-    </MetricWrapper>
+    </>
   );
 }

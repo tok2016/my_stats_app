@@ -3,11 +3,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
+  FetchPeriodTopsMetricParams,
   MetricId,
   PeriodTop,
   PeriodTopsMetric,
   PrecisePeriod
 } from '@ts/games/metric';
+import { MetricResponse } from '@ts/requests';
 import {
   ChartData,
   ChartValueField,
@@ -15,7 +17,6 @@ import {
 } from '@ts/ui/charts-data';
 import { Option } from '@ts/ui/components-props';
 
-import { useAction } from '@lib/hooks';
 import {
   DEFAULT_PERIOD_BLOCKS_GAP,
   DEFAULT_PERIOD_BLOCK_WIDTH,
@@ -26,27 +27,39 @@ import {
 import Divider from '@components/Divider';
 import Select from '@components/Select';
 
+import FetchMetric from '@app/games/(metrics)/components/FetchMetric';
+
 import MetricWrapper from './MetricWrapper';
 import PeriodBarChart from './PeriodBarChart';
 import PeriodTopsSkeletons from './PeriodTopsSkeletons';
 import PeriodTopsGroup from './PeriosTopsGroup';
+
+type PeriodTopsScrollProps<
+  ItemType extends ChartData,
+  ValueKey extends ChartValueField<ItemType>
+> = {
+  id: MetricId;
+  periodMetricData: PeriodTopsMetric<ItemType & Record<ValueKey, number>>;
+  periodTopClassName?: string;
+  blockWidthRem?: number;
+  gapRem?: number;
+  showBar?: boolean;
+  listItemContent: (item: ItemType, i: number) => React.ReactNode;
+  barClassName?: string;
+} & PeriodBarChartMainProps<ItemType, ValueKey>;
 
 type PeriodTopsProps<
   ItemType extends ChartData,
   ValueKey extends ChartValueField<ItemType>
 > = {
   className?: string;
-  periodTopClassName?: string;
-  barClassName?: string;
-  id: MetricId;
-  blockWidthRem?: number;
-  gapRem?: number;
-  showBar?: boolean;
-  listItemContent: (item: ItemType, i: number) => React.ReactNode;
-  getPeriodMetric: (
-    periodType?: PrecisePeriod
-  ) => Promise<PeriodTopsMetric<ItemType & Record<ValueKey, number>>>;
-} & PeriodBarChartMainProps<ItemType, ValueKey>;
+  userId: string;
+  fetchPeriodMetric: (
+    params: FetchPeriodTopsMetricParams
+  ) => Promise<
+    MetricResponse<PeriodTopsMetric<ItemType & Record<ValueKey, number>>>
+  >;
+} & Omit<PeriodTopsScrollProps<ItemType, ValueKey>, 'periodMetricData'>;
 
 const periodTypesLables: Record<PrecisePeriod, string> = {
   year: 'by year',
@@ -63,33 +76,33 @@ const periodTypeOptions: Option[] = PrecisePeriods.map((periodType) => ({
 const setTopsIndexes = <ItemType extends ChartData>(
   periodType: PrecisePeriod,
   tops: PeriodTop<ItemType>[]
-) => {
-  const yearMap = new Map<string, Record<number | string, number>>();
+): PeriodTopsMetric<ItemType>['tops'] => {
+  const yearItemMap = new Map<string, Record<number | string, number>>();
   const indexTops = tops.map((periodTop) => {
     const year =
       periodType === 'year'
         ? '0'
         : getPeriodString['year'](periodTop.period, false);
-    const yearEntry = yearMap.get(year);
+    const itemOfYear = yearItemMap.get(year);
 
-    if (!yearEntry) {
+    if (!itemOfYear) {
       const updatedTop = periodTop.top;
       const indexes = Object.fromEntries(
-        updatedTop.map((entry, i) => {
-          entry.index = i;
-          return [entry.id, i];
+        updatedTop.map((item, i) => {
+          item.index = i;
+          return [item.id, i];
         })
       );
 
-      yearMap.set(year, indexes);
+      yearItemMap.set(year, indexes);
       return { ...periodTop, top: updatedTop };
     }
 
     const updatedTop = periodTop.top;
     updatedTop.forEach((item) => {
-      if (!yearEntry[item.id]) {
-        const index = Object.keys(yearEntry).length;
-        yearEntry[item.id] = index;
+      if (!itemOfYear[item.id]) {
+        const index = Object.keys(itemOfYear).length;
+        itemOfYear[item.id] = index;
         item.index = index;
       }
     });
@@ -99,28 +112,22 @@ const setTopsIndexes = <ItemType extends ChartData>(
   return indexTops;
 };
 
-export default function PeriodTops<
+function PeriodTopsScroll<
   ItemType extends ChartData,
   ValueKey extends ChartValueField<ItemType>
 >({
-  className = '',
-  periodTopClassName = '',
   id,
+  periodMetricData,
+  listItemContent,
+  periodTopClassName = '',
+  barClassName = '',
   blockWidthRem = DEFAULT_PERIOD_BLOCK_WIDTH,
   gapRem = DEFAULT_PERIOD_BLOCKS_GAP,
-  listItemContent,
-  getPeriodMetric,
   showBar,
   displayFields,
-  fieldsNames,
   valueField,
-  barClassName = ''
-}: PeriodTopsProps<ItemType, ValueKey>) {
-  const [periodMetricData, updatePeriodMetric, isPending] = useAction(
-    getPeriodMetric,
-    null
-  );
-
+  fieldsNames
+}: PeriodTopsScrollProps<ItemType, ValueKey>) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [year, setYear] = useState<string>('');
 
@@ -140,10 +147,6 @@ export default function PeriodTops<
       return null;
     }
   });
-
-  const onPeriodSelect = (value: string) => {
-    updatePeriodMetric(value as PrecisePeriod);
-  };
 
   const topsByYear: Map<string, PeriodTopsMetric<ItemType>['tops']> =
     useMemo(() => {
@@ -169,14 +172,10 @@ export default function PeriodTops<
     }, [periodMetricData]);
 
   useEffect(() => {
-    updatePeriodMetric('season');
-  }, [updatePeriodMetric]);
-
-  useEffect(() => {
     if (scrollRef.current) {
-      const lastPeriod = periodMetricData?.tops.at(-1);
-      if (lastPeriod)
-        setYear(getPeriodString['year'](lastPeriod.period, false));
+      const latestPeriod = periodMetricData.tops.at(-1);
+      if (latestPeriod)
+        setYear(getPeriodString['year'](latestPeriod.period, false));
       else setYear('');
 
       scrollRef.current.scrollTo({
@@ -189,36 +188,8 @@ export default function PeriodTops<
     }
   }, [periodMetricData, observer]);
 
-  if (isPending || !periodMetricData)
-    return (
-      <PeriodTopsSkeletons
-        metricId={id}
-        periodTopClassName={periodTopClassName}
-        blockWidthRem={blockWidthRem}
-        gapRem={gapRem}
-        showBar={showBar}
-        barClassName={barClassName}
-      />
-    );
-
   return (
-    <MetricWrapper
-      id={id}
-      className={className}
-      renderTitle={(title) => (
-        <span className='select-title'>
-          {title}
-          <Select
-            id={`${id}-select`}
-            name={`${id}-select`}
-            defaultValue={periodMetricData.periodType}
-            variant='text'
-            options={periodTypeOptions}
-            onSelect={onPeriodSelect}
-          />
-        </span>
-      )}
-    >
+    <>
       <div className='period-tops' ref={scrollRef}>
         <div className='period-tops-groups'>
           {topsByYear
@@ -276,6 +247,46 @@ export default function PeriodTops<
           valueField={valueField}
         />
       )}
+    </>
+  );
+}
+
+export default function PeriodTops<
+  ItemType extends ChartData,
+  ValueKey extends ChartValueField<ItemType>
+>(props: PeriodTopsProps<ItemType, ValueKey>) {
+  const [periodType, setPeriodType] = useState<PrecisePeriod>('season');
+
+  const onPeriodSelect = (value: string) => {
+    setPeriodType(value as PrecisePeriod);
+  };
+
+  return (
+    <MetricWrapper
+      id={props.id}
+      className={props.className}
+      renderTitle={(title) => (
+        <span className='select-title'>
+          {title}
+          <Select
+            id={`${props.id}-select`}
+            name={`${props.id}-select`}
+            defaultValue={periodType}
+            variant='text'
+            options={periodTypeOptions}
+            onSelect={onPeriodSelect}
+          />
+        </span>
+      )}
+    >
+      <FetchMetric
+        fetchMetricData={props.fetchPeriodMetric}
+        fallback={<PeriodTopsSkeletons metricId={props.id} {...props} />}
+        metric={(data) => (
+          <PeriodTopsScroll {...props} periodMetricData={data} />
+        )}
+        params={{ userId: props.userId, period: periodType }}
+      />
     </MetricWrapper>
   );
 }

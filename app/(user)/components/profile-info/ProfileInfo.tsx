@@ -4,7 +4,7 @@ import { Share, Wrench } from '@mynaui/icons-react';
 
 import Link from 'next/link';
 
-import { UserSet } from '@ts/users/user';
+import { User } from '@ts/users/user';
 
 import IconButton from '@components/IconButton';
 import Logo from '@components/Logo';
@@ -15,7 +15,7 @@ import PublishButton from '../publish-controlls/PublishButton';
 import ProfileCreditsSkeleton from './ProfileCreditsSkeleton';
 
 type ProfileInfoProps = {
-  user: UserSet;
+  user: User;
   authorized?: boolean;
   loading?: boolean;
 };

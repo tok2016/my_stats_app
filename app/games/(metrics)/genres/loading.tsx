@@ -1,9 +1,17 @@
 import { GameGenresMetricsIds } from '@lib/metrics/metrics-id';
 
-import { GameMetricsSkeletons } from '../GameMetrics';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
+
+import { GameMetricsSkeletons } from '../components/GameMetrics';
 
 export default function GenresLoading() {
   return (
-    <>{GameGenresMetricsIds.map((genre) => GameMetricsSkeletons[genre])}</>
+    <>
+      {GameGenresMetricsIds.map((metric) => (
+        <MetricWrapper id={metric} key={metric}>
+          {GameMetricsSkeletons[metric]}
+        </MetricWrapper>
+      ))}
+    </>
   );
 }

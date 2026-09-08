@@ -1,64 +1,62 @@
-import { Suspense } from 'react';
+'use client';
 
-import Game, { GameCore } from '@ts/games/game';
-import { MetricId, PlaytimeData } from '@ts/games/metric';
-import { StudioType } from '@ts/games/studio';
+import Game from '@ts/games/game';
+import { PlaytimeData } from '@ts/games/metric';
+import { MetricResponse } from '@ts/requests';
 
+import { getMetricClient } from '@lib/actions';
 import ObjectMapArray from '@lib/object-map-array';
-import { getMetricData } from '@lib/server-actions';
 
+import Skeleton from '@components/Skeleton';
+import AdjacentChart from '@components/charts/AdjacentChart';
+import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
-import { StudiosGameFields } from '../../utils';
+import FetchMetric from '../../components/FetchMetric';
+import { StudiosGameCoreFields, StudiosGameFields } from '../../utils';
 import StudiosCountChart from '../charts/StudiosCountChart';
-import StudiosCountPlaytimeSkeleton from '../skeletons/StudiosCountSkeleton';
-import { StudioCountData, StudiosMetricContentProps } from '../types';
+import {
+  FetchStudiosParams,
+  StudioCountData,
+  StudiosMetricContentProps
+} from '../types';
 
-type FetchStudiosCountPlaytimeProps = {
-  metricId: MetricId;
-  studios: ObjectMapArray<Game['developers'][number], 'id'>;
-  type: StudioType;
-  userId: string;
-};
+const fetchStudiosCountPlaytime =
+  (studios: ObjectMapArray<Game['developers'][number], 'id'>) =>
+  async (
+    params: FetchStudiosParams
+  ): Promise<MetricResponse<StudioCountData[]>> => {
+    const playtimeData = await getMetricClient<PlaytimeData[]>(
+      '/api/games/studios/count',
+      params
+    );
 
-const StudiosTypeFields: Record<StudioType, keyof GameCore> = {
-  developer: 'developersIds',
-  publisher: 'publishersIds'
-};
+    return {
+      error: playtimeData.error,
+      data: playtimeData.data
+        ?.filter((data) => data.id !== -1)
+        .map((data, i) => ({
+          id: data.id,
+          name: studios.findByKey(data.id)?.name ?? 'Other',
+          index: i,
+          topGame: data.topGame,
+          count: data.count,
+          hours: data.hours,
+          percent: data.percent
+        }))
+    };
+  };
 
-async function FetchtudiosCountPlaytime({
-  studios,
-  type,
-  metricId,
-  userId
-}: FetchStudiosCountPlaytimeProps) {
-  const playtimeData = await getMetricData<PlaytimeData[]>(
-    '/api/games/studios/count',
-    [],
-    userId,
-    { field: StudiosTypeFields[type] }
-  );
-
-  const chartData: StudioCountData[] = playtimeData
-    .filter((data) => data.id !== -1)
-    .map((data, i) => ({
-      id: data.id,
-      name: studios.findByKey(data.id)?.name ?? 'Other',
-      index: i,
-      topGame: data.topGame,
-      count: data.count,
-      hours: data.hours,
-      percent: data.percent
-    }));
-
+export function StudiosCountPlaytimeSkeleton() {
   return (
-    <MetricWrapper id={metricId}>
-      <StudiosCountChart data={chartData} type={type} />
-    </MetricWrapper>
+    <AdjacentChart>
+      <Skeleton type='tablet' rows={10} />
+      <ChartSkeleton type='bar' />
+    </AdjacentChart>
   );
 }
 
-export default async function StudiosCountPlaytime({
+export default function StudiosCountPlaytime({
   metricId,
   games,
   type,
@@ -70,13 +68,13 @@ export default async function StudiosCountPlaytime({
   );
 
   return (
-    <Suspense fallback={<StudiosCountPlaytimeSkeleton metricId={metricId} />}>
-      <FetchtudiosCountPlaytime
-        metricId={metricId}
-        type={type}
-        studios={studios}
-        userId={userId}
+    <MetricWrapper id={metricId}>
+      <FetchMetric
+        fetchMetricData={fetchStudiosCountPlaytime(studios)}
+        metric={(data) => <StudiosCountChart type={type} data={data} />}
+        fallback={<StudiosCountPlaytimeSkeleton />}
+        params={{ userId, field: StudiosGameCoreFields[type] }}
       />
-    </Suspense>
+    </MetricWrapper>
   );
 }

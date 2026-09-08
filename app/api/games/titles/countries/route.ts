@@ -1,3 +1,5 @@
+import countries from 'i18n-iso-countries';
+
 import { NextResponse } from 'next/server';
 
 import { GameCore, GameCountryMetric, GameShort } from '@ts/games/game';
@@ -26,6 +28,7 @@ const aggregateCountryData = (
 
   return {
     country,
+    name: countries.getName(country, 'en', { select: 'alias' }) ?? '',
     count: (stored?.count ?? 0) + 1,
     hours: (stored?.hours ?? 0) + gameShort.hours,
     topGames: stored ? stored.topGames : [gameShort]

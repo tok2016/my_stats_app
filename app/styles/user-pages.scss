@@ -383,23 +383,7 @@ $frame-start-width: 200px;
 }
 
 .no-results {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 0.67em;
-
   font-family: utils.$ibm-plex;
   @include utils.font(utils.$h2-size, utils.$regular-font, utils.$fit-font);
-
-  svg {
-    width: 5.5em;
-    height: 5.5em;
-
-    * {
-      stroke-width: 2px;
-    }
-  }
-
   flex: 1;
 }

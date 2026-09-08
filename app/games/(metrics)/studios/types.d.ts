@@ -1,3 +1,4 @@
+import { GameCore } from '@ts/games/game';
 import { MetricContentProps, PlaytimeData } from '@ts/games/metric';
 import { StudioPeriodTop, StudioType } from '@ts/games/studio';
 import { ChartData } from '@ts/ui/charts-data';
@@ -13,4 +14,9 @@ export type CountryStudioChartData = ChartData & {
 
 export type StudiosMetricContentProps = MetricContentProps & {
   type: StudioType;
+};
+
+export type FetchStudiosParams = {
+  userId: string;
+  field: Extract<keyof GameCore, 'developersIds' | 'publishersIds'>;
 };
