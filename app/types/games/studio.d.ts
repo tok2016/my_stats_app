@@ -51,6 +51,7 @@ export type StudiosPeriodMetric = PeriodTopsMetric<StudioPeriodTop>;
 
 export interface StudioCountryMetric {
   country: number;
+  name: string;
   gamesCount: number;
   developers: number[];
 }

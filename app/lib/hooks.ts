@@ -58,8 +58,8 @@ export const useURLSearchParams = () => {
   return { getParam, getParams, setParam, updateParams, deleteParam } as const;
 };
 
-export const useAction = <DataType, ParameterType = undefined>(
-  action: (newData?: ParameterType) => Promise<DataType>,
+export const useAction = <DataType, ParameterType = void>(
+  action: (newData: ParameterType) => Promise<DataType>,
   initialData: DataType,
   refreshPath: boolean = false
 ) => {
@@ -69,12 +69,17 @@ export const useAction = <DataType, ParameterType = undefined>(
   const actionRef = useRef(action);
 
   const startAction = useCallback(
-    async (newData?: ParameterType) => {
+    async (newData: ParameterType) => {
       setPending(true);
-      const data = await actionRef.current(newData);
 
-      setData(data);
-      setPending(false);
+      try {
+        const data = await actionRef.current(newData);
+        setData(data);
+      } catch (err) {
+        throw err;
+      } finally {
+        setPending(false);
+      }
 
       if (refreshPath) {
         refresh();

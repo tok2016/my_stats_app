@@ -1,56 +1,45 @@
-import countries from 'i18n-iso-countries';
-import { Suspense } from 'react';
+'use client';
 
 import Game from '@ts/games/game';
-import { MetricContentProps, MetricId } from '@ts/games/metric';
+import { MetricContentProps } from '@ts/games/metric';
 import { StudioCountryMetric } from '@ts/games/studio';
+import { MetricResponse } from '@ts/requests';
 
+import { getMetricClient } from '@lib/actions';
 import ObjectMapArray from '@lib/object-map-array';
-import { getMetricData } from '@lib/server-actions';
 
+import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
+import FetchMetric from '../../components/FetchMetric';
 import StudiosMapChart from '../charts/StuidosMapChart';
-import StudiosCountriesSkeleton from '../skeletons/StudiosCountriesSkeleton';
 import { CountryStudioChartData } from '../types';
 
-type FetchStudiosCountries = {
-  developers: ObjectMapArray<Game['developers'][number], 'id'>;
-  metricId: MetricId;
-  userId: string;
-};
+const fetchStudiosCountries =
+  (developers: ObjectMapArray<Game['developers'][number], 'id'>) =>
+  async (params: {
+    userId: string;
+  }): Promise<MetricResponse<CountryStudioChartData[]>> => {
+    const countriesData = await getMetricClient<StudioCountryMetric[]>(
+      '/api/games/studios/countries',
+      params
+    );
 
-async function FetchStudiosCountries({
-  metricId,
-  developers,
-  userId
-}: FetchStudiosCountries) {
-  const countriesData = await getMetricData<StudioCountryMetric[]>(
-    '/api/games/studios/countries',
-    [],
-    userId
-  );
+    return {
+      error: countriesData.error,
+      data: countriesData.data?.map((country, i) => ({
+        id: country.country,
+        name: country.name,
+        index: i,
+        count: country.gamesCount,
+        developers: country.developers.map(
+          (developer) => developers.findByKey(developer)?.name ?? ''
+        )
+      }))
+    };
+  };
 
-  const countriesChartData: CountryStudioChartData[] = countriesData
-    .map((country, i) => ({
-      id: country.country,
-      name: countries.getName(country.country, 'en', { select: 'alias' }) ?? '',
-      index: i,
-      count: country.gamesCount,
-      developers: country.developers.map(
-        (developer) => developers.findByKey(developer)?.name ?? ''
-      )
-    }))
-    .filter((country) => !!country.name);
-
-  return (
-    <MetricWrapper id={metricId}>
-      <StudiosMapChart data={countriesChartData} />
-    </MetricWrapper>
-  );
-}
-
-export default async function StudiosCountries({
+export default function StudiosCountries({
   games,
   metricId,
   userId
@@ -61,12 +50,13 @@ export default async function StudiosCountries({
   );
 
   return (
-    <Suspense fallback={<StudiosCountriesSkeleton />}>
-      <FetchStudiosCountries
-        developers={developers}
-        metricId={metricId}
-        userId={userId}
+    <MetricWrapper id={metricId}>
+      <FetchMetric
+        fetchMetricData={fetchStudiosCountries(developers)}
+        metric={(data) => <StudiosMapChart data={data} />}
+        fallback={<ChartSkeleton type='map' />}
+        params={{ userId }}
       />
-    </Suspense>
+    </MetricWrapper>
   );
 }

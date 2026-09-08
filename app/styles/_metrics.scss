@@ -8,6 +8,7 @@ $min-data-rank-width: 2em;
   flex-direction: column;
   align-items: stretch;
   gap: 3em;
+  flex: 1;
 }
 
 .metric,
@@ -232,7 +233,7 @@ $min-data-rank-width: 2em;
   }
 }
 
-.empty-metric {
+.error-metric {
   display: flex;
   flex-direction: column;
   align-items: center;

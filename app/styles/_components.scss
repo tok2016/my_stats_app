@@ -374,26 +374,8 @@ form .drawer-submenu {
   }
 }
 
-.not-found {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0.67rem;
-
+.user-error {
   flex: 1;
-  margin: auto;
-
-  @include utils.font(utils.$h2-size, utils.$regular-font, utils.$fit-font);
-
-  svg {
-    width: 4.5rem;
-    height: 4.5rem;
-
-    * {
-      stroke-width: 0.1em;
-    }
-  }
 }
 
 .spinner {
@@ -566,4 +548,31 @@ form .drawer-submenu {
     background-color: $bg-color;
     color: $text-color;
   }
+}
+
+.error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+
+  font-size: utils.$regular-size;
+  width: 100%;
+
+  text-align: center;
+
+  .error-message-icon {
+    width: 5em;
+    height: 5em;
+  }
+}
+
+.stretch-error {
+  flex: 1;
+}
+
+.error-metric {
+  min-height: 7em;
+  height: 10em;
 }

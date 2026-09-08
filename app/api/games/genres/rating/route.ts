@@ -14,6 +14,7 @@ const getHighestRatedGenres: GameEndpointAction<
     'genresIds',
     ITEMS_IN_RATING
   );
+
   return NextResponse.json(genresRatingMetric, {
     status: 200,
     statusText: 'Genres were calculated by mean rating'

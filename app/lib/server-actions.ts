@@ -5,14 +5,14 @@ import { AxiosRequestConfig } from 'axios';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import Game, { GamesTablePageResponse } from '@ts/games/game';
+import { GamesFilter } from '@ts/games/filter';
+import { GamesTablePageResponse } from '@ts/games/game';
 import { CountData, MetricId } from '@ts/games/metric';
 import Country, { CountryIso, CountryResponse } from '@ts/users/country';
 import { ServicesMap } from '@ts/users/service';
-import { User, UserSet } from '@ts/users/user';
+import { User } from '@ts/users/user';
 
 import AxiosInstanse, { AxiosCountriesInstanse } from './axios-instanse';
-import ObjectMapArray from './object-map-array';
 import { defaultCountry, getErrorFormState } from './utils';
 
 export const logout = async () => {
@@ -37,13 +37,13 @@ const getAuthConfig = async (): Promise<AxiosRequestConfig | undefined> => {
   };
 };
 
-export const getUserSet = async (): Promise<UserSet> => {
+export const getCurrentUser = async (): Promise<User> => {
   const response = await AxiosInstanse.get<User>(
     '/api/user',
     await getAuthConfig()
   );
 
-  return { ...response.data, metrics: new Set(response.data.metrics) };
+  return response.data;
 };
 
 export const getServices = async (userId?: string): Promise<ServicesMap> => {
@@ -140,52 +140,38 @@ export const getUserDashboard = async (
   }
 };
 
-export const getData = async <DataType>(
-  url: string,
-  defaultValue: DataType
-): Promise<DataType> => {
-  try {
-    const response = await AxiosInstanse.get<DataType>(
-      url,
-      await getAuthConfig()
-    );
-    return response.data;
-  } catch {
-    return defaultValue;
-  }
+export const getData = async <DataType>(url: string): Promise<DataType> => {
+  const response = await AxiosInstanse.get<DataType>(
+    url,
+    await getAuthConfig()
+  );
+
+  return response.data;
 };
 
 export const getMetricData = async <MetricType>(
   url: string,
-  defaultValue: MetricType,
   userId: string,
   searchParams?: Record<string, string>
 ): Promise<MetricType> => {
   const params = new URLSearchParams({ user: userId, ...searchParams });
-  try {
-    const response = await AxiosInstanse.get<MetricType>(
-      `${url}?${params.toString()}`,
-      await getAuthConfig()
-    );
-    return response.data;
-  } catch {
-    return defaultValue;
-  }
+  const response = await AxiosInstanse.get<MetricType>(
+    `${url}?${params.toString()}`,
+    await getAuthConfig()
+  );
+  return response.data;
 };
 
 export const getGames = async (
-  userId: string
-): Promise<ObjectMapArray<Game, 'id'>> => {
-  try {
-    const response = await AxiosInstanse.get<GamesTablePageResponse>(
-      `/api/games?user=${userId}`,
-      await getAuthConfig()
-    );
+  params: Partial<GamesFilter> & { userId: string }
+): Promise<GamesTablePageResponse> => {
+  const searchParams = new URLSearchParams(params);
+  const response = await AxiosInstanse.get<GamesTablePageResponse>(
+    `/api/games?${searchParams.toString()}`,
+    await getAuthConfig()
+  );
 
-    return new ObjectMapArray(response.data.games, 'id');
-  } catch {
-    return new ObjectMapArray<Game, 'id'>([], 'id');
-  }
+  return response.data;
 };
 
 export const refreshSteamData = async () => {

@@ -15,11 +15,11 @@ export default async function AddGamePage({
   searchParams: Promise<AddGameParams>;
 }) {
   const { gameId } = await searchParams;
-  const game = gameId
-    ? await getData<SearchGame | null>(`/api/games/search/${gameId}`, null)
-    : undefined;
 
-  if (!game) return <SearchGameForm />;
-
-  return <GameRatingForm game={game} />;
+  try {
+    const game = await getData<SearchGame>(`/api/games/search/${gameId}`);
+    return <GameRatingForm game={game} />;
+  } catch {
+    return <SearchGameForm />;
+  }
 }

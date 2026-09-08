@@ -1,17 +1,23 @@
 import { PlatformsMetricsIds } from '@lib/metrics/metrics-id';
-import { getGames, getUserSet } from '@lib/server-actions';
+import { getCurrentUser, getGames } from '@lib/server-actions';
 
-import Metric from '../Metric';
+import ErrorMessage from '@components/ErrorMessage';
+
+import MetricPage from '../components/MetricPage';
 
 export default async function GamesPlatformsPage() {
-  const user = await getUserSet();
-  const games = await getGames(user.id);
+  try {
+    const user = await getCurrentUser();
+    const gamesPage = await getGames({ userId: user.id });
 
-  return (
-    <>
-      {PlatformsMetricsIds.map((metricId) => (
-        <Metric id={metricId} games={games} key={metricId} userId={user.id} />
-      ))}
-    </>
-  );
+    return (
+      <MetricPage
+        games={gamesPage.games}
+        userId={user.id}
+        metrics={PlatformsMetricsIds.slice()}
+      />
+    );
+  } catch (err) {
+    return <ErrorMessage error={err} className='stretch-error' />;
+  }
 }

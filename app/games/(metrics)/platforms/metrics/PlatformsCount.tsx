@@ -1,9 +1,16 @@
+'use client';
+
 import Game from '@ts/games/game';
 import { CountData } from '@ts/games/metric';
+import { MetricResponse } from '@ts/requests';
 
+import { getMetricClient } from '@lib/actions';
 import ObjectMapArray from '@lib/object-map-array';
-import { getMetricData } from '@lib/server-actions';
 
+import { ChartSkeleton } from '@components/charts/ChartSkeleton';
+import MetricWrapper from '@components/data-blocks/MetricWrapper';
+
+import FetchMetric from '../../components/FetchMetric';
 import PlatformsCountChart from '../charts/PlatformsCountChart';
 import { PlatformCountChartData } from '../types';
 
@@ -13,29 +20,49 @@ type PlatformsCountProps = {
   userId: string;
 };
 
-export default async function PlatformsCount({
+const fetchPlatformsCount =
+  (
+    platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>,
+    series: ObjectMapArray<NonNullable<Game['series']>, 'id'>
+  ) =>
+  async (params: {
+    userId: string;
+  }): Promise<MetricResponse<PlatformCountChartData[]>> => {
+    const platformsCountData = await getMetricClient<CountData[]>(
+      '/api/games/platforms/count',
+      params
+    );
+
+    return {
+      error: platformsCountData.error,
+      data: platformsCountData.data?.map((platform, i) => ({
+        id: platform.id,
+        percent: platform.percent,
+        name: platforms.findByKey(platform.id)?.name ?? 'Other',
+        index: i,
+        count: platform.count,
+        topSeries: platform.topSeries
+          ? series.findByKey(platform.topSeries)
+          : undefined
+      }))
+    };
+  };
+
+export default function PlatformsCount({
   platforms,
   seriesArray,
   userId
 }: PlatformsCountProps) {
-  const platformsCountData = await getMetricData<CountData[]>(
-    '/api/games/platforms/count',
-    [],
-    userId
+  return (
+    <MetricWrapper id='platforms-count' submetric>
+      <FetchMetric
+        fetchMetricData={fetchPlatformsCount(platforms, seriesArray)}
+        metric={(data) => <PlatformsCountChart data={data} />}
+        fallback={
+          <ChartSkeleton type='doughnut' className='switchable-chart' />
+        }
+        params={{ userId }}
+      />
+    </MetricWrapper>
   );
-
-  const chartData: PlatformCountChartData[] = platformsCountData.map(
-    (platform, i) => ({
-      id: platform.id,
-      percent: platform.percent,
-      name: platforms.findByKey(platform.id)?.name ?? 'Other',
-      index: i,
-      count: platform.count,
-      topSeries: platform.topSeries
-        ? seriesArray.findByKey(platform.topSeries)
-        : undefined
-    })
-  );
-
-  return <PlatformsCountChart data={chartData} />;
 }

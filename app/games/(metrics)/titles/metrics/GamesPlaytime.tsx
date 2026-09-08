@@ -1,21 +1,60 @@
-import { Suspense } from 'react';
+'use client';
 
-import { GameTableData } from '@ts/games/game';
+import Game, { GameTableData } from '@ts/games/game';
 import { MetricContentProps } from '@ts/games/metric';
+import { MetricResponse } from '@ts/requests';
 
-import { getMetricData } from '@lib/server-actions';
+import { getMetricClient } from '@lib/actions';
+import ObjectMapArray from '@lib/object-map-array';
 
+import Skeleton from '@components/Skeleton';
 import GameCollage from '@components/data-blocks/GameCollage';
+import GameCollageSkeleton from '@components/data-blocks/GameCollageSkeleton';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
+import PropBlock from '@components/data-blocks/PropBlock';
 
-import PropBlock from '../../../../components/data-blocks/PropBlock';
+import FetchMetric from '../../components/FetchMetric';
 import GamesPlaytimeTable from '../charts/GamesPlaytimeTable';
-import GamesPlaytimeSkeleton from '../skeletons/GamesPlaytimeSkeleton';
 import { SPECIAL_GAMES_COUNT } from '../utils';
 
 type TopGameBlockProps = {
   game: GameTableData;
 };
+
+type TopGameSkeletonProps = {
+  parentKey: string;
+  index: number;
+};
+
+const PLAYTIME_SKELETON_TABLE_ROWS = 7;
+
+const fetchGamePlaytime =
+  (games: ObjectMapArray<Game, 'id'>) =>
+  async (params: {
+    userId: string;
+  }): Promise<MetricResponse<GameTableData[]>> => {
+    const gamesIds = await getMetricClient<string[]>(
+      '/api/games/titles/playtime',
+      params
+    );
+
+    return {
+      error: gamesIds.error,
+      data: gamesIds.data
+        ?.map((id, i) => {
+          const game = games.findByKey(id);
+          if (!game) return;
+
+          const data: GameTableData = {
+            ...game,
+            index: i
+          };
+
+          return data;
+        })
+        .filter((game) => !!game)
+    };
+  };
 
 function TopGameBlock({ game }: TopGameBlockProps) {
   return (
@@ -49,50 +88,79 @@ function TopGameBlock({ game }: TopGameBlockProps) {
   );
 }
 
-async function TopGamesPlaytime({
+function TopGameSkeleton({ parentKey, index }: TopGameSkeletonProps) {
+  return (
+    <div className='data-block top-game'>
+      <Skeleton type='h4' />
+      <GameCollageSkeleton parentKey={parentKey} />
+      <div className='data-block-grid min'>
+        <PropBlock title='Developer'>
+          <Skeleton lineHeight='wide' rows={2} />
+        </PropBlock>
+
+        <PropBlock title='Publisher'>
+          <Skeleton lineHeight='wide' rows={2} />
+        </PropBlock>
+
+        <PropBlock title='Platform'>
+          <Skeleton lineHeight='wide' />
+        </PropBlock>
+
+        <PropBlock title='Playtime'>
+          <Skeleton lineHeight='wide' />
+        </PropBlock>
+      </div>
+
+      <div className='data-block-rank'>{index + 1}</div>
+    </div>
+  );
+}
+
+export function GamesPlaytimeSkeleton() {
+  return (
+    <div className='games-playtime'>
+      <div className='top-3-games'>
+        {Array.from({ length: SPECIAL_GAMES_COUNT }).map((_, i) => (
+          <TopGameSkeleton
+            key={`game-playtime-skeleton-${i}`}
+            parentKey={`game-playtime-skeleton-${i}`}
+            index={i}
+          />
+        ))}
+      </div>
+
+      <Skeleton
+        type='tablet'
+        unitClassName='game-row-skeleton'
+        rows={PLAYTIME_SKELETON_TABLE_ROWS}
+      />
+    </div>
+  );
+}
+
+export default function GamesPlaytime({
   metricId,
   games,
   userId
 }: MetricContentProps) {
-  const gamesIds = await getMetricData<string[]>(
-    '/api/games/titles/playtime',
-    [],
-    userId
-  );
-
-  const topGames = gamesIds
-    .map((id, i) => {
-      const game = games.findByKey(id);
-      if (!game) return;
-
-      const data: GameTableData = {
-        ...game,
-        index: i
-      };
-
-      return data;
-    })
-    .filter((game) => !!game);
-
   return (
     <MetricWrapper id={metricId}>
-      <div className='games-playtime'>
-        <div className='top-3-games'>
-          {topGames.slice(0, SPECIAL_GAMES_COUNT).map((game) => (
-            <TopGameBlock game={game} key={`${game.id}-playtime`} />
-          ))}
-        </div>
+      <FetchMetric
+        fetchMetricData={fetchGamePlaytime(games)}
+        metric={(data) => (
+          <div className='games-playtime'>
+            <div className='top-3-games'>
+              {data.slice(0, SPECIAL_GAMES_COUNT).map((game) => (
+                <TopGameBlock game={game} key={`${game.id}-playtime`} />
+              ))}
+            </div>
 
-        <GamesPlaytimeTable data={topGames.slice(SPECIAL_GAMES_COUNT)} />
-      </div>
+            <GamesPlaytimeTable data={data.slice(SPECIAL_GAMES_COUNT)} />
+          </div>
+        )}
+        fallback={<GamesPlaytimeSkeleton />}
+        params={{ userId }}
+      />
     </MetricWrapper>
-  );
-}
-
-export default function GamesPlaytime(props: MetricContentProps) {
-  return (
-    <Suspense fallback={<GamesPlaytimeSkeleton />}>
-      <TopGamesPlaytime {...props} />
-    </Suspense>
   );
 }

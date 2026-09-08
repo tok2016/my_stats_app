@@ -90,6 +90,11 @@ export type PeriodTopsMetric<MetricData> = {
 
 export type PeriodPlaytimeTops = PeriodTopsMetric<PeriodPlaytimeData>;
 
+export type FetchPeriodTopsMetricParams = {
+  userId: string;
+  period: PrecisePeriod;
+};
+
 export interface YearCountMetric {
   year: number;
   count: number;
@@ -100,15 +105,4 @@ export type MetricContentProps = {
   metricId: MetricId;
   userId: string;
   games: ObjectMapArray<Game, 'id'>;
-};
-
-export type MetricClientContentProps = Omit<MetricContentProps, 'games'> & {
-  games: Game[];
-};
-
-export type MetricWrapperProps = {
-  id: MetricId;
-  renderTitle?: (title: string) => React.ReactNode;
-  children: React.ReactNode;
-  className?: string;
 };

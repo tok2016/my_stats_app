@@ -1,24 +1,46 @@
-import { Suspense } from 'react';
+'use client';
 
 import Game from '@ts/games/game';
 import { MetricContentProps } from '@ts/games/metric';
 import { SeriesCollapsed } from '@ts/games/series';
+import { MetricResponse } from '@ts/requests';
 
+import { getMetricClient } from '@lib/actions';
 import ObjectMapArray from '@lib/object-map-array';
-import { getMetricData } from '@lib/server-actions';
 
+import Skeleton from '@components/Skeleton';
 import EmptyImage from '@components/data-blocks/EmptyImage';
 import GameCover from '@components/data-blocks/GameCover';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
+import PropBlock from '@components/data-blocks/PropBlock';
 
-import PropBlock from '../../../../components/data-blocks/PropBlock';
-import SeriesCountSkeleton from '../skeletons/SeriesCountSkeleton';
+import FetchMetric from '../../components/FetchMetric';
 import { MAX_GAMES_IN_SERIES } from '../utils';
 
 type TopSeriesProps = {
   series: SeriesCollapsed;
   games: ObjectMapArray<Game, 'id'>;
+};
+
+type TopSeriesSkeletonProps = {
+  parentKey: string;
+};
+
+const MAX_SERIES_SKELETONS = 5;
+
+const fetchTopSeries = async (params: {
+  userId: string;
+}): Promise<MetricResponse<SeriesCollapsed[]>> => {
+  const seriesData = await getMetricClient<SeriesCollapsed[]>(
+    '/api/games/titles/series',
+    params
+  );
+
+  return {
+    error: seriesData.error,
+    data: seriesData.data
+  };
 };
 
 function TopSeries({ series, games }: TopSeriesProps) {
@@ -88,36 +110,84 @@ function TopSeries({ series, games }: TopSeriesProps) {
   );
 }
 
-async function FetchSeriesCount({
+function TopSeriesSkeleton({ parentKey }: TopSeriesSkeletonProps) {
+  return (
+    <div className='data-block series-block'>
+      <Skeleton type='h4' />
+
+      <div className='series-games-collage'>
+        {Array.from({ length: MAX_GAMES_IN_SERIES }).map((_, i) => (
+          <Skeleton
+            key={`${parentKey}-series-game-cover-skeleton-${i}`}
+            type='image'
+            className={`game-cover series-game-${i}`}
+          />
+        ))}
+      </div>
+
+      <PropBlock title='Best game' className='min'>
+        <Skeleton lineHeight='wide' />
+      </PropBlock>
+
+      <div className='data-block-grid min'>
+        <PropBlock title='Developers'>
+          <Skeleton lineHeight='wide' rows={2} />
+        </PropBlock>
+
+        <PropBlock title='Publishers'>
+          <Skeleton lineHeight='wide' rows={2} />
+        </PropBlock>
+
+        <PropBlock title='Games'>
+          <Skeleton />
+        </PropBlock>
+
+        <PropBlock title='Playtime'>
+          <Skeleton />
+        </PropBlock>
+      </div>
+
+      <MultipleRating />
+    </div>
+  );
+}
+
+export function SeriesCountSkeleton() {
+  return (
+    <div className='top-series'>
+      {Array.from({ length: MAX_SERIES_SKELETONS }).map((_, i) => (
+        <TopSeriesSkeleton
+          key={`top-series-skeleton-${i}`}
+          parentKey={`top-series-skeleton-${i}`}
+        />
+      ))}
+    </div>
+  );
+}
+
+export default function SeriesCount({
   metricId,
   games,
   userId
 }: MetricContentProps) {
-  const seriesData = await getMetricData<SeriesCollapsed[]>(
-    '/api/games/titles/series',
-    [],
-    userId
-  );
-
   return (
     <MetricWrapper id={metricId}>
-      <div className='top-series'>
-        {seriesData.map((series) => (
-          <TopSeries
-            key={`${series.id}-series`}
-            series={series}
-            games={games}
-          />
-        ))}
-      </div>
+      <FetchMetric
+        fetchMetricData={fetchTopSeries}
+        metric={(data) => (
+          <div className='top-series'>
+            {data.map((series) => (
+              <TopSeries
+                key={`${series.id}-series`}
+                series={series}
+                games={games}
+              />
+            ))}
+          </div>
+        )}
+        fallback={<SeriesCountSkeleton />}
+        params={{ userId }}
+      />
     </MetricWrapper>
-  );
-}
-
-export default function SeriesCount(props: MetricContentProps) {
-  return (
-    <Suspense fallback={<SeriesCountSkeleton />}>
-      <FetchSeriesCount {...props} />
-    </Suspense>
   );
 }

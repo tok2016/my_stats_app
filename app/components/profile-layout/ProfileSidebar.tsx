@@ -7,7 +7,7 @@ import {
   SidebarModuleProps,
   SidebarOptionProps
 } from '@ts/ui/components-props';
-import { UserSet } from '@ts/users/user';
+import { User } from '@ts/users/user';
 
 import { logout } from '@lib/server-actions';
 import { ModulesPaths, defaultUser } from '@lib/utils';
@@ -19,7 +19,7 @@ import SidebarOption from './SidebarOption';
 import UserSearch from './UserSearch';
 
 type AuthorizedSidebarProps = SidebarModuleProps & {
-  user: UserSet;
+  user: User;
 };
 
 const SidebarOptions: SidebarOptionProps[] = [
@@ -52,11 +52,14 @@ function ProfileSidebarRaw({ user, path, expand }: AuthorizedSidebarProps) {
 
   const onLogout = async () => {
     await logout();
-    setUserState({ user: defaultUser });
+    setUserState({ user: { ...defaultUser, metrics: new Set() } });
   };
 
   useEffect(() => {
-    setUserState({ user, status: 'success' });
+    setUserState({
+      user: { ...user, metrics: new Set(user.metrics) },
+      status: 'success'
+    });
   }, [user, setUserState]);
 
   return (

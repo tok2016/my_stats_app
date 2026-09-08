@@ -1,56 +1,52 @@
-import countries from 'i18n-iso-countries';
-import { Suspense } from 'react';
+'use client';
 
 import { GameCountryMetric } from '@ts/games/game';
-import { MetricContentProps, MetricId } from '@ts/games/metric';
+import { MetricContentProps } from '@ts/games/metric';
+import { MetricResponse } from '@ts/requests';
 
-import { getMetricData } from '@lib/server-actions';
+import { getMetricClient } from '@lib/actions';
 
+import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
+import FetchMetric from '../../components/FetchMetric';
 import GamesCountriesChart from '../charts/GamesCountriesChart';
-import GamesCountriesSkeleton from '../skeletons/GamesCountriesSkeleton';
 import { GameCountryChartData } from '../types';
 
-type FetchGamesCountriesProps = {
-  metricId: MetricId;
+const fetchGamesCountries = async (params: {
   userId: string;
-};
-
-async function FetchGamesCountries({
-  metricId,
-  userId
-}: FetchGamesCountriesProps) {
-  const countriesData = await getMetricData<GameCountryMetric[]>(
+}): Promise<MetricResponse<GameCountryChartData[]>> => {
+  const countriesData = await getMetricClient<GameCountryMetric[]>(
     '/api/games/titles/countries',
-    [],
-    userId
+    params
   );
 
-  const chartData: GameCountryChartData[] = countriesData.map((country, i) => ({
-    id: country.country,
-    name: countries.getName(country.country, 'en', { select: 'alias' }) ?? '',
-    count: country.count,
-    country: country.country,
-    topGames: country.topGames,
-    hours: country.hours,
-    index: i
-  }));
-
-  return (
-    <MetricWrapper id={metricId}>
-      <GamesCountriesChart data={chartData} />
-    </MetricWrapper>
-  );
-}
+  return {
+    error: countriesData.error,
+    data: countriesData.data?.map((country, i) => ({
+      id: country.country,
+      name: country.name,
+      count: country.count,
+      country: country.country,
+      topGames: country.topGames,
+      hours: country.hours,
+      index: i
+    }))
+  };
+};
 
 export default function GamesCountries({
   metricId,
   userId
 }: MetricContentProps) {
   return (
-    <Suspense fallback={<GamesCountriesSkeleton />}>
-      <FetchGamesCountries metricId={metricId} userId={userId} />
-    </Suspense>
+    <MetricWrapper id={metricId}>
+      <FetchMetric
+        fetchMetricData={fetchGamesCountries}
+        metric={(data) => <GamesCountriesChart data={data} />}
+        fallback={<ChartSkeleton type='map' />}
+        params={{ userId }}
+      />
+    </MetricWrapper>
   );
 }

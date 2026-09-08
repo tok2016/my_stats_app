@@ -139,7 +139,12 @@ export const validateData = async <
   const validated = await validator.safeParseAsync(data);
 
   if (!validated.success) {
-    throw generateErrorResponse(400, 'Invalid data', validated.error.issues);
+    throw generateErrorResponse(
+      400,
+      'Invalid data',
+      'Invalid data',
+      validated.error.issues
+    );
   }
 
   return validated.data;

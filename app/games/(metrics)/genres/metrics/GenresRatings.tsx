@@ -1,29 +1,25 @@
-import { Suspense } from 'react';
+'use client';
 
 import Game from '@ts/games/game';
-import { MetricContentProps, MetricId, RatingData } from '@ts/games/metric';
+import { MetricContentProps, RatingData } from '@ts/games/metric';
+import { MetricResponse } from '@ts/requests';
 
-import ObjectMapArray from '@lib/object-map-array';
-import { getMetricData } from '@lib/server-actions';
+import { getMetricClient } from '@lib/actions';
 import { getSingularOrPlural } from '@lib/utils';
 
 import Rating from '@components/Rating';
-import EmptyMetric from '@components/data-blocks/EmptyMetric';
+import Skeleton from '@components/Skeleton';
 import GameCover from '@components/data-blocks/GameCover';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
-import GenresRatingsSkeleton from '../skeletons/GenresRatingsSkeleton';
-
-type HighestRatedGenresProps = {
-  metricId: MetricId;
-  genres: ObjectMapArray<Game['genres'][number], 'id'>;
-  userId: string;
-};
+import FetchMetric from '../../components/FetchMetric';
 
 type RatedGenreProps = {
   ratingData: RatingData;
   genre?: Game['genres'][number];
 };
+
+const RATED_GENRES_COUNT = 5;
 
 function RatedGenre({ ratingData, genre }: RatedGenreProps) {
   if (!genre) return;
@@ -51,35 +47,38 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
   );
 }
 
-async function HighestRatedGenres({
-  genres,
-  metricId,
-  userId
-}: HighestRatedGenresProps) {
-  const ratingData = await getMetricData<RatingData[]>(
-    '/api/games/genres/rating',
-    [],
-    userId
-  );
-
+export function GenresRatingsSkeleton() {
   return (
-    <MetricWrapper id={metricId}>
-      {!ratingData.length ? (
-        <EmptyMetric message={`You haven't rated any game yet`} />
-      ) : (
-        <div className='blocks-group'>
-          {ratingData.map((data) => (
-            <RatedGenre
-              key={`${data.id}-rating`}
-              ratingData={data}
-              genre={genres.findByKey(data.id)}
-            />
-          ))}
+    <div className='blocks-group'>
+      {Array.from({ length: RATED_GENRES_COUNT }).map((_, i) => (
+        <div
+          className='data-block genre-rating-block'
+          key={`rated-genre-skeleton-${i}`}
+        >
+          <Skeleton type='h4' unitClassName='rating-title-skeleton' />
+
+          <div className='data-block-content'>
+            <span className='min'>Best game:</span>
+            <Skeleton type='image' className='game-cover' />
+            <Skeleton />
+            <Skeleton fontSize='min' />
+          </div>
         </div>
-      )}
-    </MetricWrapper>
+      ))}
+    </div>
   );
 }
+
+const fetchGenresRatings = async (params: {
+  userId: string;
+}): Promise<MetricResponse<RatingData[]>> => {
+  const ratingData = await getMetricClient<RatingData[]>(
+    '/api/games/genres/rating',
+    params
+  );
+
+  return ratingData;
+};
 
 export default function GenresRatings({
   metricId,
@@ -92,8 +91,23 @@ export default function GenresRatings({
   );
 
   return (
-    <Suspense fallback={<GenresRatingsSkeleton />}>
-      <HighestRatedGenres genres={genres} metricId={metricId} userId={userId} />
-    </Suspense>
+    <MetricWrapper id={metricId}>
+      <FetchMetric
+        fetchMetricData={fetchGenresRatings}
+        metric={(data) => (
+          <div className='blocks-group'>
+            {data.map((value) => (
+              <RatedGenre
+                key={`${value.id}-rating`}
+                ratingData={value}
+                genre={genres.findByKey(value.id)}
+              />
+            ))}
+          </div>
+        )}
+        fallback={<GenresRatingsSkeleton />}
+        params={{ userId }}
+      />
+    </MetricWrapper>
   );
 }

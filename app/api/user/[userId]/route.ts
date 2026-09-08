@@ -19,7 +19,8 @@ const getUser: GeneralEndpointAction<'/api/user/[userId]'> = async (
   if (!credentials || !userInfo)
     throw generateErrorResponse(404, 'User was not found');
 
-  if (!userInfo.isPublic) throw generateErrorResponse(403, 'Forbidden');
+  if (!userInfo.isPublic)
+    throw generateErrorResponse(403, 'User profile is private');
 
   return NextResponse.json(uniteUserData(credentials, userInfo), {
     status: 200,

@@ -2,51 +2,47 @@
 
 import Game from '@ts/games/game';
 import {
-  MetricClientContentProps,
+  FetchPeriodTopsMetricParams,
+  MetricContentProps,
   PeriodPlaytimeTops,
-  PeriodTopsMetric,
-  PrecisePeriod
+  PeriodTopsMetric
 } from '@ts/games/metric';
+import { MetricResponse } from '@ts/requests';
 
+import { getMetricClient } from '@lib/actions';
 import ObjectMapArray from '@lib/object-map-array';
-import { getMetricData } from '@lib/server-actions';
 
 import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
 
 import { PlatformPeriodPlaytimeData } from '../types';
 
 const getPlatformsPeriods =
-  (
-    platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>,
-    userId: string
-  ) =>
+  (platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>) =>
   async (
-    periodType?: PrecisePeriod
-  ): Promise<PeriodTopsMetric<PlatformPeriodPlaytimeData>> => {
-    const periodTops = await getMetricData<PeriodPlaytimeTops>(
+    params: FetchPeriodTopsMetricParams
+  ): Promise<MetricResponse<PeriodTopsMetric<PlatformPeriodPlaytimeData>>> => {
+    const periodTops = await getMetricClient<PeriodPlaytimeTops>(
       '/api/games/platforms/periods',
-      {
-        periodType: 'season',
-        tops: []
-      },
-      userId,
-      {
-        period: periodType ?? 'season'
-      }
+      params
     );
 
     return {
-      periodType: periodTops.periodType,
-      tops: periodTops.tops.map((periodTop) => ({
-        period: periodTop.period,
-        top: periodTop.top.map((item, i) => ({
-          id: item.id,
-          name: platforms.findByKey(item.id)?.name ?? 'Other',
-          index: i,
-          hours: item.hours,
-          logo: platforms.findByKey(item.id)?.logo
-        }))
-      }))
+      error: periodTops.error,
+      data: !periodTops.data
+        ? undefined
+        : {
+            periodType: periodTops.data.periodType,
+            tops: periodTops.data.tops.map((periodTop) => ({
+              period: periodTop.period,
+              top: periodTop.top.map((item, i) => ({
+                id: item.id,
+                name: platforms.findByKey(item.id)?.name ?? 'Other',
+                index: i,
+                hours: item.hours,
+                logo: platforms.findByKey(item.id)?.logo
+              }))
+            }))
+          }
     };
   };
 
@@ -58,16 +54,17 @@ export default function PlatformsPeriodTops({
   metricId,
   games,
   userId
-}: MetricClientContentProps) {
-  const platforms = new ObjectMapArray(games, 'id').mapByKey<
-    Game['platform'],
+}: MetricContentProps) {
+  const platforms = games.mapByKey<Game['platform'], 'id'>(
+    (game) => game.platform,
     'id'
-  >((game) => game.platform, 'id');
+  );
 
   return (
     <PeriodTops
       id={metricId}
-      getPeriodMetric={getPlatformsPeriods(platforms, userId)}
+      userId={userId}
+      fetchPeriodMetric={getPlatformsPeriods(platforms)}
       listItemContent={platformItemContent}
       displayFields={['hours']}
       valueField='hours'

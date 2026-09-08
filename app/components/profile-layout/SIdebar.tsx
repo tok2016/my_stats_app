@@ -4,7 +4,7 @@ import { memo, useReducer } from 'react';
 
 import { usePathname } from 'next/navigation';
 
-import { UserSet } from '@ts/users/user';
+import { User } from '@ts/users/user';
 
 import { defaultUser } from '@lib/utils';
 
@@ -12,7 +12,7 @@ import GuestSidebar from './GuestSidebar';
 import ProfileSidebar from './ProfileSidebar';
 
 type SidebarProps = {
-  user?: UserSet;
+  user?: User;
   authorized?: boolean;
 };
 

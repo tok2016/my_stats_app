@@ -1,23 +1,15 @@
-import { getGames, getUserSet, refreshSteamData } from '@lib/server-actions';
+import { getCurrentUser } from '@lib/server-actions';
 
+import Dashboard from '@app/(user)/components/profile-info/Dashboard';
 import ProfileInfo from '@app/(user)/components/profile-info/ProfileInfo';
-import Metric from '@app/games/(metrics)/Metric';
 
 export default async function IamPage() {
-  const user = await getUserSet();
-
-  if (user.metrics.size) {
-    await refreshSteamData();
-  }
-
-  const games = await getGames(user.id);
+  const user = await getCurrentUser();
 
   return (
     <div className='metrics'>
       <ProfileInfo user={user} authorized />
-      {user.metrics.values().map((metric) => (
-        <Metric id={metric} games={games} key={metric} userId={user.id} />
-      ))}
+      <Dashboard user={user} />
     </div>
   );
 }

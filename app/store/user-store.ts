@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 
+import { MetricId } from '@ts/games/metric';
 import { FetchStatus } from '@ts/ui/fetch-status';
 import { UserSet } from '@ts/users/user';
 
@@ -15,7 +16,7 @@ type UserActions = {
 };
 
 const userState = create<UserState & UserActions>((set) => ({
-  user: defaultUser,
+  user: { ...defaultUser, metrics: new Set<MetricId>() },
   status: 'pending',
   setUserState: (userState) => set(userState)
 }));

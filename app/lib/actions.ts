@@ -1,3 +1,8 @@
+import { isAxiosError } from 'axios';
+
+import { GamesFilter } from '@ts/games/filter';
+import Game from '@ts/games/game';
+import { MetricResponse } from '@ts/requests';
 import FormState from '@ts/ui/form-state';
 import {
   ConfirmationBaseAction,
@@ -7,6 +12,8 @@ import {
 import { User } from '@ts/users/user';
 
 import AxiosInstanse from './axios-instanse';
+import ObjectMapArray from './object-map-array';
+import { isErrorResponse } from './type-guards';
 import { defaultConfirmation, getErrorFormState } from './utils';
 
 export const getUsers = async (
@@ -14,21 +21,18 @@ export const getUsers = async (
   limit?: number,
   signal?: AbortSignal
 ): Promise<User[]> => {
-  try {
-    const searchParams = new URLSearchParams();
+  const searchParams = new URLSearchParams();
 
-    if (credential) searchParams.append('credential', credential);
+  if (credential) searchParams.append('credential', credential);
 
-    if (limit) searchParams.append('limit', limit.toString());
+  if (limit) searchParams.append('limit', limit.toString());
 
-    const response = await AxiosInstanse.get<User[]>(
-      `/api/users?${searchParams.toString()}`,
-      { signal }
-    );
-    return response.data;
-  } catch {
-    return [];
-  }
+  const response = await AxiosInstanse.get<User[]>(
+    `/api/users?${searchParams.toString()}`,
+    { signal }
+  );
+
+  return response.data;
 };
 
 export const getOtherUser = async (userId: string): Promise<User> => {
@@ -95,4 +99,50 @@ export const deleteConfirmation = async (operationId: string) => {
   } catch {
     return;
   }
+};
+
+export const getMetricClient = async <MetricType>(
+  url: string,
+  searchParams: Record<string, string> & { userId: string }
+): Promise<MetricResponse<MetricType>> => {
+  try {
+    const params = new URLSearchParams(searchParams);
+    const response = await AxiosInstanse.get<MetricType>(
+      `${url}?${params.toString()}`
+    );
+    return { data: response.data };
+  } catch (error) {
+    if (isAxiosError(error)) {
+      if (isErrorResponse(error.response?.data))
+        return { error: error.response.data };
+
+      return {
+        error: {
+          name: error.name,
+          status: error.response?.status ?? 500,
+          message: error.response?.statusText ?? error.message,
+          issues: []
+        }
+      };
+    }
+
+    return {
+      error: {
+        name: 'Undefined error',
+        status: 500,
+        message: 'Something went wrong',
+        issues: []
+      }
+    };
+  }
+};
+
+export const getGamesClient = async (
+  filters: Partial<GamesFilter> & { userId: string }
+): Promise<MetricResponse<ObjectMapArray<Game, 'id'>>> => {
+  const games = await getMetricClient<Game[]>('/api/games', filters);
+  return {
+    error: games.error,
+    data: !games.data ? undefined : new ObjectMapArray(games.data, 'id')
+  };
 };

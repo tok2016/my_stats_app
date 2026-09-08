@@ -49,14 +49,11 @@ const getServicesByCredentialsId = async (id: string): Promise<ServicesMap> => {
 
 const generateAccessError = (error: unknown) => {
   if (isErrorResponse(error)) {
-    console.log('fine');
     return NextResponse.json(error, {
       status: error.status,
       statusText: error.message
     });
   }
-
-  console.log('bad');
 
   const errorResponse = generateErrorResponse(
     500,
@@ -178,6 +175,9 @@ export const gameProtectedEndpoint =
         id: game._id.toString()
       }));
 
+      if (!games.length)
+        throw generateErrorResponse(404, 'Games list is empty');
+
       return await action(
         req,
         context.params,
@@ -194,7 +194,7 @@ export const gameMetricEndpoint =
   ) =>
   async (req: NextRequest, context: RouteContext<Endpoint>) => {
     try {
-      const userId = req.nextUrl.searchParams.get('user');
+      const userId = req.nextUrl.searchParams.get('userId');
 
       if (!userId) throw generateErrorResponse(400, 'User ID was not given');
 
@@ -204,12 +204,15 @@ export const gameMetricEndpoint =
       else if (user._id.toString() !== userId && !user.isPublic)
         throw generateErrorResponse(403, 'Forbidden');
 
-      const games: GameCore[] = (
-        await GamesModel.find({ userId: userId }).lean()
-      ).map((game) => ({
-        ...game,
-        id: game._id.toString()
-      }));
+      const games: GameCore[] = (await GamesModel.find({ userId }).lean()).map(
+        (game) => ({
+          ...game,
+          id: game._id.toString()
+        })
+      );
+
+      if (!games.length)
+        throw generateErrorResponse(404, 'Games list is empty');
 
       return await action(
         req,

@@ -130,7 +130,7 @@ const getGameById: GameEndpointAction<
   )[0];
 
   if (!foundIgdbGame)
-    throw generateErrorResponse(404, 'Game full data was not found');
+    throw generateErrorResponse(404, 'Game data was not found');
 
   const otherGames = await getFullGames(games);
   const gameFull = uniteGameCoreAndIgdb(

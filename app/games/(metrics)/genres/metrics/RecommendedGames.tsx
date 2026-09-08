@@ -1,39 +1,41 @@
-import { Suspense } from 'react';
+'use client';
 
 import { RecommendedGame } from '@ts/games/game';
-import { MetricContentProps, MetricId } from '@ts/games/metric';
+import { MetricContentProps } from '@ts/games/metric';
+import { MetricResponse } from '@ts/requests';
 
-import { getMetricData } from '@lib/server-actions';
+import { getMetricClient } from '@lib/actions';
 
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import RecommendedGameBlock from '@app/games/components/RecommendedGameBlock';
+import RecommendedGameSkeleton from '@app/games/components/RecommendedGameSkeleton';
 
-import RecommendedGamesSkeletons from '../skeletons/RecommendedGamesSkeletons';
+import FetchMetric from '../../components/FetchMetric';
 
-type RecommendedGamesListProps = {
-  metricId: MetricId;
+const GAMES_SKELETONS_TO_SHOW = 5;
+
+const fetchRecommendations = async (params: {
   userId: string;
-};
-
-async function RecommendedGamesList({
-  metricId,
-  userId
-}: RecommendedGamesListProps) {
-  const recommendations = await getMetricData<RecommendedGame[]>(
+}): Promise<MetricResponse<RecommendedGame[]>> => {
+  const recommendations = await getMetricClient<RecommendedGame[]>(
     '/api/games/genres/recommend',
-    [],
-    userId
+    params
   );
 
+  return recommendations;
+};
+
+export function RecommendedGamesSkeleton() {
   return (
-    <MetricWrapper id={metricId} className='recommended-group'>
-      <div className='recommended-games'>
-        {recommendations.map((game) => (
-          <RecommendedGameBlock key={game.id} {...game} />
-        ))}
-      </div>
-    </MetricWrapper>
+    <div className='recommended-games'>
+      {Array.from({ length: GAMES_SKELETONS_TO_SHOW }).map((_, i) => (
+        <RecommendedGameSkeleton
+          key={`recommended-game-${i}`}
+          parentKey={`recommended-game-${i}`}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -42,8 +44,19 @@ export default function RecommendedGames({
   userId
 }: MetricContentProps) {
   return (
-    <Suspense fallback={<RecommendedGamesSkeletons />}>
-      <RecommendedGamesList metricId={metricId} userId={userId} />
-    </Suspense>
+    <MetricWrapper id={metricId} className='recommended-group'>
+      <FetchMetric
+        fetchMetricData={fetchRecommendations}
+        fallback={<RecommendedGamesSkeleton />}
+        metric={(data) => (
+          <div className='recommended-games'>
+            {data.map((game) => (
+              <RecommendedGameBlock key={game.id} {...game} />
+            ))}
+          </div>
+        )}
+        params={{ userId }}
+      />
+    </MetricWrapper>
   );
 }

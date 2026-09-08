@@ -1,54 +1,52 @@
-import { Suspense } from 'react';
+'use client';
 
-import {
-  MetricContentProps,
-  MetricId,
-  YearCountMetric
-} from '@ts/games/metric';
+import { MetricContentProps, YearCountMetric } from '@ts/games/metric';
+import { MetricResponse } from '@ts/requests';
 
-import { getMetricData } from '@lib/server-actions';
+import { getMetricClient } from '@lib/actions';
 
+import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
+import FetchMetric from '../../components/FetchMetric';
 import GamesLineChart from '../charts/GamesLineChart';
-import GameYearsSkeleton from '../skeletons/GameYearsSkeleton';
 import { GameYearChartData } from '../types';
 
-type FetchGamePlayDatesProps = { metricId: MetricId; userId: string };
-
-async function FetchGamePlayDates({
-  metricId,
-  userId
-}: FetchGamePlayDatesProps) {
-  const years = await getMetricData<YearCountMetric[]>(
+const fetchGamePlayDates = async (params: {
+  userId: string;
+}): Promise<MetricResponse<GameYearChartData[]>> => {
+  const years = await getMetricClient<YearCountMetric[]>(
     '/api/games/titles/playdate',
-    [],
-    userId
+    params
   );
 
-  const chartData: GameYearChartData[] = years.map((year) => ({
-    id: year.year,
-    name: year.year.toString(),
-    year: year.year,
-    count: year.count,
-    index: 0,
-    topGame: year.topGames[0].name
-  }));
-
-  return (
-    <MetricWrapper id={metricId}>
-      <GamesLineChart data={chartData} chartId='game-playdates-line' />
-    </MetricWrapper>
-  );
-}
+  return {
+    error: years.error,
+    data: years.data?.map((year) => ({
+      id: year.year,
+      name: year.year.toString(),
+      year: year.year,
+      count: year.count,
+      index: 0,
+      topGame: year.topGames[0].name
+    }))
+  };
+};
 
 export default function GamePlayDates({
   metricId,
   userId
 }: MetricContentProps) {
   return (
-    <Suspense fallback={<GameYearsSkeleton metricId={metricId} />}>
-      <FetchGamePlayDates metricId={metricId} userId={userId} />
-    </Suspense>
+    <MetricWrapper id={metricId}>
+      <FetchMetric
+        fetchMetricData={fetchGamePlayDates}
+        metric={(data) => (
+          <GamesLineChart data={data} chartId='game-playdates-line' />
+        )}
+        fallback={<ChartSkeleton type='line' />}
+        params={{ userId }}
+      />
+    </MetricWrapper>
   );
 }
