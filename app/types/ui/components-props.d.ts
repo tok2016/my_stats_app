@@ -58,6 +58,7 @@ export interface SliderProps extends InputBaseProps {
 export type PathInfo = {
   name: string;
   label: string;
+  disabled?: boolean;
 };
 
 export type SidebarSubButtonProps = PathInfo & {

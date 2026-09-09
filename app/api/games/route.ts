@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { GamesFilter } from '@ts/games/filter';
 import Game, { GameTableData, GamesTablePageResponse } from '@ts/games/game';
+import { IgdbSeries } from '@ts/games/series';
 import { GameEndpointAction, ProtectedEndpointAction } from '@ts/requests';
 import { LiteralType } from '@ts/util-types';
 
@@ -11,6 +12,7 @@ import {
   protectedEndpoint
 } from '@lib/endpoint-generators';
 import { getFullGames } from '@lib/games/games-utils';
+import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
 import { generateErrorResponse, parseBooleanString } from '@lib/utils';
 import { NewGameValidator, validateData } from '@lib/validation-schemas';
@@ -193,6 +195,35 @@ const postNewGame: ProtectedEndpointAction<'/api/games'> = async (
     status: 201,
     statusText: 'New game was added successfully'
   });
+};
+
+export const PUT = async () => {
+  const games = await GamesModel.find().lean();
+  const gamesApiIds = games.map((game) => game.apiId);
+
+  const gamesWithSeries = await igdbRequest<{
+    id: number;
+    collections?: IgdbSeries[];
+  }>('/games', {
+    fields: ['collections', 'collections.games', 'collections.name'],
+    where: `id = (${gamesApiIds.join(',')})`,
+    limit: gamesApiIds.length
+  });
+
+  const promises = gamesWithSeries.map((game) =>
+    GamesModel.updateMany(
+      { apiId: game.id },
+      {
+        seriesId: game.collections?.reduce((prev, curr) =>
+          curr.games.length > prev.games.length ? curr : prev
+        ).id
+      }
+    )
+  );
+
+  await Promise.all(promises);
+
+  return new NextResponse('fine');
 };
 
 export const GET = gameMetricEndpoint(getGames);

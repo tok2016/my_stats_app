@@ -28,7 +28,7 @@ export default function SidebarOption(sidebarOption: SidebarOptionProps) {
     expand(isChoosen ? sidebarOption.name : '');
   }, [expand, isChoosen, sidebarOption.name]);
 
-  if (!sidebarOption.subButtons) {
+  if (!sidebarOption.subButtons || sidebarOption.disabled) {
     return button;
   }
 

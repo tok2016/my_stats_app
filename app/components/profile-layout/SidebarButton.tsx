@@ -19,11 +19,12 @@ export default function SidebarButton({
   href,
   isChoosen = false,
   loading = false,
+  disabled,
   onClick
 }: SidebarButtonProps) {
   return (
     <div
-      className={`sidebar-button ${isChoosen ? 'choosen' : ''}`}
+      className={`sidebar-button ${isChoosen ? 'choosen' : ''} ${disabled ? 'disabled' : ''}`}
       onClick={onClick}
     >
       {loading ? (
@@ -43,7 +44,7 @@ export default function SidebarButton({
         <span className={SIDEBAR_LABEL_CLASS}>{label}</span>
       )}
 
-      {!href || <Link href={href} className='sidebar-link' scroll={false} />}
+      {href && <Link href={href} className='sidebar-link' scroll={false} />}
     </div>
   );
 }

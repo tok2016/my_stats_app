@@ -28,7 +28,7 @@ const fetchGamePlayDates = async (params: {
       year: year.year,
       count: year.count,
       index: 0,
-      topGame: year.topGames[0].name
+      topGame: year.topGames[0]?.name ?? 'no'
     }))
   };
 };

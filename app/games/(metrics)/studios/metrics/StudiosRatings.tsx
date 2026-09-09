@@ -27,6 +27,8 @@ function RatedStudio({ ratedStudio, studio }: RatedStudioProps) {
 
   const topGame = ratedStudio.topGames[0];
 
+  if (!topGame) return;
+
   return (
     <div className='data-block rated-studio'>
       <h3 className='colored'>{studio.name}</h3>

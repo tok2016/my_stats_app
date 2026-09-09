@@ -25,6 +25,7 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
   if (!genre) return;
 
   const topGame = ratingData.topGames[0];
+  if (!topGame) return;
   return (
     <div className='data-block genre-rating-block'>
       <div className='rating-title'>

@@ -47,7 +47,7 @@ function TopSeries({ series, games }: TopSeriesProps) {
   const seriesGames = series.games
     .slice(0, MAX_GAMES_IN_SERIES)
     .map((game) => games.findByKey(game));
-  const percent = Math.round((seriesGames.length / series.allGames) * 100);
+  const percent = Math.round((series.games.length / series.allGames) * 100);
 
   return (
     <div className='data-block series-block'>
@@ -92,7 +92,7 @@ function TopSeries({ series, games }: TopSeriesProps) {
         </PropBlock>
 
         <PropBlock title='Games'>
-          <span className='colored bold'>{seriesGames.length}</span>
+          <span className='colored bold'>{series.games.length}</span>
           <span>{` (${percent}%)`}</span>
         </PropBlock>
 

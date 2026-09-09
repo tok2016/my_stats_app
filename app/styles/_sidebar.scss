@@ -103,8 +103,12 @@ $sidebar-expanded-width: 16em;
     }
   }
 
-  svg * {
+  svg {
     stroke-width: 3px;
+  }
+
+  &.disabled {
+    cursor: default;
   }
 }
 
@@ -147,27 +151,25 @@ $sidebar-expanded-width: 16em;
 
   .sidebar-button,
   .sidebar-subbutton {
-    span,
-    svg {
-      color: $text-color;
-    }
+    color: $text-color;
 
-    .sidebar-icon.loaded {
+    &:not(.disabled) .sidebar-icon.loaded {
       .avatar,
       svg {
         filter: drop-shadow(0 0 2 * utils.$spread $text-color);
       }
     }
 
-    &:hover {
-      span,
-      svg {
-        color: $text-hover-color;
-      }
+    &:not(.disabled):hover {
+      color: $text-hover-color;
 
       img {
         filter: brightness(0.75);
       }
+    }
+
+    &.disabled {
+      color: utils.$skeleton-color;
     }
   }
 
