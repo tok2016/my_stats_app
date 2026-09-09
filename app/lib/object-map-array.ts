@@ -228,12 +228,8 @@ export default class ObjectMapArray<
     initialValue: T[ValueKey]
   ) {
     let result = initialValue;
-    this.#array.forEach((item, i, arr) => {
-      result = callbackfn(
-        i === 0 ? initialValue : arr[i - 1][key],
-        item[key],
-        i
-      );
+    this.#array.forEach((item, i) => {
+      result = callbackfn(result, item[key], i);
     });
 
     return result;

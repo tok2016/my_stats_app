@@ -52,10 +52,10 @@ export const CredentialsValidator: z.ZodType<NewCredentials> =
 
 export const UserUpdateValidator: z.ZodType<UserUpdate> = z.object({
   email: z.email().optional(),
-  birthdate: z.string().nullish().default(null),
-  country: z.string().nullish().default(null),
-  isPublic: z.boolean().default(false),
-  unblockDate: z.string().nullish().default(null)
+  birthdate: z.string().nullish(),
+  country: z.string().nullish(),
+  isPublic: z.boolean().optional(),
+  unblockDate: z.string().nullish()
 });
 
 export const UserLoginValidator: z.ZodType<UserLogin> = z.object({
@@ -119,7 +119,8 @@ export const NewGameValidator: z.ZodType<NewGame> = z.object({
   rating: z.number().nonnegative().optional(),
   releasedAt: z.string().optional(),
   playDate: z.string().optional(),
-  coverId: z.string().optional()
+  coverId: z.string().optional(),
+  seriesId: z.number().optional()
 });
 
 export const GameUpdateValidator: z.ZodType<GameUpdate> = z.object({

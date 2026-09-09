@@ -27,6 +27,7 @@ const SidebarOptions: SidebarOptionProps[] = [
     name: 'music',
     label: 'Music',
     icon: <MusicSolid />,
+    disabled: true,
     subButtons: Object.entries(ModulesPaths)
       .filter((entry) => entry[0].startsWith('/music'))
       .map((entry) => ({

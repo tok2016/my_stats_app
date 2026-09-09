@@ -83,8 +83,7 @@ const getTopSeries: GameEndpointAction<'/api/games/titles/series'> = async (
 
   const allIgdbSeries = await igdbRequest<IgdbSeriesExpanded>('/collections', {
     fields: SERIES_EXPANDED_FIELDS,
-    where: `id = (${topSeries.join(',')})`,
-    limit: topSeries.length
+    where: `id = (${topSeries.join(',')})`
   });
 
   const series: SeriesCollapsed[] = allIgdbSeries
