@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { ProtectedEndpointAction } from '@ts/requests';
 
-import { getCredentialsById } from '@lib/auth';
+import { tryGetCredentialsById } from '@lib/auth';
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import { UsersModel } from '@lib/models';
 import { generateErrorResponse } from '@lib/utils';
@@ -13,7 +13,7 @@ const getDashboard: ProtectedEndpointAction<'/api/dashboard'> = async (
   _params,
   token
 ) => {
-  const credentials = await getCredentialsById(token.id);
+  const credentials = await tryGetCredentialsById(token.id);
   if (!credentials)
     throw generateErrorResponse(404, 'Credentials were not found');
 
@@ -32,7 +32,7 @@ const postNewMetric: ProtectedEndpointAction<'/api/dashboard'> = async (
 ) => {
   const metricId = await validateData(DashboardValidator, await req.text());
 
-  const credentials = await getCredentialsById(token.id);
+  const credentials = await tryGetCredentialsById(token.id);
   if (!credentials)
     throw generateErrorResponse(404, 'Credentials were not found');
 
@@ -56,7 +56,7 @@ const deleteMetric: ProtectedEndpointAction<'/api/dashboard'> = async (
 ) => {
   const metricId = await validateData(DashboardValidator, await req.text());
 
-  const credentials = await getCredentialsById(token.id);
+  const credentials = await tryGetCredentialsById(token.id);
   if (!credentials)
     throw generateErrorResponse(404, 'Credentials were not found');
 
@@ -78,7 +78,7 @@ const deleteDashboard: ProtectedEndpointAction<'/api/dashboard'> = async (
   _params,
   token
 ) => {
-  const credentials = await getCredentialsById(token.id);
+  const credentials = await tryGetCredentialsById(token.id);
   if (!credentials)
     throw generateErrorResponse(404, 'Credentials were not found');
 

@@ -14,20 +14,29 @@ import ObjectMapArray from '@lib/object-map-array';
 
 const TOP_SERIES = 5;
 
+/**
+ * Calculates series data.
+ * @param igdbSeries - Series data from IGDB with all games.
+ * @param games - All users games.
+ * @returns Series detailed data.
+ */
 const getSeriesInfo = (
   igdbSeries: IgdbSeriesExpanded,
   games: ObjectMapArray<GameCore, 'apiId'>
 ): SeriesCollapsed => {
+  //Filters series games that the user has and sorts them by rating and playtime.
   const ownedGames = new ObjectMapArray(
     igdbSeries.games
       .map((game) => games.findByKey(game.id))
       .filter((game) => !!game),
     'id'
-  ).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  ).sort((a, b) => {
+    const diff = (b.rating ?? 0) - (a.rating ?? 0);
+    if (!diff) return b.hours - a.hours;
+    return diff;
+  });
 
-  if (typeof ownedGames.at(0)?.rating !== 'number')
-    ownedGames.sort((a, b) => b.hours - a.hours);
-
+  //Distributes developers and publishers of series games.
   const developers = new ObjectMapArray<
     SeriesCollapsed['developers'][number],
     'id'
@@ -44,6 +53,7 @@ const getSeriesInfo = (
     });
   });
 
+  //Calculates mean ratings.
   const fullSeries: SeriesCollapsed = {
     id: igdbSeries.id,
     name: igdbSeries.name,
@@ -60,11 +70,22 @@ const getSeriesInfo = (
   return fullSeries;
 };
 
+/**
+ * Public method. Calculates top series by games count.
+ * @param _req - Request object.
+ * @param _params - Route params.
+ * @param games - All games of user.
+ * @throws 400 if user id is not given.
+ * @throws 403 if user is private.
+ * @throws 404 if user is not found or no game of theirs is found.
+ * @returns Top series by games count.
+ */
 const getTopSeries: GameEndpointAction<'/api/games/titles/series'> = async (
   _req,
   _params,
   games
 ) => {
+  //Groups games by series with their count.
   const seriesCountMap = new Map<number, number>();
 
   games.forEach((game) => {
@@ -73,6 +94,7 @@ const getTopSeries: GameEndpointAction<'/api/games/titles/series'> = async (
     seriesCountMap.set(game.seriesId, seriesCount + 1);
   });
 
+  //Filters series with games more than 1 and sorts them by games count.
   const topSeries = seriesCountMap
     .entries()
     .toArray()
@@ -81,14 +103,15 @@ const getTopSeries: GameEndpointAction<'/api/games/titles/series'> = async (
     .slice(0, TOP_SERIES)
     .map((entry) => entry[0]);
 
+  //Fetches all games of series from IGDB.
   const allIgdbSeries = await igdbRequest<IgdbSeriesExpanded>('/collections', {
     fields: SERIES_EXPANDED_FIELDS,
     where: `id = (${topSeries.join(',')})`
   });
 
-  const series: SeriesCollapsed[] = allIgdbSeries
-    .map((igdbSeries) => getSeriesInfo(igdbSeries, games))
-    .sort((a, b) => b.games.length - a.games.length);
+  const series: SeriesCollapsed[] = allIgdbSeries.map((igdbSeries) =>
+    getSeriesInfo(igdbSeries, games)
+  );
 
   return NextResponse.json(series, {
     status: 200,

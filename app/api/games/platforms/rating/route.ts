@@ -8,14 +8,26 @@ import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getRatingMetric } from '@lib/metrics/rating-metric';
 import { ITEMS_IN_RATING } from '@lib/utils';
 
+/**
+ * Public method. Calculates top platforms by average rating of their games.
+ * @param _req - Request object.
+ * @param _params - Route params.
+ * @param games - All games of user.
+ * @throws 400 if user id is not given.
+ * @throws 403 if user is private.
+ * @throws 404 if user is not found, no game of theirs is found or ranked.
+ * @returns Top platforms by average rating with top rated games and genre.
+ */
 const getPlatformsRatings: GameEndpointAction<
   '/api/games/platforms/rating'
 > = async (_req, _params, games) => {
+  //Map of platform id and map of genres.
   const genresByPlatforms = new Map<
     number | string,
     MetricMap<CountCompareData>
   >();
 
+  //Calculates playtime and games count for every genres of every platform.
   games.forEach((game) => {
     game.genresIds.forEach((genre) => {
       const platformGenre = genresByPlatforms.get(game.platformId);
@@ -31,12 +43,14 @@ const getPlatformsRatings: GameEndpointAction<
     });
   });
 
+  //Calculates top platforms by average rating and top rated games.
   const platformsRatings = getRatingMetric(
     games,
     'platformId',
     ITEMS_IN_RATING
   );
 
+  //Defines top genre of every platforms by games count and playtime.
   const platfromsAndGenres: PlatformRatingData[] = platformsRatings.map(
     (ratingData) => {
       const platformGenres = genresByPlatforms.get(ratingData.id) ?? {};

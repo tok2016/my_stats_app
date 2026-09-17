@@ -14,6 +14,16 @@ type GenreCompareData = {
   games: string[];
 };
 
+const GENRES_WITH_TOPS = 3;
+const GAMES_IN_TOP = 5;
+
+/**
+ * Calculates compate data for genre groups.
+ * @param game - Base game data.
+ * @param genreId - Genre id from genres array of game.
+ * @param stored - Previously stored genre group.
+ * @returns Genre group with aggregated data.
+ */
 const aggregateGenreCompare = (
   game: GameCore,
   genreId: number,
@@ -29,12 +39,21 @@ const aggregateGenreCompare = (
   };
 };
 
-const GENRES_WITH_TOPS = 3;
-const GAMES_IN_TOP = 5;
-
+/**
+ * Public method. Calculates top games of top-3 genres by playtime of current year or all time. All time is the default option.
+ * @param _req - Request object.
+ * @param _params - Route params.
+ * @param games - All games of user.
+ * @throws 400 if user id is not given.
+ * @throws 403 if user is private.
+ * @throws 404 if user is not found or no game of theirs is found.
+ * @returns Top-3 genres by playtime with their top games by playtime.
+ */
 const getTopLongestGamesByGenre: GameEndpointAction<
   '/api/games/genres/topGames'
 > = async (req, _params, games) => {
+  //If period is current yera, filters games by the last date the user played them.
+  //Sorts games by playtime.
   const greatPeriod =
     (req.nextUrl.searchParams.get('period') as GreatPeriod) ?? 'allTime';
 
@@ -48,20 +67,18 @@ const getTopLongestGamesByGenre: GameEndpointAction<
         )
   ).sort((a, b) => b.hours - a.hours);
 
-  const topsByGenre = gamesDescending.flatGroupBy(
-    aggregateGenreCompare,
-    'genresIds',
-    'id',
-    undefined
-  );
-
-  const genreTops: GenreTop[] = topsByGenre
+  //Groups games by genres and sorts them by count and playtime.
+  const topsByGenre = gamesDescending
+    .flatGroupBy(aggregateGenreCompare, 'genresIds', 'id', undefined)
     .sort((a, b) => {
       const diff = b.count - a.count;
       if (!diff) return b.hours - a.hours;
       return diff;
     })
-    .slice(0, GENRES_WITH_TOPS)
+    .slice(0, GENRES_WITH_TOPS);
+
+  //Converts genres map array to array.
+  const genreTops: GenreTop[] = topsByGenre
     .map((genre) => ({
       id: genre.id,
       topGames: genre.games

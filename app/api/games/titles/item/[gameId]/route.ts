@@ -11,7 +11,7 @@ import Game, {
 import { RatingDetialed, Ratings } from '@ts/games/rating';
 import { GameEndpointAction, ProtectedEndpointAction } from '@ts/requests';
 
-import { getCredentialsById } from '@lib/auth';
+import { tryGetCredentialsById } from '@lib/auth';
 import {
   gameProtectedEndpoint,
   protectedEndpoint
@@ -77,10 +77,17 @@ const uniteGameAndIgdbDetailed = (
   };
 };
 
+/**
+ * Calculates position / rank of game in games and series list by ratings.
+ * @param game - Game data.
+ * @param otherGames - Other games without given game.
+ * @returns Ratings values with positions.
+ */
 const getDetialedRatings = (
   game: Game,
   otherGames: ObjectMapArray<Game, 'id'>
 ): Ratings => {
+  //Fillds ratings fields with default positions.
   const ratings = new Map<keyof Ratings, RatingDetialed | undefined>(
     RatingsKeys.map((key) => [
       key,
@@ -94,6 +101,7 @@ const getDetialedRatings = (
     ])
   );
 
+  //Calculates positions.
   otherGames.forEach((otherGame) => {
     RatingsKeys.forEach((key) => {
       const rating = ratings.get(key);
@@ -113,15 +121,26 @@ const getDetialedRatings = (
   return Object.fromEntries(ratings.entries()) as never as Ratings;
 };
 
+/**
+ * Protected method. Fetches detailed data of game of given id.
+ * @param _req - Request object.
+ * @param params - Route params with game id.
+ * @param games - All games of user.
+ * @throws 400 if game id is not given.
+ * @throws 404 if no game of user is found.
+ * @returns Detailed data of game.
+ */
 const getGameById: GameEndpointAction<
   '/api/games/titles/item/[gameId]'
 > = async (_req, params, games) => {
+  //Finds game with given id.
   const { gameId } = await params;
   if (!gameId) throw generateErrorResponse(400, 'Game ID was not provided');
 
   const foundGame = games.find((game) => game.id === gameId);
   if (!foundGame) throw generateErrorResponse(404, 'Game was not found');
 
+  //Fetches game detailed data form IGDB.
   const foundIgdbGame = (
     await igdbRequest<IgdbGameDetailed>('/games', {
       fields: DetailedGameFields,
@@ -132,13 +151,15 @@ const getGameById: GameEndpointAction<
   if (!foundIgdbGame)
     throw generateErrorResponse(404, 'Game data was not found');
 
-  const otherGames = await getFullGames(games);
   const gameFull = uniteGameCoreAndIgdb(
     foundGame,
     foundIgdbGame,
     'screenshot_big',
     MAX_SCREENSHOTS_IN_GAME
   );
+
+  //Calculates game positions in ratings and playtime list.
+  const otherGames = await getFullGames(games);
   const gameRatings = getDetialedRatings(gameFull, otherGames);
 
   return NextResponse.json(
@@ -150,14 +171,26 @@ const getGameById: GameEndpointAction<
   );
 };
 
+/**
+ * Protected endpoint. Updates game data by id.
+ * @param req - Request object with updated data.
+ * @param params - Route params with game id.
+ * @param token - Token object.
+ * @throws 400 if updated data is invalid or game id is not given.
+ * @throws 404 if user or game are not found.
+ * @returns Response object
+ */
 const putGameChangesById: ProtectedEndpointAction<
   '/api/games/titles/item/[gameId]'
 > = async (req, params, token) => {
+  //Validates game update data.
   const { gameId } = await params;
   if (!gameId) throw generateErrorResponse(400, 'Game ID was not provided');
 
-  const credentials = await getCredentialsById(token.id);
   const update = await validateData(GameUpdateValidator, await req.json());
+
+  //Stores updated data.
+  const credentials = await tryGetCredentialsById(token.id);
 
   const updatedGame = await GamesModel.updateOne(
     { userId: credentials.userId, _id: new Types.ObjectId(gameId) },
@@ -172,13 +205,22 @@ const putGameChangesById: ProtectedEndpointAction<
   });
 };
 
+/**
+ * Protected endpoint. Deletes game data by id.
+ * @param _req - Request object.
+ * @param params - Route params with game id.
+ * @param token - Token object.
+ * @throws 400 if game id is not given.
+ * @throws 404 if user or game are not found.
+ * @returns Response object
+ */
 const deleteGameById: ProtectedEndpointAction<
   '/api/games/titles/item/[gameId]'
 > = async (_req, params, token) => {
   const { gameId } = await params;
   if (!gameId) throw generateErrorResponse(400, 'Game ID was not provided');
 
-  const credentials = await getCredentialsById(token.id);
+  const credentials = await tryGetCredentialsById(token.id);
   const deletedGame = await GamesModel.deleteOne({
     userId: credentials.userId,
     _id: new Types.ObjectId(gameId)

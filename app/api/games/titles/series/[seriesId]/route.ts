@@ -8,21 +8,31 @@ import { protectedEndpoint } from '@lib/endpoint-generators';
 import {
   SERIES_EXPANDED_FIELDS,
   getAverageRating,
-  getItemById
+  tryGetItemById
 } from '@lib/games/games-utils';
 import ObjectMapArray from '@lib/object-map-array';
 
+/**
+ * Protected method. Finds and calculates series data by id.
+ * @param _req - Request object.
+ * @param params - Route params with series id.
+ * @param token - Token object.
+ * @throws 400 if series id is not given.
+ * @returns Series full data.
+ */
 const getSeriesById: ProtectedEndpointAction<
   '/api/games/titles/series/[seriesId]'
 > = async (_req, params, token) => {
+  //Fetches series data from IGDB.
   const { seriesId } = await params;
-  const [basicInfo, igdbSeries] = await getItemById<IgdbSeriesExpanded>(
+  const [basicInfo, igdbSeries] = await tryGetItemById<IgdbSeriesExpanded>(
     token,
     ['seriesId'],
     SERIES_EXPANDED_FIELDS,
     seriesId
   );
 
+  //Distributes developers and publishers of series games.
   const developers = new ObjectMapArray<IgdbStudioBase, 'id'>([], 'id');
   const publishers = new ObjectMapArray<IgdbStudioBase, 'id'>([], 'id');
 
@@ -33,6 +43,7 @@ const getSeriesById: ProtectedEndpointAction<
     });
   });
 
+  //Calculates mean ratings.
   const series: Series = {
     ...basicInfo,
     allGames: igdbSeries.games.length,

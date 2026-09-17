@@ -3,14 +3,18 @@ import { RootFilterQuery } from 'mongoose';
 import { NextResponse } from 'next/server';
 
 import { GeneralEndpointAction } from '@ts/requests';
-import { CredentialsInSchema } from '@ts/users/credentials';
 import { User, UserInfo } from '@ts/users/user';
 
 import { generalEndpoint } from '@lib/endpoint-generators';
 import { CredentialsModel, UsersModel } from '@lib/models';
 import { generateErrorResponse, uniteUserData } from '@lib/utils';
 
+/** Public method. Filters public users by email or username.
+ * @param req - Request object.
+ * @throws 404 if none of users is found.
+ * @returns Filtered array of public users. */
 const getUsers: GeneralEndpointAction<'/api/users'> = async (req) => {
+  //Parses search params.
   const credentialSearch = req.nextUrl.searchParams.get('credential');
   const limit = parseInt(req.nextUrl.searchParams.get('limit') ?? '0');
 
@@ -21,18 +25,20 @@ const getUsers: GeneralEndpointAction<'/api/users'> = async (req) => {
     });
   }
 
+  //Searches for credentials objects with query in username or email.
   const regex = new RegExp(credentialSearch.toLowerCase().trim(), 'i');
   const credentials = await CredentialsModel.find({
     $or: [{ username: regex }, { email: regex }]
   }).lean();
 
-  const credentialsMap: { [key: string]: CredentialsInSchema } =
-    Object.fromEntries(
-      credentials.map((credential) => [credential.userId, credential])
-    );
+  //Maps credentials data with user id.
+  const credentialsMap = new Map(
+    credentials.map((credential) => [credential.userId, credential])
+  );
 
+  //Searches for users data by id and limits it.
   const usersQuery: RootFilterQuery<UserInfo> = {
-    _id: { $in: Object.keys(credentialsMap) },
+    _id: { $in: credentialsMap.keys() },
     isPublic: true
   };
 
@@ -48,9 +54,13 @@ const getUsers: GeneralEndpointAction<'/api/users'> = async (req) => {
     );
   }
 
-  const unitedUsers: User[] = usersInfo.map((userInfo) =>
-    uniteUserData(credentialsMap[userInfo._id.toString()], userInfo)
-  );
+  //Unites credential and users data.
+  const unitedUsers: User[] = usersInfo
+    .map((userInfo) => {
+      const credentials = credentialsMap.get(userInfo._id.toString());
+      return credentials ? uniteUserData(credentials, userInfo) : undefined;
+    })
+    .filter((user) => !!user);
 
   return NextResponse.json(unitedUsers, {
     status: 200,

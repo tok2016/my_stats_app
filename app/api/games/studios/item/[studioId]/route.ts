@@ -7,7 +7,7 @@ import { IgdbStudio, Studio } from '@ts/games/studio';
 import { ProtectedEndpointAction } from '@ts/requests';
 
 import { protectedEndpoint } from '@lib/endpoint-generators';
-import { getItemById, getTopItem } from '@lib/games/games-utils';
+import { getTopItem, tryGetItemById } from '@lib/games/games-utils';
 import { getImageUrl } from '@lib/games/igdb';
 import ObjectMapArray from '@lib/object-map-array';
 
@@ -16,6 +16,13 @@ type SeriesCompareData = IgdbSeries & {
   hours: number;
 };
 
+/**
+ * Calculates compate data for genre groups.
+ * @param game - Game data.
+ * @param genre - Genre from genres array of game.
+ * @param stored - Previously stored genre group.
+ * @returns Genre group with aggregated data.
+ */
 const aggregateGenre = (
   game: Game,
   genre: Game['genres'][number],
@@ -26,12 +33,21 @@ const aggregateGenre = (
   hours: (stored?.hours ?? 0) + game.hours
 });
 
+/**
+ * Protected method. Finds and calculates studio data by id.
+ * @param _req - Request object.
+ * @param params - Route params with studio id.
+ * @param token - Token object.
+ * @throws 400 if studio id is not given.
+ * @returns Studio full data.
+ */
 const getStudioById: ProtectedEndpointAction<
   '/api/games/studios/item/[studioId]'
 > = async (_req, params, token) => {
+  //Fetches full studio data from IGDB.
   const { studioId } = await params;
 
-  const [basicInfo, igdbStudio] = await getItemById<IgdbStudio>(
+  const [basicInfo, igdbStudio] = await tryGetItemById<IgdbStudio>(
     token,
     ['developersIds', 'publishersIds'],
     [
@@ -46,6 +62,7 @@ const getStudioById: ProtectedEndpointAction<
     studioId
   );
 
+  //Distributes developed and published games. Forms series array.
   const developed: Game[] = [];
   const published: Game[] = [];
   const seriesMapArray = new ObjectMapArray<SeriesCompareData, 'id'>([], 'id');
@@ -72,6 +89,7 @@ const getStudioById: ProtectedEndpointAction<
     return countDiff;
   });
 
+  //Fills studio data.
   const studio: Studio = {
     id: basicInfo.id,
     name: basicInfo.name,

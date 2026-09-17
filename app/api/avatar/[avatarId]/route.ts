@@ -9,6 +9,14 @@ import { AVATAR_DIRECTORY } from '@lib/auth';
 import { generalEndpoint } from '@lib/endpoint-generators';
 import { generateErrorResponse } from '@lib/utils';
 
+/**
+ * Public method. Returns image file of avatar by id.
+ * @param _req - Request object.
+ * @param params - Route params with avatar id.
+ * @throws 400 if avatar is is not given.
+ * @throws 404 if avatar file is not found.
+ * @returns Avatar file.
+ */
 const getAvatarById: GeneralEndpointAction<'/api/avatar/[avatarId]'> = async (
   _req,
   params
@@ -17,6 +25,7 @@ const getAvatarById: GeneralEndpointAction<'/api/avatar/[avatarId]'> = async (
   if (!avatarId) throw generateErrorResponse(400, 'Avatar id was not given');
 
   try {
+    //Finds file by path and defines it's MIME type. File's name is avatar id.
     const avatarBuffer = await readFile(path.join(AVATAR_DIRECTORY, avatarId));
 
     const mimeType = `image/${avatarId.split('.').at(-1) ?? 'png'}`;

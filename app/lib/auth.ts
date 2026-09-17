@@ -4,14 +4,18 @@ import path from 'path';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
 import Confirmation, { ConfirmationInfo } from '@ts/users/confirmation';
 import Credentials, { CredentialsInSchema } from '@ts/users/credentials';
 import { User } from '@ts/users/user';
 import { UserAccess } from '@ts/users/user';
 
-import { CredentialsModel, GamesModel, UsersModel } from './models';
-import { ACCESS_TTL, REFRESH_TTL, extractToken, generateToken } from './token';
+import { CredentialsModel, UsersModel } from './models';
+import {
+  ACCESS_TTL,
+  REFRESH_TTL,
+  generateToken,
+  tryExtractToken
+} from './token';
 import { generateErrorResponse, uniteUserData } from './utils';
 
 export const AVATAR_DIRECTORY = path.join(process.cwd(), 'avatars');
@@ -43,7 +47,7 @@ export const generateAccessResponse = async (
   });
 };
 
-export const hashPassword = async (password: string): Promise<string> => {
+export const tryHashPassword = async (password: string): Promise<string> => {
   if (!process.env.HASH_SALT) {
     throw generateErrorResponse(500, 'Internal server error');
   }
@@ -76,7 +80,7 @@ export const deleteTokens = async () => {
   cookiesStorage.delete('refreshToken');
 };
 
-export const getCredentialsById = async (
+export const tryGetCredentialsById = async (
   id: string
 ): Promise<Credentials & CredentialsInSchema> => {
   const credentials = await CredentialsModel.findById(id).lean();
@@ -88,7 +92,7 @@ export const getCredentialsById = async (
   return { ...credentials, id: credentials._id.toString() };
 };
 
-export const getCredentials = async (
+export const tryGetCredentials = async (
   credential: string
 ): Promise<Credentials> => {
   const credentials = await CredentialsModel.findOne({
@@ -102,8 +106,8 @@ export const getCredentials = async (
   return { ...credentials, id: credentials._id.toString() };
 };
 
-export const getUserById = async (id: string): Promise<User> => {
-  const credentials = await getCredentialsById(id);
+export const tryGetUserById = async (id: string): Promise<User> => {
+  const credentials = await tryGetCredentialsById(id);
   const userInfo = await UsersModel.findById(credentials.userId).lean();
 
   if (!userInfo) {
@@ -121,8 +125,8 @@ export const checkUserAuthorRights = async (
     throw generateErrorResponse(400, 'User id was not given');
   }
 
-  const token = await extractToken(tokenRaw);
-  const credentials = await getCredentialsById(token.id);
+  const token = await tryExtractToken(tokenRaw);
+  const credentials = await tryGetCredentialsById(token.id);
 
   if (credentials.userId !== userId) {
     throw generateErrorResponse(403, 'Forbidden');
@@ -141,12 +145,4 @@ export const generateConfirmationResponse = (operation: Confirmation) => {
     status: 202,
     statusText: 'Confirmation operation was accepted'
   });
-};
-
-export const getGamesByUserId = async (userId: string): Promise<GameCore[]> => {
-  const games = await GamesModel.find({ userId }).lean();
-  return games.map((game) => ({
-    ...game,
-    id: game._id.toString()
-  }));
 };

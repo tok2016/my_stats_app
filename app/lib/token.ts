@@ -1,9 +1,10 @@
 import { SignJWT, jwtVerify } from 'jose';
 
+import { cookies } from 'next/headers';
+
 import Token, { TokenPack } from '@ts/users/token';
 
 import { MILLISECONDS, generateErrorResponse, isExpired } from './utils';
-import { cookies } from 'next/headers';
 
 export const ACCESS_TTL = 5 * 60;
 export const REFRESH_TTL = 30 * 24 * 60 * 60;
@@ -59,7 +60,9 @@ export const decodeToken = async (token: string): Promise<Token> => {
   };
 };
 
-export const extractToken = async (tokenRaw: string | null): Promise<Token> => {
+export const tryExtractToken = async (
+  tokenRaw: string | null
+): Promise<Token> => {
   const token = tokenRaw?.split(' ').at(-1);
 
   if (!token) {

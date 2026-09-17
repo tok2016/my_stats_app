@@ -17,7 +17,7 @@ import { LiteralType } from '@ts/util-types';
 
 import ObjectMapArray from '@lib/object-map-array';
 
-import { getCredentialsById } from '../auth';
+import { tryGetCredentialsById } from '../auth';
 import { GamesModel } from '../models';
 import { generateErrorResponse, mean } from '../utils';
 import { getImageUrl, igdbRequest } from './igdb';
@@ -226,7 +226,7 @@ const fieldToEndpoint: Record<ItemsFields, string> = {
   rating: '/games'
 };
 
-export const getItemById = async <IgdbDataType extends IgdbBasic>(
+export const tryGetItemById = async <IgdbDataType extends IgdbBasic>(
   token: Token,
   fields: ItemsFields[],
   igdbFields: LiteralType<keyof IgdbDataType>[],
@@ -234,7 +234,7 @@ export const getItemById = async <IgdbDataType extends IgdbBasic>(
 ): Promise<[IgdbItemInfo, IgdbDataType]> => {
   if (!id) throw generateErrorResponse(400, 'ID was not provided');
 
-  const credentials = await getCredentialsById(token.id);
+  const credentials = await tryGetCredentialsById(token.id);
   const parsedId = Number(id);
   const additionalFilters = fields.map((field) => ({ [field]: parsedId }));
 

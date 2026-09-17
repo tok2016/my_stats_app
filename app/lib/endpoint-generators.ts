@@ -22,7 +22,7 @@ import {
   UsersModel
 } from './models';
 import ObjectMapArray from './object-map-array';
-import { extractToken } from './token';
+import { tryExtractToken } from './token';
 import { isErrorResponse } from './type-guards';
 import { generateErrorResponse } from './utils';
 
@@ -85,7 +85,7 @@ export const protectedEndpoint =
   async (req: NextRequest, context: RouteContext<Endpoint>) => {
     try {
       const token = await req.headers.get('Authorization');
-      return await action(req, context.params, await extractToken(token));
+      return await action(req, context.params, await tryExtractToken(token));
     } catch (err) {
       return generateAccessError(err);
     }
@@ -143,7 +143,7 @@ export const serviceEndpoint =
   async (req: NextRequest, context: RouteContext<Endpoint>) => {
     try {
       const tokenRaw = await req.headers.get('Authorization');
-      const token = await extractToken(tokenRaw);
+      const token = await tryExtractToken(tokenRaw);
       const services = await getServicesByCredentialsId(token.id);
 
       return await action(req, context.params, services?.steam);
@@ -159,7 +159,7 @@ export const gameProtectedEndpoint =
   async (req: NextRequest, context: RouteContext<Endpoint>) => {
     try {
       const tokenRaw = await req.headers.get('Authorization');
-      const token = await extractToken(tokenRaw);
+      const token = await tryExtractToken(tokenRaw);
 
       const credentials = await CredentialsModel.findById(token.id).lean();
 

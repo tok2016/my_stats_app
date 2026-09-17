@@ -6,8 +6,15 @@ import { ItemCompareData } from '@ts/games/metric';
 import { ProtectedEndpointAction } from '@ts/requests';
 
 import { protectedEndpoint } from '@lib/endpoint-generators';
-import { getItemById, getTopItem } from '@lib/games/games-utils';
+import { getTopItem, tryGetItemById } from '@lib/games/games-utils';
 
+/**
+ * Calculates compate data for series groups.
+ * @param game - Game data.
+ * @param series - Series id of game.
+ * @param stored - Previously stored series group.
+ * @returns Series group with aggregated data.
+ */
 const aggregateSeries = (
   game: Game,
   series: Game['series'],
@@ -21,18 +28,28 @@ const aggregateSeries = (
   };
 };
 
+/**
+ * Protected method. Finds and calculates genre data by id.
+ * @param _req - Request object.
+ * @param params - Route params with genre id.
+ * @param token - Token object.
+ * @throws 400 if genre id is not given.
+ * @returns Genre full data.
+ */
 const getGenreByApiId: ProtectedEndpointAction<
   '/api/games/genres/item/[genreId]'
 > = async (_req, params, token) => {
+  //Fetch genres from IGDB.
   const { genreId } = await params;
 
-  const [basicInfo] = await getItemById<IgdbGenre>(
+  const [basicInfo] = await tryGetItemById<IgdbGenre>(
     token,
     ['genresIds'],
     ['name'],
     genreId
   );
 
+  //Finds top series by games count of genre.
   const genre: Genre = {
     ...basicInfo,
     topSeries: getTopItem(

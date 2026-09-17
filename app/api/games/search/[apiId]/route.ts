@@ -3,19 +3,25 @@ import { NextResponse } from 'next/server';
 import { IgdbGameFull, SearchGame } from '@ts/games/game';
 import { ProtectedEndpointAction } from '@ts/requests';
 
-import { getCredentialsById } from '@lib/auth';
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import { FULL_GAME_FIELDS } from '@lib/games/games-utils';
 import { getImageUrl, igdbRequest } from '@lib/games/igdb';
 import { MILLISECONDS, generateErrorResponse } from '@lib/utils';
 
+/**
+ * Protected method. Searhes game by IGDB id.
+ * @param _req - Request object.
+ * @param params - Route params with game IGDB id.
+ * @throws 400 if IGDB id is not given.
+ * @throws 404 if game is not found.
+ * @returns Found game from IGDB.
+ */
 const searchForGameById: ProtectedEndpointAction<
   '/api/games/search/[apiId]'
-> = async (_req, params, token) => {
+> = async (_req, params) => {
+  //Searches game in IGDB by IGDB id.
   const { apiId } = await params;
   if (!apiId) throw generateErrorResponse(400, 'ID was not provided');
-
-  await getCredentialsById(token.id);
 
   const searchedGame = (
     await igdbRequest<IgdbGameFull>('/games', {
@@ -26,6 +32,7 @@ const searchForGameById: ProtectedEndpointAction<
 
   if (!searchedGame) throw generateErrorResponse(404, 'Game was not found');
 
+  //Formats games to format that would be enough for storing one of them.
   const games: SearchGame = {
     apiId: searchedGame.id,
     name: searchedGame.name,

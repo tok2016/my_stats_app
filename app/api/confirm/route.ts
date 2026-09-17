@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { ConfirmationEndpointAction } from '@ts/requests';
 import { ConfirmationCode, NewConfirmation } from '@ts/users/confirmation';
 
-import { getCredentials } from '@lib/auth';
+import { tryGetCredentials } from '@lib/auth';
 import { confirmationEndpoint } from '@lib/endpoint-generators';
 import { ConfirmationsModel } from '@lib/models';
 import {
@@ -17,14 +17,24 @@ import {
   validateData
 } from '@lib/validation-schemas';
 
+/**
+ * Public method. Finds operation by id.
+ * @throws 401 if operation id was not given.
+ * @throws 404 if operation is not found.
+ * @returns Operation data.
+ */
 const getConfirmation: ConfirmationEndpointAction<
   '/api/confirm'
 > = async () => {
+  //Finds operation.
   const cookiesStore = await cookies();
   const operationId = cookiesStore.get('operation')?.value;
-  if (!operationId) throw generateErrorResponse(401, 'Operation was not given');
+  if (!operationId)
+    throw generateErrorResponse(401, 'Operation ID was not given');
 
   const operation = await ConfirmationsModel.findById(operationId).lean();
+
+  //If operation is not found, deleted operation id.
   if (!operation) {
     cookiesStore.delete('operation');
     throw generateErrorResponse(404, 'Operation was not found');
@@ -36,18 +46,26 @@ const getConfirmation: ConfirmationEndpointAction<
   };
 };
 
+/**
+ * Public method. Creates new operation. If it already exists, returns it.
+ * @param req - Request object with user's credentials and action type.
+ * @throws 400 if credentials and action type are invalid.
+ * @throws 404 if user is not found.
+ * @returns Operation data.
+ */
 const postConfirmation: ConfirmationEndpointAction<'/api/confirm'> = async (
   req
 ) => {
-  const cookiesStore = await cookies();
-  const operationId = cookiesStore.get('operation')?.value;
-
+  //Validates data for new operation.
   const newConfirmation = await validateData<NewConfirmation>(
     NewConfirmationValidator,
     await req.json()
   );
 
-  const credentials = await getCredentials(newConfirmation.credential);
+  //Checks if operation already exists and it has the same credentials.
+  const cookiesStore = await cookies();
+  const operationId = cookiesStore.get('operation')?.value;
+  const credentials = await tryGetCredentials(newConfirmation.credential);
 
   if (operationId) {
     const currentOperation =
@@ -65,6 +83,7 @@ const postConfirmation: ConfirmationEndpointAction<'/api/confirm'> = async (
     }
   }
 
+  //Deletes previous operations of user.
   const userCodes = await ConfirmationsModel.find({
     credential: credentials.username
   }).lean();
@@ -73,6 +92,7 @@ const postConfirmation: ConfirmationEndpointAction<'/api/confirm'> = async (
     await ConfirmationsModel.deleteMany({ credential: credentials.username });
   }
 
+  //Generates confirmation code and creates new unconfirmed operation.
   const code = generateCode();
   const operation = await ConfirmationsModel.create({
     credential: credentials.email,
@@ -97,21 +117,28 @@ const postConfirmation: ConfirmationEndpointAction<'/api/confirm'> = async (
   };
 };
 
-const putConfirmation: ConfirmationEndpointAction<'/api/confirm'> = async (
-  req
-) => {
+/**
+ * Public method. Confirms or rejects operation by code and id.
+ * @param req - Request object with operation data and confirmation code.
+ * @throws 400 if operation data is invalid or codes mismatch.
+ * @throws 404 if operation is not found.
+ * @returns Updated operation data.
+ */
+const confirm: ConfirmationEndpointAction<'/api/confirm'> = async (req) => {
+  //Validates operation data and confirmation code.
   const confirmationCode = await validateData<ConfirmationCode>(
     ConfirmationCodeValidator,
     await req.json()
   );
 
+  //Find operation by id.
   const operation = await ConfirmationsModel.findById(
     confirmationCode.id
   ).lean();
 
-  if (!operation)
-    throw generateErrorResponse(404, 'Confirmation operation was not found');
+  if (!operation) throw generateErrorResponse(404, 'Operation was not found');
 
+  //Compares codes. If they're the same, permits operation.
   if (confirmationCode.code !== operation.code)
     throw generateErrorResponse(400, 'Incorrect confirmation code');
 
@@ -133,4 +160,4 @@ const putConfirmation: ConfirmationEndpointAction<'/api/confirm'> = async (
 
 export const GET = confirmationEndpoint(getConfirmation);
 export const POST = confirmationEndpoint(postConfirmation);
-export const PUT = confirmationEndpoint(putConfirmation);
+export const PUT = confirmationEndpoint(confirm);

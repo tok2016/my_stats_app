@@ -7,6 +7,16 @@ import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import { getPeriodMetric } from '@lib/metrics/periods-metric';
 import { TOP_ENTRIES } from '@lib/utils';
 
+/**
+ * Public method. Calculates top games by playtime of every month / season / year. Season is default period type.
+ * @param req - Request object with period type.
+ * @param _params - Route params.
+ * @param games - All games of user.
+ * @throws 400 if user id is not given.
+ * @throws 403 if user is private.
+ * @throws 404 if user is not found or no game of theirs is found.
+ * @returns Top games by periods.
+ */
 const getGamesPeriods: GameEndpointAction<'/api/games/titles/periods'> = async (
   req,
   _params,
