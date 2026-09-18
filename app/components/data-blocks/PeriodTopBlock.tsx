@@ -1,6 +1,6 @@
 import { PeriodTop, PrecisePeriod } from '@ts/games/metric';
 
-import { DEFAULT_PERIOD_BLOCK_WIDTH, getPeriodString } from '@lib/utils';
+import { DEFAULT_PERIOD_BLOCK_WIDTH, getPeriodName } from '@lib/utils';
 
 type PeriodTopBlockProps<ItemType> = {
   className?: string;
@@ -29,7 +29,7 @@ export default function PeriodTopBlock<ItemType>({
     >
       <div className='data-block-title'>
         <p className={current ? 'colored' : ''}>
-          {getPeriodString[periodType](periodTop.period, false)}
+          {getPeriodName[periodType](periodTop.period, false)}
         </p>
       </div>
 

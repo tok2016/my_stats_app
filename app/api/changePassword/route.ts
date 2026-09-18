@@ -4,7 +4,7 @@ import { ProtectedEndpointAction } from '@ts/requests';
 import { PasswordUpdate } from '@ts/users/password';
 
 import {
-  generateAccessResponse,
+  tryGenerateAccessResponse,
   tryGetCredentialsById,
   tryHashPassword
 } from '@lib/auth';
@@ -50,7 +50,7 @@ const postChangePassword: ProtectedEndpointAction<
     { new: true }
   );
 
-  return await generateAccessResponse(
+  return await tryGenerateAccessResponse(
     credentials.id,
     credentials.username,
     'Password was changed successfully'

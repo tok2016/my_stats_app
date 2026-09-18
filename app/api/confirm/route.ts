@@ -3,9 +3,8 @@ import { cookies } from 'next/headers';
 import { ConfirmationEndpointAction } from '@ts/requests';
 import { ConfirmationCode, NewConfirmation } from '@ts/users/confirmation';
 
-import { tryGetCredentials } from '@lib/auth';
 import { confirmationEndpoint } from '@lib/endpoint-generators';
-import { ConfirmationsModel } from '@lib/models';
+import { ConfirmationsModel, CredentialsModel } from '@lib/models';
 import {
   CONFIRMATION_TTL,
   generateCode,
@@ -62,10 +61,18 @@ const postConfirmation: ConfirmationEndpointAction<'/api/confirm'> = async (
     await req.json()
   );
 
+  const credentials = await CredentialsModel.findOne({
+    $or: [
+      { username: newConfirmation.credential },
+      { email: newConfirmation.credential }
+    ]
+  }).lean();
+
+  if (!credentials) throw generateErrorResponse(404, 'User was not found');
+
   //Checks if operation already exists and it has the same credentials.
   const cookiesStore = await cookies();
   const operationId = cookiesStore.get('operation')?.value;
-  const credentials = await tryGetCredentials(newConfirmation.credential);
 
   if (operationId) {
     const currentOperation =

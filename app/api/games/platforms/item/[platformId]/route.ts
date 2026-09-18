@@ -3,10 +3,14 @@ import { NextResponse } from 'next/server';
 import Game from '@ts/games/game';
 import { ItemCompareData } from '@ts/games/metric';
 import Platform, { IgdbPlatform } from '@ts/games/platform';
-import { ProtectedEndpointAction } from '@ts/requests';
+import { GameEndpointAction } from '@ts/requests';
 
-import { protectedEndpoint } from '@lib/endpoint-generators';
-import { getTopItem, tryGetItemById } from '@lib/games/games-utils';
+import { gameProtectedEndpoint } from '@lib/endpoint-generators';
+import {
+  getFullGames,
+  getTopItem,
+  tryGetItemById
+} from '@lib/games/games-utils';
 import { getImageUrl } from '@lib/games/igdb';
 
 /**
@@ -50,21 +54,23 @@ const aggregateGenre = (
  * Protected method. Finds and calculates platform data by id.
  * @param _req - Request object.
  * @param params - Route params with platform id.
- * @param token - Token object.
+ * @param games - All games of user.
  * @throws 400 if platform id is not given.
+ * @throws 404 if platform is not found.
  * @returns Platform full data.
  */
-const getPlatformById: ProtectedEndpointAction<
+const getPlatformById: GameEndpointAction<
   '/api/games/platforms/item/[platformId]'
-> = async (_req, params, token) => {
+> = async (_req, params, games) => {
   //Fetches platform full data from IGDB.
   const { platformId } = await params;
 
+  const gamesFull = await getFullGames(games);
   const [basicInfo, igdbPlatform] = await tryGetItemById<IgdbPlatform>(
-    token,
-    ['platformId'],
-    ['name', 'platform_family.name', 'platform_logo.image_id'],
-    platformId
+    gamesFull,
+    'platform',
+    Number(platformId),
+    ['name', 'platform_family.name', 'platform_logo.image_id']
   );
 
   //Calculates top genre and series of platform.
@@ -88,4 +94,4 @@ const getPlatformById: ProtectedEndpointAction<
   });
 };
 
-export const GET = protectedEndpoint(getPlatformById);
+export const GET = gameProtectedEndpoint(getPlatformById);

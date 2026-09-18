@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { GeneralEndpointAction } from '@ts/requests';
 import { NewPassword } from '@ts/users/password';
 
-import { generateAccessResponse, tryHashPassword } from '@lib/auth';
+import { tryGenerateAccessResponse, tryHashPassword } from '@lib/auth';
 import { generalEndpoint } from '@lib/endpoint-generators';
 import { ConfirmationsModel, CredentialsModel } from '@lib/models';
 import { generateErrorResponse } from '@lib/utils';
@@ -61,7 +61,7 @@ const resetPassword: GeneralEndpointAction<'/api/resetPassword'> = async (
   const cookieStore = await cookies();
   cookieStore.delete('operation');
 
-  return generateAccessResponse(
+  return tryGenerateAccessResponse(
     updatedCredentials._id.toString(),
     updatedCredentials.username,
     'Password was reset successfully'

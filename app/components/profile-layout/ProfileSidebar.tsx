@@ -10,7 +10,7 @@ import {
 import { User } from '@ts/users/user';
 
 import { logout } from '@lib/server-actions';
-import { ModulesPaths, defaultUser } from '@lib/utils';
+import { ModulesPathsAndNames, defaultUser } from '@lib/utils';
 
 import { useUserState } from '@store/user-store';
 
@@ -28,7 +28,7 @@ const SidebarOptions: SidebarOptionProps[] = [
     label: 'Music',
     icon: <MusicSolid />,
     disabled: true,
-    subButtons: Object.entries(ModulesPaths)
+    subButtons: Object.entries(ModulesPathsAndNames)
       .filter((entry) => entry[0].startsWith('/music'))
       .map((entry) => ({
         ...entry[1],
@@ -39,7 +39,7 @@ const SidebarOptions: SidebarOptionProps[] = [
     name: 'games',
     label: 'Video Games',
     icon: <ControllerSolid />,
-    subButtons: Object.entries(ModulesPaths)
+    subButtons: Object.entries(ModulesPathsAndNames)
       .filter((entry) => entry[0].startsWith('/games'))
       .map((entry) => ({
         ...entry[1],

@@ -130,6 +130,13 @@ export const GameUpdateValidator: z.ZodType<GameUpdate> = z.object({
   platformId: z.number().nonnegative().nonoptional()
 });
 
+/**
+ * Validates given data by given validatior.
+ * @param validator - Validator to check data by.
+ * @param data - Data to validate.
+ * @throws 400 with issues list for each invalid field value if there's any.
+ * @returns Validated date with correct type.
+ */
 export const validateData = async <
   DataType,
   ValidatorType extends z.ZodType = z.ZodType<DataType>

@@ -7,7 +7,6 @@ import { redirect } from 'next/navigation';
 
 import { GamesFilter } from '@ts/games/filter';
 import { GamesTablePageResponse } from '@ts/games/game';
-import { CountData, MetricId } from '@ts/games/metric';
 import Country, { CountryIso, CountryResponse } from '@ts/users/country';
 import { ServicesMap } from '@ts/users/service';
 import { User } from '@ts/users/user';
@@ -15,6 +14,9 @@ import { User } from '@ts/users/user';
 import AxiosInstanse, { AxiosCountriesInstanse } from './axios-instanse';
 import { defaultCountry, getErrorFormState } from './utils';
 
+/**
+ * Logs user out by deleting tokens. Redirects to login page.
+ */
 export const logout = async () => {
   const cookiesStorage = await cookies();
   cookiesStorage.delete('accessToken');
@@ -23,6 +25,10 @@ export const logout = async () => {
   redirect('/login');
 };
 
+/**
+ * Forms authorization headers with tokens.
+ * @returns Authorization and refresh headers with tokens.
+ */
 const getAuthConfig = async (): Promise<AxiosRequestConfig | undefined> => {
   const cookiesStore = await cookies();
 
@@ -46,11 +52,9 @@ export const getCurrentUser = async (): Promise<User> => {
   return response.data;
 };
 
-export const getServices = async (userId?: string): Promise<ServicesMap> => {
-  if (!userId) {
-    return {};
-  }
-
+export const getServicesByUserId = async (
+  userId?: string
+): Promise<ServicesMap> => {
   try {
     const response = await AxiosInstanse.get<ServicesMap>(
       `/api/user/${userId}/service`,
@@ -63,7 +67,7 @@ export const getServices = async (userId?: string): Promise<ServicesMap> => {
   }
 };
 
-export const getCountyData = async (country?: string): Promise<Country> => {
+export const getCountryData = async (country?: string): Promise<Country> => {
   try {
     const countryData = await AxiosCountriesInstanse.post<
       CountryResponse<Country>
@@ -75,72 +79,54 @@ export const getCountyData = async (country?: string): Promise<Country> => {
   }
 };
 
-export const getCountries = async (): Promise<CountryIso[]> => {
-  if (!process.env.COUNTRIES_API) {
+export const getCountriesList = async (): Promise<CountryIso[]> => {
+  try {
+    const response =
+      await AxiosCountriesInstanse.get<CountryResponse<CountryIso[]>>('/iso');
+    return response.data.data;
+  } catch {
     return [];
   }
-
-  const response =
-    await AxiosCountriesInstanse.get<CountryResponse<CountryIso[]>>('/iso');
-
-  return response.data.data;
 };
 
-export const getUserCountries = async (
+/**
+ * Fetches data of countries of given users.
+ * @param users
+ * @returns Map of users ids and their countries data.
+ */
+export const getUsersCountriesData = async (
   users: User[]
 ): Promise<Record<string, Country | undefined>> => {
-  if (!process.env.COUNTRIES_API) {
+  try {
+    const response =
+      await AxiosCountriesInstanse.get<CountryResponse<Country[]>>(
+        '/flag/images'
+      );
+
+    const countriesMap: Record<string, Country> = Object.fromEntries(
+      response.data.data.map((country) => [country.iso2, country])
+    );
+
+    return Object.fromEntries(
+      users.map((user) => [
+        user.id,
+        user.country ? countriesMap[user.country] : undefined
+      ])
+    );
+  } catch {
     return {};
   }
-
-  const response =
-    await AxiosCountriesInstanse.get<CountryResponse<Country[]>>(
-      '/flag/images'
-    );
-
-  const countriesMap: Record<string, Country> = Object.fromEntries(
-    response.data.data.map((country) => [country.iso2, country])
-  );
-
-  return Object.fromEntries(
-    users.map((user) => [
-      user.id,
-      user.country ? countriesMap[user.country] : undefined
-    ])
-  );
 };
 
-export const getGenresCount = async (): Promise<CountData[]> => {
-  try {
-    const response = await AxiosInstanse.get<CountData[]>(
-      `/api/games/genres/count`,
-      await getAuthConfig()
-    );
-
-    return response.data;
-  } catch {
-    return [];
-  }
-};
-
-export const getUserDashboard = async (
-  userId?: string
-): Promise<MetricId[]> => {
-  const url = userId ? `/api/user/${userId}/dashboard` : '/api/dashboard';
-
-  try {
-    const response = await AxiosInstanse.get<MetricId[]>(
-      url,
-      await getAuthConfig()
-    );
-
-    return response.data;
-  } catch {
-    return [];
-  }
-};
-
-export const getData = async <DataType>(url: string): Promise<DataType> => {
+/**
+ * Fetches data by API type that needs authorization.
+ * @param url
+ * @throws AxiosError.
+ * @returns Data of given type.
+ */
+export const tryGetDataAuthorized = async <DataType>(
+  url: string
+): Promise<DataType> => {
   const response = await AxiosInstanse.get<DataType>(
     url,
     await getAuthConfig()
@@ -149,20 +135,12 @@ export const getData = async <DataType>(url: string): Promise<DataType> => {
   return response.data;
 };
 
-export const getMetricData = async <MetricType>(
-  url: string,
-  userId: string,
-  searchParams?: Record<string, string>
-): Promise<MetricType> => {
-  const params = new URLSearchParams({ user: userId, ...searchParams });
-  const response = await AxiosInstanse.get<MetricType>(
-    `${url}?${params.toString()}`,
-    await getAuthConfig()
-  );
-  return response.data;
-};
-
-export const getGames = async (
+/**
+ * Fetches games by given user id and filter params.
+ * @param params - Filter params with user id.
+ * @returns Filtered games. If no filter param is given, return all user's games.
+ */
+export const tryGetGames = async (
   params: Partial<GamesFilter> & { userId: string }
 ): Promise<GamesTablePageResponse> => {
   const searchParams = new URLSearchParams(params);
@@ -174,6 +152,10 @@ export const getGames = async (
   return response.data;
 };
 
+/**
+ * Sends request to refresh data from steam.
+ * @returns Response status text or error message.
+ */
 export const refreshSteamData = async () => {
   try {
     const response = await AxiosInstanse.post(

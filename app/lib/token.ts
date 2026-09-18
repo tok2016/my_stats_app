@@ -1,7 +1,5 @@
 import { SignJWT, jwtVerify } from 'jose';
 
-import { cookies } from 'next/headers';
-
 import Token, { TokenPack } from '@ts/users/token';
 
 import { MILLISECONDS, generateErrorResponse, isExpired } from './utils';
@@ -11,6 +9,11 @@ export const REFRESH_TTL = 30 * 24 * 60 * 60;
 
 const encoder = new TextEncoder();
 
+/**
+ * Encodes data by JWT.
+ * @param data - Data to encode.
+ * @returns JWT-encoded data.
+ */
 export const encodeJwt = async (data: object) => {
   if (!process.env.SECRET_KEY || !process.env.ALGORITHM) {
     throw generateErrorResponse(500, 'Internal server error');
@@ -21,6 +24,11 @@ export const encodeJwt = async (data: object) => {
     .sign(encoder.encode(process.env.SECRET_KEY));
 };
 
+/**
+ * Decodes token by JWT.
+ * @param token - JWT-encoded data.
+ * @returns Decoded data.
+ */
 export const decodeJwt = async <TokenType>(token: string) => {
   if (!process.env.SECRET_KEY || !process.env.ALGORITHM) {
     throw generateErrorResponse(500, 'Internal server error');
@@ -35,6 +43,12 @@ export const decodeJwt = async <TokenType>(token: string) => {
   );
 };
 
+/**
+ * Generates and encodes token object.
+ * @param credentialsId - User credentials id to encode.
+ * @param isRefresh - If true, generates refresh token. Genereates access token otherwise.
+ * @returns Encoded token.
+ */
 export const generateToken = async (
   credentialsId: string,
   isRefresh: boolean = false
@@ -51,6 +65,11 @@ export const generateToken = async (
   return await encodeJwt(token);
 };
 
+/**
+ * Decodes token.
+ * @param token - Encoded token.
+ * @returns Token object.
+ */
 export const decodeToken = async (token: string): Promise<Token> => {
   const decoded = await decodeJwt<Token>(token);
 
@@ -60,10 +79,16 @@ export const decodeToken = async (token: string): Promise<Token> => {
   };
 };
 
-export const tryExtractToken = async (
-  tokenRaw: string | null
+/**
+ * Extracts token from header and decodes.
+ * @param headerWithToken - Header content with token.
+ * @throws 401 if token is not set or expired.
+ * @returns Token object.
+ */
+export const tryExtractTokenFromHeader = async (
+  headerWithToken: string | null
 ): Promise<Token> => {
-  const token = tokenRaw?.split(' ').at(-1);
+  const token = headerWithToken?.split(' ').at(-1);
 
   if (!token) {
     throw generateErrorResponse(401, 'Unauthorized');
@@ -78,23 +103,29 @@ export const tryExtractToken = async (
   return decoded;
 };
 
-export const compareTokens = async (accessToken: Token, refreshToken: Token) =>
-  accessToken.id === refreshToken.id;
-
-export const deleteTokens = async () => {
-  const cookiesStorage = await cookies();
-  cookiesStorage.delete('accessToken');
-  cookiesStorage.delete('refreshToken');
-};
-
-const isAccessLegit = async (accessToken: Token, refreshToken: Token) => {
-  if (!(await compareTokens(accessToken, refreshToken))) {
-    throw new Error('Forbidden');
-  }
+/**
+ * Checks if access and refresh tokens authorized same user.
+ * @param accessToken
+ * @param refreshToken
+ * @throws 403 if tokens authorizes different users.
+ * @returns True if access token is expired.
+ */
+const checkAccessLegalityAndExpiration = (
+  accessToken: Token,
+  refreshToken: Token
+) => {
+  if (accessToken.id !== refreshToken.id)
+    throw generateErrorResponse(403, 'Forbidden');
 
   return isExpired(accessToken.expiresAt);
 };
 
+/**
+ * Refreshes access token.
+ * @param defaultRefresh - Encoded refresh token
+ * @param defaultAccess - Encoded access token.
+ * @returns Relevant refresh and access tokens with update flag. Update flag means that token was refreshed.
+ */
 export const refreshAccessTokens = async (
   defaultRefresh?: string,
   defaultAccess?: string
@@ -102,14 +133,18 @@ export const refreshAccessTokens = async (
   let accessValue = defaultAccess ?? '';
   let update = false;
 
+  //Checks refresh token existance and expiration.
   const refreshToken = await decodeToken(defaultRefresh ?? '');
-  if (isExpired(refreshToken.expiresAt)) {
-    throw new Error('Session is expired');
-  }
+  if (isExpired(refreshToken.expiresAt))
+    throw generateErrorResponse(401, 'Session is expired');
 
+  //Check access token legality. Allows to update access token if both tokens belong to the same user.
   if (
     !accessValue
-    || (await isAccessLegit(await decodeToken(accessValue), refreshToken))
+    || checkAccessLegalityAndExpiration(
+      await decodeToken(accessValue),
+      refreshToken
+    )
   ) {
     accessValue = await generateToken(refreshToken.id);
     update = true;

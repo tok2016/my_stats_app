@@ -4,12 +4,17 @@ import Game from '@ts/games/game';
 import { ItemCompareData } from '@ts/games/metric';
 import { IgdbSeries } from '@ts/games/series';
 import { IgdbStudio, Studio } from '@ts/games/studio';
-import { ProtectedEndpointAction } from '@ts/requests';
+import { GameEndpointAction } from '@ts/requests';
 
-import { protectedEndpoint } from '@lib/endpoint-generators';
-import { getTopItem, tryGetItemById } from '@lib/games/games-utils';
-import { getImageUrl } from '@lib/games/igdb';
+import { gameProtectedEndpoint } from '@lib/endpoint-generators';
+import {
+  getAverageRating,
+  getFullGames,
+  getTopItem
+} from '@lib/games/games-utils';
+import { getImageUrl, igdbRequest } from '@lib/games/igdb';
 import ObjectMapArray from '@lib/object-map-array';
+import { generateErrorResponse } from '@lib/utils';
 
 type SeriesCompareData = IgdbSeries & {
   count: number;
@@ -37,82 +42,98 @@ const aggregateGenre = (
  * Protected method. Finds and calculates studio data by id.
  * @param _req - Request object.
  * @param params - Route params with studio id.
- * @param token - Token object.
+ * @param games - All games of user.
  * @throws 400 if studio id is not given.
+ * @throws 404 if studio is not found.
  * @returns Studio full data.
  */
-const getStudioById: ProtectedEndpointAction<
+const getStudioById: GameEndpointAction<
   '/api/games/studios/item/[studioId]'
-> = async (_req, params, token) => {
-  //Fetches full studio data from IGDB.
+> = async (_req, params, games) => {
+  //Filters games by given field and item id.
   const { studioId } = await params;
+  const parsedId = Number(studioId);
 
-  const [basicInfo, igdbStudio] = await tryGetItemById<IgdbStudio>(
-    token,
-    ['developersIds', 'publishersIds'],
-    [
-      'name',
-      'logo.image_id',
-      'country',
-      'developed.rating',
-      'developed.aggregated_rating',
-      'published.rating',
-      'published.aggregated_rating'
-    ],
-    studioId
+  const studiosGames = (await getFullGames(games)).filter(
+    (game) =>
+      game.developers.some((dev) => dev.id === parsedId)
+      || game.publishers.some((pub) => pub.id === parsedId)
   );
 
-  //Distributes developed and published games. Forms series array.
-  const developed: Game[] = [];
-  const published: Game[] = [];
-  const seriesMapArray = new ObjectMapArray<SeriesCompareData, 'id'>([], 'id');
+  //Finds item from IGDB by given id.
+  try {
+    const igdbItem = (
+      await igdbRequest<IgdbStudio>('/companies', {
+        fields: [
+          'name',
+          'logo.image_id',
+          'country',
+          'developed.rating',
+          'developed.aggregated_rating',
+          'published.rating',
+          'published.aggregated_rating'
+        ],
+        where: `id = ${parsedId}`
+      })
+    )[0];
 
-  basicInfo.games.forEach((game: Game) => {
-    if (game.developers.some((developer) => developer.id === basicInfo.id))
-      developed.push(game);
+    //Distributes developed and published games. Forms series array.
+    const developed: Game[] = [];
+    const published: Game[] = [];
+    const seriesMapArray = new ObjectMapArray<SeriesCompareData, 'id'>(
+      [],
+      'id'
+    );
 
-    if (game.publishers.some((publisher) => publisher.id === basicInfo.id))
-      published.push(game);
+    studiosGames.forEach((game: Game) => {
+      if (game.developers.some((developer) => developer.id === igdbItem.id))
+        developed.push(game);
 
-    if (!game.series) return;
-    const series = seriesMapArray.findByKey(game.series.id);
-    seriesMapArray.push({
-      ...game.series,
-      count: (series?.count ?? 0) + 1,
-      hours: (series?.hours ?? 0) + game.hours
+      if (game.publishers.some((publisher) => publisher.id === igdbItem.id))
+        published.push(game);
+
+      if (!game.series) return;
+      const series = seriesMapArray.findByKey(game.series.id);
+      seriesMapArray.push({
+        ...game.series,
+        count: (series?.count ?? 0) + 1,
+        hours: (series?.hours ?? 0) + game.hours
+      });
     });
-  });
 
-  seriesMapArray.sort((a, b) => {
-    const countDiff = b.count - a.count;
-    if (!countDiff) return b.hours - a.hours;
-    return countDiff;
-  });
+    seriesMapArray.sort((a, b) => {
+      const countDiff = b.count - a.count;
+      if (!countDiff) return b.hours - a.hours;
+      return countDiff;
+    });
 
-  //Fills studio data.
-  const studio: Studio = {
-    id: basicInfo.id,
-    name: basicInfo.name,
-    hours: basicInfo.hours,
-    averageRating: basicInfo.averageRating,
-    criticsRating: basicInfo.criticsRating,
-    usersRating: basicInfo.usersRating,
-    developed,
-    published,
-    series: seriesMapArray.toArray(),
-    country: igdbStudio.country,
-    logo: igdbStudio.logo?.image_id
-      ? getImageUrl(igdbStudio.logo.image_id, 'logo_med')
-      : undefined,
-    topGenre: getTopItem(
-      basicInfo.games.flatGroupBy(aggregateGenre, 'genres', 'id', 'id')
-    )
-  };
+    //Fills studio data.
+    const studio: Studio = {
+      id: igdbItem.id,
+      name: igdbItem.name,
+      hours: studiosGames.toArray().reduce((sum, curr) => sum + curr.hours, 0),
+      averageRating: getAverageRating(studiosGames, 'rating'),
+      criticsRating: getAverageRating(studiosGames, 'criticsRating'),
+      usersRating: getAverageRating(studiosGames, 'usersRating'),
+      developed,
+      published,
+      series: seriesMapArray.toArray(),
+      country: igdbItem.country,
+      logo: igdbItem.logo?.image_id
+        ? getImageUrl(igdbItem.logo.image_id, 'logo_med')
+        : undefined,
+      topGenre: getTopItem(
+        studiosGames.flatGroupBy(aggregateGenre, 'genres', 'id', 'id')
+      )
+    };
 
-  return NextResponse.json(studio, {
-    status: 200,
-    statusText: 'Studio was found'
-  });
+    return NextResponse.json(studio, {
+      status: 200,
+      statusText: 'Studio was found'
+    });
+  } catch {
+    throw generateErrorResponse(404, 'Item was not found');
+  }
 };
 
-export const GET = protectedEndpoint(getStudioById);
+export const GET = gameProtectedEndpoint(getStudioById);

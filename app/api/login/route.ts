@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { GeneralEndpointAction } from '@ts/requests';
 import { UserLogin } from '@ts/users/user';
 
-import { generateAccessResponse } from '@lib/auth';
+import { tryGenerateAccessResponse } from '@lib/auth';
 import { generalEndpoint } from '@lib/endpoint-generators';
 import { CredentialsModel } from '@lib/models';
 import { generateErrorResponse } from '@lib/utils';
@@ -42,7 +42,7 @@ const login: GeneralEndpointAction<'/api/login'> = async (req) => {
     throw generateErrorResponse(400, 'Wrong password');
   }
 
-  return await generateAccessResponse(
+  return await tryGenerateAccessResponse(
     credentials._id.toString(),
     credentials.username
   );

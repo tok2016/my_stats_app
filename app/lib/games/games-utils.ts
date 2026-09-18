@@ -1,28 +1,21 @@
 import { IgdbBasic, IgdbItemInfo, IgdbQuery } from '@ts/games/api-response';
 import Game, {
   GameCore,
-  GameInSchema,
   GameShort,
   IgdbGameFull,
   IgdbRecommendedGame,
   RecommendedGame
 } from '@ts/games/game';
-import { IgdbGenre } from '@ts/games/genre';
 import { IgdbImageSize } from '@ts/games/image';
 import { ItemCompareData } from '@ts/games/metric';
 import { PlatformShort } from '@ts/games/platform';
 import { IgdbSeriesExpanded } from '@ts/games/series';
-import Token from '@ts/users/token';
-import { LiteralType } from '@ts/util-types';
+import { ExtractTypeFields, LiteralType } from '@ts/util-types';
 
 import ObjectMapArray from '@lib/object-map-array';
 
-import { tryGetCredentialsById } from '../auth';
-import { GamesModel } from '../models';
 import { generateErrorResponse, mean } from '../utils';
 import { getImageUrl, igdbRequest } from './igdb';
-
-type ItemsFields = keyof Omit<GameInSchema, 'userId' | 'storeId'>;
 
 const MAX_SCREENSHOTS = 3;
 
@@ -64,27 +57,6 @@ export const SERIES_EXPANDED_FIELDS: Required<
   'games.involved_companies.company.country',
   'name'
 ];
-
-export const getGenres = async (games: GameCore[]) => {
-  const genresIds = new Set<number>();
-  games.forEach((game) => {
-    game.genresIds.forEach((genre) => {
-      genresIds.add(genre);
-    });
-  });
-
-  const genres = await igdbRequest<IgdbGenre>('/genres', {
-    fields: ['name'],
-    where: `id = (${genresIds.values().toArray().join(',')})`,
-    limit: genresIds.size
-  });
-
-  const genresMap: Record<number, IgdbGenre> = Object.fromEntries(
-    genres.map((genre) => [genre.id, genre])
-  );
-
-  return genresMap;
-};
 
 const igdbPlatfromToPlatformShort = (
   igdbPlatform: IgdbGameFull['platforms'][number] | undefined
@@ -154,6 +126,7 @@ export const gameCoreToShort = (game: GameCore): GameShort => ({
 export const formRecommendedGame = (
   igdbGame: IgdbRecommendedGame
 ): RecommendedGame => {
+  //Stores sources of game to avoid the same links.
   const sources: Record<number, boolean> = {};
 
   return {
@@ -187,6 +160,11 @@ export const formRecommendedGame = (
   };
 };
 
+/**
+ * Fetches games from IGDB and unites them with stored core data.
+ * @param games - Stored core game data.
+ * @returns Game full data.
+ */
 export const getFullGames = async (
   games: ObjectMapArray<GameCore, 'apiId'>
 ): Promise<ObjectMapArray<Game, 'id'>> => {
@@ -211,61 +189,71 @@ export const getFullGames = async (
   return fullGames;
 };
 
-const fieldToEndpoint: Record<ItemsFields, string> = {
-  apiId: '/games',
-  name: '/games',
-  seriesId: '/collections',
-  developersIds: '/companies',
-  publishersIds: '/companies',
-  platformId: '/platforms',
-  genresIds: '/genres',
-  playDate: '/games',
-  hours: '/games',
-  releasedAt: '/release_dates',
-  coverId: '/covers',
-  rating: '/games'
+const fieldToEndpoint: Record<
+  ExtractTypeFields<Required<Game>, { id: number } | { id: number }[]>,
+  string
+> = {
+  series: '/collections',
+  developers: '/companies',
+  publishers: '/companies',
+  platform: '/platforms',
+  genres: '/genres'
 };
 
+/**
+ * Finds item (genre, platform, studio, etc.) by given field and id.
+ * @param games - Games data.
+ * @param field - Item field of game core to search games by.
+ * @param itemId - Item id.
+ * @param igdbFields - Fields of IGDB data to include.
+ * @throws 404 if item was not found.
+ * @returns Tuple of item full data and raw item IGDB data.
+ */
 export const tryGetItemById = async <IgdbDataType extends IgdbBasic>(
-  token: Token,
-  fields: ItemsFields[],
-  igdbFields: LiteralType<keyof IgdbDataType>[],
-  id?: string
+  games: ObjectMapArray<Game, 'id'>,
+  field: ExtractTypeFields<Required<Game>, { id: number } | { id: number }[]>,
+  itemId: number,
+  igdbFields: LiteralType<keyof IgdbDataType>[]
 ): Promise<[IgdbItemInfo, IgdbDataType]> => {
-  if (!id) throw generateErrorResponse(400, 'ID was not provided');
+  //Filters games by given field and item id.
+  const filteredGames = games.filter((game) => {
+    if (Array.isArray(game[field]))
+      return game[field].some((item) => item.id === itemId);
+    return game[field]?.id === itemId;
+  });
 
-  const credentials = await tryGetCredentialsById(token.id);
-  const parsedId = Number(id);
-  const additionalFilters = fields.map((field) => ({ [field]: parsedId }));
+  //Finds item from IGDB by given id.
+  try {
+    const igdbItem = (
+      await igdbRequest<IgdbDataType>(fieldToEndpoint[field], {
+        fields: igdbFields,
+        where: `id = ${itemId}`
+      })
+    )[0];
 
-  const gamesCore = (
-    await GamesModel.find({
-      userId: credentials.userId,
-      $or: additionalFilters
-    }).lean()
-  ).map((game) => ({ ...game, id: game._id.toString() }));
+    //Calculates aggregated values of games grouped by item.
+    const itemInfo: IgdbItemInfo = {
+      id: igdbItem.id,
+      name: igdbItem.name,
+      hours: filteredGames.toArray().reduce((sum, curr) => sum + curr.hours, 0),
+      averageRating: getAverageRating(filteredGames, 'rating'),
+      criticsRating: getAverageRating(filteredGames, 'criticsRating'),
+      usersRating: getAverageRating(filteredGames, 'usersRating'),
+      games: filteredGames
+    };
 
-  const igdbItem = (
-    await igdbRequest<IgdbDataType>(fieldToEndpoint[fields[0] ?? 'apiId'], {
-      fields: igdbFields,
-      where: `id = ${parsedId}`
-    })
-  )[0];
-
-  const fullGames = await getFullGames(mapGamesByApiId(gamesCore));
-  const itemInfo: IgdbItemInfo = {
-    id: igdbItem.id,
-    name: igdbItem.name,
-    hours: getTotalPlaytime(gamesCore),
-    averageRating: getAverageRating(fullGames, 'rating'),
-    criticsRating: getAverageRating(fullGames, 'criticsRating'),
-    usersRating: getAverageRating(fullGames, 'usersRating'),
-    games: fullGames
-  };
-
-  return [itemInfo, igdbItem] as const;
+    return [itemInfo, igdbItem] as const;
+  } catch {
+    throw generateErrorResponse(404, 'Item was not found');
+  }
 };
 
+/**
+ * Calculates mean values of rating field.
+ * @param games - Games data.
+ * @param field - Rating field.
+ * @returns Mean rating.
+ */
 export const getAverageRating = <
   GameType extends object,
   RatingField extends keyof GameType
@@ -282,11 +270,11 @@ export const getAverageRating = <
   return typeof meanValue === 'number' ? Math.round(meanValue) : undefined;
 };
 
-export const getTotalPlaytime = (games: GameCore[]): number =>
-  Math.round(
-    games.map((game) => game.hours).reduce((prev, curr) => prev + curr, 0)
-  );
-
+/**
+ * Returns top item by its games count or playtime.
+ * @param compareData - Item compare data with games count and playtime.
+ * @returns Item with the biggest games count and playtime.
+ */
 export const getTopItem = <IgdbData extends IgdbBasic>(
   compareData: ObjectMapArray<ItemCompareData<IgdbData>, 'id'>
 ): IgdbData | undefined => {
@@ -297,11 +285,4 @@ export const getTopItem = <IgdbData extends IgdbBasic>(
       return countDiff;
     })
     .at(0);
-};
-
-export const mapGamesByApiId = (
-  games: GameCore[]
-): ObjectMapArray<GameCore, 'apiId'> => {
-  const gamesMapArray = new ObjectMapArray(games, 'apiId');
-  return gamesMapArray;
 };

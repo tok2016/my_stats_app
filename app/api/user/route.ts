@@ -6,13 +6,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { GeneralEndpointAction, ProtectedEndpointAction } from '@ts/requests';
 import { NewCredentials } from '@ts/users/credentials';
-import { UserUpdate } from '@ts/users/user';
+import { User, UserUpdate } from '@ts/users/user';
 
 import {
   AVATAR_DIRECTORY,
-  checkUserExistance,
-  generateAccessResponse,
-  tryGetUserById,
+  tryGenerateAccessResponse,
+  tryGetCredentialsById,
   tryHashPassword
 } from '@lib/auth';
 import { generalEndpoint, protectedEndpoint } from '@lib/endpoint-generators';
@@ -30,6 +29,17 @@ import {
   validateData
 } from '@lib/validation-schemas';
 
+const tryGetUserByCredentialsId = async (id: string): Promise<User> => {
+  const credentials = await tryGetCredentialsById(id);
+  const userInfo = await UsersModel.findById(credentials.userId).lean();
+
+  if (!userInfo) {
+    throw generateErrorResponse(404, 'User was not found');
+  }
+
+  return uniteUserData(credentials, userInfo);
+};
+
 /**
  * Protected method. Finds user by token.
  * @param _req - Request object.
@@ -43,12 +53,35 @@ const getCurrentUser: ProtectedEndpointAction<'/api/user'> = async (
   _params,
   token
 ) => {
-  const user = await tryGetUserById(token.id);
+  const user = await tryGetUserByCredentialsId(token.id);
 
   return NextResponse.json(user, {
     status: 200,
     statusText: 'User was found'
   });
+};
+
+/**
+ * Checks if the user with given username or email exists.
+ * @param username
+ * @param email
+ * @returns Empty string if user doesn't exists.
+ */
+const checkUserExistance = async (
+  username: string,
+  email: string
+): Promise<string> => {
+  const foundUsers = await CredentialsModel.find({
+    $or: [{ username }, { email }]
+  }).lean();
+
+  if (foundUsers[0]?.username === username) {
+    return 'User with this username already exits';
+  } else if (foundUsers[0]?.email === email) {
+    return 'User with this email already exits';
+  }
+
+  return '';
 };
 
 /**
@@ -87,7 +120,7 @@ const postNewUser: GeneralEndpointAction<'/api/user'> = async (
     userId: user._id.toString()
   });
 
-  return await generateAccessResponse(
+  return await tryGenerateAccessResponse(
     credentials.id,
     credentials.username,
     'User account was created successfully'

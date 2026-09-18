@@ -2,17 +2,30 @@
 
 import { useEffect, useState } from 'react';
 
+import FormState from '@ts/ui/form-state';
+
+import AxiosInstanse from '@lib/axios-instanse';
+import { useAction, useConfirm } from '@lib/hooks';
+import { MILLISECONDS, defaultFormState, getErrorFormState } from '@lib/utils';
+
 import Button from '../Button';
 import Hint from '../Hint';
-import { defaultFormState, MILLISECONDS } from '@lib/utils';
-import { useAction, useConfirm } from '@lib/hooks';
-import { sendCodeAgain } from '@lib/actions';
-import FormState from '@ts/ui/form-state';
 
 const SECONDS_UNAVAILABLE = 60;
 const SECONDS_IN_MINUTE = 60;
 
 const MIN_TIME_DIGITS = 2;
+
+const sendCodeAgain = async (
+  operationId: string = ''
+): Promise<FormState<never>> => {
+  try {
+    await AxiosInstanse.put(`/api/confirm/${operationId}`);
+    return { error: false, message: '' };
+  } catch (err) {
+    return getErrorFormState(err);
+  }
+};
 
 const formatSeconds = (seconds: number) => {
   const minutes = Math.floor(seconds / SECONDS_IN_MINUTE).toLocaleString(

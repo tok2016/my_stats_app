@@ -1,6 +1,6 @@
 import { GameDetailed } from '@ts/games/game';
 
-import { getData } from '@lib/server-actions';
+import { tryGetDataAuthorized } from '@lib/server-actions';
 
 import ErrorMessage from '@components/ErrorMessage';
 
@@ -17,7 +17,7 @@ export default async function GameInfoPage({
 }) {
   try {
     const { gameId } = await params;
-    const game = await getData<GameDetailed>(
+    const game = await tryGetDataAuthorized<GameDetailed>(
       `/api/games/titles/item/${gameId}`
     );
 

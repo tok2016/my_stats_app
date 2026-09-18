@@ -17,7 +17,7 @@ import {
   ChartColors,
   MONTHS_IN_YEAR,
   Seasons,
-  getPeriodString
+  getPeriodName
 } from '@lib/utils';
 
 import ChartProvider from '@store/ChartProvider';
@@ -129,7 +129,7 @@ const getPeriodDatasets = async <
   const periodsNames = Object.fromEntries(
     allPeriods.map((period) => [
       period,
-      getPeriodString[periodType](period, ShortFormats[periodType])
+      getPeriodName[periodType](period, ShortFormats[periodType])
     ])
   );
 

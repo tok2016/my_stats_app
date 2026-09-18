@@ -1,7 +1,9 @@
 import { Suspense } from 'react';
 
-import { getUsers } from '@lib/actions';
-import { getUserCountries } from '@lib/server-actions';
+import { User } from '@ts/users/user';
+
+import AxiosInstanse from '@lib/axios-instanse';
+import { getUsersCountriesData } from '@lib/server-actions';
 
 import ErrorMessage from '@components/ErrorMessage';
 import Pagination from '@components/Pagination';
@@ -12,6 +14,23 @@ import UserPreview from '../components/UserPreview';
 type UsersParams = { query: string; page?: string };
 
 const USER_PER_PAGE = 10;
+
+const getUsers = async (
+  credential?: string,
+  limit?: number,
+  signal?: AbortSignal
+): Promise<User[]> => {
+  const searchParams = new URLSearchParams();
+  if (credential) searchParams.append('credential', credential);
+  if (limit) searchParams.append('limit', limit.toString());
+
+  const response = await AxiosInstanse.get<User[]>(
+    `/api/users?${searchParams.toString()}`,
+    { signal }
+  );
+
+  return response.data;
+};
 
 export default async function UsersPage({
   searchParams
@@ -24,7 +43,7 @@ export default async function UsersPage({
     const parsedPage = page ? parseInt(page) : 1;
 
     const users = await getUsers(query);
-    const countries = await getUserCountries(users);
+    const countries = await getUsersCountriesData(users);
 
     const startIndex = isNaN(parsedPage) ? 0 : (parsedPage - 1) * USER_PER_PAGE;
     const endIndex = isNaN(parsedPage)

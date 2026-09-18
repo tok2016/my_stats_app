@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import Country from '@ts/users/country';
 
 import { useAction } from '@lib/hooks';
-import { getCountyData } from '@lib/server-actions';
+import { getCountryData } from '@lib/server-actions';
 import { defaultCountry } from '@lib/utils';
 
 import FetchImage from '@components/FetchImage';
@@ -18,7 +18,7 @@ type CountryDataFetchProps = {
 
 export default function CountryDataFetch({ country }: CountryDataFetchProps) {
   const [countryData, findCountry, isPending] = useAction<Country, string>(
-    getCountyData,
+    getCountryData,
     defaultCountry
   );
 

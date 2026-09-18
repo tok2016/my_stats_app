@@ -21,7 +21,7 @@ import {
   DEFAULT_PERIOD_BLOCKS_GAP,
   DEFAULT_PERIOD_BLOCK_WIDTH,
   PrecisePeriods,
-  getPeriodString
+  getPeriodName
 } from '@lib/utils';
 
 import Divider from '@components/Divider';
@@ -82,7 +82,7 @@ const setTopsIndexes = <ItemType extends ChartData>(
     const year =
       periodType === 'year'
         ? '0'
-        : getPeriodString['year'](periodTop.period, false);
+        : getPeriodName['year'](periodTop.period, false);
     const itemOfYear = yearItemMap.get(year);
 
     if (!itemOfYear) {
@@ -163,7 +163,7 @@ function PeriodTopsScroll<
 
       for (let i = periodMetricData.tops.length - 1; i >= 0; i--) {
         const top = periodMetricData.tops[i];
-        const year = getPeriodString['year'](top.period, false);
+        const year = getPeriodName['year'](top.period, false);
         const yearTop = tops.get(year);
         if (!yearTop) tops.set(year, [top]);
         else yearTop.push(top);
@@ -175,7 +175,7 @@ function PeriodTopsScroll<
     if (scrollRef.current) {
       const latestPeriod = periodMetricData.tops.at(-1);
       if (latestPeriod)
-        setYear(getPeriodString['year'](latestPeriod.period, false));
+        setYear(getPeriodName['year'](latestPeriod.period, false));
       else setYear('');
 
       scrollRef.current.scrollTo({

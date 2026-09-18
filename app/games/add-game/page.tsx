@@ -1,6 +1,6 @@
 import { SearchGame } from '@ts/games/game';
 
-import { getData } from '@lib/server-actions';
+import { tryGetDataAuthorized } from '@lib/server-actions';
 
 import GameRatingForm from './components/GameRatingForm';
 import SearchGameForm from './components/SearchGameForm';
@@ -17,7 +17,9 @@ export default async function AddGamePage({
   const { gameId } = await searchParams;
 
   try {
-    const game = await getData<SearchGame>(`/api/games/search/${gameId}`);
+    const game = await tryGetDataAuthorized<SearchGame>(
+      `/api/games/search/${gameId}`
+    );
     return <GameRatingForm game={game} />;
   } catch {
     return <SearchGameForm />;
