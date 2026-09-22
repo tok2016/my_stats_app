@@ -6,9 +6,27 @@ import {
   ConfirmationCode,
   ConfirmationInfo
 } from '@ts/users/confirmation';
+import { User } from '@ts/users/user';
 
 import AxiosInstanse from './axios-instanse';
 import { isErrorResponse } from './type-guards';
+
+export const getUsers = async (
+  credential?: string,
+  limit?: number,
+  signal?: AbortSignal
+): Promise<User[]> => {
+  const searchParams = new URLSearchParams();
+  if (credential) searchParams.append('credential', credential);
+  if (limit) searchParams.append('limit', limit.toString());
+
+  const response = await AxiosInstanse.get<User[]>(
+    `/api/users?${searchParams.toString()}`,
+    { signal }
+  );
+
+  return response.data;
+};
 
 export const requestConfimation =
   (signal?: AbortSignal): ConfirmationBaseAction =>

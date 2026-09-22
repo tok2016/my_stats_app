@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent } from 'react';
+import { ChangeEvent, FormEvent } from 'react';
 
 import { InputBaseProps } from '@ts/ui/components-props';
 
@@ -13,6 +13,7 @@ type SwitchProps = InputBaseProps & {
   defaultValue?: boolean;
   value?: boolean;
   onChange?: (value: boolean) => void;
+  onInput?: (evt: FormEvent<HTMLInputElement>) => void;
 };
 
 export default function BinaryInput({
@@ -27,7 +28,8 @@ export default function BinaryInput({
   value,
   errorHint,
   hint,
-  onChange
+  onChange,
+  onInput
 }: SwitchProps) {
   const onSwitch = (evt: ChangeEvent<HTMLInputElement>) => {
     onChange?.(evt.target.checked);
@@ -44,6 +46,7 @@ export default function BinaryInput({
           checked={value}
           className={isSwitch ? 'switch' : ''}
           onChange={onSwitch}
+          onInput={onInput}
           disabled={disabled}
         />
         <label htmlFor={id}>{label}</label>

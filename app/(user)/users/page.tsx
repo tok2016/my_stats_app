@@ -1,8 +1,6 @@
 import { Suspense } from 'react';
 
-import { User } from '@ts/users/user';
-
-import AxiosInstanse from '@lib/axios-instanse';
+import { getUsers } from '@lib/actions';
 import { getUsersCountriesData } from '@lib/server-actions';
 
 import ErrorMessage from '@components/ErrorMessage';
@@ -14,23 +12,6 @@ import UserPreview from '../components/UserPreview';
 type UsersParams = { query: string; page?: string };
 
 const USER_PER_PAGE = 10;
-
-const getUsers = async (
-  credential?: string,
-  limit?: number,
-  signal?: AbortSignal
-): Promise<User[]> => {
-  const searchParams = new URLSearchParams();
-  if (credential) searchParams.append('credential', credential);
-  if (limit) searchParams.append('limit', limit.toString());
-
-  const response = await AxiosInstanse.get<User[]>(
-    `/api/users?${searchParams.toString()}`,
-    { signal }
-  );
-
-  return response.data;
-};
 
 export default async function UsersPage({
   searchParams

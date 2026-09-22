@@ -1,5 +1,7 @@
 'use client';
 
+import { FormEvent } from 'react';
+
 import { InputBaseProps, Option } from '@ts/ui/components-props';
 
 import BinaryInput from './BinaryInput';
@@ -11,6 +13,7 @@ type RadioGroupProps = Omit<InputBaseProps, 'id'> & {
   defaultValue?: string | string[];
   value?: string | string[];
   onChange?: (value: string | string[]) => void;
+  onInput?: (evt: FormEvent<HTMLInputElement>) => void;
 };
 
 const isChecked = (current: string | string[] | undefined, value: string) =>
@@ -26,20 +29,16 @@ export default function RadioCheckboxGroup({
   value,
   hint,
   errorHint,
-  onChange
+  onChange,
+  onInput
 }: RadioGroupProps) {
-  const onCheck = (id: string) =>
-    typeof value === 'undefined'
-      ? undefined
-      : (checked: boolean) => {
-          if (value && typeof value !== 'string') {
-            onChange?.(
-              checked ? [...value, id] : value.filter((val) => val !== id)
-            );
-          } else {
-            onChange?.(id);
-          }
-        };
+  const onCheck = (id: string) => (checked: boolean) => {
+    if (value && typeof value !== 'string') {
+      onChange?.(checked ? [...value, id] : value.filter((val) => val !== id));
+    } else {
+      onChange?.(id);
+    }
+  };
 
   return (
     <div className={`input-select-group ${className}`}>
@@ -56,6 +55,7 @@ export default function RadioCheckboxGroup({
             defaultValue={isChecked(defaultValue, option.value)}
             value={isChecked(value, option.value)}
             onChange={onCheck(option.value)}
+            onInput={onInput}
           />
         ))}
       </div>
