@@ -5,6 +5,12 @@ type ChartLegendProps<DataType extends ChartData> = {
   percentsMap?: Map<number | string, number | undefined>;
 };
 
+/**
+ * @param props
+ * @param props.data - Data for chart.
+ * @param props.percentsMap - Percents by data. If given and not empty, displays percents as list marks.
+ * @returns
+ */
 export default function ChartLegend<DataType extends ChartData>({
   data,
   percentsMap

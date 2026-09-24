@@ -48,7 +48,7 @@ export default function GenresPlaytimeChart({
               data={doughnutData}
               defaultValueField='hours'
               valueFields={['hours']}
-              fieldsNames={playtimeFieldsNames}
+              fieldsInfo={playtimeFieldsNames}
               showLegend
               displayFields={['hours', 'topGame']}
             />

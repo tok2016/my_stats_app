@@ -6,21 +6,30 @@ import { ChartCoreProps, ChartData, ChartValueField } from '@ts/ui/charts-data';
 
 import { useChart } from '@lib/hooks';
 
-import { getTooltip } from './ChartTooltip';
+import { setTooltip } from './ChartTooltip';
 import { ChartClasses } from './chart-styles';
 
 const MAX_TICKS = 20;
 
+/**
+ * @param props
+ * @param props.data - Chart data to visualize.
+ * @param props.valueField - Field of data which values will be used to build the chart elements. Accept only number fields.
+ * @param props.fieldsInfo - Fields render data with names for tooltip and chart.
+ * @returns Line chart. Connects dots with empty value in between with dash line.
+ */
 export default function LineChart<
   DataType extends ChartData,
   ValueKey extends ChartValueField<DataType>
->({ data, valueField, fieldsNames }: ChartCoreProps<DataType, ValueKey>) {
+>({ data, valueField, fieldsInfo }: ChartCoreProps<DataType, ValueKey>) {
   const dataMap = new Map<number | string, ChartData>(
     data.map((value) => [value.id, value])
   );
 
   const { updateTooltip, tooltipRef, tooltipProps } = useChart();
 
+  //Does not let render 0 values with dots.
+  //They're considered as empty values, so the line will ignore them and connect previous full data with the next one.
   const values = data.map((d) => (!d[valueField] ? null : d[valueField]));
 
   return (
@@ -44,20 +53,20 @@ export default function LineChart<
               stepSize: Math.ceil(data.length / MAX_TICKS)
             },
             title: {
-              text: fieldsNames.name.name
+              text: fieldsInfo.name.name
             }
           },
           y: {
             type: 'linear',
             beginAtZero: true,
-            title: { text: fieldsNames[valueField].name }
+            title: { text: fieldsInfo[valueField].name }
           }
         },
         plugins: {
           legend: {
             display: false
           },
-          tooltip: getTooltip(
+          tooltip: setTooltip(
             tooltipRef,
             updateTooltip,
             dataMap,

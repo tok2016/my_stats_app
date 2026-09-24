@@ -12,6 +12,13 @@ type SwitchableChartProps = {
   className?: string;
 };
 
+/**
+ * Switches between given charts. Button shows the icon of the chart that will be rendered on click.
+ * @param props
+ * @param props.chartsOptions - Inner charts to switch with their icon button.
+ * @param props.className
+ * @returns Chart that switches given charts on switch button click.
+ */
 export default function SwitchableChart({
   chartsOptions,
   className = ''

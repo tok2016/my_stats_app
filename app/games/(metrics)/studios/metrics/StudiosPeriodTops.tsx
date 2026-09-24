@@ -88,7 +88,7 @@ export default function StudiosPeriodTops({
       fetchPeriodMetric={getStudioPeriodMetric(developers, publishers)}
       displayFields={['hours']}
       valueField='hours'
-      fieldsNames={{
+      fieldsInfo={{
         id: { name: 'ID' },
         index: { name: '№' },
         hours: { name: 'Hours' },

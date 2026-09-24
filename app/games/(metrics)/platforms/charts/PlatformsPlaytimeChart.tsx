@@ -48,7 +48,7 @@ export default function PlatformsPlaytimeChart({
               displayFields={['hours', 'topGame']}
               valueFields={['hours']}
               defaultValueField='hours'
-              fieldsNames={fieldsNames}
+              fieldsInfo={fieldsNames}
               showLegend
             />
           ),

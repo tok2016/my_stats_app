@@ -77,7 +77,7 @@ export default function StudiosCountChart({
         displayFields={['count', 'hours', 'topGame']}
         valueFields={['count', 'hours']}
         defaultValueField='count'
-        fieldsNames={{
+        fieldsInfo={{
           id: { name: 'ID' },
           name: { name: StudioTypeTitles[type] },
           index: { name: '№' },

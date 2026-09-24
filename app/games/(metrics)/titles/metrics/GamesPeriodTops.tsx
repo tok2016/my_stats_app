@@ -71,7 +71,7 @@ export default function GamesPeriodTops({
       listItemContent={gameItemContent}
       displayFields={['hours']}
       valueField='hours'
-      fieldsNames={{
+      fieldsInfo={{
         id: { name: 'ID' },
         index: { name: '№' },
         name: { name: 'Game' },

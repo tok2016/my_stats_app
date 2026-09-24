@@ -71,7 +71,7 @@ export default function GenresPeriodTops({
       displayFields={['hours']}
       valueField='hours'
       showBar
-      fieldsNames={{
+      fieldsInfo={{
         id: { name: 'ID' },
         name: { name: 'Genre' },
         index: { name: '№' },

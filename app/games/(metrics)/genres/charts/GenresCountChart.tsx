@@ -47,7 +47,7 @@ export default function GenresCountChart({ data }: GenresCountChartProps) {
               displayFields={['count', 'topSeries']}
               valueFields={['count']}
               showLegend
-              fieldsNames={genresCountFieldsNames}
+              fieldsInfo={genresCountFieldsNames}
             />
           ),
           icon: <ChartPieSolid />

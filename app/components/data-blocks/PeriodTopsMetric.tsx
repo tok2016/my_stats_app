@@ -126,7 +126,7 @@ function PeriodTopsScroll<
   showBar,
   displayFields,
   valueField,
-  fieldsNames
+  fieldsInfo: fieldsNames
 }: PeriodTopsScrollProps<ItemType, ValueKey>) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [year, setYear] = useState<string>('');
@@ -153,20 +153,18 @@ function PeriodTopsScroll<
       const tops = new Map();
 
       if (!periodMetricData) return tops;
-      else if (periodMetricData.periodType === 'year') {
-        tops.set(
-          periodMetricData.tops[0].period,
-          periodMetricData.tops.toReversed()
-        );
-        return tops;
-      }
 
       for (let i = periodMetricData.tops.length - 1; i >= 0; i--) {
         const top = periodMetricData.tops[i];
         const year = getPeriodName['year'](top.period, false);
-        const yearTop = tops.get(year);
-        if (!yearTop) tops.set(year, [top]);
-        else yearTop.push(top);
+
+        const decade = Math.floor(Number(year) / 10) * 10;
+        const yearOrDecade =
+          periodMetricData.periodType === 'year' ? year : decade + 's';
+
+        const yearDecadeTop = tops.get(yearOrDecade);
+        if (!yearDecadeTop) tops.set(yearOrDecade, [top]);
+        else yearDecadeTop.push(top);
       }
       return tops;
     }, [periodMetricData]);
@@ -209,9 +207,7 @@ function PeriodTopsScroll<
             ))}
         </div>
 
-        <div
-          className={`years ${periodMetricData?.periodType === 'year' ? 'invisible' : ''}`}
-        >
+        <div className='years'>
           {topsByYear
             .entries()
             .toArray()
@@ -243,7 +239,7 @@ function PeriodTopsScroll<
             periodMetricData.tops
           )}
           displayFields={displayFields}
-          fieldsNames={fieldsNames}
+          fieldsInfo={fieldsNames}
           valueField={valueField}
         />
       )}

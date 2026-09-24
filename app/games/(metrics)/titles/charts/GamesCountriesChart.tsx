@@ -40,7 +40,7 @@ export default function GamesCountriesChart({
         colored: true,
         enableTransition: false
       }}
-      fieldsNames={{
+      fieldsInfo={{
         id: { name: 'ID' },
         index: { name: '№' },
         percent: { name: '%' },

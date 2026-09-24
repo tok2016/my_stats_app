@@ -69,7 +69,7 @@ export default function PlatformsPeriodTops({
       displayFields={['hours']}
       valueField='hours'
       showBar
-      fieldsNames={{
+      fieldsInfo={{
         id: { name: 'ID' },
         name: { name: 'Platform' },
         index: { name: '№' },

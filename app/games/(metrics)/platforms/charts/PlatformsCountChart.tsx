@@ -47,7 +47,7 @@ export default function PlatformsCountChart({
               displayFields={['count', 'topSeries']}
               valueFields={['count']}
               defaultValueField='count'
-              fieldsNames={fieldsNames}
+              fieldsInfo={fieldsNames}
               showLegend
             />
           ),

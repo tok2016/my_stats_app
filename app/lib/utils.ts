@@ -12,6 +12,7 @@ import { isAxiosError, isErrorResponse } from './type-guards';
 export const MILLISECONDS = 1000;
 export const MINUTES = 60;
 export const MONTHS_IN_YEAR = 12;
+export const YEARS_IN_DECADE = 10;
 
 export const CODE_LENGTH = 6;
 

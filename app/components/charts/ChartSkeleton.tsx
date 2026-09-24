@@ -12,10 +12,16 @@ type ChartSkeletonProps = {
   type: CustomChartType;
 };
 
+/**
+ * @param props
+ * @param props.className
+ * @param props.type - Chart type.
+ * @returns Skeleton for every chart type.
+ */
 export function ChartSkeleton({ className, type }: ChartSkeletonProps) {
   if (type === 'map')
     return (
-      <div className={`chart ${ChartClasses[type].container}`}>
+      <div className={`chart ${ChartClasses[type].container} ${className}`}>
         <div className='chart-legend-content'>
           <div className='chart-core-wrapper'>
             <div className={ChartClasses[type].core}>

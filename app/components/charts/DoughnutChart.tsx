@@ -9,9 +9,15 @@ import { ChartColors } from '@lib/utils';
 
 import { ChartContext } from '@store/ChartProvider';
 
-import { getTooltip } from './ChartTooltip';
+import { setTooltip } from './ChartTooltip';
 import { ChartClasses } from './chart-styles';
 
+/**
+ * @param props
+ * @param props.data - Chart data to visualize.
+ * @param props.valueField - Field of data which values will be used to build the chart elements. Accept only number fields.
+ * @returns Pie chart with the hole in the center.
+ */
 export default function DoughnutChart<
   DataType extends ChartData,
   ValueKey extends ChartValueField<DataType>
@@ -36,7 +42,7 @@ export default function DoughnutChart<
         },
         locale: 'en-US',
         plugins: {
-          tooltip: getTooltip(
+          tooltip: setTooltip(
             tooltipRef,
             updateTooltip,
             dataMap,

@@ -145,6 +145,9 @@ Chart.defaults.elements = {
   }
 };
 
+/**
+ * Classes of chart element itself and its container by chart type.
+ */
 export const ChartClasses: Record<CustomChartType, ChartClassName> = {
   doughnut: {
     core: 'doughnut-chart',

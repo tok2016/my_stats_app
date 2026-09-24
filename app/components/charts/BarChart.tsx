@@ -8,7 +8,7 @@ import { ChartCoreProps, ChartData, ChartValueField } from '@ts/ui/charts-data';
 import { useChart } from '@lib/hooks';
 import { ChartColors } from '@lib/utils';
 
-import { getTooltip } from './ChartTooltip';
+import { setTooltip } from './ChartTooltip';
 import { ChartClasses } from './chart-styles';
 
 type BarChartCoreProps<
@@ -20,6 +20,13 @@ type BarChartCoreProps<
 
 type ChartScaleType = NonNullable<Chart['options']['scales']>[string];
 
+/**
+ * @param props
+ * @param props.data - Chart data to visualize.
+ * @param props.valueField - Field of data which values will be used to build the chart elements. Accept only number fields.
+ * @param props.horizontal - Are bars horizontal.
+ * @returns Bar chart.
+ */
 export default function BarChart<
   DataType extends ChartData,
   ValueKey extends ChartValueField<DataType>
@@ -34,6 +41,7 @@ export default function BarChart<
 
   const { updateTooltip, tooltipRef, tooltipProps } = useChart();
 
+  //X axis of vertical bar chart.
   const xAxis: ChartScaleType = {
     type: 'category',
     labels: data.map((value) => value.id.toString()),
@@ -46,6 +54,7 @@ export default function BarChart<
     offset: true
   };
 
+  //Y axis of vertical bar chart.
   const yAxis: ChartScaleType = {
     type: 'linear',
     title: {
@@ -81,7 +90,7 @@ export default function BarChart<
           legend: {
             display: false
           },
-          tooltip: getTooltip(
+          tooltip: setTooltip(
             tooltipRef,
             updateTooltip,
             dataMap,

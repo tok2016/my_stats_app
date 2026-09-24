@@ -35,7 +35,7 @@ export default function StudiosMapChart({ data }: StudiosMapChartProps) {
       displayFields={['developers']}
       valueFields={['count']}
       defaultValueField='count'
-      fieldsNames={{
+      fieldsInfo={{
         id: { name: 'ID' },
         index: { name: '№' },
         percent: { name: '%' },

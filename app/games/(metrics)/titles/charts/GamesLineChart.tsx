@@ -18,7 +18,7 @@ export default function GamesLineChart({ data, chartId }: GamesLineChartProps) {
       displayFields={['count', 'topGame']}
       valueFields={['count']}
       defaultValueField='count'
-      fieldsNames={{
+      fieldsInfo={{
         id: { name: 'ID' },
         name: { name: 'Year' },
         year: { name: 'Year' },
