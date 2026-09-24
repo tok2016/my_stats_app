@@ -76,7 +76,7 @@ export default function ProfileInfo({
             )}
 
             {user.country ? (
-              <CountryDataFetch country={user.country} />
+              <CountryDataFetch countryIso={user.country} />
             ) : (
               <p>Unknown country</p>
             )}

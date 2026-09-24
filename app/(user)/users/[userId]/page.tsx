@@ -7,6 +7,10 @@ import ErrorMessage from '@components/ErrorMessage';
 import Dashboard from '@app/(user)/components/profile-info/Dashboard';
 import ProfileInfo from '@app/(user)/components/profile-info/ProfileInfo';
 
+/**
+ * @param param0 - Route params with user id.
+ * @returns Profile page of user of id.
+ */
 export default async function UserPage({
   params
 }: {

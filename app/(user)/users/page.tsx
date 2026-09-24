@@ -1,8 +1,6 @@
 import { Suspense } from 'react';
 
-import { User } from '@ts/users/user';
-
-import AxiosInstanse from '@lib/axios-instanse';
+import { getUsers } from '@lib/actions';
 import { getUsersCountriesData } from '@lib/server-actions';
 
 import ErrorMessage from '@components/ErrorMessage';
@@ -11,40 +9,29 @@ import UserSearch from '@components/profile-layout/UserSearch';
 
 import UserPreview from '../components/UserPreview';
 
-type UsersParams = { query: string; page?: string };
+type UsersParams = { query?: string; page?: string };
 
 const USER_PER_PAGE = 10;
 
-const getUsers = async (
-  credential?: string,
-  limit?: number,
-  signal?: AbortSignal
-): Promise<User[]> => {
-  const searchParams = new URLSearchParams();
-  if (credential) searchParams.append('credential', credential);
-  if (limit) searchParams.append('limit', limit.toString());
-
-  const response = await AxiosInstanse.get<User[]>(
-    `/api/users?${searchParams.toString()}`,
-    { signal }
-  );
-
-  return response.data;
-};
-
+/**
+ * @param param0 - Search params.
+ * @returns Page with found users list.
+ */
 export default async function UsersPage({
   searchParams
 }: {
   searchParams: Promise<UsersParams>;
 }) {
   try {
+    //Parses search params.
     const { query, page } = await searchParams;
-
     const parsedPage = page ? parseInt(page) : 1;
 
+    //Finds users and their countries by query.
     const users = await getUsers(query);
     const countries = await getUsersCountriesData(users);
 
+    //Forms pagination params.
     const startIndex = isNaN(parsedPage) ? 0 : (parsedPage - 1) * USER_PER_PAGE;
     const endIndex = isNaN(parsedPage)
       ? users.length

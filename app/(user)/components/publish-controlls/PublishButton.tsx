@@ -2,11 +2,14 @@
 
 import { Lock, LockOpen } from '@mynaui/icons-react';
 
-import IconButton from '@components/IconButton';
-import { usePopupState } from '@store/popup-store';
 import { useAction } from '@lib/hooks';
-import { changeProfilePrivacy } from '../../actions';
 import { defaultFormState } from '@lib/utils';
+
+import { usePopupState } from '@store/popup-store';
+
+import IconButton from '@components/IconButton';
+
+import { changeProfilePrivacy } from '../../actions';
 import PublishPopup from './PublishPopup';
 
 type PublishButtonProps = {
@@ -16,6 +19,12 @@ type PublishButtonProps = {
 
 const PUBLISH_POPUP_NAME = 'publish';
 
+/**
+ * @param props
+ * @param props.isPublic - Is user profile public.
+ * @param props.loading - Is parent component loading.
+ * @returns Button to switch privacy with warning publish popup.
+ */
 export default function PublishButton({
   isPublic = false,
   loading = false

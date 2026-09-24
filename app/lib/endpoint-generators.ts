@@ -108,6 +108,7 @@ export const generalEndpoint =
     try {
       return await action(req, context.params);
     } catch (err) {
+      console.log(err);
       return catchErrorResponse(err);
     }
   };

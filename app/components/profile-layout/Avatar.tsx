@@ -12,6 +12,11 @@ type AvatarProps = {
 
 const AVATAR_WIDTH = 150;
 
+/**
+ * Checks if given avatarId is URL. If it's not, forms avatar's URL.
+ * @param avatarId - Avatar id.
+ * @returns Avatar URL.
+ */
 const getAvatarUrl = (avatarId: string) => {
   try {
     const avatarUrl = new URL(avatarId);
@@ -21,6 +26,14 @@ const getAvatarUrl = (avatarId: string) => {
   }
 };
 
+/**
+ * @param props
+ * @param props.username
+ * @param props.avatarId - User's avatar id.
+ * @param props.loading - Is parent component loading. If true, renders skeleton.
+ * @param props.className
+ * @returns Image with user's avatar.
+ */
 export default function Avatar({
   username,
   avatarId,

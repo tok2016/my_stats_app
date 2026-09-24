@@ -4,13 +4,14 @@ import { useRef } from 'react';
 
 import { ConfirmationState } from '@ts/users/confirmation';
 
-import DeleteAccountWarning from './DeleteAccountWarning';
-import { requestConfimation } from '@lib/actions';
-import { deleteAccount } from '@app/(user)/actions';
-import Popup from '@components/Popup';
 import { useConfirm } from '@lib/hooks';
-import DeleteAccountCodeForm from './DeleteAccountCodeForm';
+
 import { usePopupState } from '@store/popup-store';
+
+import Popup from '@components/Popup';
+
+import DeleteAccountCodeForm from './DeleteAccountCodeForm';
+import DeleteAccountWarning from './DeleteAccountWarning';
 
 type DeleteAccountFormProps = {
   popupName: string;
@@ -21,22 +22,24 @@ type DeleteFormFunc = (
   onCancel: () => void
 ) => React.ReactNode;
 
+/**
+ * Delete account forms by confirmation state.
+ */
 const DeleteForms: Record<ConfirmationState, DeleteFormFunc> = {
   void: (signal, onCancel) => (
-    <DeleteAccountWarning
-      baseAction={requestConfimation(signal)}
-      onCancel={onCancel}
-    />
+    <DeleteAccountWarning signal={signal} onCancel={onCancel} />
   ),
   pending: (signal, onCancel) => (
-    <DeleteAccountCodeForm
-      baseAction={deleteAccount(signal)}
-      onCancel={onCancel}
-    />
+    <DeleteAccountCodeForm signal={signal} onCancel={onCancel} />
   ),
   confirmed: () => undefined
 };
 
+/**
+ * @param props
+ * @param props.popupName - Name of popup with delete forms.
+ * @returns Popup with delete forms by confirmation state.
+ */
 export default function DeleteAccountForm({
   popupName
 }: DeleteAccountFormProps) {

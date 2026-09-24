@@ -16,6 +16,11 @@ const SECONDS_IN_MINUTE = 60;
 
 const MIN_TIME_DIGITS = 2;
 
+/**
+ * Requests code update and resend.
+ * @param operationId - Operation id which code will be updated and resent.
+ * @returns Form state with request status text and possible error.
+ */
 const sendCodeAgain = async (
   operationId: string = ''
 ): Promise<FormState<never>> => {
@@ -27,6 +32,10 @@ const sendCodeAgain = async (
   }
 };
 
+/**
+ * @param seconds - Time in seconds.
+ * @returns Time in MM:SS format.
+ */
 const formatSeconds = (seconds: number) => {
   const minutes = Math.floor(seconds / SECONDS_IN_MINUTE).toLocaleString(
     'en-US',
@@ -41,6 +50,9 @@ const formatSeconds = (seconds: number) => {
   return `${minutes}:${secondsModules}`;
 };
 
+/**
+ * @returns Component with timer and update send code again button.
+ */
 export default function SendAgainTimer() {
   const [seconds, setSeconds] = useState<number>(SECONDS_UNAVAILABLE);
   const { confirmation } = useConfirm();

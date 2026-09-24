@@ -12,6 +12,12 @@ type UserPreviewProps = {
   country?: Country;
 };
 
+/**
+ * @param props
+ * @param props.user - User to preview.
+ * @param props.country - User's country.
+ * @returns User preview block with their main data.
+ */
 export default function UserPreview({ user, country }: UserPreviewProps) {
   return (
     <Link href={`/users/${user.id}`} className='user-preview'>

@@ -10,35 +10,36 @@ import {
 
 import { SearchBaseProps } from '@ts/ui/components-props';
 
-import { useAction } from '@lib/hooks';
-
 import Picker from './Picker';
 import Spinner from './Spinner';
 
 const SEARCH_COOLDOWN = 1000;
 
-type SearchProps<T> = SearchBaseProps & {
+type SearchProps<T extends { key: string }> = SearchBaseProps & {
   defaultQuery?: string;
+  options?: T[];
+  loading?: boolean;
   renderOption?: (option: T) => React.ReactNode;
-  action: (query?: string) => Promise<(T & { key: string })[] | undefined>;
   onOptionSelect?: (option: T) => void;
-  onSearchSubmit: (query: string) => void;
+  onType?: (query?: string) => void;
+  onSearchSubmit: (query?: string) => void;
 };
 
-export default function Search<T>({
+export default function Search<T extends { key: string }>({
   id,
   name,
   placeholder,
   defaultQuery = '',
   className = '',
+  loading,
+  options,
   renderOption,
-  action,
   onOptionSelect,
+  onType,
   onSearchSubmit,
   onFocus,
   onBlur
 }: SearchProps<T>) {
-  const [options, search, isPending] = useAction(action, []);
   const [query, setQuery] = useState<string>(defaultQuery);
 
   const onSubmit = () => {
@@ -56,12 +57,14 @@ export default function Search<T>({
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      search(query);
-    }, SEARCH_COOLDOWN);
+    if (onType) {
+      const timer = setTimeout(() => {
+        onType(query);
+      }, SEARCH_COOLDOWN);
 
-    return () => clearTimeout(timer);
-  }, [query, search]);
+      return () => clearTimeout(timer);
+    }
+  }, [query, onType]);
 
   return (
     <div className={`input-select-group select-search ${className}`}>
@@ -78,7 +81,7 @@ export default function Search<T>({
           onBlur={onBlur}
         />
 
-        {isPending ? (
+        {loading ? (
           <Spinner className='input-icon' />
         ) : (
           <SearchIcon className='input-icon' onClick={onSubmit} />

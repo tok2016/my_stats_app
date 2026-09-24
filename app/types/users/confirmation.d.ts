@@ -5,11 +5,11 @@ import { ConfirmationActions } from '@lib/utils';
 
 export type ConfirmationState = 'void' | 'pending' | 'confirmed';
 
-export type ConfirmationAction = (typeof ConfirmationActions)[number];
+export type ConfirmationActionType = (typeof ConfirmationActions)[number];
 
 export interface NewConfirmation {
   credential: string;
-  action: ConfirmationAction;
+  action: ConfirmationActionType;
 }
 
 export interface ConfirmationId extends NewConfirmation {
@@ -38,7 +38,6 @@ export type ConfirmationBaseAction = (
 ) => Promise<ConfirmationInfo>;
 
 export type ConfirmationFormProps = {
-  baseAction: ConfirmationBaseAction;
   addendum?: ReactNode;
   path?: string;
 };

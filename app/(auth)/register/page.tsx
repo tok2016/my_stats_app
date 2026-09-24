@@ -2,13 +2,42 @@
 
 import Link from 'next/link';
 
+import { FormAction } from '@ts/ui/form-state';
+import { NewCredentials } from '@ts/users/credentials';
+import { UserAccess } from '@ts/users/user';
+
+import AxiosInstanse from '@lib/axios-instanse';
+import { useRedirectActionForm } from '@lib/hooks';
+import { getErrorFormState, getFormDataValue } from '@lib/utils';
+
 import Input from '@components/Input';
-import { register } from '../actions';
-import { getFormDataValue } from '@lib/utils';
 import SubmitButton from '@components/SubmitButton';
 import PasswordHint from '@components/password-form/PasswordHint';
-import { useRedirectActionForm } from '@lib/hooks';
 
+/**
+ * Sends new user's data to register.
+ * @param _state - Previous state.
+ * @param formData - New data.
+ * @returns Updated form state.
+ */
+const register: FormAction<NewCredentials> = async (_state, formData) => {
+  try {
+    const body = Object.fromEntries(formData.entries());
+    const response = await AxiosInstanse.post<UserAccess>('/api/user', body);
+
+    return {
+      error: false,
+      message: response.statusText,
+      data: formData
+    };
+  } catch (err) {
+    return getErrorFormState(err, formData);
+  }
+};
+
+/**
+ * @returns Page with register form.
+ */
 export default function RegisterPage() {
   const [state, action, isPending] = useRedirectActionForm(register, '/iam');
 

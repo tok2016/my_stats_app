@@ -1,6 +1,5 @@
 'use client';
 
-import NextImage from 'next/image';
 import {
   type MouseEvent as ReactMouseEvent,
   SyntheticEvent,
@@ -9,13 +8,16 @@ import {
   useRef
 } from 'react';
 
-import Button from '@components/Button';
+import NextImage from 'next/image';
+
 import { clamp } from '@lib/utils';
+
+import Button from '@components/Button';
 
 type AvatarEditorProps = {
   avatarUrl: string;
   onCancel: () => void;
-  saveFile: (file: File) => void;
+  onEditSave: (file: File) => void;
 };
 
 type Direction = 'cen' | 'ne' | 'nw' | 'se' | 'sw';
@@ -51,22 +53,30 @@ const ProportionCursors: Record<Direction, string> = {
   sw: 'nesw-resize'
 };
 
+/**
+ * Translates frame along axis.
+ * @param top - Translate frame along y axis. If true, moves the top boundary.
+ * @param left - Translate frame along x axis. If true, moves the left boundary.
+ */
 const translateFrame =
   (top?: boolean, left?: boolean) =>
   (evt: MouseEvent, frame: HTMLElement, resizeStart: ResizeStartState) => {
+    //Calculates the shift.
     const diff = (evt.pageY - resizeStart.mouseY) * (top ? -1 : 1);
+
+    //Scales frame width and hight proportionally. If top or left, changes top and left positions.
     const newTop = top ? resizeStart.y - diff : frame.offsetTop;
     const newLeft = left ? resizeStart.x - diff : frame.offsetLeft;
     const size = Math.max(resizeStart.height + diff, MIN_FRAME_SIZE);
 
+    //Does not let the frame go beyond the image borders.
     if (
       size + newTop > resizeStart.bottomBorder
       || size + newLeft > resizeStart.rightBorder
       || newTop < resizeStart.topBorder
       || newLeft < resizeStart.leftBorder
-    ) {
+    )
       return;
-    }
 
     frame.style.height = `${size}px`;
     frame.style.width = `${size}px`;
@@ -75,6 +85,14 @@ const translateFrame =
     frame.style.left = `${newLeft}px`;
   };
 
+/**
+ * Transforms frame by given direction.
+ * "cen" moves the frame.
+ * "ne" translates top and right boundaries.
+ * "nw" translates top and left boundaries.
+ * "se" translates bottom and right boundaries.
+ * "sw" translates bottom and left boundaries.
+ */
 const TransformFrame: Record<Direction, FrameTransform> = {
   cen: (evt, frame, resizeStart) => {
     const newTop = clamp(
@@ -97,14 +115,23 @@ const TransformFrame: Record<Direction, FrameTransform> = {
   sw: translateFrame(false, true)
 };
 
+/**
+ * @param props
+ * @param props.avatarUrl - Uploaded avatar url to edit.
+ * @param props.onCancel - On upload and edit cancel.
+ * @param props.onEditSave - On edit file save.
+ * @returns Avatar crop editor.
+ */
 export default function AvatarEditor({
   avatarUrl,
   onCancel,
-  saveFile
+  onEditSave
 }: AvatarEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+
+  //Controlls crop frame.
   const resizeStateRef = useRef<ResizeStartState>({
     isMouseDown: false,
     mouseX: 0,
@@ -119,12 +146,19 @@ export default function AvatarEditor({
     rightBorder: 0
   });
 
+  /**
+   * Releases crop frame.
+   */
   const onMouseUp = useCallback(() => {
     resizeStateRef.current.isMouseDown = false;
     document.documentElement.style.cursor = 'unset';
     document.removeEventListener('mousemove', onTransform);
   }, []);
 
+  /**
+   * Transforms crop frame when mouse is down and moving.
+   * @param evt
+   */
   const onTransform = (evt: MouseEvent) => {
     if (
       frameRef.current
@@ -139,6 +173,10 @@ export default function AvatarEditor({
     }
   };
 
+  /**
+   * Sets initial frame transform values before moving and scaling it when mouse is down.
+   * @param evt
+   */
   const onMouseDown = (evt: ReactMouseEvent) => {
     resizeStateRef.current.isMouseDown = true;
     if (frameRef.current && imageRef.current) {
@@ -162,11 +200,19 @@ export default function AvatarEditor({
     }
   };
 
+  /**
+   * Crops file within transformed frame and saves it.
+   */
   const onSave = async () => {
     if (canvasRef.current && frameRef.current && imageRef.current) {
+      //Transforms canvas to same value as frame.
       const { top, left, height, width } =
         frameRef.current.getBoundingClientRect();
 
+      canvasRef.current.height = height;
+      canvasRef.current.width = width;
+
+      //Calculates proportions between natural and rendered image size to save the same resolution.
       const {
         top: imgTop,
         left: imgLeft,
@@ -176,9 +222,7 @@ export default function AvatarEditor({
       const hProption = imageRef.current.naturalHeight / imgHeight;
       const wProportion = imageRef.current.naturalWidth / imgWidth;
 
-      canvasRef.current.height = height;
-      canvasRef.current.width = width;
-
+      //Draws cropped image in canvas according to the frame boundaries.
       canvasRef.current
         .getContext('2d')
         ?.drawImage(
@@ -193,24 +237,30 @@ export default function AvatarEditor({
           height
         );
 
+      //Exports canvas content with image as file.
       canvasRef.current.toBlob((blob) => {
         if (blob) {
           const file = new File([blob], Date.now().toString(), {
             type: 'image/png'
           });
 
-          saveFile(file);
+          onEditSave(file);
         }
       }, 'image/png');
     }
   };
 
+  /**
+   * Sets initial and minimum frame transform that fits the image transform when it's loaded.
+   * @param evt
+   */
   const onLoad = (evt: SyntheticEvent) => {
     const imageSize = (evt.target as HTMLImageElement)?.getBoundingClientRect();
 
     if (imageSize && frameRef.current && imageRef.current) {
       const { top, bottom, left, right, height, width } = imageSize;
 
+      //Stores border of image that the frame can't get beyond.
       resizeStateRef.current.topBorder = Math.ceil(top);
       resizeStateRef.current.bottomBorder = Math.ceil(bottom);
       resizeStateRef.current.leftBorder = Math.ceil(left);
@@ -230,6 +280,9 @@ export default function AvatarEditor({
   };
 
   useEffect(() => {
+    /**
+     * Corrects frame transform on window resize to fit the image.
+     */
     const onResize = () => {
       if (imageRef.current && frameRef.current) {
         const {

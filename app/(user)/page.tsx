@@ -6,7 +6,10 @@ import Button from '@components/Button';
 import Divider from '@components/Divider';
 import UserSearch from '@components/profile-layout/UserSearch';
 
-export default function Guest() {
+/**
+ * @returns Guest page with user search.
+ */
+export default function GuestPage() {
   return (
     <div className='guest-page'>
       <h1 className='title'>

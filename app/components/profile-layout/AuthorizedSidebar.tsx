@@ -15,7 +15,8 @@ import { ModulesPathsAndNames, defaultUser } from '@lib/utils';
 import { useUserState } from '@store/user-store';
 
 import Avatar from './Avatar';
-import SidebarOption from './SidebarOption';
+import SidebarButton from './SidebarButton';
+import SidebarButtonsGroup from './SidebarButtonsGroup';
 import UserSearch from './UserSearch';
 
 type AuthorizedSidebarProps = SidebarModuleProps & {
@@ -48,7 +49,14 @@ const SidebarOptions: SidebarOptionProps[] = [
   }
 ];
 
-function ProfileSidebarRaw({ user, path, expand }: AuthorizedSidebarProps) {
+/**
+ * @param props
+ * @param props.user - User data.
+ * @param props.path - Current page's path.
+ * @param props.expand - Expand sidebar.
+ * @returns Sidebat navigation options for authorized user.
+ */
+function AuthorizedSidebarRaw({ user, path, expand }: AuthorizedSidebarProps) {
   const { setUserState, status } = useUserState();
 
   const onLogout = async () => {
@@ -65,8 +73,8 @@ function ProfileSidebarRaw({ user, path, expand }: AuthorizedSidebarProps) {
 
   return (
     <>
-      <div className='sidebar-upper'>
-        <SidebarOption
+      <nav className='sidebar-upper'>
+        <SidebarButton
           name='iam'
           label={user.username}
           loading={status === 'pending'}
@@ -75,7 +83,7 @@ function ProfileSidebarRaw({ user, path, expand }: AuthorizedSidebarProps) {
         />
 
         {SidebarOptions.map((sidebarOption) => (
-          <SidebarOption key={sidebarOption.name} {...sidebarOption} />
+          <SidebarButtonsGroup key={sidebarOption.name} {...sidebarOption} />
         ))}
 
         <UserSearch
@@ -85,9 +93,9 @@ function ProfileSidebarRaw({ user, path, expand }: AuthorizedSidebarProps) {
           onFocus={expand}
           onBlur={expand}
         />
-      </div>
+      </nav>
 
-      <SidebarOption
+      <SidebarButton
         name='logout'
         label='Logout'
         icon={<LogoutSolid />}
@@ -97,5 +105,12 @@ function ProfileSidebarRaw({ user, path, expand }: AuthorizedSidebarProps) {
   );
 }
 
-const ProfileSidebar = memo(ProfileSidebarRaw);
-export default ProfileSidebar;
+/**
+ * @param props
+ * @param props.user - User data.
+ * @param props.path - Current page's path.
+ * @param props.expand - Expand sidebar.
+ * @returns Sidebat navigation options for authorized user.
+ */
+const AuthorizedSidebar = memo(AuthorizedSidebarRaw);
+export default AuthorizedSidebar;

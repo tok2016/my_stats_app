@@ -1,20 +1,36 @@
 'use client';
 
-import { ConfirmationFormProps } from '@ts/users/confirmation';
+import {
+  ConfirmationBaseAction,
+  ConfirmationFormProps
+} from '@ts/users/confirmation';
 import { PasswordUpdate } from '@ts/users/password';
 
 import { useConfirm, useRedirectActionForm } from '@lib/hooks';
 import { getFormDataValue } from '@lib/utils';
+
 import Input from '@components/Input';
-import PasswordHint from './PasswordHint';
 import SubmitButton from '@components/SubmitButton';
 
+import PasswordHint from './PasswordHint';
+
+/**
+ * @param props
+ * @param props.baseAction - Action to perform on submit.
+ * @param props.addendum - Components to add after form.
+ * @param props.path - Path to page to redirect to.
+ * @param props.requireOld - Is old password required.
+ * @returns Form with password inputs.
+ */
 export default function NewPasswordForm({
   baseAction,
   addendum,
   path = '/iam',
   requireOld = false
-}: ConfirmationFormProps & { requireOld?: boolean }) {
+}: ConfirmationFormProps & {
+  requireOld?: boolean;
+  baseAction: ConfirmationBaseAction;
+}) {
   const { getFormAction } = useConfirm();
   const [state, action, isPending] = useRedirectActionForm(
     getFormAction<PasswordUpdate>(baseAction),

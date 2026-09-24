@@ -22,36 +22,51 @@ type AvatarInputProps = {
   defaultFile?: Blob;
 };
 
-//Check rerender of this component before memoizing it
-export default function AvatarInputRaw({
+/**
+ * @param props
+ * @param props.username
+ * @param props.avatarId - Default user's avatart.
+ * @param props.defaultFile - Default file from form data.
+ * @returns File input with avatar preview and editor.
+ */
+export default function AvatarInput({
   username,
   avatarId = '',
   defaultFile
 }: AvatarInputProps) {
-  const [avatar, setAvatar] = useState<string>(avatarId ?? '');
-  const [newAvatar, setNewAvatar] = useReducer((prev, next) => {
+  const [previewAvatar, setPreviewAvatar] = useState<string>(avatarId ?? '');
+  const [uploadedAvatar, setUploadedAvatar] = useReducer((prev, next) => {
     URL.revokeObjectURL(prev);
     return next;
   }, '');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  //Defines what to do with user's avatar.
   const avatarState: AvatarState =
-    !avatar && !!defaultFile
+    !previewAvatar && !!defaultFile
       ? 'delete'
-      : avatar !== avatarId
+      : previewAvatar !== avatarId
         ? 'update'
         : 'same';
 
+  /**
+   * Generates url of original file that was uploaded.
+   * @param evt
+   */
   const onFileUpload = (evt: ChangeEvent<HTMLInputElement>) => {
     const file = evt.target.files?.[0];
 
     if (file) {
       const fileUrl = URL.createObjectURL(file);
-      setNewAvatar(fileUrl);
+      setUploadedAvatar(fileUrl);
     }
   };
 
+  /**
+   * Saves cropped image file to input and previews it.
+   * @param file - File of cropped image.
+   */
   const saveFile = (file: File) => {
     if (fileInputRef.current) {
       const transfer = new DataTransfer();
@@ -59,23 +74,29 @@ export default function AvatarInputRaw({
       fileInputRef.current.files = transfer.files;
 
       const newAvatarUrl = URL.createObjectURL(file);
-      setAvatar(newAvatarUrl);
-      setNewAvatar('');
+      setPreviewAvatar(newAvatarUrl);
+      setUploadedAvatar('');
     }
   };
 
+  /**
+   * Cancel avatar upload.
+   */
   const onCancel = () => {
     if (fileInputRef.current) fileInputRef.current.value = '';
-    setNewAvatar('');
+    setUploadedAvatar('');
   };
 
+  /**
+   * Deletes user's avatar.
+   */
   const onDelete = () => {
     onCancel();
-    setAvatar('');
+    setPreviewAvatar('');
   };
 
   useEffect(() => {
-    setAvatar(avatarId ?? '');
+    setPreviewAvatar(avatarId ?? '');
   }, [avatarId]);
 
   useEffect(() => {
@@ -90,14 +111,14 @@ export default function AvatarInputRaw({
 
   return (
     <div className='avatar-field'>
-      <Avatar username={username} avatarId={avatar} />
+      <Avatar username={username} avatarId={previewAvatar} />
 
       <label htmlFor='avatar' className='avatar-label'>
         <Refresh />
         <span>Change avatar</span>
       </label>
 
-      {!avatar || (
+      {!previewAvatar || (
         <IconButton
           className='avatar-delete'
           variant='secondary'
@@ -124,11 +145,11 @@ export default function AvatarInputRaw({
         onChange={onFileUpload}
       />
 
-      {!newAvatar || (
+      {!uploadedAvatar || (
         <AvatarEditor
-          avatarUrl={newAvatar}
+          avatarUrl={uploadedAvatar}
           onCancel={onCancel}
-          saveFile={saveFile}
+          onEditSave={saveFile}
         />
       )}
     </div>

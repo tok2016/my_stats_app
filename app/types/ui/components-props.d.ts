@@ -70,7 +70,7 @@ export type SidebarOptionProps = Omit<SidebarSubButtonProps, 'href'> & {
   href?: string;
 } & {
   icon: ReactNode;
-  subButtons?: SidebarSubButtonProps[];
+  subButtons: SidebarSubButtonProps[];
   onClick?: () => void;
 };
 

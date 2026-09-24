@@ -66,8 +66,6 @@ export default function SearchGameForm() {
       prevName: searchResults.query,
       name: query ?? ''
     });
-
-    return Promise.resolve(undefined);
   };
 
   const onLoadMore = () => {
@@ -87,7 +85,6 @@ export default function SearchGameForm() {
         id='search-game'
         name='searchGame'
         placeholder='Search game'
-        action={onSearch}
         onSearchSubmit={onSearch}
       />
 

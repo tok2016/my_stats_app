@@ -18,6 +18,12 @@ type ServicesSettingsProps = {
   state: FormState<ServicesLogins>;
 };
 
+/**
+ * @param props
+ * @param props.userId - User id to fetch service credentials by.
+ * @param props.state - Form state.
+ * @returns Tab of services settings.
+ */
 export default function ServicesSettings({
   userId,
   state

@@ -1,6 +1,7 @@
 import Service from '@ts/users/service';
 
 import Input from '@components/Input';
+
 import { ServiceStatusColors, ServiceStatusNames } from '../../utils';
 
 type ServiceAuthInfoProps = {
@@ -9,6 +10,13 @@ type ServiceAuthInfoProps = {
   errorHint?: string;
 };
 
+/**
+ * @param props
+ * @param props.serviceData - Steam credentials and status data.
+ * @param props.defaultValue - Default credentials input value.
+ * @param props.errorHint - Error hint for credentials input.
+ * @returns Steam ID input and authorization status.
+ */
 export default function SteamAuthInfo({
   serviceData,
   defaultValue,

@@ -41,8 +41,6 @@ export default function GamesFilterMenu({
   const onGameSearch = (query?: string) => {
     if (!query) deleteParam('name');
     else setParam('name', query);
-
-    return Promise.resolve(undefined);
   };
 
   return (
@@ -52,7 +50,6 @@ export default function GamesFilterMenu({
           id='games-search'
           name='Search game'
           defaultQuery={filters.name}
-          action={onGameSearch}
           onSearchSubmit={onGameSearch}
           placeholder='Search games'
           disabled={disabled}

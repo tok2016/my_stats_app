@@ -17,7 +17,11 @@ const EmptyCountry: Option = {
   key: '-'
 };
 
+/**
+ * @returns Page with user's settings form.
+ */
 export default async function SettingsPage() {
+  //Forms countries options.
   const countries = await getCountriesList();
   const options: Option[] = countries.map((country) => ({
     label: country.name,

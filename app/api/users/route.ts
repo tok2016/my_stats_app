@@ -38,7 +38,9 @@ const getUsers: GeneralEndpointAction<'/api/users'> = async (req) => {
 
   //Searches for users data by id and limits it.
   const usersQuery: RootFilterQuery<UserInfo> = {
-    _id: { $in: credentialsMap.keys() },
+    _id: {
+      $in: credentialsMap.keys().toArray()
+    },
     isPublic: true
   };
 
