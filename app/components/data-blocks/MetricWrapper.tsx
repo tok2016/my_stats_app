@@ -38,6 +38,15 @@ const MetricTitles: Record<MetricId | SubmetricId, string> = {
   'platforms-playtime': 'by playtime'
 };
 
+/**
+ * @param props
+ * @param props.id - Metric id.
+ * @param props.renderTitle - Render function for metric title. If it's given, renders default title by metric id.
+ * @param props.children - Metric content (chart, block, etc.).
+ * @param props.className - Class of metric component.
+ * @param props.submetric - If true, applies smaller styles so that metric component will look like part of different metric.
+ * @returns Metric wrapper component with metric title and add button.
+ */
 export default function MetricWrapper<Submetric extends boolean = false>({
   id,
   renderTitle,

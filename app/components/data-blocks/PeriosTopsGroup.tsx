@@ -19,6 +19,16 @@ type PeriodTopsGroupProps<ItemType> = {
   current?: boolean;
 };
 
+/**
+ * @param props
+ * @param props.tops - Period tops of group.
+ * @param props.periodType - Type of periods in period tops: month / season / year.
+ * @param props.blockWidthRem - Block width in rem.
+ * @param props.gapRem - Gap size between period top blocks in rem.
+ * @param props.listItemContent - Top item render function for period top block.
+ * @param props.current - Highlights the most recent top.
+ * @returns Group of period top blocks.
+ */
 export default function PeriodTopsGroup<ItemType>({
   tops,
   periodType,

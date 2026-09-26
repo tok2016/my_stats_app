@@ -1,7 +1,7 @@
 'use client';
 
 import { RecommendedGame } from '@ts/games/game';
-import { MetricContentProps } from '@ts/games/metric';
+import { CoreMetricProps } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -15,6 +15,10 @@ import FetchMetric from '../../components/FetchMetric';
 
 const GAMES_SKELETONS_TO_SHOW = 5;
 
+/**
+ * @param params - Search params with user id.
+ * @returns Recommended games list or error data.
+ */
 const fetchRecommendations = async (params: {
   userId: string;
 }): Promise<MetricResponse<RecommendedGame[]>> => {
@@ -39,12 +43,14 @@ export function RecommendedGamesSkeleton() {
   );
 }
 
-export default function RecommendedGames({
-  metricId,
-  userId
-}: MetricContentProps) {
+/**
+ * @param props
+ * @param props.userId - User whose metric will be fetched.
+ * @returns Metric component of games recommended to user.
+ */
+export default function RecommendedGames({ userId }: CoreMetricProps) {
   return (
-    <MetricWrapper id={metricId} className='recommended-group'>
+    <MetricWrapper id='recommended-games' className='recommended-group'>
       <FetchMetric
         fetchMetricData={fetchRecommendations}
         fallback={<RecommendedGamesSkeleton />}

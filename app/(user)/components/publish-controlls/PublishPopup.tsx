@@ -1,8 +1,8 @@
 'use client';
 
-import Popup from '@components/Popup';
 import Button from '@components/Button';
 import Hint from '@components/Hint';
+import Popup from '@components/Popup';
 
 type PublishPopupProps = {
   name: string;
@@ -14,6 +14,17 @@ type PublishPopupProps = {
   onConfirm?: () => void;
 };
 
+/**
+ * @param props
+ * @param props.name - Name of popup.
+ * @param props.isPublic - Privacy value before change.
+ * @param props.loading - Is parent component loading.
+ * @param props.errorMessage - Error hint for privacy input.
+ * @param props.onClose - On popup close.
+ * @param props.onCancel - On privacy change cancel.
+ * @param props.onConfirm - On privacy change confirm.
+ * @returns Popup with privacy switch warning.
+ */
 export default function PublishPopup({
   name,
   isPublic,

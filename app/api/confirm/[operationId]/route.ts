@@ -13,9 +13,18 @@ import {
 import { ConfirmationsModel } from '@lib/models';
 import { generateCode, generateErrorResponse } from '@lib/utils';
 
-const putConfirmationChange: ConfirmationEndpointAction<
+/**
+ * Public method. Generates and sends new confirmation code by operation id.
+ * @param _req - Request object.
+ * @param params - Route params with operation id.
+ * @throws 400 if operation id is not given.
+ * @throws 404 if operation is not found.
+ * @returns Operation data.
+ */
+const updateConfirmationCode: ConfirmationEndpointAction<
   '/api/confirm/[operationId]'
 > = async (_req, params) => {
+  //Generates new code and updates operation of given id.
   const { operationId } = await params;
   if (!operationId)
     throw generateErrorResponse(400, 'Operation id was not given');
@@ -40,6 +49,13 @@ const putConfirmationChange: ConfirmationEndpointAction<
   };
 };
 
+/**
+ * Public method. Cancels and deletes operation by id.
+ * @param _req - Request object.
+ * @param params - Route params with operation id.
+ * @throws 400 if operation id is not given.
+ * @returns Response object.
+ */
 const deleteConfirmation: GeneralEndpointAction<
   '/api/confirm/[operationId]'
 > = async (_req, params) => {
@@ -58,5 +74,5 @@ const deleteConfirmation: GeneralEndpointAction<
   });
 };
 
-export const PUT = confirmationEndpoint(putConfirmationChange);
+export const PUT = confirmationEndpoint(updateConfirmationCode);
 export const DELETE = generalEndpoint(deleteConfirmation);

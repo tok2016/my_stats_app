@@ -5,18 +5,14 @@ import FormState from '@ts/ui/form-state';
 import { ConfirmationInfo } from '@ts/users/confirmation';
 import Country from '@ts/users/country';
 import { CredentialsInSchema } from '@ts/users/credentials';
-import { NewPassword } from '@ts/users/password';
 import { User, UserInfoInSchema } from '@ts/users/user';
 
 import { isAxiosError, isErrorResponse } from './type-guards';
 
 export const MILLISECONDS = 1000;
 export const MINUTES = 60;
-export const MONTHS_IN_QUARTER = 3;
 export const MONTHS_IN_YEAR = 12;
-const MONTHS_SHIFT = 11;
-
-export const FOUND_USERS_LIMIT = 5;
+export const YEARS_IN_DECADE = 10;
 
 export const CODE_LENGTH = 6;
 
@@ -27,15 +23,11 @@ export const GAMES_IN_METRIC = 5;
 export const ITEMS_IN_RATING = 5;
 
 export const MAX_ENTRIES_IN_CHART = 10;
-export const MIN_PERCENT_FOR_CHART = 2;
 
 export const DEFAULT_PERIOD_BLOCK_WIDTH = 11;
 export const DEFAULT_PERIOD_BLOCKS_GAP = 1.5;
 
 export const MAX_RATING = 100;
-
-const SUCCESS_CODE_START = 200;
-const SUCCESS_CODE_END = 300;
 
 export const ServiceNames = ['spotify', 'steam'] as const;
 
@@ -56,20 +48,6 @@ export const ServiceStatuses = [
 export const Modules = ['user', 'music', 'games'] as const;
 
 export const Seasons = ['Winter', 'Spring', 'Summer', 'Fall'] as const;
-export const Months = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec'
-] as const;
 
 export const ChartColors = [
   '#2EACC8',
@@ -99,13 +77,6 @@ export const defaultConfirmation: ConfirmationInfo = {
   action: 'password'
 };
 
-export const defaultNewPassword: NewPassword = {
-  credential: '',
-  operationId: '',
-  password: '',
-  repeatPassword: ''
-};
-
 export const defaultUser: User = {
   id: '',
   username: '',
@@ -130,9 +101,12 @@ export const emptyOption: Option = {
 export const isExpired = (date: Date | string | number) =>
   new Date(date) < new Date();
 
-export const isSuccess = (status: number) =>
-  status >= SUCCESS_CODE_START && status < SUCCESS_CODE_END;
-
+/**
+ * Unites credentials and user data. Replaces credentials id with user id.
+ * @param credentials
+ * @param userInfo
+ * @returns United user object.
+ */
 export const uniteUserData = (
   credentials: CredentialsInSchema,
   userInfo: UserInfoInSchema
@@ -144,6 +118,9 @@ export const uniteUserData = (
   ...userInfo
 });
 
+/**
+ * @returns 6 numbers long code.
+ */
 export const generateCode = () =>
   Math.floor(Math.random() * Math.pow(10, CODE_LENGTH)).toLocaleString(
     'en-US',
@@ -153,6 +130,14 @@ export const generateCode = () =>
     }
   );
 
+/**
+ * Forms ErrorResponse object for clearer error info.
+ * @param status - HTTP client or server error status.
+ * @param message - Reason of error.
+ * @param name - Error name. Default name is error's message.
+ * @param issues - List of validation issues.
+ * @returns ErrorResponse object.
+ */
 export const generateErrorResponse = (
   status: number,
   message: string,
@@ -165,6 +150,13 @@ export const generateErrorResponse = (
   name: name ?? message
 });
 
+/**
+ * Decides number form of word depending on given number.
+ * @param number - Number.
+ * @param singular - Singular form of word.
+ * @param plural - Plural form of word.
+ * @returns Correct number form of word.
+ */
 export const getSingularOrPlural = (
   number: number,
   singular: string,
@@ -172,14 +164,17 @@ export const getSingularOrPlural = (
 ) => (number <= 1 ? singular : plural);
 
 export const clamp = (value: number, min: number, max: number) => {
-  if (value < min) {
-    return min;
-  } else if (value > max) {
-    return max;
-  }
+  if (value < min) return min;
+  else if (value > max) return max;
   return value;
 };
 
+/**
+ * Forms error data for form state.
+ * @param err - Error
+ * @param data - Form data.
+ * @returns Form state with error data.
+ */
 export const getErrorFormState = <FormDataType>(
   err: unknown,
   data?: FormData
@@ -203,12 +198,17 @@ export const getErrorFormState = <FormDataType>(
 
   return {
     error: true,
-    message: 'Something went wrong. Please, try it later',
+    message: 'Something went wrong',
     data
   };
 };
 
-export const mapIssuesMessages = <T>(
+/**
+ * Distrubutes validation issues for every object field.
+ * @param issues - Validation issues.
+ * @returns
+ */
+const mapIssuesMessages = <T>(
   issues: ValidationIssue[]
 ): Record<keyof T, string> => {
   const entries = [];
@@ -222,11 +222,21 @@ export const mapIssuesMessages = <T>(
   return Object.fromEntries(entries);
 };
 
+/**
+ * @param name - Key name to find value by.
+ * @param formData
+ * @returns String value of form date by given key name or undefined.
+ */
 export const getFormDataValue = (
   name: string,
   formData?: FormData
 ): string | undefined => formData?.get(name)?.toString() ?? undefined;
 
+/**
+ * @param name - Key name to find value by.
+ * @param formData
+ * @returns Number value of form date by given key name. Returns undefined if value is not found or NaN.
+ */
 export const getNumberFormDataValue = (
   name: string,
   formData?: FormData
@@ -237,27 +247,14 @@ export const getNumberFormDataValue = (
   return Number.isNaN(parsed) ? undefined : parsed;
 };
 
+/**
+ * Parses boolean string from inputs.
+ * @param value
+ * @returns True if value is not empty, does not equal false or off.
+ */
 export const parseBooleanString = (value: string) => {
   const lowercase = value.toLowerCase();
   return !!value && lowercase !== 'false' && lowercase !== 'off';
-};
-
-export const getPeriodDate: Record<
-  PrecisePeriod,
-  (date: Date | string) => string
-> = {
-  year: (date) => new Date(date).getFullYear().toString(),
-  season: (date) => {
-    const formDate = new Date(date);
-    const seasonNumber = Math.floor(
-      ((formDate.getMonth() % MONTHS_SHIFT) + 1) / MONTHS_IN_QUARTER
-    );
-    return `${formDate.getFullYear()}-${seasonNumber + 1}`;
-  },
-  month: (date) => {
-    const formDate = new Date(date);
-    return `${formDate.getFullYear()}-${formDate.getMonth() + 1}`;
-  }
 };
 
 export const mean = (values: number[]) =>
@@ -265,7 +262,7 @@ export const mean = (values: number[]) =>
     ? values.reduce((prev, curr) => prev + curr, 0) / values.length
     : undefined;
 
-export const ModulesPaths: Record<string, PathInfo> = {
+export const ModulesPathsAndNames: Record<string, PathInfo> = {
   '/music/genres': {
     name: 'genres',
     label: 'Genres'
@@ -308,12 +305,22 @@ export const ModulesPaths: Record<string, PathInfo> = {
   }
 };
 
+/**
+ * @param period
+ * @param short - If true, return the last 2 digits.
+ * @returns Stringified year.
+ */
 const getYearString = (period: string, short: boolean) => {
   const year = period.split('-')[0] ?? '';
   const startIndex = short && year.length > 2 ? year.length - 2 : 0;
   return year.substring(startIndex, year.length);
 };
 
+/**
+ * @param period
+ * @param short - If true, returns first 3 letters.
+ * @returns Name of season.
+ */
 const getSeasonString = (period: string, short: boolean) => {
   const parts = period.split('-');
   if (!parts[1]) return getYearString(parts[0], short);
@@ -323,6 +330,11 @@ const getSeasonString = (period: string, short: boolean) => {
   return Seasons[seasonNumber].substring(0, endIndex);
 };
 
+/**
+ * @param period
+ * @param short - If true, returns first 3 letters.
+ * @returns Name of month.
+ */
 const getMonthString = (period: string, short: boolean) => {
   const parts = period.split('-');
   if (!parts[1]) return getYearString(parts[0], short);
@@ -332,7 +344,10 @@ const getMonthString = (period: string, short: boolean) => {
   });
 };
 
-export const getPeriodString: Record<
+/**
+ * Returns full or short name of period by period type.
+ */
+export const getPeriodName: Record<
   PrecisePeriod,
   (period: string, short: boolean) => string
 > = {

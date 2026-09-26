@@ -14,7 +14,7 @@ import { usePopupState } from '@store/popup-store';
 
 import Button from '@components/Button';
 import DoubleSlider from '@components/DoubleSlider';
-import HiddenInput from '@components/HiddenInput';
+import HidingInput from '@components/HidingInput';
 import Input from '@components/Input';
 import Popup from '@components/Popup';
 
@@ -28,6 +28,10 @@ type AdvanceSearchProps = {
   popupName: string;
 };
 
+/**
+ * @param defaultFilters - Default data for form.
+ * @returns Form state with filled form data, if default filters are given.
+ */
 const formDefaultData = (
   defaultFilters: GamesFilterFormData
 ): FormState<GamesFilterFormData> => {
@@ -50,6 +54,14 @@ const formDefaultData = (
   };
 };
 
+/**
+ * Deletes given fields from updated data if check field was not checked.
+ * It lets delete filter params of fields that can be empty (rating, etc.) but their inputs always return non-empty values.
+ * @param checkField
+ * @param fieldsToDelete
+ * @param updatedData
+ * @param deletedKeys
+ */
 const deleteHiddenFields = (
   checkField: keyof GamesFilterFormData,
   fieldsToDelete: (keyof GamesFilterFormData)[],
@@ -63,6 +75,14 @@ const deleteHiddenFields = (
     });
 };
 
+/**
+ * Advance search form that lets filter games by various fields.
+ * @param props
+ * @param props.maxHours - Max playtime among all user's games in hours.
+ * @param props.defaultFilters - Default filters from search params.
+ * @param props.popupName - Name of popup with advance search form.
+ * @returns Popup with games advance search form.
+ */
 export default function AdvanceSearch({
   maxHours,
   defaultFilters,
@@ -71,11 +91,18 @@ export default function AdvanceSearch({
   const { updateParams } = useURLSearchParams();
   const { togglePopup } = usePopupState();
 
+  /**
+   * Updates page's search params to filter games by.
+   * @param _state - Previous form state.
+   * @param formData - Form data with filter params values.
+   * @returns Successful form state.
+   */
   const searchGames: FormAction<GamesFilterFormData> = (_state, formData) => {
     const data = Object.fromEntries(formData.entries()) as GamesFilterFormData;
     const updatedEntries: GamesFilterFormData = {};
     const deletedKeys: string[] = [];
 
+    //Deletes params with empty values. Sets params with form value otherwise.
     Object.entries(data).forEach((entry) => {
       if (!entry[1]) deletedKeys.push(entry[0]);
       else
@@ -83,6 +110,7 @@ export default function AdvanceSearch({
           entry[1].toString();
     });
 
+    //Deletes params that can be empty in game data.
     deleteHiddenFields(
       'showRating',
       ['ratingFrom', 'ratingTo', 'showRating'],
@@ -102,6 +130,7 @@ export default function AdvanceSearch({
       deletedKeys
     );
 
+    //Updates search params.
     updateParams(updatedEntries, deletedKeys);
     togglePopup(popupName);
 
@@ -122,6 +151,9 @@ export default function AdvanceSearch({
   const playdateStart = new Date();
   playdateStart.setFullYear(playdateStart.getFullYear() - PLAYDATE_DIFF);
 
+  /**
+   * Delete all filter params and resets form.
+   */
   const resetParams = () => {
     togglePopup(popupName);
     if (state.data) updateParams({}, state.data.keys().toArray());
@@ -220,7 +252,8 @@ export default function AdvanceSearch({
           defaultValue={getFormDataValue('playDateTo', state.data)}
         />
 
-        <HiddenInput
+        {/*If rating slider is shown, it will filter ONLY games with ratings.*/}
+        <HidingInput
           id='game-no-rating'
           name='showRating'
           label='Your rating'
@@ -240,9 +273,9 @@ export default function AdvanceSearch({
               getNumberFormDataValue('ratingFrom', state.data) ?? MAX_RATING
             ]}
           />
-        </HiddenInput>
+        </HidingInput>
 
-        <HiddenInput
+        <HidingInput
           id='game-no-critics-rating'
           name='showCriticsRating'
           label='Critics rating'
@@ -263,9 +296,9 @@ export default function AdvanceSearch({
                 ?? MAX_RATING
             ]}
           />
-        </HiddenInput>
+        </HidingInput>
 
-        <HiddenInput
+        <HidingInput
           id='game-no-users-rating'
           name='showUsersRating'
           label='Users rating'
@@ -286,7 +319,7 @@ export default function AdvanceSearch({
               getNumberFormDataValue('usersRatingTo', state.data) ?? MAX_RATING
             ]}
           />
-        </HiddenInput>
+        </HidingInput>
 
         <DoubleSlider
           leftId='game-hours-from'

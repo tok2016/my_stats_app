@@ -4,6 +4,12 @@ import { getCurrentUser } from '@lib/server-actions';
 
 import Sidebar from './SIdebar';
 
+/**
+ * @param props
+ * @param props.authorizedOnly - Is profile only for authorized user. If true and user is unauthorized, throws an error.
+ * @param props.children - Profile content.
+ * @returns Layout of user's profile with sidebar.
+ */
 export default async function ProfileLayout({
   authorizedOnly = true,
   children

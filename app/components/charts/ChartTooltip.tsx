@@ -18,13 +18,13 @@ import { clamp } from '@lib/utils';
 type ChartTooltipProps<DataType extends ChartData> = {
   data?: DataType;
   displayFields: DisplayFields<DataType>;
-  fieldsNames: FieldsInfo<DataType>;
+  fieldsInfo: FieldsInfo<DataType>;
   ref: RefObject<HTMLDivElement | null>;
   showRank?: boolean;
   colored?: boolean;
 };
 
-type ChartTooltipKeyProps<DataType extends ChartData> = {
+type ChartTooltipFieldProps<DataType extends ChartData> = {
   data?: DataType;
   field: keyof DataType;
   fieldData: FieldData<DataType>;
@@ -40,25 +40,37 @@ const SCREEN_MARGIN = 20;
 const MAX_WIDTH = 18;
 const FONT_SIZE = 16;
 
+/**
+ * Coeffients to relative position number value by position type.
+ */
 const PositionMult: Record<TooltipPosition, number> = {
   start: 0,
   center: 0.5,
   end: 1
 };
 
-function ChartTooltipKey<DataType extends ChartData>({
+/**
+ * @param props
+ * @param props.data - Data entry which the tooltip points to.
+ * @param props.field - Field of data which value will be displayed on tooltip.
+ * @param props.fieldData - Data about field render including it's name and render function.
+ * @returns Value of given field of data for tooltip.
+ */
+function ChartTooltipField<DataType extends ChartData>({
   data,
   field,
   fieldData
-}: ChartTooltipKeyProps<DataType>) {
+}: ChartTooltipFieldProps<DataType>) {
   let valueComponent = null;
 
+  //Default value component by it's type.
   if (isNumberOrString(data?.[field]))
     valueComponent = <span className='colored'>{data[field]}</span>;
   else if (isNumberOrStringArray(data?.[field]))
     valueComponent = <span className='colored'>{data[field].join(', ')}</span>;
   else if (!data?.[field]) valueComponent = 'no data';
 
+  //Skips field string if render function is not provided and default value component was not assigned.
   if (!valueComponent && !fieldData.renderValue) return;
 
   return (
@@ -69,15 +81,29 @@ function ChartTooltipKey<DataType extends ChartData>({
   );
 }
 
+/**
+ * Displays displays given data which chart element was hovered.
+ * Always displays name of data. Displays percents if given.
+ * @param props
+ * @param props.data - Data entry which the tooltip points to.
+ * @param props.displayFields - Fields to display on tooltip.
+ * @param props.fieldsInfo - Fields render data with names that for tooltip and chart.
+ * @param props.ref - Referense to control the tooltip by.
+ * @param props.showRank - If true, renders rank of given data among other chart data. Defined by index field.
+ * @param props.colored - If true, colors tooltip highlight text and border by data rank.
+ * @returns Tooltip that displays given data.
+ */
 export default function ChartTooltip<DataType extends ChartData>({
   data,
   displayFields,
-  fieldsNames,
+  fieldsInfo,
   ref,
   showRank,
   colored
 }: ChartTooltipProps<DataType>) {
   const rank = (data?.index ?? -1) + 1;
+
+  //Hides tooltip if data is not given.
   return (
     <div
       style={{
@@ -96,11 +122,11 @@ export default function ChartTooltip<DataType extends ChartData>({
         <h3 className='colored'>{data?.name}</h3>
 
         {displayFields.map((field) => (
-          <ChartTooltipKey
+          <ChartTooltipField
             key={field.toString()}
             field={field}
             data={data}
-            fieldData={fieldsNames[field]}
+            fieldData={fieldsInfo[field]}
           />
         ))}
 
@@ -129,27 +155,42 @@ const resetTooltip = (tooltipRef: RefObject<HTMLDivElement | null>) => {
   }
 };
 
+/**
+ * Makes tooltip invisible.
+ * @param tooltipRef - Tooltip referense.
+ */
 export const hideTooltip = (tooltipRef: RefObject<HTMLDivElement | null>) => {
   if (tooltipRef.current) tooltipRef.current.style.opacity = '0';
 };
 
+/**
+ * Adjusts tooltip position, so it won't get beyond the screen.
+ * @param tooltipRef - Tooltip component referense.
+ * @param tooltipTransform - Tooltip transform with values from default chart.js tooltip.
+ * @param horizontalPos - Horizontal position relative to hovered chart element.
+ * @param verticalPos - Vertical position relative to hovered chart element.
+ * @param enableTransition - If true, sets transition of tooltip positions.
+ */
 const adjustTooltipPosition = (
   tooltipRef: RefObject<HTMLDivElement | null>,
-  tooltip: TooltipTransform,
+  tooltipTransform: TooltipTransform,
   horizontalPos: TooltipPosition,
   verticalPos: TooltipPosition,
   enableTransition: boolean = true
 ) => {
   if (tooltipRef.current) {
+    //X and Y positions with given relative position taken in account.
     const originX =
-      tooltip.caretX
+      tooltipTransform.caretX
       - tooltipRef.current.offsetWidth * PositionMult[horizontalPos];
     const originY =
-      tooltip.caretY
+      tooltipTransform.caretY
       - tooltipRef.current.offsetHeight * PositionMult[verticalPos];
 
-    const { top, left } = tooltip.boundaries;
+    //Chart.js return position relative to viewport.
+    const { top, left } = tooltipTransform.boundaries;
 
+    //Clamps relative left position between chart left and right borders with viewport position taken in account.
     const absLeft = left + window.pageXOffset;
     const adjustedLeft = clamp(
       originX,
@@ -161,6 +202,7 @@ const adjustTooltipPosition = (
         - SCREEN_MARGIN
     );
 
+    //Clamps relative top position between chart top and bottom borders with viewport position taken in account.
     const absTop = top + window.pageYOffset;
     const adjustedTop = clamp(
       originY,
@@ -175,6 +217,7 @@ const adjustTooltipPosition = (
     tooltipRef.current.style.left = `${adjustedLeft}px`;
     tooltipRef.current.style.top = `${adjustedTop}px`;
 
+    //Makes tooltip visible.
     if (!Number(tooltipRef.current.style.opacity))
       tooltipRef.current.style.opacity = '1';
     else if (enableTransition)
@@ -185,7 +228,19 @@ const adjustTooltipPosition = (
 const tooltipTitleToNumber = (title?: string) =>
   Number(title?.toString().replace(/[\s,]/g, '') ?? '0');
 
-export const getTooltip = <DataType extends ChartData>(
+/**
+ * Tooltip options and rerender function for chart options.
+ * Chart.js does not have render function that would accept React node.
+ * Gives tooltip the data that will be displayed.
+ * @param tooltipRef - Tooltip component referense.
+ * @param updateTooltip - Update state function that will force tooltip rerender.
+ * @param dataMap - Map of data and its id.
+ * @param horizontalPos - Horizontal position relative to hovered chart element.
+ * @param verticalPos - Vertical position relative to hovered chart element.
+ * @param enableTransition - If true, sets transition of tooltip positions.
+ * @returns Tooltip options for chart with rerender function.
+ */
+export const setTooltip = <DataType extends ChartData>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   updateTooltip: ChartContextProps<DataType>['updateTooltip'],
   dataMap: Map<number | string, DataType>,
@@ -195,20 +250,24 @@ export const getTooltip = <DataType extends ChartData>(
 ): NonNullable<Chart['options']['plugins']>['tooltip'] => ({
   enabled: false,
   position: 'nearest',
-  external: ({ tooltip }) => {
-    if (!tooltip.opacity && tooltipRef.current) {
+  external: ({ tooltip: defaultTooltip }) => {
+    //Default tooltip is the tooltip implemented by chart.js.
+    //If opacity of default tooltip equals 0 hides tooltip component and resets its position.
+    if (!defaultTooltip.opacity && tooltipRef.current) {
       resetTooltip(tooltipRef);
       return;
     }
 
-    const itemId = tooltipTitleToNumber(tooltip.title?.[0]);
+    //Finds data by id that was set in global labels of data elements.
+    //Default tooltips renders global label in title.
+    const itemId = tooltipTitleToNumber(defaultTooltip.title?.[0]);
     const data = dataMap.get(itemId);
-    const storedId = tooltipRef.current?.dataset['item'];
 
+    //Calculates new tooltip position. Default tooltip contains new position that is near the hovered element.
     const tooltipTransform: TooltipTransform = {
-      caretX: tooltip.caretX,
-      caretY: tooltip.caretY,
-      boundaries: tooltip.chart.canvas.getBoundingClientRect()
+      caretX: defaultTooltip.caretX,
+      caretY: defaultTooltip.caretY,
+      boundaries: defaultTooltip.chart.canvas.getBoundingClientRect()
     };
 
     adjustTooltipPosition(
@@ -219,16 +278,35 @@ export const getTooltip = <DataType extends ChartData>(
       enableTransition
     );
 
+    //If found data is the same as the one that tooltip is pointing to, skips rerender.
+    const storedId = tooltipRef.current?.dataset['item'];
     if (!data || storedId?.toString() === itemId.toString()) return;
 
     updateTooltip(data);
   }
 });
 
-export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
+/**
+ * Tooltip options and rerender function for period bar chart options.
+ * Chart.js does not have render function that would accept React node.
+ * Gives tooltip the data that will be displayed.
+ * @param tooltipRef - Tooltip component referense.
+ * @param updateTooltip - Update state function that will force tooltip rerender.
+ * @param dataMap - Map of data and its id.
+ * @param
+ * @param horizontalPos - Horizontal position relative to hovered chart element.
+ * @param verticalPos - Vertical position relative to hovered chart element.
+ * @param enableTransition - If true, sets transition of tooltip positions.
+ * @returns Tooltip options for period bar chart with rerender function.
+ */
+export const setPeriodTooltip = <
+  DataType extends PeriodChartTransformed,
+  ValueKey extends keyof DataType
+>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   updateTooltip: ChartContextProps<DataType>['updateTooltip'],
   dataMap: Map<number | string, DataType>,
+  valueField: ValueKey,
   horizontalPos: TooltipPosition = 'start',
   verticalPos: TooltipPosition = 'start',
   enableTransition: boolean = true
@@ -236,15 +314,19 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
   enabled: false,
   position: 'nearest',
   external: ({ tooltip }) => {
+    //Default tooltip is the tooltip implemented by chart.js.
+    //If opacity of default tooltip equals 0 hides tooltip component and resets its position.
     if (!tooltip.opacity && tooltipRef.current) {
       resetTooltip(tooltipRef);
       return;
     }
 
+    //Finds data by id. Period bar has multiple datasets, so data id is stored in label of item's dataset.
+    //Default tooltips renders local label of data in dataPoints.
     const itemId = tooltipTitleToNumber(tooltip.dataPoints[0].dataset.label);
     const data = dataMap.get(itemId);
-    const storedId = tooltipRef.current?.dataset['item'];
 
+    //Calculates new tooltip position. Default tooltip contains new position that is near the hovered element.
     const tooltipTransform: TooltipTransform = {
       caretX: tooltip.caretX,
       caretY: tooltip.caretY,
@@ -259,15 +341,28 @@ export const getPeriodTooltip = <DataType extends PeriodChartTransformed>(
       enableTransition
     );
 
-    if (!data || storedId?.toString() === itemId.toString()) return;
+    if (!data) return;
 
-    updateTooltip({
-      ...data
-      //reservedValue: data.countByPeriod[valueKey] ?? data.reservedValue
-    });
+    //Changes general value of field to it's period value.
+    const period = tooltip.title?.[0];
+    if (data.countByPeriod[period])
+      data[valueField] = data.countByPeriod[period] as DataType[ValueKey];
+
+    updateTooltip(data);
   }
 });
 
+/**
+ * Gives tooltip the data that will be displayed. Forces rerender of tooltip.
+ * @param tooltipRef - Tooltip component referense.
+ * @param mapRef - Map chart referense.
+ * @param target - Mouse target.
+ * @param updateTooltip - Update state function that will force tooltip rerender.
+ * @param dataMap - Map of data and its id.
+ * @param horizontalPos - Horizontal position relative to hovered chart element.
+ * @param verticalPos - Vertical position relative to hovered chart element.
+ * @param enableTransition - If true, sets transition of tooltip positions.
+ */
 export const updateMapTooltipPos = <DataType extends ChartData>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   mapRef: RefObject<HTMLDivElement | null>,
@@ -283,31 +378,41 @@ export const updateMapTooltipPos = <DataType extends ChartData>(
     return;
   }
 
+  //Country code is stored as ID of path element in svg map.
   const country = target.id;
   const data = dataMap.get(country);
+
+  //Hides tooltip if it points to the same data without position reset.
+  //It helps avoid frequent positions calculations and rerender caused by rough borders of countries.
   const storedId = tooltipRef.current?.dataset['item'];
-
-  const { top, left, height, width } = target.getBoundingClientRect();
-  const { top: mapTop, left: mapLeft } = mapRef.current.getBoundingClientRect();
-
-  const tooltipTransform: TooltipTransform = {
-    caretX: left + width / 2 - mapLeft,
-    caretY: top + height / 2 - mapTop,
-    boundaries: mapRef.current.getBoundingClientRect()
-  };
-
-  if (data && storedId?.toString() !== country.toString()) {
-    adjustTooltipPosition(
-      tooltipRef,
-      tooltipTransform,
-      horizontalPos,
-      verticalPos,
-      enableTransition
-    );
-
-    updateTooltip(data);
-  } else {
+  if (!data || storedId?.toString() === country.toString()) {
     hideTooltip(tooltipRef);
     return;
   }
+
+  //Calculates new position of tooltip.
+  const {
+    top: targetTop,
+    left: targetLeft,
+    height: targetHeight,
+    width: targetWidth
+  } = target.getBoundingClientRect();
+  const { top: mapTop, left: mapLeft } = mapRef.current.getBoundingClientRect();
+
+  const tooltipTransform: TooltipTransform = {
+    caretX: targetLeft + targetWidth / 2 - mapLeft,
+    caretY: targetTop + targetHeight / 2 - mapTop,
+    boundaries: mapRef.current.getBoundingClientRect()
+  };
+
+  //Adjusts tooltip position.
+  adjustTooltipPosition(
+    tooltipRef,
+    tooltipTransform,
+    horizontalPos,
+    verticalPos,
+    enableTransition
+  );
+
+  updateTooltip(data);
 };

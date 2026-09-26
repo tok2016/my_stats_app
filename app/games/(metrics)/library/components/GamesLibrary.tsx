@@ -1,7 +1,7 @@
 import { GamesFilter } from '@ts/games/filter';
 import { GameTableData } from '@ts/games/game';
 
-import { getCurrentUser, getGames } from '@lib/server-actions';
+import { getCurrentUser, tryGetGames } from '@lib/server-actions';
 
 import ErrorMessage from '@components/ErrorMessage';
 
@@ -11,19 +11,26 @@ import GamesTablePagination from './GamesTablePagination';
 
 const GAMES_PAGE_LIMIT = 20;
 
+/**
+ * @param props
+ * @param props.filters - Filters from search params.
+ * @returns List of all user's games, filtered by given filters, divided into pages.
+ */
 export default async function GamesLibrary({
   filters
 }: {
   filters: GamesFilter;
 }) {
   try {
+    //Searches games by given filters.
     const user = await getCurrentUser();
-    const gamesPage = await getGames({
+    const gamesPage = await tryGetGames({
       ...filters,
       limit: GAMES_PAGE_LIMIT.toString(),
       userId: user.id
     });
 
+    //Starts indexation with global index of first game in given array.
     const gamesTableData: GameTableData[] = gamesPage.games.map((game, i) => ({
       ...game,
       index: gamesPage.startIndex + i

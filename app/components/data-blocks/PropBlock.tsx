@@ -4,6 +4,13 @@ type PropBlockProps = {
   className?: string;
 };
 
+/**
+ * @param props
+ * @param props.title - Title of prop.
+ * @param props.className
+ * @param props.children - Content of prop.
+ * @returns Block for prop with title and given content.
+ */
 export default function PropBlock({
   title,
   className = '',

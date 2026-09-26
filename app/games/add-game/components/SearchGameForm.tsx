@@ -21,6 +21,12 @@ type SearchQuery = {
   prevName: string;
 };
 
+/**
+ * Searches games by given name and returns the list segment by given page.
+ * Adds found games to given games list, if new query equals the previous one.
+ * @param query - Query data to search games by.
+ * @returns Search results with segment of found games and segment (page) number.
+ */
 const browseGames = async (
   query?: SearchQuery
 ): Promise<SearchGamesResults> => {
@@ -33,6 +39,7 @@ const browseGames = async (
     `/api/games/search?${searchParams.toString()}`
   );
 
+  //If new query is the same as previous one, adds found games to current games list.
   return {
     ...searchResults.data,
     games:
@@ -42,6 +49,12 @@ const browseGames = async (
   };
 };
 
+/**
+ * Preview block of browsed game. Clicking on it moves to game rating form.
+ * @param props
+ * @param props.game - IGDB game to preview and select.
+ * @returns Preview block with browsed game data.
+ */
 function BrowsedGameChoice({ game }: BrowsedGameProps) {
   const { setParam } = useURLSearchParams();
   const chooseGame = (gameApiId: number) => () => {
@@ -51,6 +64,10 @@ function BrowsedGameChoice({ game }: BrowsedGameProps) {
   return <BrowsedGame game={game} onClick={chooseGame(game.apiId)} />;
 }
 
+/**
+ * Form to browse and select a game. Has hidden pagination, so browsed games are pulled segmentally.
+ * @returns Form to browse a game from IGDB by name and select it.
+ */
 export default function SearchGameForm() {
   const [searchResults, searchGames, isPending] = useAction(browseGames, {
     games: [],
@@ -59,6 +76,10 @@ export default function SearchGameForm() {
     query: ''
   });
 
+  /**
+   * Searches IGDB by name with given query.
+   * @param query
+   */
   const onSearch = (query?: string) => {
     searchGames({
       prevGames: searchResults.games,
@@ -66,10 +87,11 @@ export default function SearchGameForm() {
       prevName: searchResults.query,
       name: query ?? ''
     });
-
-    return Promise.resolve(undefined);
   };
 
+  /**
+   * Loads the next page of games with query in name.
+   */
   const onLoadMore = () => {
     searchGames({
       prevGames: searchResults.games,
@@ -87,7 +109,6 @@ export default function SearchGameForm() {
         id='search-game'
         name='searchGame'
         placeholder='Search game'
-        action={onSearch}
         onSearchSubmit={onSearch}
       />
 
@@ -101,6 +122,7 @@ export default function SearchGameForm() {
           <BrowsedGameChoice game={game} key={game.apiId} />
         ))}
 
+        {/*Hides button when all found games were loaded.*/}
         {searchResults.isEnd || (
           <Button variant='secondary' onClick={onLoadMore} loading={isPending}>
             More

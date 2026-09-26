@@ -19,6 +19,11 @@ type GameDeleteMenuProps = {
   popupName: string;
 };
 
+/**
+ * @param gameId - Id of game to delete from library.
+ * @param controller - Abort controller to cancel delete.
+ * @returns Form state with request status.
+ */
 const deleteGame =
   (gameId: string, controller: AbortController): FormAction<void> =>
   async () => {
@@ -36,7 +41,13 @@ const deleteGame =
     }
   };
 
-export default function GameDeleteMenu({
+/**
+ * @param props
+ * @param props.game - Game to delete from library.
+ * @param props.popupName - Name of popup.
+ * @returns Popup of delete confirmation message.
+ */
+export default function GameDeletePopup({
   game,
   popupName
 }: GameDeleteMenuProps) {

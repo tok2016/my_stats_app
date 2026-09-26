@@ -1,7 +1,7 @@
 'use client';
 
 import Game from '@ts/games/game';
-import { MetricContentProps } from '@ts/games/metric';
+import { CoreMetricProps } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -28,8 +28,16 @@ type TopGameSkeletonProps = {
 
 const TOP_GAMES_SKELETONS = 12;
 
+/**
+ * @param games - All user's games.
+ * @returns Funtion to fetch top games by rating.
+ */
 const fetchTopGames =
   (games: ObjectMapArray<Game, 'id'>) =>
+  /**
+   * @param params - Search params with user id.
+   * @returns Top games by rating or error data.
+   */
   async (params: { userId: string }): Promise<MetricResponse<Game[]>> => {
     const gamesIds = await getMetricClient<string[]>(
       '/api/games/titles/rating',
@@ -44,6 +52,12 @@ const fetchTopGames =
     };
   };
 
+/**
+ * @param props
+ * @param props.game - Full game data.
+ * @param props.index - Index of game in sorted array.
+ * @returns Data block with game data and ratings from critics, IGDB users and My Stats user.
+ */
 function TopGame({ game, index }: TopGameProps) {
   return (
     <div className='data-block top-game'>
@@ -112,13 +126,15 @@ export function GamesRatingsSkeleton() {
   );
 }
 
-export default function GamesRatings({
-  metricId,
-  games,
-  userId
-}: MetricContentProps) {
+/**
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Metric component of top games by user's rating.
+ */
+export default function GamesRatings({ games, userId }: CoreMetricProps) {
   return (
-    <MetricWrapper id={metricId}>
+    <MetricWrapper id='games-rating'>
       <FetchMetric
         fetchMetricData={fetchTopGames(games)}
         metric={(data) => (

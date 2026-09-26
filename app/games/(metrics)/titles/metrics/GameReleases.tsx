@@ -1,6 +1,6 @@
 'use client';
 
-import { MetricContentProps, YearCountMetric } from '@ts/games/metric';
+import { CoreMetricProps, YearCountMetric } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -9,9 +9,13 @@ import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import FetchMetric from '../../components/FetchMetric';
-import GamesLineChart from '../charts/GamesLineChart';
+import GamesYearLineChart from '../charts/GamesYearLineChart';
 import { GameYearChartData } from '../types';
 
+/**
+ * @param params - Search params with user id.
+ * @returns Games release years with games count and top game or error data.
+ */
 const fetchGameReleases = async (params: {
   userId: string;
 }): Promise<MetricResponse<GameYearChartData[]>> => {
@@ -33,13 +37,18 @@ const fetchGameReleases = async (params: {
   };
 };
 
-export default function GameReleases({ metricId, userId }: MetricContentProps) {
+/**
+ * @param props
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Metric of games release years with games count and top game.
+ */
+export default function GameReleases({ userId }: CoreMetricProps) {
   return (
-    <MetricWrapper id={metricId}>
+    <MetricWrapper id='games-release'>
       <FetchMetric
         fetchMetricData={fetchGameReleases}
         metric={(data) => (
-          <GamesLineChart data={data} chartId='game-releases-line' />
+          <GamesYearLineChart data={data} chartId='game-releases-line' />
         )}
         fallback={<ChartSkeleton type='line' />}
         params={{ userId }}

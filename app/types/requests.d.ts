@@ -6,6 +6,7 @@ import ObjectMapArray from '@lib/object-map-array';
 
 import { AppRouteHandlerRoutes } from '../../.next/types/routes';
 import { GameCore } from './games/game';
+import Service from './users/service';
 import Token from './users/token';
 
 export type ValidationIssue = $ZodIssue;

@@ -29,7 +29,7 @@ export type ChartCoreProps<
 > = {
   data: (DataType & Record<ValueKey, number>)[];
   valueField: ValueKey;
-  fieldsNames: FieldsInfo<DataType>;
+  fieldsInfo: FieldsInfo<DataType>;
   tooltipProps?: TooltipProps;
 };
 
@@ -82,6 +82,6 @@ export type PeriodBarChartMainProps<
   ValueKey extends ChartValueField<DataType>
 > = {
   displayFields: DisplayFields<DataType>;
-  fieldsNames: FieldsInfo<DataType>;
+  fieldsInfo: FieldsInfo<DataType>;
   valueField: ValueKey;
 };

@@ -15,6 +15,10 @@ const rankIcons: Record<
   2: (props) => <Medal {...props} />
 };
 
+/**
+ * @param props - SVG props with rank value.
+ * @returns Icon that represents given rank.
+ */
 export default function RankIcon(
   props: SVGProps<SVGSVGElement> & { rank: number }
 ) {

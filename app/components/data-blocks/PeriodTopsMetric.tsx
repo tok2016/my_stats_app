@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   FetchPeriodTopsMetricParams,
@@ -21,9 +21,10 @@ import {
   DEFAULT_PERIOD_BLOCKS_GAP,
   DEFAULT_PERIOD_BLOCK_WIDTH,
   PrecisePeriods,
-  getPeriodString
+  getPeriodName
 } from '@lib/utils';
 
+import Button from '@components/Button';
 import Divider from '@components/Divider';
 import Select from '@components/Select';
 
@@ -73,45 +74,65 @@ const periodTypeOptions: Option[] = PrecisePeriods.map((periodType) => ({
   key: periodType
 }));
 
+const getDecadeByYear = (year: string) =>
+  Math.floor(parseInt(year) / 10) * 10 + 's';
+
+/**
+ * Adds indexes to period tops chart data to color item's datasets.
+ * Index is used here only to set color, not to rank the item, to differ datasets visually.
+ * Indexes are given only within a year or decade group.
+ * @param periodType - Type of periods: month / season / year.
+ * @param tops - Period tops to indexes for.
+ * @returns Period top with indexes for each top item within one year or decade.
+ */
 const setTopsIndexes = <ItemType extends ChartData>(
   periodType: PrecisePeriod,
-  tops: PeriodTop<ItemType>[]
+  tops: PeriodTop<ItemType>[],
+  year: string
 ): PeriodTopsMetric<ItemType>['tops'] => {
-  const yearItemMap = new Map<string, Record<number | string, number>>();
-  const indexTops = tops.map((periodTop) => {
-    const year =
-      periodType === 'year'
-        ? '0'
-        : getPeriodString['year'](periodTop.period, false);
-    const itemOfYear = yearItemMap.get(year);
+  const itemIndexMap = new Map<number | string, number>();
 
-    if (!itemOfYear) {
-      const updatedTop = periodTop.top;
-      const indexes = Object.fromEntries(
-        updatedTop.map((item, i) => {
-          item.index = i;
-          return [item.id, i];
-        })
-      );
+  const indexTops: PeriodTopsMetric<ItemType>['tops'] = [];
+  tops.forEach((periodTop) => {
+    //Defines year or decade to group indexes by.
+    const currentYear = getPeriodName['year'](periodTop.period, false);
+    const yearDecade =
+      periodType === 'year' ? getDecadeByYear(currentYear) : currentYear;
 
-      yearItemMap.set(year, indexes);
-      return { ...periodTop, top: updatedTop };
-    }
+    if (yearDecade !== year) return;
 
+    //Adds indexes for every unsaved item and returns top with updated indexes.
+    //The index of new item equals the current length of group items.
     const updatedTop = periodTop.top;
     updatedTop.forEach((item) => {
-      if (!itemOfYear[item.id]) {
-        const index = Object.keys(itemOfYear).length;
-        itemOfYear[item.id] = index;
-        item.index = index;
+      const index = itemIndexMap.get(item.id);
+      if (typeof index === 'undefined') {
+        const newIndex = itemIndexMap.size;
+        itemIndexMap.set(item.id, newIndex);
+        item.index = newIndex;
       }
     });
-    return { ...periodTop, top: updatedTop };
+
+    indexTops.push({ ...periodTop, top: updatedTop });
   });
 
   return indexTops;
 };
 
+/**
+ * @param props
+ * @param props.id - Metric id.
+ * @param props.periodTopClassName - Class of a single period top block.
+ * @param props.blockWidthRem - Period top block width in rem.
+ * @param props.gapRem - Gap size between period top blocks in rem.
+ * @param props.listItemContent - Top item render function for period top block.
+ * @param props.showBar - If true, shows period bar chart after period tops scroll.
+ * @param props.barClassName - Class of period bar chart.
+ * @param props.displayFields - Display fields for period bar chart tooltip.
+ * @param props.fieldsInfo - Fields render data with names for tooltip and chart.
+ * @param props.valueField - Field of data which values will be used to build the period bar chart elements. Accept only number fields.
+ * @returns Period tops scroll and bar chart.
+ */
 function PeriodTopsScroll<
   ItemType extends ChartData,
   ValueKey extends ChartValueField<ItemType>
@@ -126,13 +147,17 @@ function PeriodTopsScroll<
   showBar,
   displayFields,
   valueField,
-  fieldsNames
+  fieldsInfo: fieldsNames
 }: PeriodTopsScrollProps<ItemType, ValueKey>) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [year, setYear] = useState<string>('');
 
-  const onIntersect: IntersectionObserverCallback = (entres) => {
-    entres.forEach((entry) => {
+  /**
+   * Updates year which group intersects the viewport.
+   * @param entries
+   */
+  const onIntersect: IntersectionObserverCallback = (entries) => {
+    entries.forEach((entry) => {
       if (entry.isIntersecting) {
         const year = entry.target.id.split('-').at(-1);
         if (year) setYear(year);
@@ -140,6 +165,15 @@ function PeriodTopsScroll<
     });
   };
 
+  /**
+   * Shows periods of clicked year.
+   * @param evt
+   */
+  const onYearClick = (evt: MouseEvent) => {
+    setYear(evt.currentTarget.id);
+  };
+
+  //Observer to track tops group intersection with viewport.
   const [observer] = useState(() => {
     try {
       return new IntersectionObserver(onIntersect, { threshold: 0.5 });
@@ -148,39 +182,41 @@ function PeriodTopsScroll<
     }
   });
 
+  //Period tops grouped by year or decade.
   const topsByYear: Map<string, PeriodTopsMetric<ItemType>['tops']> =
     useMemo(() => {
       const tops = new Map();
 
       if (!periodMetricData) return tops;
-      else if (periodMetricData.periodType === 'year') {
-        tops.set(
-          periodMetricData.tops[0].period,
-          periodMetricData.tops.toReversed()
-        );
-        return tops;
-      }
 
+      //Defines year/decade of each period top and adds it to group.
       for (let i = periodMetricData.tops.length - 1; i >= 0; i--) {
         const top = periodMetricData.tops[i];
-        const year = getPeriodString['year'](top.period, false);
-        const yearTop = tops.get(year);
-        if (!yearTop) tops.set(year, [top]);
-        else yearTop.push(top);
+        const year = getPeriodName['year'](top.period, false);
+
+        const decade = getDecadeByYear(year);
+        const yearOrDecade =
+          periodMetricData.periodType === 'year' ? decade : year;
+
+        const yearDecadeTop = tops.get(yearOrDecade);
+        if (!yearDecadeTop) tops.set(yearOrDecade, [top]);
+        else yearDecadeTop.push(top);
       }
       return tops;
     }, [periodMetricData]);
 
+  //Sets the most recent year at the start and assigns observable elements.
   useEffect(() => {
     if (scrollRef.current) {
       const latestPeriod = periodMetricData.tops.at(-1);
       if (latestPeriod)
-        setYear(getPeriodString['year'](latestPeriod.period, false));
+        setYear(getPeriodName['year'](latestPeriod.period, false));
       else setYear('');
 
       scrollRef.current.scrollTo({
         left: scrollRef.current.scrollWidth
       });
+
       observer?.disconnect();
       scrollRef.current.querySelectorAll('.year-line').forEach((el) => {
         observer?.observe(el);
@@ -209,9 +245,7 @@ function PeriodTopsScroll<
             ))}
         </div>
 
-        <div
-          className={`years ${periodMetricData?.periodType === 'year' ? 'invisible' : ''}`}
-        >
+        <div className='years'>
           {topsByYear
             .entries()
             .toArray()
@@ -225,7 +259,13 @@ function PeriodTopsScroll<
                 }}
               >
                 <Divider rounded colored={currentYear === year}>
-                  {currentYear}
+                  <Button
+                    variant={currentYear === year ? 'link' : 'text'}
+                    onClick={onYearClick}
+                    id={currentYear}
+                  >
+                    {currentYear}
+                  </Button>
                 </Divider>
               </div>
             ))}
@@ -240,10 +280,11 @@ function PeriodTopsScroll<
           chartId={`${id}-bar`}
           data={setTopsIndexes(
             periodMetricData.periodType,
-            periodMetricData.tops
+            periodMetricData.tops,
+            year
           )}
           displayFields={displayFields}
-          fieldsNames={fieldsNames}
+          fieldsInfo={fieldsNames}
           valueField={valueField}
         />
       )}
@@ -251,6 +292,23 @@ function PeriodTopsScroll<
   );
 }
 
+/**
+ * Renders tops scroll and bar chart. Bar chart displays only periods on currently visible year or decade.
+ * @param props - Period tops metric props.
+ * @param props.id - Metric id.
+ * @param props.userId - User with metric data to fetch.
+ * @param props.fetchPeriodMetric - Function to fetch metric data.
+ * @param props.periodTopClassName - Class of a single period top block.
+ * @param props.blockWidthRem - Period top block width in rem.
+ * @param props.gapRem - Gap size between period top blocks in rem.
+ * @param props.listItemContent - Top item render function for period top block.
+ * @param props.showBar - If true, shows period bar chart after period tops scroll.
+ * @param props.barClassName - Class of period bar chart.
+ * @param props.displayFields - Display fields for period bar chart tooltip.
+ * @param props.fieldsInfo - Fields render data with names for tooltip and chart.
+ * @param props.valueField - Field of data which values will be used to build the period bar chart elements. Accept only number fields.
+ * @returns Period top metric with tops scroll and bar chart.
+ */
 export default function PeriodTops<
   ItemType extends ChartData,
   ValueKey extends ChartValueField<ItemType>

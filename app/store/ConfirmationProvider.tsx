@@ -9,7 +9,8 @@ import {
   ConfirmationState
 } from '@ts/users/confirmation';
 
-import { deleteConfirmation, getOperation } from '@lib/actions';
+import { deleteConfirmation } from '@lib/actions';
+import AxiosInstanse from '@lib/axios-instanse';
 import { useAction } from '@lib/hooks';
 import {
   defaultConfirmation,
@@ -31,6 +32,15 @@ type ConfirmationContextProps = {
   isPending: boolean;
   getFormAction: ConfirmationFormAction;
   cancelConfirm: () => void;
+};
+
+const getOperation = async (): Promise<ConfirmationInfo> => {
+  try {
+    const response = await AxiosInstanse.get<ConfirmationInfo>('/api/confirm');
+    return response.data;
+  } catch {
+    return defaultConfirmation;
+  }
 };
 
 export const ConfirmationContext = createContext<ConfirmationContextProps>({

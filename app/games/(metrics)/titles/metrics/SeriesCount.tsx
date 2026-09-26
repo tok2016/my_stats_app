@@ -1,22 +1,22 @@
 'use client';
 
 import Game from '@ts/games/game';
-import { MetricContentProps } from '@ts/games/metric';
+import { CoreMetricProps } from '@ts/games/metric';
 import { SeriesCollapsed } from '@ts/games/series';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
 import ObjectMapArray from '@lib/object-map-array';
 
+import BlankImage from '@components/BlankImage';
 import Skeleton from '@components/Skeleton';
-import EmptyImage from '@components/data-blocks/EmptyImage';
 import GameCover from '@components/data-blocks/GameCover';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 import PropBlock from '@components/data-blocks/PropBlock';
 
 import FetchMetric from '../../components/FetchMetric';
-import { MAX_GAMES_IN_SERIES } from '../utils';
+import { MAX_GAMES_IN_SERIES } from '../../utils';
 
 type TopSeriesProps = {
   series: SeriesCollapsed;
@@ -29,6 +29,10 @@ type TopSeriesSkeletonProps = {
 
 const MAX_SERIES_SKELETONS = 5;
 
+/**
+ * @param params - Search params with user id.
+ * @returns Top series by games count that user's played or error data.
+ */
 const fetchTopSeries = async (params: {
   userId: string;
 }): Promise<MetricResponse<SeriesCollapsed[]>> => {
@@ -43,6 +47,12 @@ const fetchTopSeries = async (params: {
   };
 };
 
+/**
+ * @param props
+ * @param props.series - Full series data.
+ * @param props.games - All user's games.
+ * @returns Data block with series data.
+ */
 function TopSeries({ series, games }: TopSeriesProps) {
   const seriesGames = series.games
     .slice(0, MAX_GAMES_IN_SERIES)
@@ -62,8 +72,8 @@ function TopSeries({ series, games }: TopSeriesProps) {
               className={`series-game-${i}`}
             />
           ) : (
-            <EmptyImage
-              key={`series-empty-cover-${i}`}
+            <BlankImage
+              key={`series-blank-image-${i}`}
               className={`game-cover series-game-${i}`}
             />
           )
@@ -165,13 +175,15 @@ export function SeriesCountSkeleton() {
   );
 }
 
-export default function SeriesCount({
-  metricId,
-  games,
-  userId
-}: MetricContentProps) {
+/**
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Metric component of top series by games count that user's played.
+ */
+export default function SeriesCount({ games, userId }: CoreMetricProps) {
   return (
-    <MetricWrapper id={metricId}>
+    <MetricWrapper id='top-series'>
       <FetchMetric
         fetchMetricData={fetchTopSeries}
         metric={(data) => (

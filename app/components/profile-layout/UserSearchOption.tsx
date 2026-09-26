@@ -8,7 +8,12 @@ type UserOptionProps = {
   user: User;
 };
 
-export default function UserOption({ user }: UserOptionProps) {
+/**
+ * @param props
+ * @param props.user - User data to preview.
+ * @returns User preview block for search option.
+ */
+export default function UserSearchOption({ user }: UserOptionProps) {
   return (
     <Link href={`/users/${user.id}`} className='user-option'>
       <Avatar username={user.username} avatarId={user.avatarUrl} />

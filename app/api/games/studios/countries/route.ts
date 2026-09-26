@@ -14,9 +14,15 @@ import { MAX_ENTRIES_IN_CHART, TOP_ENTRIES } from '@lib/utils';
 
 type CountyStudioCountCompare = CountCompareData & { country?: number };
 
+/**
+ * Returns studios compare data with countries.
+ * @param studiosCompareData - Studios with games count and playtime
+ * @returns Studios compare data with country data.
+ */
 const getCountriesOfStudios = async (
   studiosCompareData: ObjectMapArray<CountCompareData, 'id'>
 ) => {
+  //Ids of developers.
   const ids = studiosCompareData
     .toArray()
     .map((data) => data.id)
@@ -29,6 +35,7 @@ const getCountriesOfStudios = async (
 
   if (!ids) return studiosCompareWithCountries;
 
+  //Fetches countries of given developers.
   const studiosWithCountry = await igdbRequest<IgdbStudioCountry>(
     '/companies',
     {
@@ -38,6 +45,7 @@ const getCountriesOfStudios = async (
     }
   );
 
+  //Adds country data to studio compare data.
   studiosWithCountry.forEach((studioCountry) => {
     const studioCompare = studiosCompareData.findByKey(studioCountry.id);
     if (studioCompare)
@@ -50,6 +58,13 @@ const getCountriesOfStudios = async (
   return studiosCompareWithCountries;
 };
 
+/**
+ * Calculates compate data for developers groups.
+ * @param game - Base game data.
+ * @param developerId - Developer id from developers array of game.
+ * @param stored - Previously stored developer group.
+ * @returns Developer group with aggregated data.
+ */
 const aggregateStudioCompare = (
   game: GameCore,
   developerId: number,
@@ -60,6 +75,13 @@ const aggregateStudioCompare = (
   hours: (stored?.hours ?? 0) + game.hours
 });
 
+/**
+ * Calculates aggregated country data.
+ * @param studioCompareData - Aggregated studio data.
+ * @param country - Country of studio.
+ * @param stored - Previously stored country group.
+ * @returns Country group with aggregated data.
+ */
 const aggregateCountryData = (
   studioCompareData: CountCompareData,
   country?: number,
@@ -77,9 +99,20 @@ const aggregateCountryData = (
   };
 };
 
+/**
+ * Public method. Calculates top countries by their developers' games count and playtime.
+ * @param _req - Request object.
+ * @param _params - Route params.
+ * @param games - All games of user.
+ * @throws 400 if user id is not given.
+ * @throws 403 if user is private.
+ * @throws 404 if user is not found or no game of theirs is found.
+ * @returns Top countires by games count and playtime with top developers.
+ */
 const getStudiosByCountry: GameEndpointAction<
   '/api/games/studios/countries'
 > = async (_req, _params, games) => {
+  //Aggragate games by developer id with count and playtime.
   const studiosCompareData = games.flatGroupBy(
     aggregateStudioCompare,
     'developersIds',
@@ -87,6 +120,7 @@ const getStudiosByCountry: GameEndpointAction<
     undefined
   );
 
+  //Fetches countries of developers and sorts developers by count and playtime.
   const studiosWithCountries = await getCountriesOfStudios(studiosCompareData);
   studiosWithCountries.sort((a, b) => {
     const diff = b.count - a.count;
@@ -94,6 +128,8 @@ const getStudiosByCountry: GameEndpointAction<
     return diff;
   });
 
+  //Aggregates studios by countries with games count and top developers.
+  //Sorts countries by games and developers count.
   const countries = studiosWithCountries
     .groupBy(aggregateCountryData, 'country', 'country', undefined)
     .sort((a, b) => {

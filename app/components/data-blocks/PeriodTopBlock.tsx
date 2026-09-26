@@ -1,6 +1,6 @@
 import { PeriodTop, PrecisePeriod } from '@ts/games/metric';
 
-import { DEFAULT_PERIOD_BLOCK_WIDTH, getPeriodString } from '@lib/utils';
+import { DEFAULT_PERIOD_BLOCK_WIDTH, getPeriodName } from '@lib/utils';
 
 type PeriodTopBlockProps<ItemType> = {
   className?: string;
@@ -11,6 +11,15 @@ type PeriodTopBlockProps<ItemType> = {
   listItemContent: (item: ItemType, i: number) => React.ReactNode;
 };
 
+/**
+ * @param props
+ * @param props.periodTop - Top to render.
+ * @param props.periodType - Type of periods: month / season / year.
+ * @param props.blockWidthRem - Block width in rem.
+ * @param props.current - Highlights the most recent top.
+ * @param props.listItemContent - Top item render function.
+ * @returns Block with top item of period.
+ */
 export default function PeriodTopBlock<ItemType>({
   className = '',
   periodTop,
@@ -29,7 +38,7 @@ export default function PeriodTopBlock<ItemType>({
     >
       <div className='data-block-title'>
         <p className={current ? 'colored' : ''}>
-          {getPeriodString[periodType](periodTop.period, false)}
+          {getPeriodName[periodType](periodTop.period, false)}
         </p>
       </div>
 

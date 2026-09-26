@@ -30,6 +30,7 @@ export type SearchBaseProps = Omit<
 };
 
 export type ButtonProps = {
+  id?: string;
   children?: ReactNode;
   variant?: ButtonVariant;
   status?: ButtonStatus;
@@ -70,7 +71,7 @@ export type SidebarOptionProps = Omit<SidebarSubButtonProps, 'href'> & {
   href?: string;
 } & {
   icon: ReactNode;
-  subButtons?: SidebarSubButtonProps[];
+  subButtons: SidebarSubButtonProps[];
   onClick?: () => void;
 };
 

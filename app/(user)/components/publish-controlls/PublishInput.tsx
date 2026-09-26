@@ -1,7 +1,9 @@
 import { useState } from 'react';
 
-import BinaryInput from '@components/BinaryInput';
 import { usePopupState } from '@store/popup-store';
+
+import BinaryInput from '@components/BinaryInput';
+
 import PublishPopup from './PublishPopup';
 
 const PUBLISH_FORM_POPUP_NAME = 'publish-form';
@@ -11,6 +13,12 @@ type PublishInputProps = {
   defaultValue?: boolean;
 };
 
+/**
+ * @param props
+ * @param props.wasPublic - Was user profile public before setting.
+ * @param props.defaultValue - Default isPublic value from form.
+ * @returns Switch privacy input with warning publish popup.
+ */
 export default function PublishInput({
   wasPublic = false,
   defaultValue = false

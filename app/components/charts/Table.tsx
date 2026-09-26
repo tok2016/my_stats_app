@@ -28,6 +28,17 @@ type TableProps<DataType extends ChartData> = {
 const ROW_ANIMATION_DELAY = 75;
 const MIN_COLUMNS_TO_SHOW_BORDERS = 4;
 
+/**
+ * @param props
+ * @param props.id - Table id.
+ * @param props.data - Chart data to distribute into cells.
+ * @param props.header - Fields with render data that will be columns headers. Default width is 1fr.
+ * @param props.sortField - Field that the data sorted by.
+ * @param props.sortDirection - Direction of sorted data: ascending / descending.
+ * @param props.onSort - On header's sort button click. Delivers field that the date should be sorted by.
+ * @param props.className
+ * @returns
+ */
 export default function Table<DataType extends ChartData>({
   id,
   data,
@@ -37,6 +48,7 @@ export default function Table<DataType extends ChartData>({
   sortDirection,
   onSort
 }: TableProps<DataType>) {
+  //Calculates width of every grid column and table min width.
   const widths: string[] = [];
   const minWidths: string[] = [];
 
@@ -49,15 +61,21 @@ export default function Table<DataType extends ChartData>({
 
   return (
     <div
+      role='table'
       id={id}
       className={`table ${Object.keys(headers).length < MIN_COLUMNS_TO_SHOW_BORDERS ? 'hide-borders' : ''} ${className}`}
       style={{
         minWidth: `calc(${minWidths.join(' + ')})`
       }}
     >
-      <div className='table-header' style={{ gridTemplateColumns: columns }}>
+      <div
+        role='rowheader'
+        className='table-header'
+        style={{ gridTemplateColumns: columns }}
+      >
         {Object.entries(headers).map(([key, header]) => (
           <div
+            role='columnheader'
             key={key}
             className={`header-cell ${onSort && header.sort ? 'sort-header' : ''} ${header.headerCellClassName ?? ''}`}
             onClick={() => onSort?.(key as keyof DataType)}
@@ -67,13 +85,18 @@ export default function Table<DataType extends ChartData>({
               <div
                 className={`sort-button ${sortField === key ? 'colored' : ''}`}
               >
-                <ChevronUpDown className={!!sortDirection ? 'hidden' : ''} />
+                <ChevronUpDown
+                  className={!!sortDirection ? 'hidden' : ''}
+                  role='banner'
+                />
                 <ChevronUp
+                  role='banner'
                   className={
                     sortDirection === 'asc' && key === sortField ? '' : 'hidden'
                   }
                 />
                 <ChevronDown
+                  role='banner'
                   className={
                     sortDirection !== 'desc' && key === sortField
                       ? 'hidden'
@@ -88,6 +111,7 @@ export default function Table<DataType extends ChartData>({
 
       {data.map((value, i) => (
         <div
+          role='row'
           key={value.id}
           className={`table-row ${i === 0 ? 'top-row' : ''}`}
           style={{
@@ -97,6 +121,7 @@ export default function Table<DataType extends ChartData>({
         >
           {Object.entries(headers).map(([key, header]) => (
             <div
+              role='cell'
               key={`${value.id}-${key}`}
               className={`table-cell ${header.bodyCellClassName ?? ''}`}
             >

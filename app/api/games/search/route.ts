@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import { IgdbGameFull, SearchGame, SearchGamesResults } from '@ts/games/game';
 import { ProtectedEndpointAction } from '@ts/requests';
 
-import { getCredentialsById } from '@lib/auth';
 import { protectedEndpoint } from '@lib/endpoint-generators';
 import { FULL_GAME_FIELDS } from '@lib/games/games-utils';
 import { getImageUrl, igdbRequest } from '@lib/games/igdb';
@@ -11,11 +10,15 @@ import { MILLISECONDS } from '@lib/utils';
 
 const SEARCHED_GAMES_LIMIT = 10;
 
+/**
+ * Protected method. Searches games in IGDB by name.
+ * @param req - Request body with query.
+ * @returns Found games from IGDB with page and offset.
+ */
 const searchForGames: ProtectedEndpointAction<'/api/games/search'> = async (
-  req,
-  _params,
-  token
+  req
 ) => {
+  //Parses search params.
   const query = req.nextUrl.searchParams.get('query');
   const parsedPage = parseInt(req.nextUrl.searchParams.get('page') ?? '1');
   const page = Number.isNaN(parsedPage) ? 1 : parsedPage;
@@ -34,8 +37,7 @@ const searchForGames: ProtectedEndpointAction<'/api/games/search'> = async (
     });
   }
 
-  await getCredentialsById(token.id);
-
+  //Searches games with query in the name starting with given page.
   const searchedGames = await igdbRequest<IgdbGameFull>('/games', {
     fields: FULL_GAME_FIELDS,
     search: `"${query.toLowerCase().trim()}"`,
@@ -57,6 +59,7 @@ const searchForGames: ProtectedEndpointAction<'/api/games/search'> = async (
     });
   }
 
+  //Formats games to format that would be enough for storing one of them.
   const games: SearchGame[] = searchedGames.map((game) => ({
     apiId: game.id,
     name: game.name,

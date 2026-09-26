@@ -2,12 +2,40 @@
 
 import Link from 'next/link';
 
-import Input from '@components/Input';
-import { getFormDataValue } from '@lib/utils';
-import { login } from '../actions';
-import SubmitButton from '@components/SubmitButton';
-import { useRedirectActionForm } from '@lib/hooks';
+import { FormAction } from '@ts/ui/form-state';
+import { UserAccess, UserLogin } from '@ts/users/user';
 
+import AxiosInstanse from '@lib/axios-instanse';
+import { useRedirectActionForm } from '@lib/hooks';
+import { getErrorFormState, getFormDataValue } from '@lib/utils';
+
+import Input from '@components/Input';
+import SubmitButton from '@components/SubmitButton';
+
+/**
+ * Sends input credentials to authenticate.
+ * @param _state - Previous state.
+ * @param formData - New form data.
+ * @returns Updated form state.
+ */
+const login: FormAction<UserLogin> = async (_state, formData) => {
+  try {
+    const body = Object.fromEntries(formData.entries());
+    const response = await AxiosInstanse.post<UserAccess>('/api/login', body);
+
+    return {
+      error: false,
+      message: response.statusText,
+      data: formData
+    };
+  } catch (err) {
+    return getErrorFormState(err, formData);
+  }
+};
+
+/**
+ * @returns Page with login form.
+ */
 export default function LoginPage() {
   const [state, action, isPending] = useRedirectActionForm(login, '/iam');
 

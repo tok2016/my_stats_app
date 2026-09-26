@@ -9,6 +9,12 @@ type BrowsedGameProps = {
   onClick?: () => void;
 };
 
+/**
+ * @param props
+ * @param props.game - IGDB game.
+ * @param props.onClick - On game preview block clock.
+ * @returns Preview block for game browsed from IGDB.
+ */
 export default function BrowsedGame({ game, onClick }: BrowsedGameProps) {
   const releaseYear = game.releasedAt
     ? new Date(game.releasedAt).getFullYear()

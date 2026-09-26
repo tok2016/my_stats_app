@@ -1,33 +1,45 @@
 'use client';
 
+import { ButtonStyle } from '@ts/ui/components-props';
 import {
+  ConfirmationBaseAction,
   ConfirmationCode,
   ConfirmationFormProps
 } from '@ts/users/confirmation';
-import { ButtonStyle } from '@ts/ui/components-props';
 
-import { defaultFormState } from '@lib/utils';
-import SubmitButton from '@components/SubmitButton';
-import SendAgainTimer from './SendAgainTimer';
 import { useConfirm, useRedirectActionForm } from '@lib/hooks';
+import { defaultFormState } from '@lib/utils';
+
 import CodeInput from '@components/CodeInput';
+import SubmitButton from '@components/SubmitButton';
+
+import SendAgainTimer from './SendAgainTimer';
 
 type ConfirmCodeFormProps = ConfirmationFormProps & {
   buttonStyle?: ButtonStyle;
   label?: React.ReactNode;
 };
 
+/**
+ * @param props
+ * @param props.addendum - Components to add after form.
+ * @param props.buttonStyle - Confirm button style.
+ * @param props.path - Path to page to redirect to.
+ * @param props.label - Confirm button text.
+ * @param props.confirmCodeAction - Action to perform on submit.
+ * @returns Form with confirmation code.
+ */
 export default function ConfirmCodeForm({
-  baseAction,
   addendum,
   buttonStyle,
   path,
+  confirmCodeAction,
   label = 'Continue'
-}: ConfirmCodeFormProps) {
+}: ConfirmCodeFormProps & { confirmCodeAction: ConfirmationBaseAction }) {
   const { getFormAction, confirmation } = useConfirm();
 
   const [state, action, isPending] = useRedirectActionForm(
-    getFormAction<ConfirmationCode>(baseAction),
+    getFormAction<ConfirmationCode>(confirmCodeAction),
     path,
     defaultFormState()
   );

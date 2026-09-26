@@ -6,6 +6,11 @@ type CountryDataProps = {
   country: Country;
 };
 
+/**
+ * @param props
+ * @param props.country - Country data with name and flag url.
+ * @returns Country name and flag.
+ */
 export default function CountryData({ country }: CountryDataProps) {
   return (
     <div className='country'>

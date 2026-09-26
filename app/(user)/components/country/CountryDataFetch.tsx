@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import Country from '@ts/users/country';
 
 import { useAction } from '@lib/hooks';
-import { getCountyData } from '@lib/server-actions';
+import { getCountryData } from '@lib/server-actions';
 import { defaultCountry } from '@lib/utils';
 
 import FetchImage from '@components/FetchImage';
@@ -13,20 +13,27 @@ import FetchImage from '@components/FetchImage';
 import CountryDataSkeleton from './CountryDataSkeleton';
 
 type CountryDataFetchProps = {
-  country: string;
+  countryIso: string;
 };
 
-export default function CountryDataFetch({ country }: CountryDataFetchProps) {
+/**
+ * @param props
+ * @param props.countryIso - Country ISO code.
+ * @returns Country name and flag that were fetched by country code.
+ */
+export default function CountryDataFetch({
+  countryIso
+}: CountryDataFetchProps) {
   const [countryData, findCountry, isPending] = useAction<Country, string>(
-    getCountyData,
+    getCountryData,
     defaultCountry
   );
 
   useEffect(() => {
-    findCountry(country);
-  }, [country, findCountry]);
+    findCountry(countryIso);
+  }, [countryIso, findCountry]);
 
-  if (isPending || country !== countryData.iso2) {
+  if (isPending || countryIso !== countryData.iso2) {
     return <CountryDataSkeleton />;
   } else if (!countryData.name) {
     return <p>Unknown country</p>;

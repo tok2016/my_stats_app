@@ -19,7 +19,7 @@ import {
 
 import Button from '@components/Button';
 import CircleSlider from '@components/CircleSlider';
-import HiddenInput from '@components/HiddenInput';
+import HidingInput from '@components/HidingInput';
 import Input from '@components/Input';
 import NumberInput from '@components/NumberInput';
 import Select from '@components/Select';
@@ -30,6 +30,12 @@ type GameRatingFormProps = {
   game: SearchGame;
 };
 
+/**
+ * Stores given game data for user. Game must have data from IGDB and user.
+ * @param game - Game to add.
+ * @param controller - Abort controller.
+ * @returns Form state with possible error and issues.
+ */
 const addNewGame =
   (game: SearchGame, controller: AbortController): FormAction<GameUpdate> =>
   async (_state, formData) => {
@@ -68,6 +74,11 @@ const addNewGame =
     }
   };
 
+/**
+ * @param props
+ * @param props.game - Found IGDB game that user has choosen and will add to his library.
+ * @returns Form to add personal info about selected game: rating, date of last play, used platform, playtime.
+ */
 export default function GameRatingForm({ game }: GameRatingFormProps) {
   const { deleteParam } = useURLSearchParams();
   const abortController = useRef(new AbortController());
@@ -77,11 +88,15 @@ export default function GameRatingForm({ game }: GameRatingFormProps) {
     '/games/library'
   );
 
+  /**
+   * Resets form data and moves to search game form.
+   */
   const onReset = () => {
     deleteParam('gameId');
     abortController.current.abort();
   };
 
+  //Platforms that the game is available on.
   const platformOptions: Option[] = game.platforms.map((platform) => ({
     value: platform.id.toString(),
     label: platform.name,
@@ -125,7 +140,7 @@ export default function GameRatingForm({ game }: GameRatingFormProps) {
           errorHint={state.issues?.platformId}
         />
 
-        <HiddenInput
+        <HidingInput
           id='is-rated'
           name='isRated'
           label='Your rating'
@@ -138,7 +153,7 @@ export default function GameRatingForm({ game }: GameRatingFormProps) {
             max={MAX_RATING}
             defaultValue={getNumberFormDataValue('rating', state.data)}
           />
-        </HiddenInput>
+        </HidingInput>
 
         <div className='buttons-flex-box'>
           <Button type='submit' variant='primary' loading={isPending}>

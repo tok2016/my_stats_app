@@ -21,8 +21,16 @@ import {
   StudiosMetricContentProps
 } from '../types';
 
+/**
+ * @param studios - All studios (developers or publishers) of user's games.
+ * @returns Funtion to fetch top studios of given type by games count and playtime with top game.
+ */
 const fetchStudiosCountPlaytime =
   (studios: ObjectMapArray<Game['developers'][number], 'id'>) =>
+  /**
+   * @param params - Search params with user id.
+   * @returns Top studios of given type by games count or error data.
+   */
   async (
     params: FetchStudiosParams
   ): Promise<MetricResponse<StudioCountData[]>> => {
@@ -56,8 +64,14 @@ export function StudiosCountPlaytimeSkeleton() {
   );
 }
 
+/**
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.userId - User whose metrics will be fetched.
+ * @param props.type - Studio type: developer or publisher.
+ * @returns Metric of top studios of given type by games count and playtime.
+ */
 export default function StudiosCountPlaytime({
-  metricId,
   games,
   type,
   userId
@@ -68,7 +82,9 @@ export default function StudiosCountPlaytime({
   );
 
   return (
-    <MetricWrapper id={metricId}>
+    <MetricWrapper
+      id={type === 'developer' ? 'developers-playtime' : 'publishers-playtime'}
+    >
       <FetchMetric
         fetchMetricData={fetchStudiosCountPlaytime(studios)}
         metric={(data) => <StudiosCountChart type={type} data={data} />}

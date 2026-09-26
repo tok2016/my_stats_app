@@ -19,8 +19,16 @@ type PlatformPlaytimeProps = {
   userId: string;
 };
 
+/**
+ * @param platforms - All platforms of user's games.
+ * @returns Funtion to fetch top platforms by playtime.
+ */
 const fetchPlatformPlaytime =
   (platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>) =>
+  /**
+   * @param params - Search params with user id.
+   * @returns Top platforms by playtime or error data.
+   */
   async (params: {
     userId: string;
   }): Promise<MetricResponse<PlatformPlaytimeChartData[]>> => {
@@ -43,6 +51,12 @@ const fetchPlatformPlaytime =
     };
   };
 
+/**
+ * @param props
+ * @param props.platforms - All platforms of user's games.
+ * @param props.userId - User whose metric will be fetched.
+ * @returns Submetric component of top platforms by playtime.
+ */
 export default function PlatformsPlaytime({
   platforms,
   userId

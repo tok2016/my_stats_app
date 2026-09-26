@@ -1,10 +1,16 @@
-import { getOtherUser } from '@lib/actions';
+import { User } from '@ts/users/user';
+
+import AxiosInstanse from '@lib/axios-instanse';
 
 import ErrorMessage from '@components/ErrorMessage';
 
 import Dashboard from '@app/(user)/components/profile-info/Dashboard';
 import ProfileInfo from '@app/(user)/components/profile-info/ProfileInfo';
 
+/**
+ * @param props - Route params with user id.
+ * @returns Profile page of user of id.
+ */
 export default async function UserPage({
   params
 }: {
@@ -12,12 +18,12 @@ export default async function UserPage({
 }) {
   try {
     const { userId } = await params;
-    const user = await getOtherUser(userId);
+    const response = await AxiosInstanse.get<User>(`/api/user/${userId}`);
 
     return (
       <div className='metrics'>
-        <ProfileInfo user={user} />
-        <Dashboard user={user} />
+        <ProfileInfo user={response.data} />
+        <Dashboard user={response.data} />
       </div>
     );
   } catch (err) {

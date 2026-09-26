@@ -6,6 +6,8 @@ import Link from 'next/link';
 
 import { User } from '@ts/users/user';
 
+import { useUserState } from '@store/user-store';
+
 import IconButton from '@components/IconButton';
 import Logo from '@components/Logo';
 import Avatar from '@components/profile-layout/Avatar';
@@ -16,8 +18,6 @@ import ProfileCreditsSkeleton from './ProfileCreditsSkeleton';
 
 type ProfileInfoProps = {
   user: User;
-  authorized?: boolean;
-  loading?: boolean;
 };
 
 const formatBirthdate = (birthdate: Date | string) => {
@@ -35,11 +35,15 @@ const formatBirthdate = (birthdate: Date | string) => {
   return `${localeDate} (${age} y.o.)`;
 };
 
-export default function ProfileInfo({
-  user,
-  authorized = false,
-  loading = false
-}: ProfileInfoProps) {
+/**
+ * @param props
+ * @param props.user - User whose data will be shown.
+ * @returns Profile block with user info.
+ */
+export default function ProfileInfo({ user }: ProfileInfoProps) {
+  const { user: authUser, status } = useUserState();
+  const loading = status === 'pending';
+
   const onShare = () => {
     navigator.clipboard.writeText(
       `${window.location.origin}/users/${user.username}`
@@ -76,7 +80,7 @@ export default function ProfileInfo({
             )}
 
             {user.country ? (
-              <CountryDataFetch country={user.country} />
+              <CountryDataFetch countryIso={user.country} />
             ) : (
               <p>Unknown country</p>
             )}
@@ -84,7 +88,7 @@ export default function ProfileInfo({
         </div>
       )}
 
-      {authorized && (
+      {user.id === authUser.id && (
         <div className='profile-meta'>
           <Logo />
           <div className='profile-controlls'>

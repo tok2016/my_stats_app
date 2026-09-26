@@ -7,6 +7,11 @@ import ScreenshotsCarousel from './ScreenshotsCarousel';
 
 type GameDetailsProps = { game: GameDetailed };
 
+/**
+ * @param props
+ * @param props.game - Detailed game data to display.
+ * @returns Grid with game details props data.
+ */
 export default function GameDetails({ game }: GameDetailsProps) {
   const releaseData = game.releasedAt ? new Date(game.releasedAt) : undefined;
   const playDate = game.playDate ? new Date(game.playDate) : undefined;

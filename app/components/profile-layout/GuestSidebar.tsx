@@ -4,13 +4,19 @@ import { LoginSolid } from '@mynaui/icons-react';
 
 import { SidebarModuleProps } from '@ts/ui/components-props';
 
-import SidebarOption from './SidebarOption';
+import SidebarButtonsGroup from './SidebarButtonsGroup';
 import UserSearch from './UserSearch';
 
+/**
+ * @param props
+ * @param props.path - Current page's path.
+ * @param props.expand - Expand sidebar.
+ * @returns Sidebar navigation for unauthorized user.
+ */
 export default function GuestSidebar({ path, expand }: SidebarModuleProps) {
   return (
-    <div className='sidebar-upper'>
-      <SidebarOption
+    <nav className='sidebar-upper'>
+      <SidebarButtonsGroup
         label='Login'
         name='login'
         href='/login'
@@ -24,6 +30,6 @@ export default function GuestSidebar({ path, expand }: SidebarModuleProps) {
         onFocus={expand}
         onBlur={expand}
       />
-    </div>
+    </nav>
   );
 }

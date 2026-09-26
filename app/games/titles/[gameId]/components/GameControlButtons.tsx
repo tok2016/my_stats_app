@@ -8,7 +8,7 @@ import { usePopupState } from '@store/popup-store';
 
 import IconButton from '@components/IconButton';
 
-import GameDeleteMenu from './GameDeleteMenu';
+import GameDeletePopup from './GameDeletePopup';
 import GameUpdateForm from './GameUpdateForm';
 
 type GameButtonsProps = {
@@ -18,10 +18,13 @@ type GameButtonsProps = {
 const GAME_UPDATE_POPUP = 'update-game-popup';
 const GAME_DELETE_POPUP = 'delete-game-popup';
 
-export default function GameButtons({ game }: GameButtonsProps) {
+/**
+ * @param props
+ * @param props.game - Detailed game info.
+ * @returns Buttons and popup to delete or update given game data.
+ */
+export default function GameControlButtons({ game }: GameButtonsProps) {
   const { togglePopup } = usePopupState();
-
-  console.log(game);
 
   const onEditClick = () => {
     togglePopup(GAME_UPDATE_POPUP);
@@ -46,7 +49,7 @@ export default function GameButtons({ game }: GameButtonsProps) {
       />
 
       <GameUpdateForm game={game} popupName={GAME_UPDATE_POPUP} />
-      <GameDeleteMenu game={game} popupName={GAME_DELETE_POPUP} />
+      <GameDeletePopup game={game} popupName={GAME_DELETE_POPUP} />
     </div>
   );
 }

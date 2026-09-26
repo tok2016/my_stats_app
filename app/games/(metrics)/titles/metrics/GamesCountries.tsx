@@ -1,7 +1,7 @@
 'use client';
 
 import { GameCountryMetric } from '@ts/games/game';
-import { MetricContentProps } from '@ts/games/metric';
+import { CoreMetricProps } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -13,6 +13,10 @@ import FetchMetric from '../../components/FetchMetric';
 import GamesCountriesChart from '../charts/GamesCountriesChart';
 import { GameCountryChartData } from '../types';
 
+/**
+ * @param params - Search params with user id.
+ * @returns Top countries by games count or error data.
+ */
 const fetchGamesCountries = async (params: {
   userId: string;
 }): Promise<MetricResponse<GameCountryChartData[]>> => {
@@ -35,12 +39,14 @@ const fetchGamesCountries = async (params: {
   };
 };
 
-export default function GamesCountries({
-  metricId,
-  userId
-}: MetricContentProps) {
+/**
+ * @param props
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Metric of top countries by games count with top games.
+ */
+export default function GamesCountries({ userId }: CoreMetricProps) {
   return (
-    <MetricWrapper id={metricId}>
+    <MetricWrapper id='games-countries'>
       <FetchMetric
         fetchMetricData={fetchGamesCountries}
         metric={(data) => <GamesCountriesChart data={data} />}

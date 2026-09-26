@@ -33,7 +33,7 @@ type ChartComponentProps<
   chartId: string;
   data: (DataType & Record<ValueKey, number>)[];
   displayFields: DisplayFields<DataType>;
-  fieldsNames: FieldsInfo<DataType>;
+  fieldsInfo: FieldsInfo<DataType>;
   valueFields?: ValueKey[];
   defaultValueField: ValueKey;
   className?: string;
@@ -65,6 +65,13 @@ const TooltipPropsByType: Record<ChartType, TooltipProps> = {
   }
 };
 
+/**
+ * @param data - Data to visualize.
+ * @param valueField - Fields of data which values will be used to build the chart elements. Accept only number fields.
+ * @param fieldsInfo - Fields render data with names for tooltip and chart.
+ * @param props - Chart props specific to type.
+ * @returns Core chart component by type.
+ */
 const getChartCore = <
   CurrentChartType extends ChartType,
   DataType extends ChartData,
@@ -72,14 +79,14 @@ const getChartCore = <
 >(
   data: (DataType & Record<ValueKey, number>)[],
   valueField: ValueKey,
-  fieldsNames: FieldsInfo<DataType>,
+  fieldsInfo: FieldsInfo<DataType>,
   props?: ChartTypeProps[CurrentChartType]
 ): Record<ChartType, ReactNode> => ({
   doughnut: (
     <DoughnutChart
       data={data}
       valueField={valueField}
-      fieldsNames={fieldsNames}
+      fieldsInfo={fieldsInfo}
       {...props}
     />
   ),
@@ -87,7 +94,7 @@ const getChartCore = <
     <BarChart
       data={data}
       valueField={valueField}
-      fieldsNames={fieldsNames}
+      fieldsInfo={fieldsInfo}
       {...props}
     />
   ),
@@ -95,7 +102,7 @@ const getChartCore = <
     <LineChart
       data={data}
       valueField={valueField}
-      fieldsNames={fieldsNames}
+      fieldsInfo={fieldsInfo}
       {...props}
     />
   ),
@@ -103,12 +110,29 @@ const getChartCore = <
     <MapChart
       data={data}
       valueField={valueField}
-      fieldsNames={fieldsNames}
+      fieldsInfo={fieldsInfo}
       {...props}
     />
   )
 });
 
+/**
+ * Renders chart with single dataset by type. Serves as a wrapper for rendered chart with legend, tooltip and value fields select.
+ * @param props
+ * @param props.type - Chart type: doughnut / bar / line / map / etc.
+ * @param props.chartId - Id of chart component.
+ * @param props.data - Data to visualize.
+ * @param props.displayFields - Fields data to display on tooltip.
+ * @param props.fieldsInfo - Fields render data with names for tooltip and chart.
+ * @param props.valueFields - Fields of data which values will be used to build the chart elements. Accept only number fields.
+ * If multiple fields are given, renders select to choose one of the fields.
+ * @param props.defaultValueField - Default field in values fields select.
+ * @param props.className - Class of chart container.
+ * @param props.showLegend - If true, displays legend of chart data.
+ * @param props.tooltipProps - Tooltip component props.
+ * @param props.props - Props specific to given chart type.
+ * @returns Chart of given type.
+ */
 export default function Chart<
   CurrentChartType extends ChartType,
   DataType extends ChartData,
@@ -118,11 +142,11 @@ export default function Chart<
   chartId,
   data,
   displayFields,
-  fieldsNames,
+  fieldsInfo,
   valueFields,
   defaultValueField,
   className = '',
-  showLegend: showLabel,
+  showLegend,
   tooltipProps,
   props
 }: ChartComponentProps<CurrentChartType, DataType, ValueKey>) {
@@ -132,17 +156,17 @@ export default function Chart<
 
   const onFieldSelect = (newValue: string) => {
     const newKey = newValue as ValueKey;
-    setValueField((currValue) => (!fieldsNames[newKey] ? currValue : newKey));
+    setValueField((currValue) => (!fieldsInfo[newKey] ? currValue : newKey));
   };
 
   const options: Option[] = useMemo(
     () =>
       valueFields?.map((field) => ({
-        label: fieldsNames[field].name,
+        label: fieldsInfo[field].name,
         value: field.toString(),
         key: field.toString()
       })) ?? [],
-    [fieldsNames, valueFields]
+    [fieldsInfo, valueFields]
   );
 
   const percentMap = useMemo(
@@ -154,7 +178,7 @@ export default function Chart<
     <ChartProvider
       chartId={chartId}
       displayFields={displayFields}
-      fieldsNames={fieldsNames}
+      fieldsInfo={fieldsInfo}
       tooltipProps={tooltipProps ?? TooltipPropsByType[type]}
       className={`${ChartClasses[type].container} ${className}`}
     >
@@ -171,10 +195,10 @@ export default function Chart<
 
       <div className='chart-legend-content'>
         <div className='chart-core-wrapper'>
-          {getChartCore(data, valueField, fieldsNames, props)[type]}
+          {getChartCore(data, valueField, fieldsInfo, props)[type]}
         </div>
 
-        {showLabel && <ChartLegend data={data} percentsMap={percentMap} />}
+        {showLegend && <ChartLegend data={data} percentsMap={percentMap} />}
       </div>
     </ChartProvider>
   );

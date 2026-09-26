@@ -1,10 +1,12 @@
 import { Option } from '@ts/ui/components-props';
 
-import { getCountries } from '@lib/server-actions';
-import SettingsForm from '@app/(user)/components/settings-form/SettingsForm';
-import PasswordChangeForm from '@app/(user)/components/PasswordChangeForm';
+import { getCountriesList } from '@lib/server-actions';
+
 import ConfirmationProvider from '@store/ConfirmationProvider';
+
+import PasswordChangeForm from '@app/(user)/components/PasswordChangeForm';
 import DeleteAccountForm from '@app/(user)/components/delete-form/DeleteAccountForm';
+import SettingsForm from '@app/(user)/components/settings-form/SettingsForm';
 
 const PASSWORD_POPUP_NAME = 'password';
 const DELETE_POPUP_NAME = 'delete';
@@ -15,8 +17,12 @@ const EmptyCountry: Option = {
   key: '-'
 };
 
+/**
+ * @returns Page with user's settings form.
+ */
 export default async function SettingsPage() {
-  const countries = await getCountries();
+  //Forms countries options.
+  const countries = await getCountriesList();
   const options: Option[] = countries.map((country) => ({
     label: country.name,
     value: country.Iso2,

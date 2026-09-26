@@ -26,6 +26,11 @@ const renderDevelopersTop = (data?: CountryStudioChartData) =>
 
 const renderDevelopersKey = () => <></>;
 
+/**
+ * @param props
+ * @param props.data - Countries data with games count and top developers.
+ * @returns Map chart of top countries by games and developers count.
+ */
 export default function StudiosMapChart({ data }: StudiosMapChartProps) {
   return (
     <Chart
@@ -35,7 +40,7 @@ export default function StudiosMapChart({ data }: StudiosMapChartProps) {
       displayFields={['developers']}
       valueFields={['count']}
       defaultValueField='count'
-      fieldsNames={{
+      fieldsInfo={{
         id: { name: 'ID' },
         index: { name: '№' },
         percent: { name: '%' },

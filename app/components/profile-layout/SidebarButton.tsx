@@ -13,6 +13,17 @@ type SidebarButtonProps = Omit<SidebarOptionProps, 'subButtons'> & {
   isChoosen?: boolean;
 };
 
+/**
+ * @param props
+ * @param props.icon - Icon in sidebar button.
+ * @param props.label - Sidebar button label.
+ * @param props.href - Path to page where the button redirects to.
+ * @param props.isChoosen - Is sidebar button choosen.
+ * @param props.loading - Is sidebar loading.
+ * @param props.disable - Is sidebar button disabled.
+ * @param props.onClick - On sidebar button click.
+ * @returns Sidebar navigation button.
+ */
 export default function SidebarButton({
   icon,
   label,

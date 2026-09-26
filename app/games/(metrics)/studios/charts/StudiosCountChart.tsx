@@ -22,6 +22,12 @@ const StudioTypeTitles: Record<StudioType, string> = {
   publisher: 'Publisher'
 };
 
+/**
+ * @param props
+ * @param props.data - Studios data with games count, playtime and top game.
+ * @param props.type - Studio type: developer or publisher.
+ * @returns Adjacent charts with table and bar chart of top studios of given type by games count and playtime.
+ */
 export default function StudiosCountChart({
   type,
   data
@@ -77,7 +83,7 @@ export default function StudiosCountChart({
         displayFields={['count', 'hours', 'topGame']}
         valueFields={['count', 'hours']}
         defaultValueField='count'
-        fieldsNames={{
+        fieldsInfo={{
           id: { name: 'ID' },
           name: { name: StudioTypeTitles[type] },
           index: { name: '№' },

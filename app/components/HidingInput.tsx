@@ -12,7 +12,7 @@ type HiddenInputProps = {
   children: React.ReactNode;
 };
 
-export default function HiddenInput({
+export default function HidingInput({
   label,
   name,
   id,

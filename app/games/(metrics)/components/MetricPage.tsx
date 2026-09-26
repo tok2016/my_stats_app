@@ -13,6 +13,14 @@ type MetricPageProps = {
   userId: string;
 };
 
+/**
+ * Renders metrics by given metrics and user ids.
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.metrics - Metrics to add to the page.
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Rendered metric components.
+ */
 export default function MetricPage({
   games,
   metrics,

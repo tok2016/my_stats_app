@@ -14,13 +14,19 @@ import { hideTooltip, updateMapTooltipPos } from './ChartTooltip';
 import { ChartClasses } from './chart-styles';
 import WorldData from './world-low-res.json';
 
+/**
+ * @param props
+ * @param props.data - Chart data to visualize.
+ * @returns Chart with world map that highlights countries from given data. It does not use chart.js.
+ */
 export default function MapChart<
   DataType extends ChartData,
   ValueKey extends ChartValueField<DataType>
 >({ data }: ChartCoreProps<DataType, ValueKey>) {
   const { updateTooltip, tooltipRef, tooltipProps } = useContext(ChartContext);
 
-  const countriesMap: Map<string, DataType> = useMemo(
+  //Maps countries ISO alpha-2 codes with country chart data.
+  const countriesMap = useMemo(
     () =>
       new Map(
         data.map((entry) => [
@@ -33,6 +39,10 @@ export default function MapChart<
 
   const mapRef = useRef<HTMLDivElement>(null);
 
+  /**
+   * Updates and shows tooltip when entering the country.
+   * @param evt
+   */
   const onMouseEnter = (evt: MouseEvent<SVGPathElement>) => {
     updateMapTooltipPos(
       tooltipRef,
@@ -46,10 +56,15 @@ export default function MapChart<
     );
   };
 
+  /**
+   * Hides tooltip when leaving the country.
+   */
   const onMouseLeave = () => {
     hideTooltip(tooltipRef);
   };
 
+  //Sets country code as id and rank to all path elements of countries that were included in chart data.
+  //It helps to identify them on tooltip update.
   useEffect(() => {
     if (mapRef.current) {
       const paths = mapRef.current.querySelectorAll('[aria-checked="true"]');

@@ -1,13 +1,19 @@
 'use client';
 
-type UnitedChartProps = {
+type AdjacentChartProps = {
   children: React.ReactNode;
   className?: string;
 };
 
+/**
+ * @param props
+ * @param props.children - Charts to place in one flex box.
+ * @param props.className
+ * @returns Flex group of charts.
+ */
 export default function AdjacentChart({
   children,
   className = ''
-}: UnitedChartProps) {
+}: AdjacentChartProps) {
   return <div className={`adjacent-chart ${className}`}>{children}</div>;
 }

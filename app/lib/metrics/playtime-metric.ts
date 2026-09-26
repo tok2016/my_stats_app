@@ -7,9 +7,17 @@ import { isKeyOfArrayField } from '@lib/type-guards';
 
 import { MAX_ENTRIES_IN_CHART, getPercentThreshold } from '../utils';
 
+/**
+ * Forms top-10 items.
+ * Calculates the proportion ot item's playtime among all items.
+ * Aggregates items that didn't make into top-10.
+ * @param itemsCount - Items compare data.
+ * @returns Top-10 items compare data by playtime.
+ */
 const getTopCountData = (
   itemsCount: ObjectMapArray<PlaytimeData, 'id'>
 ): PlaytimeData[] => {
+  //Calculates sum and max playtime among all items.
   let sum = 0;
   let max = 0;
 
@@ -20,6 +28,7 @@ const getTopCountData = (
       max = value.count > max ? value.count : max;
     });
 
+  //Calculates fractions for every item and min fraction threshold.
   const threshold = getPercentThreshold((max / sum) * 100, sum);
   const countData: PlaytimeData[] = [];
 
@@ -29,6 +38,9 @@ const getTopCountData = (
 
     const percent = (data.count / sum) * 100;
 
+    //Groups the rest item into one item
+    //if playtime percent of current item is less than threshold
+    //or the top-10 is already full.
     if (percent < threshold || i === MAX_ENTRIES_IN_CHART) {
       let count = 0;
       let hours = 0;
@@ -51,6 +63,7 @@ const getTopCountData = (
       break;
     }
 
+    //Adds compare data with percent to the top.
     countData.push({
       id: data.id,
       count: data.count,
@@ -63,6 +76,13 @@ const getTopCountData = (
   return countData;
 };
 
+/**
+ * Calculates aggregated playtime data for item group.
+ * @param game - Game data.
+ * @param item - Item value.
+ * @param stored - Previously stored item group.
+ * @returns Item group with aggregated playtime data.
+ */
 const aggregatePlaytimeData = (
   game: GameCore,
   item: number | string,
@@ -75,6 +95,12 @@ const aggregatePlaytimeData = (
   topGame: !stored || game.hours > stored.topGame.hours ? game : stored.topGame
 });
 
+/**
+ * Groups games by item field. Calculates top-10 items by playtime and games count.
+ * @param games - Games to group.
+ * @param itemField - Item field to group by.
+ * @returns Top-10 items by playtime.
+ */
 export const getPlaytimeMetric = (
   games: ObjectMapArray<GameCore, 'apiId'>,
   itemField: ExtractTypeFields<GameCore, number | string | Array<number>>

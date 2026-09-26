@@ -2,20 +2,27 @@
 
 import { ConfirmationFormProps, NewConfirmation } from '@ts/users/confirmation';
 
+import { requestConfimation } from '@lib/actions';
+import { useConfirm, useRedirectActionForm } from '@lib/hooks';
 import { defaultFormState, getFormDataValue } from '@lib/utils';
+
 import Input from '@components/Input';
 import SubmitButton from '@components/SubmitButton';
-import { useConfirm, useRedirectActionForm } from '@lib/hooks';
 
+/**
+ * @param props
+ * @param addendum - Components to add after main input.
+ * @param path - Path to page to redirect to.
+ * @returns Form to request confirmation operation to reset password.
+ */
 export default function ConfirmLoginForm({
-  baseAction,
   addendum,
   path
 }: ConfirmationFormProps) {
   const { getFormAction } = useConfirm();
 
   const [state, action, isPending] = useRedirectActionForm(
-    getFormAction<NewConfirmation>(baseAction),
+    getFormAction<NewConfirmation>(requestConfimation()),
     path,
     defaultFormState()
   );

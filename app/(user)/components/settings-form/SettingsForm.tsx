@@ -43,6 +43,13 @@ const getDateValue = (date?: string | Date) => {
   return [year, month, day].join('-');
 };
 
+/**
+ * @param props
+ * @param props.countriesOptions - Options for country select.
+ * @param props.passwordPopupName - Name of popup with password change form.
+ * @param props.deletePopupName - Name of popup with delete user form.
+ * @returns User's settings form.
+ */
 export default function SettingsForm({
   countriesOptions,
   passwordPopupName,

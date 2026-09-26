@@ -1,7 +1,7 @@
 'use client';
 
 import Game, { GameTableData } from '@ts/games/game';
-import { MetricContentProps } from '@ts/games/metric';
+import { CoreMetricProps } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -14,8 +14,8 @@ import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import PropBlock from '@components/data-blocks/PropBlock';
 
 import FetchMetric from '../../components/FetchMetric';
+import { SPECIAL_GAMES_COUNT } from '../../utils';
 import GamesPlaytimeTable from '../charts/GamesPlaytimeTable';
-import { SPECIAL_GAMES_COUNT } from '../utils';
 
 type TopGameBlockProps = {
   game: GameTableData;
@@ -28,8 +28,16 @@ type TopGameSkeletonProps = {
 
 const PLAYTIME_SKELETON_TABLE_ROWS = 7;
 
+/**
+ * @param games - All user's games.
+ * @returns Funtion to fetch top games by playtime.
+ */
 const fetchGamePlaytime =
   (games: ObjectMapArray<Game, 'id'>) =>
+  /**
+   * @param params - Search params with user id.
+   * @returns Top games by playtime or error data.
+   */
   async (params: {
     userId: string;
   }): Promise<MetricResponse<GameTableData[]>> => {
@@ -56,6 +64,11 @@ const fetchGamePlaytime =
     };
   };
 
+/**
+ * @param props
+ * @param props.game - Full game data.
+ * @returns Block with game data.
+ */
 function TopGameBlock({ game }: TopGameBlockProps) {
   return (
     <div className='data-block top-game'>
@@ -138,13 +151,16 @@ export function GamesPlaytimeSkeleton() {
   );
 }
 
-export default function GamesPlaytime({
-  metricId,
-  games,
-  userId
-}: MetricContentProps) {
+/**
+ * Visualizes top-3 games with separated blocks and the rest ones with table.
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Metric of top games by playtime.
+ */
+export default function GamesPlaytime({ games, userId }: CoreMetricProps) {
   return (
-    <MetricWrapper id={metricId}>
+    <MetricWrapper id='games-playtime'>
       <FetchMetric
         fetchMetricData={fetchGamePlaytime(games)}
         metric={(data) => (

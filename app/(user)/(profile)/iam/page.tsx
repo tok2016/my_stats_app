@@ -3,12 +3,15 @@ import { getCurrentUser } from '@lib/server-actions';
 import Dashboard from '@app/(user)/components/profile-info/Dashboard';
 import ProfileInfo from '@app/(user)/components/profile-info/ProfileInfo';
 
+/**
+ * @returns Profile page of authorized user.
+ */
 export default async function IamPage() {
   const user = await getCurrentUser();
 
   return (
     <div className='metrics'>
-      <ProfileInfo user={user} authorized />
+      <ProfileInfo user={user} />
       <Dashboard user={user} />
     </div>
   );

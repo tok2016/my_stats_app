@@ -1,4 +1,5 @@
 import Logo from '@components/Logo';
+
 import '@styles/user-pages.scss';
 
 export default function AuthLayout({

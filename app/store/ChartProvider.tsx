@@ -16,7 +16,7 @@ type ChartProviderProps<DataType extends ChartData> = {
   children: React.ReactNode;
   chartId: string;
   displayFields: DisplayFields<DataType>;
-  fieldsNames: FieldsInfo<DataType>;
+  fieldsInfo: FieldsInfo<DataType>;
   tooltipProps: TooltipProps;
   className?: string;
 };
@@ -35,7 +35,7 @@ export default function ChartProvider<DataType extends ChartData>({
   children,
   chartId,
   displayFields,
-  fieldsNames,
+  fieldsInfo,
   tooltipProps,
   className = ''
 }: ChartProviderProps<DataType>) {
@@ -58,7 +58,7 @@ export default function ChartProvider<DataType extends ChartData>({
           data={tooltipData}
           ref={tooltipRef}
           displayFields={displayFields}
-          fieldsNames={fieldsNames}
+          fieldsInfo={fieldsInfo}
           showRank={tooltipProps?.showRank}
           colored={tooltipProps?.colored}
         />

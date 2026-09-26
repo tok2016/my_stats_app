@@ -3,6 +3,7 @@
 import { ButtonProps } from '@ts/ui/components-props';
 
 export default function Button({
+  id,
   children,
   variant = 'primary',
   status = '',
@@ -16,6 +17,7 @@ export default function Button({
 }: ButtonProps) {
   return (
     <button
+      id={id}
       type={type}
       disabled={disabled || loading}
       className={`${variant} ${status} ${className}`}

@@ -1,5 +1,5 @@
 import { GameCore } from '@ts/games/game';
-import { MetricContentProps, PlaytimeData } from '@ts/games/metric';
+import { CoreMetricProps, PlaytimeData } from '@ts/games/metric';
 import { StudioPeriodTop, StudioType } from '@ts/games/studio';
 import { ChartData } from '@ts/ui/charts-data';
 
@@ -12,7 +12,7 @@ export type CountryStudioChartData = ChartData & {
   developers: string[];
 };
 
-export type StudiosMetricContentProps = MetricContentProps & {
+export type StudiosMetricContentProps = CoreMetricProps & {
   type: StudioType;
 };
 

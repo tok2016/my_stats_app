@@ -9,7 +9,13 @@ type GameTableTitleProps = {
   game: Pick<Game, 'id' | 'coverUrl' | 'name'>;
 };
 
-export default function GameTableTitle({
+/**
+ * @param props
+ * @param props.game - Game data with cover and name.
+ * @param props.showLink - Inserts link to game's page into it's name component.
+ * @returns Game main data block.
+ */
+export default function GameTitle({
   game,
   showLink = false
 }: GameTableTitleProps) {

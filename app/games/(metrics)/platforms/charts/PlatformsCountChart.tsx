@@ -27,6 +27,11 @@ const fieldsNames: FieldsInfo<PlatformsCountDataForChart> = {
   percent: { name: '%' }
 };
 
+/**
+ * @param props
+ * @param props.data - Platforms data with games count and top series.
+ * @returns Switchable charts with doughnut chart and table of top platforms by games count.
+ */
 export default function PlatformsCountChart({
   data
 }: PlatformsCountChartProps) {
@@ -47,7 +52,7 @@ export default function PlatformsCountChart({
               displayFields={['count', 'topSeries']}
               valueFields={['count']}
               defaultValueField='count'
-              fieldsNames={fieldsNames}
+              fieldsInfo={fieldsNames}
               showLegend
             />
           ),

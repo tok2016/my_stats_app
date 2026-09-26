@@ -101,8 +101,11 @@ export interface YearCountMetric {
   topGames: GameShort[];
 }
 
-export type MetricContentProps = {
-  metricId: MetricId;
+export type CoreMetricProps = {
   userId: string;
   games: ObjectMapArray<Game, 'id'>;
+};
+
+export type MetricContentProps = CoreMetricProps & {
+  metricId: MetricId;
 };

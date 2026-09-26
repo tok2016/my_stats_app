@@ -38,9 +38,17 @@ igdbRateLimiter.on('received', (info) => {
   console.log(info.options);
 });
 
-const getIgdbAccess = async (
-  searchParams: URLSearchParams
-): Promise<IgdbAccess> => {
+/**
+ * Requests for new IGDB access.
+ * @returns IGDB access data.
+ */
+const fetchIgdbAccess = async (): Promise<IgdbAccess> => {
+  const searchParams = new URLSearchParams({
+    client_id: process.env.TWITCH_CLIENT_ID ?? '',
+    client_secret: process.env.TWITCH_SECRET ?? '',
+    grant_type: 'client_credentials'
+  });
+
   const response = await axios.post<IgdbAccess>(
     `${process.env.TWITCH_ACCESS_API}?${searchParams.toString()}`
   );
@@ -48,15 +56,15 @@ const getIgdbAccess = async (
   return response.data;
 };
 
-const updateIgdbAccess = async (isExpired: boolean): Promise<ApiToken> => {
-  const searchParams = new URLSearchParams({
-    client_id: process.env.TWITCH_CLIENT_ID ?? '',
-    client_secret: process.env.TWITCH_SECRET ?? '',
-    grant_type: 'client_credentials'
-  });
-
-  const igdbAccess = await igdbRateLimiter.schedule({ priority: 0 }, () =>
-    getIgdbAccess(searchParams)
+/**
+ * Updates and restores IGDB access.
+ * @param token - IGDB Token.
+ * @returns
+ */
+const updateIgdbAccess = async (token?: ApiToken): Promise<ApiToken> => {
+  const igdbAccess = await igdbRateLimiter.schedule(
+    { priority: 0 },
+    fetchIgdbAccess
   );
 
   const apiToken: ApiToken = {
@@ -70,7 +78,7 @@ const updateIgdbAccess = async (isExpired: boolean): Promise<ApiToken> => {
     token: await encodeJwt(apiToken)
   };
 
-  if (isExpired) await ApiModel.updateOne({ service: 'igdb' }, apiAccess);
+  if (token) await ApiModel.updateOne({ service: 'igdb' }, apiAccess);
   else await ApiModel.create(apiAccess);
   return apiToken;
 };
@@ -85,6 +93,11 @@ const decodeApiToken = async (apiAccess: string): Promise<ApiToken> => {
   };
 };
 
+/**
+ * Converts query object to string.
+ * @param query - Query object.
+ * @returns Query string.
+ */
 const getQueryString = <DataType>(query: IgdbQuery<DataType>): string =>
   Object.entries(query)
     .map(([key, value]) => {
@@ -99,6 +112,13 @@ const getQueryString = <DataType>(query: IgdbQuery<DataType>): string =>
     })
     .join('; ') + ';';
 
+/**
+ * Fetches data from IGDB.
+ * @param url - IGDB endpoint.
+ * @param queryString
+ * @param apiToken
+ * @returns IGDB data.
+ */
 const getIgdbData = async <DataType>(
   url: string,
   queryString: string,
@@ -114,19 +134,25 @@ const getIgdbData = async <DataType>(
   return response.data;
 };
 
+/**
+ * Sends request to IGDB.
+ * @param url - IGDB endpoint.
+ * @param query - Query object.
+ * @returns IGDB data.
+ */
 export const igdbRequest = async <DataType>(
   url: string,
   query: IgdbQuery<DataType>
 ): Promise<DataType[]> => {
+  //Finds IGDB access.
   const apiAccess = (await ApiModel.findOne({ service: 'igdb' }).lean())?.token;
   let apiToken = apiAccess ? await decodeApiToken(apiAccess) : undefined;
-  const isTokenExpired = apiToken ? isExpired(apiToken.expiresAt) : false;
 
-  if (!apiToken || isExpired(apiToken.expiresAt)) {
-    const newAccess = await updateIgdbAccess(isTokenExpired);
-    apiToken = newAccess;
-  }
+  //Refreshes or creates new IGDB access.
+  if (!apiToken || isExpired(apiToken.expiresAt))
+    apiToken = await updateIgdbAccess(apiToken);
 
+  //Schedules IGDB request if 4 requests are sent at this second or 8 requests are still awaiting.
   const queryString = getQueryString(query);
   const igdbData = await igdbRateLimiter.schedule<DataType[]>(
     { priority: 1 },
@@ -136,5 +162,11 @@ export const igdbRequest = async <DataType>(
   return igdbData;
 };
 
+/**
+ * Forms IGDB URL of image.
+ * @param imageId - IGDB ID of image.
+ * @param size - Image size and resolution.
+ * @returns Correct IGDB image URL.
+ */
 export const getImageUrl = (imageId: string, size: IgdbImageSize) =>
   `https://images.igdb.com/igdb/image/upload/t_${size}/${imageId}.jpg`;

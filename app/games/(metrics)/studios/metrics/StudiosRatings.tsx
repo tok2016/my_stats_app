@@ -22,6 +22,12 @@ type RatedStudioProps = {
 
 const MAX_SKELETONS_BLOCKS = 5;
 
+/**
+ * @param props
+ * @param props.ratedStudio - Studio data with rating and top game.
+ * @param props.studio - Full studio data.
+ * @returns Data block with studio rating data.
+ */
 function RatedStudio({ ratedStudio, studio }: RatedStudioProps) {
   if (!studio) return;
 
@@ -48,6 +54,10 @@ function RatedStudio({ ratedStudio, studio }: RatedStudioProps) {
   );
 }
 
+/**
+ * @param params - Search params with user id.
+ * @returns Top studios of given type by average rating or error data.
+ */
 const fetchStudiosRatings = async (
   params: FetchStudiosParams
 ): Promise<MetricResponse<StudioRatingMetric[]>> => {
@@ -85,9 +95,15 @@ export function StudiosRatingsSkeleton() {
   );
 }
 
+/**
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.userId - User whose metrics will be fetched.
+ * @param props.type - Studio type: developer or publisher.
+ * @returns Metric component of top studios of given type by average rating.
+ */
 export default function StudiosRatings({
   games,
-  metricId,
   type,
   userId
 }: StudiosMetricContentProps) {
@@ -97,7 +113,9 @@ export default function StudiosRatings({
   );
 
   return (
-    <MetricWrapper id={metricId}>
+    <MetricWrapper
+      id={type === 'developer' ? 'developers-rating' : 'publishers-rating'}
+    >
       <FetchMetric
         fetchMetricData={fetchStudiosRatings}
         metric={(data) => (

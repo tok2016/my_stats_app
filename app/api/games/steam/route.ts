@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 
 import { SteamApiResponse } from '@ts/games/api-response';
 import { GameInSchema, IgdbGame, SteamGame } from '@ts/games/game';
-import { ServiceEndpointAction } from '@ts/requests';
+import { ProtectedEndpointAction } from '@ts/requests';
 
-import { getGamesByUserId } from '@lib/auth';
+import { tryGetCredentialsById, tryGetServicesByUserId } from '@lib/auth';
 import { AxiosSteamInstanse } from '@lib/axios-instanse';
-import { serviceEndpoint } from '@lib/endpoint-generators';
+import { protectedEndpoint } from '@lib/endpoint-generators';
 import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
 import ObjectMapArray from '@lib/object-map-array';
@@ -20,6 +20,10 @@ const PC_ID = 6;
 
 const minutesToHours = (minutes: number) => Math.round(minutes / MINUTES);
 
+/**
+ * Updates games with fresh data from steam.
+ * @param gamesFromSteam - Games with fresh data from steam that needs to be stored.
+ */
 const updateGamesFromSteam = async (gamesFromSteam: SteamGameWithId[]) => {
   const updatePromises = gamesFromSteam.map((game) =>
     GamesModel.findByIdAndUpdate(game.id, {
@@ -67,9 +71,16 @@ const uniteSteamAndIgdb = (
   };
 };
 
+/**
+ * Finds games in IGDB by steam app ID.
+ * @param steamGamesIds - Steam games IDs.
+ * @returns Found games from IGDB.
+ */
 const searchGamesFromIgdb = async (
   steamGamesIds: number[]
 ): Promise<IgdbGame[]> => {
+  if (!steamGamesIds.length) return [];
+
   const igdbGames = await igdbRequest<IgdbGame>('/games', {
     fields: [
       'name',
@@ -98,12 +109,20 @@ const searchGamesFromIgdb = async (
   }));
 };
 
+/**
+ * Stores new user's games from steam, uniting then with IGDB data.
+ * @param steamGames - Steam games that haven't been stored before.
+ * @param userId - User data id.
+ */
 const addGameFromSteam = async (steamGames: SteamGame[], userId: string) => {
+  //Fetches steam games data in IGDB.
   const steamGamesMap = new ObjectMapArray(steamGames, 'appid');
 
   const igdbGames = await searchGamesFromIgdb(
     steamGamesMap.map((steamGame) => steamGame.appid).toArray()
   );
+
+  //Unites data from steam and IGDB.
   const gamesToAdd = igdbGames.map((igdbGame) => {
     const steamAppId = parseInt(igdbGame.external_games?.[0].uid ?? '0');
     return uniteSteamAndIgdb(
@@ -116,16 +135,31 @@ const addGameFromSteam = async (steamGames: SteamGame[], userId: string) => {
   await GamesModel.create(gamesToAdd);
 };
 
-const pullGamesFromSteam: ServiceEndpointAction<'/api/games/steam'> = async (
+/**
+ * Protected method. Fetches games from user's steam account, stores the new ones or updates the stored ones.
+ * @param _req - Request object.
+ * @param _params - Route params.
+ * @param token - Service with credentials.
+ * @throws 401 if steam ID is not given or steam account is private.
+ * @throws 404 if user or steam credentials are not found.
+ * @returns Response object.
+ */
+const pullGamesFromSteam: ProtectedEndpointAction<'/api/games/steam'> = async (
   _req,
   _params,
-  service
+  token
 ) => {
-  if (!service) throw generateErrorResponse(401, `Steam ID wasn't provided`);
+  //Finds user's steam credentials.
+  const credentials = await tryGetCredentialsById(token.id);
+  const services = await tryGetServicesByUserId(credentials.userId);
 
+  if (!services.steam)
+    throw generateErrorResponse(401, `Steam ID wasn't provided`);
+
+  //Pulls games from user's steam account.
   const searchParams = new URLSearchParams({
     key: process.env.STEAM_KEY ?? '',
-    steamid: service?.login ?? '',
+    steamid: services.steam.login ?? '',
     include_appinfo: 'true',
     include_played_free_games: 'true',
     format: 'json'
@@ -138,12 +172,19 @@ const pullGamesFromSteam: ServiceEndpointAction<'/api/games/steam'> = async (
   if (!isSteamGameObject(steamResponse.data.response))
     throw generateErrorResponse(401, 'Profile is private');
 
-  const savedGames = await getGamesByUserId(service.userId);
-  const gamesMap = new ObjectMapArray(
-    savedGames.filter((game) => !!game.storeId),
-    'storeId'
-  );
+  //Pulls stored user's games.
+  const savedGames = (
+    await GamesModel.find({ userId: credentials.userId }).lean()
+  )
+    .map((game) => ({
+      ...game,
+      id: game._id.toString()
+    }))
+    .filter((game) => !!game.storeId);
 
+  const gamesMap = new ObjectMapArray(savedGames, 'storeId');
+
+  //Distributes games to store or updated.
   const gamesToUpdate: SteamGameWithId[] = [];
   const gamesToAdd: SteamGame[] = [];
 
@@ -155,7 +196,7 @@ const pullGamesFromSteam: ServiceEndpointAction<'/api/games/steam'> = async (
   });
 
   await updateGamesFromSteam(gamesToUpdate);
-  await addGameFromSteam(gamesToAdd, service.userId);
+  await addGameFromSteam(gamesToAdd, credentials.userId);
 
   return new NextResponse('Games data from Steam were pulled successfully', {
     status: 201,
@@ -163,4 +204,4 @@ const pullGamesFromSteam: ServiceEndpointAction<'/api/games/steam'> = async (
   });
 };
 
-export const POST = serviceEndpoint(pullGamesFromSteam);
+export const POST = protectedEndpoint(pullGamesFromSteam);

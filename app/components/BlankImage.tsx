@@ -4,9 +4,9 @@ type EmptyImageProps = {
   className?: string;
 };
 
-export default function EmptyImage({ className = '' }: EmptyImageProps) {
+export default function BlankImage({ className = '' }: EmptyImageProps) {
   return (
-    <div className={`empty-cover ${className}`}>
+    <div className={`blank-image ${className}`}>
       <ImageIcon />
     </div>
   );

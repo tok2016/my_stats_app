@@ -20,11 +20,20 @@ type PlatformsCountProps = {
   userId: string;
 };
 
+/**
+ * @param platforms - All platforms of user's games.
+ * @param series - All series of of user's games.
+ * @returns Funtion to fetch top platforms by games count.
+ */
 const fetchPlatformsCount =
   (
     platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>,
     series: ObjectMapArray<NonNullable<Game['series']>, 'id'>
   ) =>
+  /**
+   * @param params - Search params with user id.
+   * @returns Top platforms by games count or error data.
+   */
   async (params: {
     userId: string;
   }): Promise<MetricResponse<PlatformCountChartData[]>> => {
@@ -48,6 +57,13 @@ const fetchPlatformsCount =
     };
   };
 
+/**
+ * @param props
+ * @param props.platforms - All platforms of user's games.
+ * @param props.seriesArray - All series of of user's games.
+ * @param props.userId - User whose metric will be fetched.
+ * @returns Submetric component of top platforms by games count.
+ */
 export default function PlatformsCount({
   platforms,
   seriesArray,

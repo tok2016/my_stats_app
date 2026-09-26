@@ -12,9 +12,17 @@ const defaultCompareData: CountCompareData = {
   hours: 0
 };
 
+/**
+ * Forms top-10 items.
+ * Calculates the proportion ot item's games count among all items.
+ * Aggregates items that didn't make into top-10.
+ * @param itemsCount - Items compare data.
+ * @returns Top-10 items compare data by games count.
+ */
 const getTopCountData = (
   itemsCount: ObjectMapArray<CountData, 'id'>
 ): CountData[] => {
+  //Calculates sum and max games count among all items.
   let sum = 0;
   let max = 0;
 
@@ -25,6 +33,7 @@ const getTopCountData = (
       max = itemCount.count > max ? itemCount.count : max;
     });
 
+  //Calculates fractions for every item and min fraction threshold.
   const threshold = getPercentThreshold((max / sum) * 100, sum);
   const countData: CountData[] = [];
 
@@ -34,6 +43,9 @@ const getTopCountData = (
 
     const percent = (data.count / sum) * 100;
 
+    //Groups the rest item into one item
+    //if games count percent of current item is less than threshold
+    //or the top-10 is already full.
     if (percent < threshold || i === MAX_ENTRIES_IN_CHART) {
       let count = 0;
       const topSeries = new Map<number, number>();
@@ -59,6 +71,7 @@ const getTopCountData = (
       break;
     }
 
+    //Adds compare data with percent to the top.
     countData.push({
       id: data.id,
       count: data.count,
@@ -70,6 +83,13 @@ const getTopCountData = (
   return countData;
 };
 
+/**
+ * Calculates compate data for series groups.
+ * @param game - Game data.
+ * @param seriesId - Series id of game.
+ * @param stored - Previously stored series group.
+ * @returns Series group with aggregated data.
+ */
 const aggregateSeriesCountData = (
   game: GameCore,
   seriesId: number | undefined,
@@ -83,8 +103,20 @@ const aggregateSeriesCountData = (
   };
 };
 
+/**
+ * Calculates compare data for item group.
+ * @param seriesCountData - Series data to compare by.
+ * @returns Aggregate callback.
+ */
 const aggregateItemData =
   (seriesCountData: ObjectMapArray<CountCompareData, 'id'>) =>
+  /**
+   * Calculates compare data for item group.
+   * @param game - Game data.
+   * @param item - Item value.
+   * @param stored - Previously stored item group.
+   * @returns Item group with aggregated data.
+   */
   (
     game: GameCore,
     item: number | string,
@@ -108,6 +140,12 @@ const aggregateItemData =
     };
   };
 
+/**
+ * Groups games by item field and makes top of these item groups by games count as an aggregated value.
+ * @param games - Games to group.
+ * @param itemField - Field to group by.
+ * @returns Top grouped items by games count.
+ */
 export const getCountMetric = (
   games: ObjectMapArray<GameCore, 'apiId'>,
   itemField: ExtractTypeFields<
@@ -115,6 +153,7 @@ export const getCountMetric = (
     number | string | Array<number | string>
   >
 ): CountData[] => {
+  //Groups games by series, calculating aggregated games count and playtime.
   const seriesCountData = games.groupBy(
     aggregateSeriesCountData,
     'seriesId',
@@ -122,6 +161,7 @@ export const getCountMetric = (
     undefined
   );
 
+  //Groups games by given item, calculating aggregated games count and top series.
   const itemsCount = isKeyOfArrayField(itemField, games.at(0))
     ? games.flatGroupBy(
         aggregateItemData(seriesCountData),

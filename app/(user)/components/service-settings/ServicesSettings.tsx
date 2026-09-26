@@ -5,22 +5,33 @@ import { useEffect } from 'react';
 import FormState from '@ts/ui/form-state';
 import { ServicesLogins } from '@ts/users/service';
 
-import Tab from '@components/Tab';
-import SteamAuthInfo from './SteamAuthInfo';
 import { useAction } from '@lib/hooks';
-import { getServices } from '@lib/server-actions';
+import { getServicesByUserId } from '@lib/server-actions';
 import { getFormDataValue } from '@lib/utils';
+
+import Tab from '@components/Tab';
+
+import SteamAuthInfo from './SteamAuthInfo';
 
 type ServicesSettingsProps = {
   userId: string;
   state: FormState<ServicesLogins>;
 };
 
+/**
+ * @param props
+ * @param props.userId - User id to fetch service credentials by.
+ * @param props.state - Form state.
+ * @returns Tab of services settings.
+ */
 export default function ServicesSettings({
   userId,
   state
 }: ServicesSettingsProps) {
-  const [services, getUserServices, isPending] = useAction(getServices, {});
+  const [services, getUserServices, isPending] = useAction(
+    getServicesByUserId,
+    {}
+  );
 
   useEffect(() => {
     getUserServices(userId);

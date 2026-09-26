@@ -2,13 +2,19 @@ import Game from '@ts/games/game';
 
 import FetchImage from '@components/FetchImage';
 
-import EmptyImage from './EmptyImage';
+import BlankImage from '../BlankImage';
 
 type GameCoverProps = {
   game: Pick<Game, 'coverUrl' | 'name'>;
   className?: string;
 };
 
+/**
+ * @param props
+ * @param props.game - Game data with cover.
+ * @param props.className
+ * @returns Image component with game cover. Replaces with blank image, if cover is empty.
+ */
 export default function GameCover({ game, className = '' }: GameCoverProps) {
   return game.coverUrl ? (
     <FetchImage
@@ -17,6 +23,6 @@ export default function GameCover({ game, className = '' }: GameCoverProps) {
       className={`game-cover ${className}`}
     />
   ) : (
-    <EmptyImage className='game-cover empty-cover' />
+    <BlankImage className='game-cover' />
   );
 }

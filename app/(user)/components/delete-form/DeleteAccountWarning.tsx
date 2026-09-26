@@ -2,22 +2,33 @@
 
 import { ConfirmationFormProps } from '@ts/users/confirmation';
 
-import Button from '@components/Button';
-import SubmitButton from '@components/SubmitButton';
+import { requestConfimation } from '@lib/actions';
 import { useConfirm, useRedirectActionForm } from '@lib/hooks';
 import { defaultFormState } from '@lib/utils';
+
 import { useUserState } from '@store/user-store';
 
+import Button from '@components/Button';
+import SubmitButton from '@components/SubmitButton';
+
+/**
+ * @param props
+ * @param props.addendum - Components to add after form.
+ * @param props.path - Path to page to redirect to.
+ * @param props.signal - Abort signal object.
+ * @param props.onCancel - On delete account cancel.
+ * @returns Hidden form that requests delete confirmation operation.
+ */
 export default function DeleteAccountWarning({
-  baseAction,
   onCancel,
   addendum,
-  path
-}: ConfirmationFormProps & { onCancel: () => void }) {
+  path,
+  signal
+}: ConfirmationFormProps & { onCancel: () => void; signal: AbortSignal }) {
   const { user } = useUserState();
   const { getFormAction } = useConfirm();
   const [state, startDelete, isPending] = useRedirectActionForm(
-    getFormAction(baseAction),
+    getFormAction(requestConfimation(signal)),
     path,
     defaultFormState()
   );

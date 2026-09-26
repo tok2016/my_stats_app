@@ -2,18 +2,40 @@
 
 import { useEffect, useState } from 'react';
 
+import FormState from '@ts/ui/form-state';
+
+import AxiosInstanse from '@lib/axios-instanse';
+import { useAction, useConfirm } from '@lib/hooks';
+import { MILLISECONDS, defaultFormState, getErrorFormState } from '@lib/utils';
+
 import Button from '../Button';
 import Hint from '../Hint';
-import { defaultFormState, MILLISECONDS } from '@lib/utils';
-import { useAction, useConfirm } from '@lib/hooks';
-import { sendCodeAgain } from '@lib/actions';
-import FormState from '@ts/ui/form-state';
 
 const SECONDS_UNAVAILABLE = 60;
 const SECONDS_IN_MINUTE = 60;
 
 const MIN_TIME_DIGITS = 2;
 
+/**
+ * Requests code update and resend.
+ * @param operationId - Operation id which code will be updated and resent.
+ * @returns Form state with request status text and possible error.
+ */
+const sendCodeAgain = async (
+  operationId: string = ''
+): Promise<FormState<never>> => {
+  try {
+    await AxiosInstanse.put(`/api/confirm/${operationId}`);
+    return { error: false, message: '' };
+  } catch (err) {
+    return getErrorFormState(err);
+  }
+};
+
+/**
+ * @param seconds - Time in seconds.
+ * @returns Time in MM:SS format.
+ */
 const formatSeconds = (seconds: number) => {
   const minutes = Math.floor(seconds / SECONDS_IN_MINUTE).toLocaleString(
     'en-US',
@@ -28,6 +50,9 @@ const formatSeconds = (seconds: number) => {
   return `${minutes}:${secondsModules}`;
 };
 
+/**
+ * @returns Component with timer and update send code again button.
+ */
 export default function SendAgainTimer() {
   const [seconds, setSeconds] = useState<number>(SECONDS_UNAVAILABLE);
   const { confirmation } = useConfirm();

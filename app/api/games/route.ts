@@ -2,21 +2,22 @@ import { NextResponse } from 'next/server';
 
 import { GamesFilter } from '@ts/games/filter';
 import Game, { GameTableData, GamesTablePageResponse } from '@ts/games/game';
-import { IgdbSeries } from '@ts/games/series';
 import { GameEndpointAction, ProtectedEndpointAction } from '@ts/requests';
 import { LiteralType } from '@ts/util-types';
 
-import { getCredentialsById } from '@lib/auth';
+import { tryGetCredentialsById } from '@lib/auth';
 import {
   gameMetricEndpoint,
   protectedEndpoint
 } from '@lib/endpoint-generators';
 import { getFullGames } from '@lib/games/games-utils';
-import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
 import { generateErrorResponse, parseBooleanString } from '@lib/utils';
 import { NewGameValidator, validateData } from '@lib/validation-schemas';
 
+/**
+ * Filter predicates by field.
+ */
 const filterByField: Record<
   LiteralType<keyof GamesFilter>,
   (game: Game, query: string) => boolean
@@ -81,9 +82,16 @@ const filterByField: Record<
   limit: () => true
 };
 
+/**
+ * Sort callbacks by field.
+ */
 const sortByFilter: Record<keyof GameTableData, (a: Game, b: Game) => number> =
   {
-    index: (a, b) => (a.rating ?? 0) - (b.rating ?? 0),
+    index: (a, b) => {
+      const diff = (a.rating ?? 0) - (b.rating ?? 0);
+      if (!diff) return a.hours - b.hours;
+      return diff;
+    },
     percent: () => 0,
     id: (a, b) => a.id.localeCompare(b.id),
     apiId: (a, b) => a.apiId - b.apiId,
@@ -110,18 +118,25 @@ const sortByFilter: Record<keyof GameTableData, (a: Game, b: Game) => number> =
     screenshots: () => 0
   };
 
+/**
+ * Public method. Filters all games of found user. If no filter is defined, returns all games.
+ * @param req - Request object with filters params.
+ * @param _params - Route params.
+ * @param games - All games of user.
+ * @throws 400 if user id is not given.
+ * @throws 403 if user is private.
+ * @throws 404 if user is not found or no game of theirs is found.
+ * @returns Filtered games data with page and offset data.
+ */
 const getGames: GameEndpointAction<'/api/games'> = async (
   req,
   _params,
   games
 ) => {
-  if (!games.count)
-    return NextResponse.json([], {
-      status: 200,
-      statusText: 'User has no games'
-    });
-
+  //Fetches full games data.
   const allGames = await getFullGames(games);
+
+  //Filters games by each given filter and calculates max playtime among all games.
   const filters = req.nextUrl.searchParams.entries().toArray();
   let maxHours = 0;
 
@@ -134,20 +149,13 @@ const getGames: GameEndpointAction<'/api/games'> = async (
     );
   });
 
+  //Sorts filtered games by given field.
   const direction = filtersObj.direction === 'asc' ? 1 : -1;
-  const sortFields: NonNullable<GamesFilter['sort']>[] = [
-    'hours',
-    filtersObj.sort ?? 'index'
-  ];
-
   filteredGames.sort(
-    (a, b) =>
-      direction
-      * sortFields
-        .map((field) => sortByFilter[field]?.(a, b) ?? 1)
-        .reduce((prev, curr) => prev + curr, 0)
+    (a, b) => direction * sortByFilter[filtersObj.sort ?? 'index'](a, b)
   );
 
+  //Limits games by pages.
   const parsedPage = parseInt(filtersObj.page ?? '1');
   const page = Number.isNaN(parsedPage) || !parsedPage ? 1 : parsedPage;
   const parsedLimit = parseInt(filtersObj.limit ?? '');
@@ -174,20 +182,30 @@ const getGames: GameEndpointAction<'/api/games'> = async (
   });
 };
 
+/**
+ * Protected method. Adds new game for current user.
+ * @param req - Request body with game data.
+ * @param _params - Route params.
+ * @param token - Token object.
+ * @throws 400 if game data is invalid or it is already stored.
+ * @throws 404 if user not found.
+ * @returns Response object.
+ */
 const postNewGame: ProtectedEndpointAction<'/api/games'> = async (
   req,
   _params,
   token
 ) => {
-  const credentials = await getCredentialsById(token.id);
-  if (!credentials)
-    throw generateErrorResponse(404, 'Credentials were not found');
-
+  //Validates game data and checks it existance in current user's collection.
   const newGame = await validateData(NewGameValidator, await req.json());
   const currentGame = await GamesModel.find({ apiId: newGame.apiId }).lean();
 
   if (!!currentGame[0])
     throw generateErrorResponse(400, 'This game was already added');
+
+  //Stores new game for current user.
+  const credentials = await tryGetCredentialsById(token.id);
+  if (!credentials) throw generateErrorResponse(404, 'User was not found');
 
   await GamesModel.create({ ...newGame, userId: credentials.userId });
 
@@ -195,35 +213,6 @@ const postNewGame: ProtectedEndpointAction<'/api/games'> = async (
     status: 201,
     statusText: 'New game was added successfully'
   });
-};
-
-export const PUT = async () => {
-  const games = await GamesModel.find().lean();
-  const gamesApiIds = games.map((game) => game.apiId);
-
-  const gamesWithSeries = await igdbRequest<{
-    id: number;
-    collections?: IgdbSeries[];
-  }>('/games', {
-    fields: ['collections', 'collections.games', 'collections.name'],
-    where: `id = (${gamesApiIds.join(',')})`,
-    limit: gamesApiIds.length
-  });
-
-  const promises = gamesWithSeries.map((game) =>
-    GamesModel.updateMany(
-      { apiId: game.id },
-      {
-        seriesId: game.collections?.reduce((prev, curr) =>
-          curr.games.length > prev.games.length ? curr : prev
-        ).id
-      }
-    )
-  );
-
-  await Promise.all(promises);
-
-  return new NextResponse('fine');
 };
 
 export const GET = gameMetricEndpoint(getGames);

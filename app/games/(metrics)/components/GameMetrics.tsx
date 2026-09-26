@@ -43,6 +43,9 @@ import SeriesCount, {
 
 type MetricFunc = (props: MetricContentProps) => React.ReactNode;
 
+/**
+ * Metrics components by metric id.
+ */
 export const GameMetrics: Record<GameMetricId, MetricFunc> = {
   'genres-count-playtime': (props) => (
     <GenresCountPlaytime {...props} key={props.metricId} />
@@ -99,6 +102,9 @@ export const GameMetrics: Record<GameMetricId, MetricFunc> = {
   'top-series': (props) => <SeriesCount {...props} key={props.metricId} />
 };
 
+/**
+ * Metrics skeletons by metric id.
+ */
 export const GameMetricsSkeletons: Record<GameMetricId, React.ReactNode> = {
   'genres-count-playtime': (
     <GenresCountPlaytimeSkeleton key='genres-count-playtime' />

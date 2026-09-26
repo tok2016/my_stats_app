@@ -4,8 +4,8 @@ import { CodeCircleSolid, EarthSolid } from '@mynaui/icons-react';
 
 import Game from '@ts/games/game';
 import {
+  CoreMetricProps,
   FetchPeriodTopsMetricParams,
-  MetricContentProps,
   PeriodTopsMetric
 } from '@ts/games/metric';
 import { StudioType, StudiosPeriodMetric } from '@ts/games/studio';
@@ -18,11 +18,20 @@ import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
 
 import { StudioFullPeriodTopData } from '../types';
 
+/**
+ * @param developers - All developers of user's games.
+ * @param publishers - All publishers of user's games.
+ * @returns Funtion to fetch top developer and publisher by period.
+ */
 const getStudioPeriodMetric =
   (
     developers: ObjectMapArray<Game['developers'][number], 'id'>,
     publishers: ObjectMapArray<Game['publishers'][number], 'id'>
   ) =>
+  /**
+   * @param params - Search params with user id.
+   * @returns Top developer and publisher by period or error data.
+   */
   async (
     params: FetchPeriodTopsMetricParams
   ): Promise<MetricResponse<PeriodTopsMetric<StudioFullPeriodTopData>>> => {
@@ -65,11 +74,13 @@ const studioItemContent = (item: StudioFullPeriodTopData) => (
   </>
 );
 
-export default function StudiosPeriodTops({
-  metricId,
-  games,
-  userId
-}: MetricContentProps) {
+/**
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Metric component for top developer and publisher by period.
+ */
+export default function StudiosPeriodTops({ games, userId }: CoreMetricProps) {
   const developers = games.flatMapByKey<Game['developers'][number], 'id'>(
     (game) => game.developers,
     'id'
@@ -82,13 +93,13 @@ export default function StudiosPeriodTops({
 
   return (
     <PeriodTops
-      id={metricId}
+      id='studios-periods'
       userId={userId}
       listItemContent={studioItemContent}
       fetchPeriodMetric={getStudioPeriodMetric(developers, publishers)}
       displayFields={['hours']}
       valueField='hours'
-      fieldsNames={{
+      fieldsInfo={{
         id: { name: 'ID' },
         index: { name: '№' },
         hours: { name: 'Hours' },

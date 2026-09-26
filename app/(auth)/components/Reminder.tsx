@@ -1,5 +1,8 @@
 import Link from 'next/link';
 
+/**
+ * @returns Link to login page.
+ */
 export default function Reminder() {
   return (
     <span>
