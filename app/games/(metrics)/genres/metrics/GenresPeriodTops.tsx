@@ -2,8 +2,8 @@
 
 import Game from '@ts/games/game';
 import {
+  CoreMetricProps,
   FetchPeriodTopsMetricParams,
-  MetricContentProps,
   PeriodPlaytimeTops,
   PeriodTopsMetric
 } from '@ts/games/metric';
@@ -19,8 +19,16 @@ import { GenresPeriodPlaytimeData } from '../types';
 
 type Genre = Game['genres'][number];
 
+/**
+ * @param genres - All genres of user's games.
+ * @returns Funtion to fetch top genres by period.
+ */
 const getGenresPeriodTops =
   (genres: ObjectMapArray<Genre, 'id'>) =>
+  /**
+   * @param params - Search params with user id.
+   * @returns Top genres by period or error data.
+   */
   async (
     params: FetchPeriodTopsMetricParams
   ): Promise<MetricResponse<PeriodTopsMetric<GenresPeriodPlaytimeData>>> => {
@@ -55,16 +63,18 @@ const genreItemContent = (genre: GenresPeriodPlaytimeData, i: number) => (
   </div>
 );
 
-export default function GenresPeriodTops({
-  metricId,
-  games,
-  userId
-}: MetricContentProps) {
+/**
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Metric component for top genres by period.
+ */
+export default function GenresPeriodTops({ games, userId }: CoreMetricProps) {
   const genres = games.flatMapByKey<Genre, 'id'>((game) => game.genres, 'id');
 
   return (
     <PeriodTops
-      id={metricId}
+      id='genres-periods'
       userId={userId}
       listItemContent={genreItemContent}
       fetchPeriodMetric={getGenresPeriodTops(genres)}

@@ -123,7 +123,7 @@ const getAllPeriodsOfYear = (
       year === recentPeriod.year ? recentPeriod.unit : unitsPerYear;
 
     for (let unit = startUnit; unit <= endUnit; unit++) {
-      allPeriods.push(`${year}-${unit}`);
+      allPeriods.push(`${year}-${unit.toString().padStart(2, '0')}`);
     }
   }
 
@@ -138,7 +138,7 @@ const getAllPeriodsOfYear = (
  * @param params.periodType - Type of periods in period tops: month / season / year.
  * @param params.valueField - Field of data which values will be used to build the chart elements. Accept only number fields.
  * @param params.year - Year / start year of decade to filter top by.
- * @returns Datasets of each
+ * @returns Datasets of each item.
  */
 const getPeriodDatasets = async <
   DataType extends ChartData,
@@ -173,18 +173,18 @@ const getPeriodDatasets = async <
     'id'
   );
   data.forEach((periodTop) => {
-    periodTop.top.forEach((top) => {
-      const storedItem = uniqueItems.findByKey(top.id);
+    periodTop.top.forEach((item) => {
+      const storedItem = uniqueItems.findByKey(item.id);
       const period = allPeriodsNames[periodTop.period] ?? '';
 
       if (!storedItem)
         uniqueItems.push({
-          ...top,
+          ...item,
           countByPeriod: {
-            [period]: top[valueField]
+            [period]: item[valueField]
           }
         });
-      else storedItem.countByPeriod[period] = top[valueField];
+      else storedItem.countByPeriod[period] = item[valueField];
     });
   });
 
@@ -257,10 +257,7 @@ function PeriodBarCore<
                 type: 'category',
                 labels: dataset.labels,
                 title: {
-                  text:
-                    periodType[0].toUpperCase()
-                    + periodType.slice(1)
-                    + (periodType === 'year' ? '' : `, ${year}`)
+                  text: year
                 }
               },
               y: {
@@ -277,12 +274,13 @@ function PeriodBarCore<
               tooltip: setPeriodTooltip(
                 tooltipRef,
                 updateTooltip,
-                dataset.dataMap
+                dataset.dataMap,
+                valueField as keyof PeriodChartTransformed
               )
             }
           }}
           data={{
-            labels: dataset.datasets.map((d) => d.label ?? ''),
+            labels: dataset.labels,
             datasets: dataset.datasets
           }}
         />

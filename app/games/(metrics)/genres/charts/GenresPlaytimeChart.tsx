@@ -28,6 +28,11 @@ const playtimeFieldsNames: FieldsInfo<GenresPlaytimeForDoughnut> = {
   index: { name: '№' }
 };
 
+/**
+ * @param props
+ * @param props.data - Genres data with games playtime and top game.
+ * @returns Switchable charts with doughnut chart and table of top genres by playtime.
+ */
 export default function GenresPlaytimeChart({
   data
 }: GenresPlaytimeChartProps) {

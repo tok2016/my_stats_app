@@ -1,7 +1,7 @@
 'use client';
 
 import Game from '@ts/games/game';
-import { MetricContentProps } from '@ts/games/metric';
+import { CoreMetricProps } from '@ts/games/metric';
 import { StudioCountryMetric } from '@ts/games/studio';
 import { MetricResponse } from '@ts/requests';
 
@@ -15,8 +15,16 @@ import FetchMetric from '../../components/FetchMetric';
 import StudiosMapChart from '../charts/StuidosMapChart';
 import { CountryStudioChartData } from '../types';
 
+/**
+ * @param developers - All developers of user's games.
+ * @returns Funtion to fetch top countries by games and developers count with top developers.
+ */
 const fetchStudiosCountries =
   (developers: ObjectMapArray<Game['developers'][number], 'id'>) =>
+  /**
+   * @param params - Search params with user id.
+   * @returns Top countries by games and developers count or error data.
+   */
   async (params: {
     userId: string;
   }): Promise<MetricResponse<CountryStudioChartData[]>> => {
@@ -39,18 +47,20 @@ const fetchStudiosCountries =
     };
   };
 
-export default function StudiosCountries({
-  games,
-  metricId,
-  userId
-}: MetricContentProps) {
+/**
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Metric of top countries by games and developers count with top developers.
+ */
+export default function StudiosCountries({ games, userId }: CoreMetricProps) {
   const developers = games.flatMapByKey<Game['developers'][number], 'id'>(
     (game) => game.developers,
     'id'
   );
 
   return (
-    <MetricWrapper id={metricId}>
+    <MetricWrapper id='developers-countries'>
       <FetchMetric
         fetchMetricData={fetchStudiosCountries(developers)}
         metric={(data) => <StudiosMapChart data={data} />}

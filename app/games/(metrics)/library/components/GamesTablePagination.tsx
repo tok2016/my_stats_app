@@ -9,6 +9,14 @@ type GamesTablePaginationProps = {
   gamesCount: number;
 };
 
+/**
+ * @param props
+ * @param props.currentPage - Current list page.
+ * @param props.pagesCount - Pages count of list.
+ * @param props.startIndex - Global index of first games from given array.
+ * @param props.gameCount - Given filtered games count.
+ * @returns Games list pagination with thier global index range.
+ */
 export default function GamesTablePagination({
   currentPage,
   pagesCount,

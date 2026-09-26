@@ -5,6 +5,9 @@ import ErrorMessage from '@components/ErrorMessage';
 
 import MetricPage from '../components/MetricPage';
 
+/**
+ * @returns Page with games studios metrics.
+ */
 export default async function GamesStudiosPage() {
   try {
     const user = await getCurrentUser();

@@ -16,6 +16,12 @@ type AddMetricButtonProps = {
   metricId: MetricId;
 };
 
+/**
+ * Sends request to add given metric. If metric is stored, removes it from dashboard.
+ * @param user - User to add metric for.
+ * @param updateUser - Update user state function.
+ * @returns Response status text.
+ */
 const toggleMetric =
   (
     user: ReturnType<typeof useUserState>['user'],
@@ -24,10 +30,8 @@ const toggleMetric =
   async (metricId?: MetricId) => {
     if (!metricId) return 'Metric ID was not given';
 
-    const isStored = user.metrics.has(metricId);
-
     try {
-      const response = isStored
+      const response = user.metrics.has(metricId)
         ? await AxiosInstanse.put<MetricId[]>(
             `/api/user/${user.id}/dashboard`,
             metricId
@@ -44,6 +48,11 @@ const toggleMetric =
     }
   };
 
+/**
+ * @param props
+ * @param props.metricId - ID of metric to add or remove.
+ * @returns Button that adds metric to dashboard or removes from it.
+ */
 export default function AddMetricButton({ metricId }: AddMetricButtonProps) {
   const { user, setUserState } = useUserState();
   const [, updateMetric, isPending] = useAction(
@@ -51,11 +60,12 @@ export default function AddMetricButton({ metricId }: AddMetricButtonProps) {
     ''
   );
 
-  const isStored = user.metrics.has(metricId);
-
   const onMetricAddClick = () => {
     updateMetric(metricId);
   };
+
+  //If metric is stored, displays remove button.
+  const isStored = user.metrics.has(metricId);
 
   return (
     <IconButton

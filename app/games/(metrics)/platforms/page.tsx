@@ -5,6 +5,9 @@ import ErrorMessage from '@components/ErrorMessage';
 
 import MetricPage from '../components/MetricPage';
 
+/**
+ * @returns Page with games platforms metrics.
+ */
 export default async function GamesPlatformsPage() {
   try {
     const user = await getCurrentUser();

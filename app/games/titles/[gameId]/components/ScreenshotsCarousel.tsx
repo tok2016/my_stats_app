@@ -14,18 +14,28 @@ type ScreenshotsCarouselProps = {
 
 const SECONDES_TO_SCROLL = 7000;
 
+/**
+ * @param props
+ * @param props.screenshots - Screenshots of game.
+ * @param props.gameName - Name of the game.
+ * @param props.groupKey - Screenshots key.
+ * @returns Screenshot preview with screenshots carousel.
+ */
 export default function ScreenshotsCarousel({
   screenshots,
   groupKey,
   gameName
 }: ScreenshotsCarouselProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
 
+  //Index of screenshot to preview. Reduce function scrolls to screenshot of given index.
   const [index, setIndex] = useReducer((prev, next: number) => {
+    //Wraps the next value to not let it get beyond the array.
     const warpedNext = next % screenshots.length;
 
     if (carouselRef.current) {
+      //Calculates the gap between element is screenshot.
       const first = carouselRef.current.children.item(0);
       const second = carouselRef.current.children.item(1);
 
@@ -37,6 +47,7 @@ export default function ScreenshotsCarousel({
             second.offsetLeft - first.offsetLeft - first.offsetWidth
           );
 
+        //Scrolls the carousel to screenshot of next index.
         carouselRef.current.scrollLeft =
           warpedNext * (first.scrollWidth + gap)
           - (warpedNext > prev
@@ -45,14 +56,15 @@ export default function ScreenshotsCarousel({
       }
     }
 
-    if (titleRef.current) {
-      const first = titleRef.current.firstChild;
+    //Scrolls the preview container to screenshot of next index.
+    if (previewRef.current) {
+      const first = previewRef.current.firstChild;
       if (first && isHTMLElement(first)) {
-        titleRef.current.scrollLeft =
+        previewRef.current.scrollLeft =
           warpedNext * first.scrollWidth
           - (warpedNext > prev
             ? 0
-            : titleRef.current.clientWidth - first.scrollWidth);
+            : previewRef.current.clientWidth - first.scrollWidth);
       }
     }
 
@@ -61,6 +73,9 @@ export default function ScreenshotsCarousel({
 
   const timeoutRef = useRef<NodeJS.Timeout>(undefined);
 
+  /**
+   * Stops and clears timeout.
+   */
   const stopScrollTimeout = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -68,6 +83,9 @@ export default function ScreenshotsCarousel({
     }
   }, []);
 
+  /**
+   * Starts the timeout to show the next screenshot.
+   */
   const waitForSroll = useCallback(() => {
     stopScrollTimeout();
 
@@ -76,14 +94,34 @@ export default function ScreenshotsCarousel({
     }, SECONDES_TO_SCROLL);
   }, [setIndex, index, stopScrollTimeout]);
 
+  //Starts the scroll timeout everytime index changes.
   useEffect(() => {
     waitForSroll();
     return stopScrollTimeout;
   }, [waitForSroll, stopScrollTimeout, index]);
 
+  //Adjust the scroll position on window resize.
+  useEffect(() => {
+    let previewWidth = previewRef.current?.clientWidth ?? 0;
+    const onResize = () => {
+      const currentWidth = previewRef.current?.clientWidth ?? 0;
+
+      if (previewWidth - currentWidth !== 0) setIndex(index);
+
+      previewWidth = previewRef.current?.clientWidth ?? 0;
+    };
+
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, [index]);
+
   return (
     <div className='screenshots-collage'>
-      <div className='title-screenshot' ref={titleRef}>
+      {/*Preview is a horizontal flexbox of screenshot with hidden overflow*/}
+      <div className='title-screenshot' ref={previewRef}>
         {screenshots.map((screenshot, i) => (
           <FetchImage
             key={`${groupKey}-${i}-title`}
@@ -94,6 +132,7 @@ export default function ScreenshotsCarousel({
         ))}
       </div>
 
+      {/*Carousel is a scrollable flexbox of clickable screenshots*/}
       <div
         className='screenshots-carousel'
         ref={carouselRef}

@@ -11,6 +11,15 @@ type PeriodTopBlockProps<ItemType> = {
   listItemContent: (item: ItemType, i: number) => React.ReactNode;
 };
 
+/**
+ * @param props
+ * @param props.periodTop - Top to render.
+ * @param props.periodType - Type of periods: month / season / year.
+ * @param props.blockWidthRem - Block width in rem.
+ * @param props.current - Highlights the most recent top.
+ * @param props.listItemContent - Top item render function.
+ * @returns Block with top item of period.
+ */
 export default function PeriodTopBlock<ItemType>({
   className = '',
   periodTop,

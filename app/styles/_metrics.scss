@@ -156,6 +156,11 @@ $min-data-rank-width: 2em;
   width: fit-content;
 }
 
+.years .divider button {
+  padding: 2px;
+  min-height: unset;
+}
+
 .period-tops-group {
   display: flex;
   flex-direction: column;
@@ -212,7 +217,7 @@ $min-data-rank-width: 2em;
   }
 }
 
-.empty-cover {
+.blank-image {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -223,8 +228,8 @@ $min-data-rank-width: 2em;
   }
 }
 
-@mixin empty-cover($bg-color, $svg-color) {
-  .empty-cover {
+@mixin blank-image($bg-color, $svg-color) {
+  .blank-image {
     background-color: $bg-color;
 
     svg {

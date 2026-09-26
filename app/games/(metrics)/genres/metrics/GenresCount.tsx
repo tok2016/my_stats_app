@@ -20,11 +20,20 @@ type GenresCountProps = {
   userId: string;
 };
 
+/**
+ * @param genres - All genres of user's games.
+ * @param series - All series of of user's games.
+ * @returns Funtion to fetch top genres by games count.
+ */
 const fetchGenresCount =
   (
     genres: ObjectMapArray<Game['genres'][number], 'id'>,
     series: ObjectMapArray<NonNullable<Game['series']>, 'id'>
   ) =>
+  /**
+   * @param params - Search params with user id.
+   * @returns Top genres by games count or error data.
+   */
   async (params: {
     userId: string;
   }): Promise<MetricResponse<GenresCountData[]>> => {
@@ -45,6 +54,13 @@ const fetchGenresCount =
     };
   };
 
+/**
+ * @param props
+ * @param props.genres - All genres of user's games.
+ * @param props.seriesArray - All series of of user's games.
+ * @param props.userId - User whose metric will be fetched.
+ * @returns Submetric component of top genres by games count.
+ */
 export default function GenresCount({
   seriesArray,
   genres,

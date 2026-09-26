@@ -28,6 +28,11 @@ const fieldsNames: FieldsInfo<PlatformPlaytimeForChart> = {
   hours: { name: 'Hours played' }
 };
 
+/**
+ * @param props
+ * @param props.data - Platforms data with games playtime and top game.
+ * @returns Switchable charts with doughnut chart and table of top platforms by playtime.
+ */
 export default function PlatformsPlaytimeChart({
   data
 }: PlatformsPlaytimeChartProps) {

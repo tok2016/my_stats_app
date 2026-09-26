@@ -19,6 +19,14 @@ type FetchMetricProps<
   params: FetchParams;
 };
 
+/**
+ * @param props
+ * @param props.metric - Metric (chart, block, table, etc.) render function that delivers fetched data as a parameter.
+ * @param props.fetchMetricData - Fetch data for metric function.
+ * @param props.fallback - Component that's rendered when awaiting data fetch.
+ * @param props.params - Params for fetchMetricData function.
+ * @returns Wraps metric data fetch and error handling logic.
+ */
 export default function FetchMetric<
   MetricData,
   FetchParams extends object & { userId: string }

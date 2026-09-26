@@ -9,6 +9,11 @@ type AddGameParams = {
   gameId?: string;
 };
 
+/**
+ * @param props
+ * @param props.searchParams - Search params with IGDB ID of choosen game.
+ * @returns Form to browse a game from IGDB. If game id is given, returns form to add personal info about the game.
+ */
 export default async function AddGamePage({
   searchParams
 }: {

@@ -10,42 +10,15 @@ import {
   ServiceEndpointAction
 } from '@ts/requests';
 import { ConfirmationInfo } from '@ts/users/confirmation';
-import { ServicesMap } from '@ts/users/service';
 import { UserRouteParams } from '@ts/users/user';
 
 import { AppRouteHandlerRoutes } from '../../.next/types/routes';
-import { tryGetCredentialsById } from './auth';
-import {
-  CredentialsModel,
-  GamesModel,
-  ServiceCredentialsModel,
-  UsersModel
-} from './models';
+import { tryGetCredentialsById, tryGetServicesByUserId } from './auth';
+import { CredentialsModel, GamesModel, UsersModel } from './models';
 import ObjectMapArray from './object-map-array';
 import { tryExtractTokenFromHeader } from './token';
 import { isErrorResponse } from './type-guards';
 import { generateErrorResponse } from './utils';
-
-/**
- * Finds services credentials by user id.
- * @param userId
- * @returns Services credentials by service type.
- */
-const tryGetServicesByUserId = async (userId: string): Promise<ServicesMap> => {
-  const services = await ServiceCredentialsModel.find({
-    userId
-  }).lean();
-
-  return Object.fromEntries(
-    services.map((service) => [
-      service.name,
-      {
-        ...service,
-        id: service._id.toString()
-      }
-    ])
-  );
-};
 
 /**
  * Forms response object with error.

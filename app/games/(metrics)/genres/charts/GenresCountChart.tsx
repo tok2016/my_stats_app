@@ -27,8 +27,13 @@ const genresCountFieldsNames: FieldsInfo<GenresCountForDoughnut> = {
   topSeries: { name: 'Biggest series' }
 };
 
+/**
+ * @param props
+ * @param props.data - Genres data with games count and top series.
+ * @returns Switchable charts with doughnut chart and table of top genres by games count.
+ */
 export default function GenresCountChart({ data }: GenresCountChartProps) {
-  const doughnutData: GenresCountForDoughnut[] = data.map((value) => ({
+  const doughnutData = data.map((value) => ({
     ...value,
     topSeries: value.topSeries?.name
   }));

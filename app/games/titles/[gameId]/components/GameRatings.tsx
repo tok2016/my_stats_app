@@ -20,6 +20,12 @@ type GamePositionsProps = {
   isSeries?: boolean;
 };
 
+/**
+ * @param props
+ * @param props.rating - Rating data with value and positions.
+ * @param props.isSeries - Is game the part of a series.
+ * @returns Blocks with postions numbers among all games and series, if games is the part of it.
+ */
 function GamePositions({ rating, isSeries }: GamePositionsProps) {
   return (
     <div className='positions'>
@@ -42,6 +48,13 @@ function GamePositions({ rating, isSeries }: GamePositionsProps) {
   );
 }
 
+/**
+ * @param props
+ * @param props.title - Rating title.
+ * @param props.rating - Rating data with value and positions.
+ * @param props.isSeries - Is game the part of a series.
+ * @returns Block with rating value and it's positions among all games and series.
+ */
 function GameRatingBlock({ title, rating, isSeries }: GameRatingBlockProps) {
   return (
     <div className='rating-block'>
@@ -52,6 +65,13 @@ function GameRatingBlock({ title, rating, isSeries }: GameRatingBlockProps) {
   );
 }
 
+/**
+ * @param props
+ * @param props.title - Rating title.
+ * @param props.rating - Playtime data with value and positions.
+ * @param props.isSeries - Is game the part of a series.
+ * @returns Block with playtime value and it's positions among all games and series.
+ */
 function GamePlaytimeBlock({ title, rating, isSeries }: GameRatingBlockProps) {
   return (
     <div className='rating-block'>
@@ -62,6 +82,11 @@ function GamePlaytimeBlock({ title, rating, isSeries }: GameRatingBlockProps) {
   );
 }
 
+/**
+ * @param props
+ * @param props.game - Game with detailed ratings and playtime.
+ * @returns Blocks with ratings values and their positions among all games and own series.
+ */
 export default function GameRatings({ game }: GameRatingsProps) {
   const isSeries = !!game.series;
 

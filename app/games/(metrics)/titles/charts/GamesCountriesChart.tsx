@@ -1,7 +1,7 @@
 'use client';
 
 import Chart from '@components/charts/Chart';
-import GameTableTitle from '@components/data-blocks/GameTitle';
+import GameTitle from '@components/data-blocks/GameTitle';
 
 import { GameCountryChartData } from '../types';
 
@@ -16,7 +16,7 @@ const renderTopGamesValue = (value?: GameCountryChartData) =>
     <ol className='data-block-list'>
       {value.topGames.slice(0, MAX_GAMES_IN_TOOLTIP).map((game) => (
         <li className='data-block-item' key={`${game.id}-${value.id}`}>
-          <GameTableTitle game={game} />
+          <GameTitle game={game} />
         </li>
       ))}
     </ol>
@@ -24,6 +24,11 @@ const renderTopGamesValue = (value?: GameCountryChartData) =>
 
 const renderTopGamessKey = () => <></>;
 
+/**
+ * @param props
+ * @param props.data - Top countries by games count with top games.
+ * @returns Map chart of top countries by games count with top games.
+ */
 export default function GamesCountriesChart({
   data
 }: GamesCountriesChartProps) {

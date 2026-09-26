@@ -2,7 +2,7 @@ import Game from '@ts/games/game';
 
 import FetchImage from '@components/FetchImage';
 
-import EmptyImage from './EmptyImage';
+import BlankImage from '../BlankImage';
 import GameCover from './GameCover';
 
 type GameCollageProps = {
@@ -11,6 +11,11 @@ type GameCollageProps = {
 
 export const SCREENSHOTS_IN_COLLAGE = 2;
 
+/**
+ * @param props
+ * @param props.game - Game data with cover and screenshots to render.
+ * @returns Collage of game's cover and 2 screenshots. Replaces empty cover / screenshots with blank image.
+ */
 export default function GameCollage({ game }: GameCollageProps) {
   const screenshots = game.screenshots ?? [];
 
@@ -20,7 +25,7 @@ export default function GameCollage({ game }: GameCollageProps) {
 
       {Array.from({ length: SCREENSHOTS_IN_COLLAGE }).map((_, i) =>
         i >= screenshots.length ? (
-          <EmptyImage
+          <BlankImage
             key={`${game.id}-empty-screenshot-${i}`}
             className={`screenshot screenshot-${i + 1}`}
           />

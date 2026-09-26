@@ -30,6 +30,7 @@ export type SearchBaseProps = Omit<
 };
 
 export type ButtonProps = {
+  id?: string;
   children?: ReactNode;
   variant?: ButtonVariant;
   status?: ButtonStatus;

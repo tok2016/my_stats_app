@@ -170,7 +170,7 @@ $modules: 'user', 'music', 'games';
 
     @include components.divider(
       map.get(utils.$text-colors, $module),
-      map.get(utils.$highlight-colors, $module)
+      map.get(utils.$active-colors, $module)
     );
 
     @include components.skeleton(
@@ -224,7 +224,7 @@ $modules: 'user', 'music', 'games';
       map.get(utils.$text-colors, $module)
     );
 
-    @include metrics.empty-cover(
+    @include metrics.blank-image(
       utils.$skeleton-color,
       utils.$skeleton-light-color
     );
@@ -335,7 +335,7 @@ $modules: 'user', 'music', 'games';
 
       @include components.divider(
         map.get(utils.$bg-2-colors, $module),
-        map.get(utils.$active-colors, $module)
+        map.get(utils.$hover-colors, $module)
       );
 
       @include components.skeleton(
@@ -377,7 +377,7 @@ $modules: 'user', 'music', 'games';
         map.get(utils.$text-colors, $module)
       );
 
-      @include metrics.empty-cover(
+      @include metrics.blank-image(
         utils.$skeleton-light-color,
         utils.$skeleton-color
       );

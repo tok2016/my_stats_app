@@ -41,11 +41,11 @@ const getPeriodString: Record<PrecisePeriod, (date: Date | string) => string> =
       const seasonNumber = Math.floor(
         ((formDate.getMonth() % MONTHS_SHIFT) + 1) / MONTHS_IN_QUARTER
       );
-      return `${formDate.getFullYear()}-${seasonNumber + 1}`;
+      return `${formDate.getFullYear()}-${(seasonNumber + 1).toString().padStart(2, '0')}`;
     },
     month: (date) => {
       const formDate = new Date(date);
-      return `${formDate.getFullYear()}-${formDate.getMonth() + 1}`;
+      return `${formDate.getFullYear()}-${(formDate.getMonth() + 1).toString().padStart(2, '0')}`;
     }
   };
 

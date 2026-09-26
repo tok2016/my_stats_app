@@ -3,12 +3,17 @@
 import { GameTableData } from '@ts/games/game';
 
 import Table from '@components/charts/Table';
-import GameTableTitle from '@components/data-blocks/GameTitle';
+import GameTitle from '@components/data-blocks/GameTitle';
 
 type GamesPlaytimeTableProps = {
   data: GameTableData[];
 };
 
+/**
+ * @param props
+ * @param props.data - Longest played games data.
+ * @returns Table of longest played games data.
+ */
 export default function GamesPlaytimeTable({ data }: GamesPlaytimeTableProps) {
   return (
     <Table
@@ -22,7 +27,7 @@ export default function GamesPlaytimeTable({ data }: GamesPlaytimeTableProps) {
         },
         name: {
           title: 'Game',
-          renderRow: (value) => <GameTableTitle game={value} />,
+          renderRow: (value) => <GameTitle game={value} />,
           width: '3fr'
         },
         developers: {

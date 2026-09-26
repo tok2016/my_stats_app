@@ -1,18 +1,23 @@
 'use client';
 
 import Game from '@ts/games/game';
-import { MetricContentProps } from '@ts/games/metric';
+import { CoreMetricProps } from '@ts/games/metric';
 
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import PlatformsCount from './PlatformsCount';
 import PlatformsPlaytime from './PlatformsPlaytime';
 
+/**
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Metric of top platforms by games count and playtime as 2 submetrics.
+ */
 export default function PlatformsCountPlaytime({
-  metricId,
   games,
   userId
-}: MetricContentProps) {
+}: CoreMetricProps) {
   const series = games.mapByKey<Game['series'], 'id'>(
     (game) => game.series,
     'id'
@@ -23,7 +28,7 @@ export default function PlatformsCountPlaytime({
   );
 
   return (
-    <MetricWrapper id={metricId}>
+    <MetricWrapper id='platforms-count-playtime'>
       <div className='double-doughnut'>
         <PlatformsCount
           platforms={platforms}

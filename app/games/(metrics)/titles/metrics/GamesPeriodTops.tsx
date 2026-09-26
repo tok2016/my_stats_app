@@ -2,8 +2,8 @@
 
 import Game from '@ts/games/game';
 import {
+  CoreMetricProps,
   FetchPeriodTopsMetricParams,
-  MetricContentProps,
   PeriodPlaytimeTops,
   PeriodTopsMetric,
   PrecisePeriod
@@ -13,14 +13,22 @@ import { MetricResponse } from '@ts/requests';
 import { getMetricClient } from '@lib/actions';
 import ObjectMapArray from '@lib/object-map-array';
 
-import GameTableTitle from '@components/data-blocks/GameTitle';
+import GameTitle from '@components/data-blocks/GameTitle';
 import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
 import RankIcon from '@components/data-blocks/RankIcon';
 
 import { GamePeriodTopData } from '../types';
 
+/**
+ * @param games - All user's games.
+ * @returns Funtion to fetch top games by period.
+ */
 const fetchGamesPeriodTops =
   (games: ObjectMapArray<Game, 'id'>) =>
+  /**
+   * @param params - Search params with user id.
+   * @returns Top games by period or error data.
+   */
   async (
     params: FetchPeriodTopsMetricParams
   ): Promise<MetricResponse<PeriodTopsMetric<GamePeriodTopData>>> => {
@@ -52,18 +60,20 @@ const fetchGamesPeriodTops =
 const gameItemContent = (value: GamePeriodTopData, i: number) => (
   <div className='ranked-entry'>
     <RankIcon rank={i} />
-    <GameTableTitle game={value} />
+    <GameTitle game={value} />
   </div>
 );
 
-export default function GamesPeriodTops({
-  metricId,
-  games,
-  userId
-}: MetricContentProps) {
+/**
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Metric component for top games by period.
+ */
+export default function GamesPeriodTops({ games, userId }: CoreMetricProps) {
   return (
     <PeriodTops
-      id={metricId}
+      id='games-periods'
       userId={userId}
       className='games-period-tops'
       blockWidthRem={18.5}

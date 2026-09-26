@@ -11,7 +11,7 @@ export default async function IamPage() {
 
   return (
     <div className='metrics'>
-      <ProfileInfo user={user} authorized />
+      <ProfileInfo user={user} />
       <Dashboard user={user} />
     </div>
   );

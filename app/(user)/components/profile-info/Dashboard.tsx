@@ -11,6 +11,11 @@ type DashboardProps = {
   user: User;
 };
 
+/**
+ * @param props
+ * @param props.user - User whose dashboard will be rendered.
+ * @returns Dashboard, a list of metrics that user has saved on profile page.
+ */
 export default async function Dashboard({ user }: DashboardProps) {
   try {
     if (user.metrics.length) {

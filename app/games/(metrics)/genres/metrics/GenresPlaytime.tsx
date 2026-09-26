@@ -19,8 +19,16 @@ type GenresPlaytimeProps = {
   userId: string;
 };
 
+/**
+ * @param genres - All genres of user's games.
+ * @returns Funtion to fetch top genres by playtime.
+ */
 const fetchGenresPlaytime =
   (genres: ObjectMapArray<Game['genres'][number], 'id'>) =>
+  /**
+   * @param params - Search params with user id.
+   * @returns Top genres by playtime or error data.
+   */
   async (params: {
     userId: string;
   }): Promise<MetricResponse<GenresPlaytimeData[]>> => {
@@ -40,6 +48,12 @@ const fetchGenresPlaytime =
     };
   };
 
+/**
+ * @param props
+ * @param props.genres - All genres of user's games.
+ * @param props.userId - User whose metric will be fetched.
+ * @returns Submetric component of top genres by playtime.
+ */
 export default function GenresPlaytime({
   genres,
   userId

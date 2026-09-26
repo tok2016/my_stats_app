@@ -5,6 +5,11 @@ import { GamesFilter } from '@ts/games/filter';
 import GamesLibrary from './components/GamesLibrary';
 import GamesLibrarySkeleton from './components/GamesLibrarySkeleton';
 
+/**
+ * @param props
+ * @param props.searchParams - Search params to filter games by.
+ * @returns Page with all user's games table and search.
+ */
 export default async function GameLibraryPage({
   searchParams
 }: {

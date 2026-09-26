@@ -1,7 +1,7 @@
 'use client';
 
 import Game from '@ts/games/game';
-import { MetricContentProps, RatingData } from '@ts/games/metric';
+import { CoreMetricProps, RatingData } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -21,6 +21,12 @@ type RatedGenreProps = {
 
 const RATED_GENRES_COUNT = 5;
 
+/**
+ * @param props
+ * @param props.ratingData - Genres data with rating and top game.
+ * @param props.genre - Full genre data.
+ * @returns Data block with genre rating data.
+ */
 function RatedGenre({ ratingData, genre }: RatedGenreProps) {
   if (!genre) return;
 
@@ -70,6 +76,10 @@ export function GenresRatingsSkeleton() {
   );
 }
 
+/**
+ * @param params - Search params with user id.
+ * @returns Top genres by average rating or error data.
+ */
 const fetchGenresRatings = async (params: {
   userId: string;
 }): Promise<MetricResponse<RatingData[]>> => {
@@ -81,18 +91,20 @@ const fetchGenresRatings = async (params: {
   return ratingData;
 };
 
-export default function GenresRatings({
-  metricId,
-  games,
-  userId
-}: MetricContentProps) {
+/**
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Metric component of top genres by average rating.
+ */
+export default function GenresRatings({ games, userId }: CoreMetricProps) {
   const genres = games.flatMapByKey<Game['genres'][number], 'id'>(
     (game) => game.genres,
     'id'
   );
 
   return (
-    <MetricWrapper id={metricId}>
+    <MetricWrapper id='genres-rating'>
       <FetchMetric
         fetchMetricData={fetchGenresRatings}
         metric={(data) => (

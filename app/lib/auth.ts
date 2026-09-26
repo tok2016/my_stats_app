@@ -5,9 +5,10 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 import Credentials, { CredentialsInSchema } from '@ts/users/credentials';
+import { ServicesMap } from '@ts/users/service';
 import { UserAccess } from '@ts/users/user';
 
-import { CredentialsModel } from './models';
+import { CredentialsModel, ServiceCredentialsModel } from './models';
 import { ACCESS_TTL, REFRESH_TTL, generateToken } from './token';
 import { generateErrorResponse } from './utils';
 
@@ -70,4 +71,27 @@ export const tryGetCredentialsById = async (
   if (!credentials) throw generateErrorResponse(404, 'User was not found');
 
   return { ...credentials, id: credentials._id.toString() };
+};
+
+/**
+ * Finds services credentials by user id.
+ * @param userId
+ * @returns Services credentials by service type.
+ */
+export const tryGetServicesByUserId = async (
+  userId: string
+): Promise<ServicesMap> => {
+  const services = await ServiceCredentialsModel.find({
+    userId
+  }).lean();
+
+  return Object.fromEntries(
+    services.map((service) => [
+      service.name,
+      {
+        ...service,
+        id: service._id.toString()
+      }
+    ])
+  );
 };

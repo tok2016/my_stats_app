@@ -293,15 +293,20 @@ export const setTooltip = <DataType extends ChartData>(
  * @param tooltipRef - Tooltip component referense.
  * @param updateTooltip - Update state function that will force tooltip rerender.
  * @param dataMap - Map of data and its id.
+ * @param
  * @param horizontalPos - Horizontal position relative to hovered chart element.
  * @param verticalPos - Vertical position relative to hovered chart element.
  * @param enableTransition - If true, sets transition of tooltip positions.
  * @returns Tooltip options for period bar chart with rerender function.
  */
-export const setPeriodTooltip = <DataType extends PeriodChartTransformed>(
+export const setPeriodTooltip = <
+  DataType extends PeriodChartTransformed,
+  ValueKey extends keyof DataType
+>(
   tooltipRef: RefObject<HTMLDivElement | null>,
   updateTooltip: ChartContextProps<DataType>['updateTooltip'],
   dataMap: Map<number | string, DataType>,
+  valueField: ValueKey,
   horizontalPos: TooltipPosition = 'start',
   verticalPos: TooltipPosition = 'start',
   enableTransition: boolean = true
@@ -336,9 +341,12 @@ export const setPeriodTooltip = <DataType extends PeriodChartTransformed>(
       enableTransition
     );
 
-    //If found data is the same as the one that tooltip is pointing to, skips rerender.
-    const storedId = tooltipRef.current?.dataset['item'];
-    if (!data || storedId?.toString() === itemId.toString()) return;
+    if (!data) return;
+
+    //Changes general value of field to it's period value.
+    const period = tooltip.title?.[0];
+    if (data.countByPeriod[period])
+      data[valueField] = data.countByPeriod[period] as DataType[ValueKey];
 
     updateTooltip(data);
   }

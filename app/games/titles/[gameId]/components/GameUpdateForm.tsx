@@ -20,7 +20,7 @@ import { usePopupState } from '@store/popup-store';
 
 import Button from '@components/Button';
 import CircleSlider from '@components/CircleSlider';
-import HiddenInput from '@components/HiddenInput';
+import HidingInput from '@components/HidingInput';
 import Input from '@components/Input';
 import NumberInput from '@components/NumberInput';
 import Popup from '@components/Popup';
@@ -31,6 +31,10 @@ type GameUpdateFormProps = {
   game: GameDetailed;
 };
 
+/**
+ * @param date
+ * @returns Date string of format acceptable by date input.
+ */
 const getInputDateString = (date: Date) => {
   const day = date.toLocaleDateString('en-US', { day: '2-digit' });
   const month = date.toLocaleDateString('en-US', { month: '2-digit' });
@@ -38,6 +42,10 @@ const getInputDateString = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 
+/**
+ * @param game - Game with data to update.
+ * @returns Form state with filled form data.
+ */
 const getDefaultData = (game: GameDetailed) => {
   const formData = new FormData();
 
@@ -53,6 +61,13 @@ const getDefaultData = (game: GameDetailed) => {
   return formData;
 };
 
+/**
+ * Sends request to update data of game of given id.
+ * @param gameId - Id of game to updated.
+ * @param controller - Abort controller to cancel update.
+ * @param onSuccess - On success function.
+ * @returns Form state with request status, possible error and issues data.
+ */
 const updateGame =
   (
     gameId: string,
@@ -91,6 +106,13 @@ const updateGame =
     }
   };
 
+/**
+ * Form to update personal info about game.
+ * @param props
+ * @param props.popupName - Name of popup with form.
+ * @param props.game - Game to updated.
+ * @returns Popup with game update form.
+ */
 export default function GameUpdateForm({
   popupName,
   game
@@ -164,7 +186,7 @@ export default function GameUpdateForm({
           errorHint={state.issues?.platformId}
         />
 
-        <HiddenInput
+        <HidingInput
           id='is-rated'
           name='isRated'
           label='Your rating'
@@ -179,7 +201,7 @@ export default function GameUpdateForm({
             max={MAX_RATING}
             defaultValue={getNumberFormDataValue('rating', state.data)}
           />
-        </HiddenInput>
+        </HidingInput>
 
         <div className='buttons-flex-box'>
           <Button type='submit' variant='primary' loading={isPending}>

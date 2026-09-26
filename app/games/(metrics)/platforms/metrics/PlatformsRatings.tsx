@@ -1,7 +1,7 @@
 'use client';
 
 import Game from '@ts/games/game';
-import { MetricContentProps } from '@ts/games/metric';
+import { CoreMetricProps } from '@ts/games/metric';
 import { PlatformRatingData } from '@ts/games/platform';
 import { MetricResponse } from '@ts/requests';
 
@@ -9,7 +9,7 @@ import { getMetricClient } from '@lib/actions';
 
 import Rating from '@components/Rating';
 import Skeleton from '@components/Skeleton';
-import GameTableTitle from '@components/data-blocks/GameTitle';
+import GameTitle from '@components/data-blocks/GameTitle';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import FetchMetric from '../../components/FetchMetric';
@@ -23,6 +23,13 @@ type RatedPlatformProps = {
 const MAX_PLATFORMS = 5;
 const MAX_GAMES = 5;
 
+/**
+ * @param props
+ * @param props.ratedPlatform - Platform data with rating, top games and genre.
+ * @param props.platform - Full platform data.
+ * @param props.topGenre - Full data about top genre.
+ * @returns Data block with platform rating data.
+ */
 function RatedPlatform({
   ratedPlatform,
   platform,
@@ -53,7 +60,7 @@ function RatedPlatform({
             key={`${ratedPlatform.id}-${topGame.id}`}
             className='game-title-rating'
           >
-            <GameTableTitle game={topGame} />
+            <GameTitle game={topGame} />
             <Rating value={topGame.rating} />
           </div>
         ))}
@@ -93,6 +100,10 @@ export function PlatformsRatingsSkeleton() {
   );
 }
 
+/**
+ * @param params - Search params with user id.
+ * @returns Top platforms by average rating with top games and genre or error data.
+ */
 const fetchPlatformsRatings = async (params: {
   userId: string;
 }): Promise<MetricResponse<PlatformRatingData[]>> => {
@@ -107,11 +118,13 @@ const fetchPlatformsRatings = async (params: {
   };
 };
 
-export default function PlatformsRatings({
-  games,
-  metricId,
-  userId
-}: MetricContentProps) {
+/**
+ * @param props
+ * @param props.games - Games of user.
+ * @param props.userId - User whose metrics will be fetched.
+ * @returns Metric component of top platforms by average rating with top games and genre.
+ */
+export default function PlatformsRatings({ games, userId }: CoreMetricProps) {
   const platforms = games.mapByKey<Game['platform'], 'id'>(
     (game) => game.platform,
     'id'
@@ -122,7 +135,7 @@ export default function PlatformsRatings({
   );
 
   return (
-    <MetricWrapper id={metricId}>
+    <MetricWrapper id='platforms-rating'>
       <FetchMetric
         fetchMetricData={fetchPlatformsRatings}
         metric={(data) => (

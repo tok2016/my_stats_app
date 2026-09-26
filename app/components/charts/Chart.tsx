@@ -123,7 +123,7 @@ const getChartCore = <
  * @param props.chartId - Id of chart component.
  * @param props.data - Data to visualize.
  * @param props.displayFields - Fields data to display on tooltip.
- * @param props.fieldsInfo - Fields render data with names that for tooltip and chart.
+ * @param props.fieldsInfo - Fields render data with names for tooltip and chart.
  * @param props.valueFields - Fields of data which values will be used to build the chart elements. Accept only number fields.
  * If multiple fields are given, renders select to choose one of the fields.
  * @param props.defaultValueField - Default field in values fields select.

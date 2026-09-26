@@ -12,6 +12,12 @@ type RatingSourceProps = {
   rating?: number;
 };
 
+/**
+ * @param props
+ * @param props.source - The ones who gave this rating (critics, IGDB users, My Stats user).
+ * @param props.rating - Rating value. If empty, shows NR (not rated).
+ * @returns
+ */
 function RatingSource({ source, rating }: RatingSourceProps) {
   return (
     <div className='rating-source'>
@@ -21,6 +27,14 @@ function RatingSource({ source, rating }: RatingSourceProps) {
   );
 }
 
+/**
+ * @param props
+ * @param props.criticsRating
+ * @param props.usersRating
+ * @param props.userOwnRating
+ * @param props.className
+ * @returns Flexbox with item ratings from critics, IGDB users and user.
+ */
 export default function MultipleRating({
   className = '',
   criticsRating,

@@ -2,10 +2,11 @@ import { NextResponse } from 'next/server';
 
 import { SteamApiResponse } from '@ts/games/api-response';
 import { GameInSchema, IgdbGame, SteamGame } from '@ts/games/game';
-import { ServiceEndpointAction } from '@ts/requests';
+import { ProtectedEndpointAction } from '@ts/requests';
 
+import { tryGetCredentialsById, tryGetServicesByUserId } from '@lib/auth';
 import { AxiosSteamInstanse } from '@lib/axios-instanse';
-import { serviceEndpoint } from '@lib/endpoint-generators';
+import { protectedEndpoint } from '@lib/endpoint-generators';
 import { igdbRequest } from '@lib/games/igdb';
 import { GamesModel } from '@lib/models';
 import ObjectMapArray from '@lib/object-map-array';
@@ -138,22 +139,27 @@ const addGameFromSteam = async (steamGames: SteamGame[], userId: string) => {
  * Protected method. Fetches games from user's steam account, stores the new ones or updates the stored ones.
  * @param _req - Request object.
  * @param _params - Route params.
- * @param service - Service with credentials.
+ * @param token - Service with credentials.
  * @throws 401 if steam ID is not given or steam account is private.
  * @throws 404 if user or steam credentials are not found.
  * @returns Response object.
  */
-const pullGamesFromSteam: ServiceEndpointAction<'/api/games/steam'> = async (
+const pullGamesFromSteam: ProtectedEndpointAction<'/api/games/steam'> = async (
   _req,
   _params,
-  service
+  token
 ) => {
-  //Pulls games from user's steam account.
-  if (!service) throw generateErrorResponse(401, `Steam ID wasn't provided`);
+  //Finds user's steam credentials.
+  const credentials = await tryGetCredentialsById(token.id);
+  const services = await tryGetServicesByUserId(credentials.userId);
 
+  if (!services.steam)
+    throw generateErrorResponse(401, `Steam ID wasn't provided`);
+
+  //Pulls games from user's steam account.
   const searchParams = new URLSearchParams({
     key: process.env.STEAM_KEY ?? '',
-    steamid: service?.login ?? '',
+    steamid: services.steam.login ?? '',
     include_appinfo: 'true',
     include_played_free_games: 'true',
     format: 'json'
@@ -167,7 +173,9 @@ const pullGamesFromSteam: ServiceEndpointAction<'/api/games/steam'> = async (
     throw generateErrorResponse(401, 'Profile is private');
 
   //Pulls stored user's games.
-  const savedGames = (await GamesModel.find({ userId: service.userId }).lean())
+  const savedGames = (
+    await GamesModel.find({ userId: credentials.userId }).lean()
+  )
     .map((game) => ({
       ...game,
       id: game._id.toString()
@@ -188,7 +196,7 @@ const pullGamesFromSteam: ServiceEndpointAction<'/api/games/steam'> = async (
   });
 
   await updateGamesFromSteam(gamesToUpdate);
-  await addGameFromSteam(gamesToAdd, service.userId);
+  await addGameFromSteam(gamesToAdd, credentials.userId);
 
   return new NextResponse('Games data from Steam were pulled successfully', {
     status: 201,
@@ -196,4 +204,4 @@ const pullGamesFromSteam: ServiceEndpointAction<'/api/games/steam'> = async (
   });
 };
 
-export const POST = serviceEndpoint(pullGamesFromSteam);
+export const POST = protectedEndpoint(pullGamesFromSteam);

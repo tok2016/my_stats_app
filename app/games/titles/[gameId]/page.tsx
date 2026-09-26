@@ -6,10 +6,15 @@ import ErrorMessage from '@components/ErrorMessage';
 
 import RecommendedGameBlock from '@app/games/components/RecommendedGameBlock';
 
-import GameButtons from './components/GameButtons';
+import GameControlButtons from './components/GameControlButtons';
 import GameDetails from './components/GameDetials';
 import GameRatings from './components/GameRatings';
 
+/**
+ * @param props
+ * @param props.params - Route params with game id.
+ * @returns Page of game of given id.
+ */
 export default async function GameInfoPage({
   params
 }: {
@@ -25,7 +30,7 @@ export default async function GameInfoPage({
       <>
         <div className='games-page-name'>
           <h2>{game.name}</h2>
-          <GameButtons game={game} />
+          <GameControlButtons game={game} />
         </div>
 
         <div className='game-page-content'>

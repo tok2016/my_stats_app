@@ -9,7 +9,16 @@ type GamesLineChartProps = {
   chartId: string;
 };
 
-export default function GamesLineChart({ data, chartId }: GamesLineChartProps) {
+/**
+ * @param props
+ * @param props.data - Years list with games count and top game.
+ * @param props.chartId - Id for line chart.
+ * @returns Line chart of years with games count as data value and top game.
+ */
+export default function GamesYearLineChart({
+  data,
+  chartId
+}: GamesLineChartProps) {
   return (
     <Chart
       chartId={chartId}

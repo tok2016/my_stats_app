@@ -1,5 +1,9 @@
+import { GamesFilter } from '@ts/games/filter';
 import Game, { GameCore } from '@ts/games/game';
 import { StudioType } from '@ts/games/studio';
+
+export const SPECIAL_GAMES_COUNT = 3;
+export const MAX_GAMES_IN_SERIES = 5;
 
 export const isIgdbGenre = (value: unknown): value is Game['genres'][number] =>
   typeof (value as Game['genres'][number])?.name !== 'undefined';
@@ -24,3 +28,10 @@ export const StudiosGameFields: Record<
   developer: 'developers',
   publisher: 'publishers'
 };
+
+export const NonFormFilterFields: (keyof GamesFilter)[] = [
+  'sort',
+  'direction',
+  'page',
+  'limit'
+] as const;
