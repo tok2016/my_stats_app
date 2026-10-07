@@ -1,14 +1,15 @@
 'use client';
 
-import { memo, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from '@mynaui/icons-react';
+import { memo, useMemo, useRef, useState } from 'react';
 
+import { Option, TextInputProps } from '@ts/ui/components-props';
 import { SelectVariant } from '@ts/ui/components-variants';
-import { TextInputProps, Option } from '@ts/ui/components-props';
+
+import { emptyOption } from '@lib/utils';
 
 import Hint from './Hint';
 import Picker from './Picker';
-import { emptyOption } from '@lib/utils';
 
 type SelectProps = TextInputProps & {
   options: Option[];
@@ -21,16 +22,16 @@ type SelectVariantProps = {
   selectGroupClass: string;
 };
 
-const EXPAND_ICON_CLASS_NAME = 'picker-icon';
+const EXPAND_ICON_CLASS_NAME = 'select__picker-icon';
 
 const SelectTypes: Record<SelectVariant, SelectVariantProps> = {
   plain: {
-    labelGroupClass: 'input-select-group',
-    selectGroupClass: 'select-picker'
+    labelGroupClass: 'input-group',
+    selectGroupClass: 'input-group__select-field'
   },
   text: {
     labelGroupClass: 'text-select-group',
-    selectGroupClass: 'text-select-picker'
+    selectGroupClass: 'text-select-group__field'
   }
 };
 
@@ -65,7 +66,7 @@ function SelectRaw({
 
   const onExpand = (isExpanded: boolean) => {
     if (expandIconRef.current)
-      expandIconRef.current.classList = `${EXPAND_ICON_CLASS_NAME} ${isExpanded ? 'expanded' : ''}`;
+      expandIconRef.current.classList = `${EXPAND_ICON_CLASS_NAME} ${isExpanded ? 'select__picker-icon--expanded' : ''}`;
   };
 
   return (

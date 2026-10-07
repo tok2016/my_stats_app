@@ -63,27 +63,27 @@ export default function Table<DataType extends ChartData>({
     <div
       role='table'
       id={id}
-      className={`table ${Object.keys(headers).length < MIN_COLUMNS_TO_SHOW_BORDERS ? 'hide-borders' : ''} ${className}`}
+      className={`table ${Object.keys(headers).length < MIN_COLUMNS_TO_SHOW_BORDERS ? 'table--hide-borders' : ''} ${className}`}
       style={{
         minWidth: `calc(${minWidths.join(' + ')})`
       }}
     >
       <div
         role='rowheader'
-        className='table-header'
+        className='table__header'
         style={{ gridTemplateColumns: columns }}
       >
         {Object.entries(headers).map(([key, header]) => (
           <div
             role='columnheader'
             key={key}
-            className={`header-cell ${onSort && header.sort ? 'sort-header' : ''} ${header.headerCellClassName ?? ''}`}
+            className={`table__header__cell ${onSort && header.sort ? 'table__header__cell--sort' : ''} ${header.headerCellClassName ?? ''}`}
             onClick={() => onSort?.(key as keyof DataType)}
           >
             {header.title}
             {onSort && header.sort && (
               <div
-                className={`sort-button ${sortField === key ? 'colored' : ''}`}
+                className={`table__header__cell__sort-button ${sortField === key ? 'colored' : ''}`}
               >
                 <ChevronUpDown
                   className={!!sortDirection ? 'hidden' : ''}
@@ -113,7 +113,7 @@ export default function Table<DataType extends ChartData>({
         <div
           role='row'
           key={value.id}
-          className={`table-row ${i === 0 ? 'top-row' : ''}`}
+          className={`table__row ${i === 0 ? 'top-row' : ''}`}
           style={{
             animationDelay: `${ROW_ANIMATION_DELAY * i}ms`,
             gridTemplateColumns: columns
@@ -123,7 +123,7 @@ export default function Table<DataType extends ChartData>({
             <div
               role='cell'
               key={`${value.id}-${key}`}
-              className={`table-cell ${header.bodyCellClassName ?? ''}`}
+              className={`table__row__cell ${header.bodyCellClassName ?? ''}`}
             >
               {header.renderRow
                 ? header.renderRow(value, i, key)

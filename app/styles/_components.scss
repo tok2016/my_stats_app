@@ -25,8 +25,8 @@ $rating-border: $rating-size - 0.5em;
     text-align: center;
   }
 
-  .left-hand,
-  .right-hand {
+  .divider__left-hand,
+  .divider__right-hand {
     box-sizing: border-box;
     flex-grow: 1;
     height: utils.$min-size * 0.5;
@@ -34,13 +34,13 @@ $rating-border: $rating-size - 0.5em;
   }
 }
 
-.divider.rounded {
-  .left-hand {
+.divider--rounded {
+  .divider__left-hand {
     border-left: $border-style;
     border-bottom-left-radius: $border-radius;
   }
 
-  .right-hand {
+  .divider__right-hand {
     border-right: $border-style;
     border-bottom-right-radius: $border-radius;
   }
@@ -50,8 +50,8 @@ $rating-border: $rating-size - 0.5em;
   .divider {
     color: $color;
 
-    .left-hand,
-    .right-hand {
+    .divider__left-hand,
+    .divider__right-hand {
       border-color: $color;
     }
   }
@@ -59,8 +59,8 @@ $rating-border: $rating-size - 0.5em;
   .divider.colored {
     color: $highlight-color;
 
-    .left-hand,
-    .right-hand {
+    .divider__left-hand,
+    .divider__right-hand {
       border-color: $highlight-color;
     }
   }
@@ -74,7 +74,7 @@ $rating-border: $rating-size - 0.5em;
 
   font-size: utils.$regular-size;
 
-  button {
+  .pagination__button {
     line-height: utils.$tight-font;
     width: fit-content;
     min-height: buttons.$button-icon-size;
@@ -111,11 +111,11 @@ $rating-border: $rating-size - 0.5em;
     margin: 0.25em;
   }
 
-  .button-group {
+  .submit-buttons-group {
     text-align: center;
   }
 
-  .close {
+  .card__close-button {
     position: absolute;
     top: 0;
     right: 0;
@@ -162,13 +162,13 @@ $rating-border: $rating-size - 0.5em;
   gap: 0.75em;
 }
 
-.skeletons {
+.skeleton {
   display: flex;
   flex-direction: column;
   align-items: stretch;
 }
 
-.skeleton {
+.skeleton__item {
   --font-size: 1em;
   --line-height: #{utils.$fit-font};
 
@@ -199,56 +199,56 @@ $rating-border: $rating-size - 0.5em;
   }
 }
 
-.skeleton.min {
+.skeleton__item--min {
   --font-size: #{utils.$min-size};
 }
 
-.skeleton.small {
+.skeleton__item--small {
   --font-size: #{utils.$small-size};
 }
 
-.skeleton.regular {
+.skeleton__item--regular {
   --font-size: #{utils.$regular-size};
 }
 
-.skeleton.large {
+.skeleton__item--large {
   --font-size: #{utils.$large-size};
 }
 
-.skeleton.tight {
+.skeleton__item--tight {
   --line-height: #{utils.$tight-font};
 }
 
-.skeleton.fit {
+.skeleton__item--fit {
   --line-height: #{utils.$fit-font};
 }
 
-.skeleton.wide {
+.skeleton__item--wide {
   --line-height: #{utils.$wide-font};
 }
 
-.skeleton.h1 {
+.skeleton__item--h1 {
   --font-size: #{utils.$h1-size};
   --line-height: #{utils.$wide-font};
 }
 
-.skeleton.h2 {
+.skeleton__item--h2 {
   --font-size: #{utils.$h2-size};
   --line-height: #{utils.$wide-font};
 }
 
-.skeleton.h3 {
+.skeleton__item--h3 {
   --font-size: #{utils.$h3-size};
   --line-height: #{utils.$fit-font};
 }
 
-.skeleton.h4 {
+.skeleton__item--h4 {
   --font-size: #{utils.$h4-size};
   --line-height: #{utils.$fit-font};
 }
 
-.skeleton.image,
-.skeleton.graph {
+.skeleton__item--image,
+.skeleton__item--graph {
   height: 100%;
   min-height: unset;
   display: flex;
@@ -258,14 +258,17 @@ $rating-border: $rating-size - 0.5em;
   margin: 0;
 }
 
-.skeleton.tablet,
-.skeleton.header {
+.skeleton:has(> .skeleton__item--tablet) {
   font-size: utils.$small-size;
+}
+
+.skeleton__item--tablet,
+.skeleton__item--header {
   --font-size: calc(1em + #{tables.$table-row-padding-y} * 2);
   --line-height: #{utils.$tight-font};
 }
 
-.skeleton.tablet {
+.skeleton__item--tablet {
   margin-top: tables.$table-gap;
 
   &:last-child {
@@ -273,7 +276,7 @@ $rating-border: $rating-size - 0.5em;
   }
 }
 
-.skeleton.header {
+.skeleton__item--header {
   margin-top: tables.$header-glow;
 }
 
@@ -284,7 +287,7 @@ $rating-border: $rating-size - 0.5em;
 }
 
 @mixin skeleton($bg-color, $icon-color) {
-  .skeleton {
+  .skeleton__item {
     background-color: $bg-color;
 
     svg {
@@ -297,7 +300,7 @@ $rating-border: $rating-size - 0.5em;
   position: relative;
   overflow: hidden;
 
-  .skeletons {
+  .skeleton {
     position: absolute;
     top: 0;
     left: 0;
@@ -330,19 +333,19 @@ $rating-border: $rating-size - 0.5em;
   }
 }
 
-.drawer-expand {
+.drawer__expand-icon {
   width: 1.5em;
   height: 1.5em;
   transition: rotate utils.$active-time;
 }
 
-.drawer.expanded {
-  .drawer-expand {
+.drawer--expanded {
+  .drawer__expand-icon {
     rotate: 180deg;
   }
 }
 
-.drawer-submenu {
+.drawer__submenu {
   --expand-time: 100ms;
 
   width: 100%;
@@ -358,7 +361,7 @@ $rating-border: $rating-size - 0.5em;
   transition: max-height var(--expand-time);
 }
 
-form .drawer-submenu {
+form .drawer__submenu {
   padding: 0.25em;
   margin: 0;
 }
@@ -501,7 +504,7 @@ form .drawer-submenu {
   border-radius: utils.$max-radius;
   @include utils.font(1.14em, utils.$bold-font, $rating-border);
 
-  .value {
+  .rating__value {
     width: $rating-border;
     height: $rating-border;
     border-radius: utils.$max-radius;
@@ -513,7 +516,7 @@ form .drawer-submenu {
 
 @mixin rating($bg-color) {
   .rating {
-    .value {
+    .rating__value {
       background-color: $bg-color;
     }
   }
@@ -562,7 +565,7 @@ form .drawer-submenu {
 
   text-align: center;
 
-  .error-message-icon {
+  .error-message__icon {
     width: 5em;
     height: 5em;
   }

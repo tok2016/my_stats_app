@@ -22,15 +22,17 @@ export default function Skeleton({
   rows = 1
 }: SkeletonProps) {
   return (
-    <div className={`skeletons ${className}`} style={{ width }}>
+    <div className={`skeleton ${className}`} style={{ width }}>
       {type === 'tablet' && (
-        <div className={`skeleton header ${fontSize} ${lineHeight}`}></div>
+        <div
+          className={`skeleton__item skeleton__item--header ${fontSize} ${lineHeight}`}
+        ></div>
       )}
 
       {Array.from({ length: rows }, (_v, i) => (
         <div
           key={i}
-          className={`skeleton ${unitClassName} ${type} ${fontSize} ${lineHeight} ${i === 0 && type === 'tablet' ? 'first-row' : ''}`}
+          className={`skeleton__item ${unitClassName} skeleton__item--${type} skeleton__item--${fontSize} skeleton__item--${lineHeight} ${i === 0 && type === 'tablet' ? 'skeleton__item--first-row' : ''}`}
           style={{ height }}
         >
           {type === 'image' && <ImageSolid />}

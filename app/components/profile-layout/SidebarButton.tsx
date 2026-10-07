@@ -6,8 +6,8 @@ import { SidebarOptionProps } from '@ts/ui/components-props';
 
 import Skeleton from '@components/Skeleton';
 
-const SIDEBAR_ICON_CLASS = 'sidebar-icon';
-const SIDEBAR_LABEL_CLASS = 'sidebar-label';
+const SIDEBAR_ICON_CLASS = 'sidebar-button__icon';
+const SIDEBAR_LABEL_CLASS = 'sidebar-button__label';
 
 type SidebarButtonProps = Omit<SidebarOptionProps, 'subButtons'> & {
   isChoosen?: boolean;
@@ -35,13 +35,15 @@ export default function SidebarButton({
 }: SidebarButtonProps) {
   return (
     <div
-      className={`sidebar-button ${isChoosen ? 'choosen' : ''} ${disabled ? 'disabled' : ''}`}
+      className={`sidebar-button ${isChoosen ? 'sidebar-button--choosen' : ''} ${disabled ? 'sidebar-button--disabled' : ''}`}
       onClick={onClick}
     >
       {loading ? (
         <Skeleton type='image' className={SIDEBAR_ICON_CLASS} />
       ) : (
-        <div className={`${SIDEBAR_ICON_CLASS} loaded`}>{icon}</div>
+        <div className={`${SIDEBAR_ICON_CLASS} ${SIDEBAR_ICON_CLASS}--loaded`}>
+          {icon}
+        </div>
       )}
 
       {loading ? (
@@ -55,7 +57,9 @@ export default function SidebarButton({
         <span className={SIDEBAR_LABEL_CLASS}>{label}</span>
       )}
 
-      {href && <Link href={href} className='sidebar-link' scroll={false} />}
+      {href && (
+        <Link href={href} className='sidebar-button__link' scroll={false} />
+      )}
     </div>
   );
 }

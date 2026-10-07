@@ -109,9 +109,9 @@ const getTopSeries: GameEndpointAction<'/api/games/titles/series'> = async (
     where: `id = (${topSeries.join(',')})`
   });
 
-  const series: SeriesCollapsed[] = allIgdbSeries.map((igdbSeries) =>
-    getSeriesInfo(igdbSeries, games)
-  );
+  const series: SeriesCollapsed[] = allIgdbSeries
+    .map((igdbSeries) => getSeriesInfo(igdbSeries, games))
+    .sort((a, b) => b.games.length - a.games.length);
 
   return NextResponse.json(series, {
     status: 200,

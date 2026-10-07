@@ -28,20 +28,20 @@ type GamePositionsProps = {
  */
 function GamePositions({ rating, isSeries }: GamePositionsProps) {
   return (
-    <div className='positions'>
-      <div className='position'>
-        <p className='position-number'>
+    <div className='rating-block__positions'>
+      <div className='rating-block__positions__block'>
+        <p className='rating-block__positions__block__rank'>
           {rating ? rating.generalPosition : '—'}
         </p>
-        <p className='position-label'>all games</p>
+        <p className='rating-block__positions__block__label'>all games</p>
       </div>
 
       {isSeries && (
-        <div className='position'>
-          <p className='position-number'>
+        <div className='rating-block__positions__block'>
+          <p className='rating-block__positions__block__rank'>
             {rating && rating.seriesPosition ? rating.seriesPosition : '—'}
           </p>
-          <p className='position-label'>series</p>
+          <p className='rating-block__positions__block__label'>series</p>
         </div>
       )}
     </div>
@@ -58,8 +58,8 @@ function GamePositions({ rating, isSeries }: GamePositionsProps) {
 function GameRatingBlock({ title, rating, isSeries }: GameRatingBlockProps) {
   return (
     <div className='rating-block'>
-      <h3>{title}</h3>
-      <Rating value={rating?.value} />
+      <h3 className='rating-block__title'>{title}</h3>
+      <Rating className='rating-block__rating' value={rating?.value} />
       <GamePositions rating={rating} isSeries={isSeries} />
     </div>
   );
@@ -91,7 +91,7 @@ export default function GameRatings({ game }: GameRatingsProps) {
   const isSeries = !!game.series;
 
   return (
-    <section id='game-ratings'>
+    <section id='game-title-page__ratings'>
       <GameRatingBlock
         title='Your rating'
         rating={game.rating}

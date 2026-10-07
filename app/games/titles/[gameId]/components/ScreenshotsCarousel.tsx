@@ -121,7 +121,7 @@ export default function ScreenshotsCarousel({
   return (
     <div className='screenshots-collage'>
       {/*Preview is a horizontal flexbox of screenshot with hidden overflow*/}
-      <div className='title-screenshot' ref={previewRef}>
+      <div className='screenshots-collage__preview' ref={previewRef}>
         {screenshots.map((screenshot, i) => (
           <FetchImage
             key={`${groupKey}-${i}-title`}
@@ -134,7 +134,7 @@ export default function ScreenshotsCarousel({
 
       {/*Carousel is a scrollable flexbox of clickable screenshots*/}
       <div
-        className='screenshots-carousel'
+        className='screenshots-collage__carousel'
         ref={carouselRef}
         onScroll={stopScrollTimeout}
         onScrollEnd={waitForSroll}
@@ -144,7 +144,7 @@ export default function ScreenshotsCarousel({
             key={`${groupKey}-${i}`}
             src={screenshot}
             alt={`Screenshot ${i + 1} of ${gameName}`}
-            className={`clickable screenshot ${i === index ? 'choosen' : ''}`}
+            className={`screenshot screenshot--clickable ${i === index ? 'screenshot--choosen' : ''}`}
             onClick={() => setIndex(i)}
           />
         ))}

@@ -7,7 +7,7 @@ type MultipleRatingProps = ExternalRatings & {
   className?: string;
 };
 
-type RatingSourceProps = {
+type RatingItemProps = {
   source: string;
   rating?: number;
 };
@@ -18,9 +18,9 @@ type RatingSourceProps = {
  * @param props.rating - Rating value. If empty, shows NR (not rated).
  * @returns
  */
-function RatingSource({ source, rating }: RatingSourceProps) {
+function RatingItem({ source, rating }: RatingItemProps) {
   return (
-    <div className='rating-source'>
+    <div className='multiple-ratings__item'>
       <span className='small'>{source}</span>
       <Rating value={rating} />
     </div>
@@ -43,9 +43,9 @@ export default function MultipleRating({
 }: MultipleRatingProps) {
   return (
     <div className={`multiple-ratings ${className}`}>
-      <RatingSource source='You' rating={userOwnRating} />
-      <RatingSource source='Critics' rating={criticsRating} />
-      <RatingSource source='Users' rating={usersRating} />
+      <RatingItem source='You' rating={userOwnRating} />
+      <RatingItem source='Critics' rating={criticsRating} />
+      <RatingItem source='Users' rating={usersRating} />
     </div>
   );
 }

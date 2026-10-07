@@ -74,7 +74,7 @@ function ChartTooltipField<DataType extends ChartData>({
   if (!valueComponent && !fieldData.renderValue) return;
 
   return (
-    <div className='tooltip-key'>
+    <div className='tooltip__content__key'>
       {fieldData.renderKey?.(field, data) ?? <span>{fieldData.name}: </span>}
       {fieldData.renderValue?.(data) ?? valueComponent}
     </div>
@@ -110,16 +110,16 @@ export default function ChartTooltip<DataType extends ChartData>({
         opacity: !data ? '0' : undefined,
         maxWidth: `${MAX_WIDTH}rem`
       }}
-      className='tooltip-container'
+      className='tooltip'
       data-item={data?.id}
       ref={ref}
     >
       <div
-        className='chart-tooltip'
+        className='tooltip__content'
         data-rank={colored ? data?.index : undefined}
         style={{ maxWidth: '100%' }}
       >
-        <h3 className='colored'>{data?.name}</h3>
+        <h3 className='tooltip__content__title colored'>{data?.name}</h3>
 
         {displayFields.map((field) => (
           <ChartTooltipField
@@ -131,13 +131,13 @@ export default function ChartTooltip<DataType extends ChartData>({
         ))}
 
         {showRank && rank && (
-          <div className='tooltip-badge tooltip-rank'>
+          <div className='tooltip__content__badge tooltip__content__badge--rank'>
             <h3>{rank}</h3>
           </div>
         )}
 
         {!data?.percent || (
-          <div className='tooltip-badge tooltip-percent'>
+          <div className='tooltip__content__badge tooltip__content__badge--percent'>
             <h4>{data?.percent}%</h4>
           </div>
         )}

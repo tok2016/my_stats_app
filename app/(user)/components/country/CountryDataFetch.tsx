@@ -41,10 +41,10 @@ export default function CountryDataFetch({
 
   return (
     <div className='country'>
-      <p>{countryData.name}</p>
+      <p className='country__name'>{countryData.name}</p>
       <FetchImage
         alt={`Flag of ${countryData.name}`}
-        className='flag'
+        className='country__flag'
         src={countryData.flag}
         width={20}
         height={20}

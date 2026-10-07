@@ -20,12 +20,12 @@ $series-collage-areas: (
   overflow-x: auto;
 }
 
-.genre-top {
+.genre-tops__top {
   font-size: utils.$small-size;
   flex-grow: 1;
   width: 19em;
 
-  .genre-top-title {
+  .genre-tops__top__title {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -46,11 +46,11 @@ $series-collage-areas: (
   }
 }
 
-.genre-rating-block {
+.data-block--genre-rating {
   width: 13em;
 }
 
-.rating-title {
+.data-block__rating-title {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -66,7 +66,7 @@ $series-collage-areas: (
   }
 }
 
-.data-block-content {
+.data-block__content {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -83,11 +83,11 @@ $series-collage-areas: (
   height: 4rem;
 }
 
-.rating-title-skeleton {
+.data-block__rating-title-skeleton {
   margin: 0.875rem 0;
 }
 
-.rated-studio {
+.data-block--studio-rating {
   .multiple-ratings {
     padding-top: 0.25em;
     border-top: solid 2px;
@@ -95,10 +95,10 @@ $series-collage-areas: (
   }
 }
 
-.rated-platform {
+.data-block--rated-platform {
   min-width: 19em;
 
-  .data-block-content {
+  .data-block__content {
     gap: 0.75em;
   }
 }
@@ -127,7 +127,7 @@ $series-collage-areas: (
   }
 }
 
-.top-game {
+.data-block--top-game {
   min-width: 15.5em;
   position: relative;
 }
@@ -136,7 +136,7 @@ $series-collage-areas: (
   overflow-x: auto;
   min-width: 50em;
 
-  .top-3-games {
+  .games-playtime__top-games {
     width: 100%;
 
     display: flex;
@@ -149,16 +149,16 @@ $series-collage-areas: (
   }
 
   .table,
-  .skeleton:has(> .tablet) {
+  .skeleton__item:has(> .skeleton__item--tablet) {
     width: 100%;
   }
 }
 
-.pre-rank-prop {
+.data-block__pre-rank-prop {
   padding-right: metrics.$max-data-rank-width;
 }
 
-.top-games-grid {
+.top-rated-games {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -176,7 +176,7 @@ $series-collage-areas: (
   gap: 2em;
 }
 
-.series-block {
+.data-block--top-series {
   min-width: 19em;
 }
 
@@ -198,21 +198,21 @@ $series-collage-areas: (
   }
 
   @each $rank, $area in $series-collage-areas {
-    .series-game-#{$rank} {
+    .series-games-collage__cover-#{$rank} {
       grid-area: $area;
     }
   }
 }
 
-.games-library-wrapper {
+.library__games-table-wrapper {
   overflow: auto;
 }
 
-.games-library {
+.library__games-table-wrapper__table {
   width: 100%;
   min-width: 60em;
 
-  .table-cell-rating {
+  .table__row__cell-rating {
     justify-content: center;
   }
 }

@@ -51,7 +51,7 @@ export default function PublishInput({
         name='isPublic'
         label='Public'
         isSwitch
-        value={isPublic}
+        checked={isPublic}
         onChange={onPrivacyChange}
       />
 

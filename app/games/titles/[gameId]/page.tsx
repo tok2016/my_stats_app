@@ -28,16 +28,17 @@ export default async function GameInfoPage({
 
     return (
       <>
-        <div className='games-page-name'>
+        <div className='games__page-name'>
           <h2>{game.name}</h2>
           <GameControlButtons game={game} />
         </div>
 
-        <div className='game-page-content'>
+        <div className='game-title-page'>
           <GameDetails game={game} />
           <GameRatings game={game} />
-          <div className='metric similar-games'>
+          <div className='metric game-title-page__similar'>
             <h3>Similar games</h3>
+
             <div className='recommended-games'>
               {game.similarGames.map((similarGame) => (
                 <RecommendedGameBlock key={similarGame.id} {...similarGame} />

@@ -56,8 +56,8 @@ export default function SidebarButtonsGroup(sidebarOption: SidebarOptionProps) {
         <Link
           key={subButton.href}
           href={subButton.href}
-          className={`sidebar-subbutton
-            ${isChoosen && endpoints[2] === subButton.name ? 'choosen' : ''}
+          className={`sidebar-submenu__button
+            ${isChoosen && endpoints[2] === subButton.name ? 'sidebar-submenu__button--choosen' : ''}
           `}
         >
           {subButton.label}

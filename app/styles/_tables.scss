@@ -26,8 +26,8 @@ $header-glow: 1px;
   @include utils.font(utils.$small-size, utils.$regular-font, utils.$fit-font);
 }
 
-.table-header,
-.table-row {
+.table__header,
+.table__row {
   display: grid;
   grid-template-columns: 1fr 5fr 2fr 5fr;
   align-items: stretch;
@@ -48,7 +48,7 @@ $header-glow: 1px;
   }
 }
 
-.table-header {
+.table__header {
   @include utils.font(utils.$min-size, utils.$bold-font, utils.$fit-font);
   position: sticky;
   top: 0;
@@ -56,19 +56,19 @@ $header-glow: 1px;
   border-radius: 3px;
 }
 
-.header-cell,
-.table-cell {
+.table__header__cell,
+.table__row__cell {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 2px;
 }
 
-.sort-header {
+.table__header__cell--sort {
   cursor: pointer;
 }
 
-.sort-button {
+.table__header__cell__sort-button {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -84,7 +84,7 @@ $header-glow: 1px;
   }
 }
 
-.table-row {
+.table__row {
   opacity: 0;
 
   animation: table-dropdown 50ms ease-out;
@@ -114,18 +114,18 @@ $header-glow: 1px;
     color: $row-text-color;
   }
 
-  .table-header {
+  .table__header {
     background-color: $header-bg-color;
     color: $header-text-color;
     box-shadow: 0 0 0 $header-glow $header-bg-color;
   }
 
-  .table-row {
+  .table__row {
     background-color: $row-bg-color;
     box-shadow: 0 0 3px 0 $row-glow-color;
   }
 
-  .table-row {
+  .table__row {
     > * {
       border-right: solid 1px $row-border-color;
 
@@ -135,7 +135,7 @@ $header-glow: 1px;
     }
   }
 
-  .table-header {
+  .table__header {
     > * {
       border-right: solid 1px $header-border-color;
 
@@ -145,16 +145,16 @@ $header-glow: 1px;
     }
   }
 
-  .hide-borders {
-    .table-row,
-    .table-header {
+  .table--hide-borders {
+    .table__row,
+    .table__header {
       > * {
         border-right: none;
       }
     }
   }
 
-  .sort-header {
+  .table__header__cell--sort {
     &:hover,
     &:focus-visible {
       color: $header-hover-color;
@@ -181,8 +181,8 @@ $header-glow: 1px;
 }
 
 #studios-table {
-  .table-header,
-  .table-row {
+  .table__header,
+  .table__row {
     grid-template-columns: 1fr 4fr 3fr 2fr 4fr;
   }
 }

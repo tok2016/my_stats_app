@@ -12,7 +12,7 @@ export default function SettingsFormSkeleton() {
     <div className='card settings'>
       <Skeleton type='h2' />
 
-      <div className='avatar-field'>
+      <div className='avatar-input'>
         <Avatar username='' loading />
       </div>
 

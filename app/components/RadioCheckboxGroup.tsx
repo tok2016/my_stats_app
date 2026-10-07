@@ -5,18 +5,31 @@ import { InputBaseProps, Option } from '@ts/ui/components-props';
 import BinaryInput from './BinaryInput';
 import Hint from './Hint';
 
-type RadioGroupProps = Omit<InputBaseProps, 'id'> & {
-  type?: 'radio' | 'checkbox';
+type RadioCheckboxGroupType = 'radio' | 'checkbox' | undefined;
+
+type ValueType<InputType extends RadioCheckboxGroupType> =
+  InputType extends 'checkbox' ? string[] : string;
+
+type RadioGroupProps<InputType extends RadioCheckboxGroupType> = Omit<
+  InputBaseProps,
+  'id'
+> & {
+  type?: InputType;
   options: Option[];
-  defaultValue?: string | string[];
-  value?: string | string[];
-  onChange?: (value: string | string[]) => void;
+  required?: boolean;
+  defaultValue?: ValueType<InputType>;
+  value?: ValueType<InputType>;
+  onChange?: <FuncInputType extends RadioCheckboxGroupType>(
+    value: ValueType<FuncInputType>
+  ) => void;
 };
 
 const isChecked = (current: string | string[] | undefined, value: string) =>
   typeof current === 'undefined' ? undefined : current.includes(value);
 
-export default function RadioCheckboxGroup({
+export default function RadioCheckboxGroup<
+  InputType extends 'radio' | 'checkbox' | undefined
+>({
   label,
   name,
   type = 'radio',
@@ -26,14 +39,15 @@ export default function RadioCheckboxGroup({
   value,
   hint,
   errorHint,
+  required,
   onChange
-}: RadioGroupProps) {
+}: RadioGroupProps<InputType>) {
   const onCheck = (id: string) =>
     typeof value === 'undefined'
       ? undefined
       : (checked: boolean) => {
-          if (value && typeof value !== 'string') {
-            onChange?.(
+          if (value && onChange && typeof value !== 'string') {
+            onChange<'checkbox'>(
               checked ? [...value, id] : value.filter((val) => val !== id)
             );
           } else {
@@ -42,10 +56,12 @@ export default function RadioCheckboxGroup({
         };
 
   return (
-    <div className={`input-select-group ${className}`}>
-      <label>{label}</label>
+    <div className={`input-group ${className}`}>
+      <label className='input-group__label' hidden={!label}>
+        {label} {required && <span className='colored'>*</span>}
+      </label>
 
-      <div className='radio-checkbox-group'>
+      <div className='input-group__radio-checkbox'>
         {options.map((option) => (
           <BinaryInput
             key={option.value}
@@ -53,8 +69,8 @@ export default function RadioCheckboxGroup({
             id={option.value}
             name={name}
             label={option.label}
-            defaultValue={isChecked(defaultValue, option.value)}
-            value={isChecked(value, option.value)}
+            defaultChecked={isChecked(defaultValue, option.value)}
+            checked={isChecked(value, option.value)}
             onChange={onCheck(option.value)}
           />
         ))}

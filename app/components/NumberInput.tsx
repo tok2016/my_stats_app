@@ -1,41 +1,45 @@
 'use client';
 
 import { ChevronDown, ChevronUp } from '@mynaui/icons-react';
-import { type ChangeEvent, type MouseEvent, useRef } from 'react';
+import {
+  type ChangeEvent,
+  DetailedHTMLProps,
+  InputHTMLAttributes,
+  type MouseEvent,
+  useRef
+} from 'react';
 
-import { InputBaseProps } from '@ts/ui/components-props';
+import { InputExpandedProps } from '@ts/ui/components-props';
 
 import Hint from './Hint';
 
-type NumberInputProps = InputBaseProps & {
-  required?: boolean;
-  value?: number;
-  defaultValue?: number;
-  onChange?: (value?: number) => void;
-  min?: number;
-  max?: number;
-  step?: number;
-  placeholder?: number;
-};
+type NumberInputProps = Omit<
+  DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
+  'value' | 'onChange' | 'defaultValue' | 'type' | 'placeholder'
+>
+  & InputExpandedProps & {
+    min?: number;
+    max?: number;
+    step?: number;
+    value?: number;
+    defaultValue?: number;
+    placeholder?: number;
+    onChange?: (value?: number) => void;
+  };
 
 export default function NumberInput({
   id,
-  name,
   label,
-  value,
-  defaultValue,
   min,
   max,
   step = 1,
   className = '',
   hint,
   errorHint,
-  disabled,
   required,
   placeholder,
-  onBlur,
-  onFocus,
-  onChange
+  onChange,
+  ...props
 }: NumberInputProps) {
   const ref = useRef<HTMLInputElement>(null);
 
@@ -64,30 +68,26 @@ export default function NumberInput({
   };
 
   return (
-    <div className={`input-select-group number-input ${className}`}>
+    <div className={`input-group input-group--number ${className}`}>
       <label hidden={!label} htmlFor={id}>
         {label}
         {!required || <span className='colored'>*</span>}
       </label>
 
-      <div className='input-wrapper'>
+      <div className='input-group__field'>
         <input
+          {...props}
+          placeholder={placeholder?.toString()}
+          required={false}
           id={id}
-          name={name}
           type='number'
           ref={ref}
-          placeholder={placeholder?.toString()}
-          defaultValue={defaultValue}
-          value={value}
           min={min}
           max={max}
-          disabled={disabled}
           onChange={onValueChange}
-          onFocus={onFocus}
-          onBlur={onBlur}
         />
 
-        <div className='increment-buttons input-icon'>
+        <div className='input-group__field__increment input-group__field__icon'>
           <ChevronUp
             onClick={onIncrement(step)}
             onMouseDown={onIncrementDown}

@@ -32,19 +32,19 @@ function PeriodTopSkeleton({
 }: PeriodTopSkeletonProps) {
   return (
     <div
-      className={`data-block period-top ${className}`}
+      className={`data-block data-block--period-top ${className}`}
       style={{ width: `${blockWidthRem}rem` }}
     >
       <Skeleton
         type='text'
-        className='data-block-title'
+        className='data-block__title'
         fontSize='regular'
         lineHeight='wide'
       />
-      <ol className='data-block-list'>
+      <ol className='data-block__list'>
         <li>
           <Skeleton
-            className='data-block-item'
+            className='data-block__list__item'
             type='text'
             fontSize='small'
             lineHeight='wide'
@@ -52,7 +52,7 @@ function PeriodTopSkeleton({
         </li>
         <li>
           <Skeleton
-            className='data-block-item'
+            className='data-block__list__item'
             type='text'
             fontSize='small'
             lineHeight='wide'
@@ -60,7 +60,7 @@ function PeriodTopSkeleton({
         </li>
         <li>
           <Skeleton
-            className='data-block-item'
+            className='data-block__list__item'
             type='text'
             fontSize='small'
             lineHeight='wide'
@@ -82,7 +82,10 @@ export default function PeriodTopsSkeletons({
   return (
     <>
       <div className='period-tops'>
-        <div className='period-tops-in-group' style={{ gap: `${gapRem}rem` }}>
+        <div
+          className='period-tops__groups__blocks'
+          style={{ gap: `${gapRem}rem` }}
+        >
           {Array.from({ length: SKELETONS_COUNT }, (_v, k) => (
             <PeriodTopSkeleton
               key={`${metricId}-${k}`}
@@ -91,7 +94,7 @@ export default function PeriodTopsSkeletons({
             />
           ))}
         </div>
-        <div className='years'>
+        <div className='period-tops__years-decades'>
           <Divider rounded className='invisible'>
             0
           </Divider>

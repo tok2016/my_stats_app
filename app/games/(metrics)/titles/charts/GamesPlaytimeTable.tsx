@@ -18,6 +18,7 @@ export default function GamesPlaytimeTable({ data }: GamesPlaytimeTableProps) {
   return (
     <Table
       id='games-playtime'
+      className='games-playtime__table'
       data={data}
       headers={{
         index: {

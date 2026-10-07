@@ -30,7 +30,7 @@ export default function HidingInput({
         name={name}
         label={label}
         onChange={setOpened}
-        defaultValue={defaultValue}
+        defaultChecked={defaultValue}
       />
       {isOpened && children}
     </div>

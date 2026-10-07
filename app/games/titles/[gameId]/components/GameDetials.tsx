@@ -17,8 +17,8 @@ export default function GameDetails({ game }: GameDetailsProps) {
   const playDate = game.playDate ? new Date(game.playDate) : undefined;
 
   return (
-    <section id='details' className='game-detials'>
-      <div className='game-details-collage'>
+    <section id='details' className='game-title-page__details'>
+      <div className='game-title-page__details__collage'>
         <GameCover game={game} />
         {game.screenshots && (
           <ScreenshotsCarousel
@@ -29,8 +29,8 @@ export default function GameDetails({ game }: GameDetailsProps) {
         )}
       </div>
 
-      <div className='game-detials-info'>
-        <div className='game-details-info-block'>
+      <div className='game-title-page__details__data'>
+        <div className='game-title-page__details__data__props'>
           <PropBlock title='Platfrom'>
             {game.platform ? game.platform.name : '—'}
           </PropBlock>
@@ -63,7 +63,7 @@ export default function GameDetails({ game }: GameDetailsProps) {
           </PropBlock>
         </div>
 
-        <div className='game-details-info-block'>
+        <div className='game-title-page__details__data__props'>
           <PropBlock title='Developers'>
             {game.developers.length
               ? game.developers.map((dev) => dev.name).join(', ')
@@ -81,7 +81,7 @@ export default function GameDetails({ game }: GameDetailsProps) {
           </PropBlock>
         </div>
 
-        <div className='game-details-info-block'>
+        <div className='game-title-page__details__data__props'>
           <PropBlock title='Genres'>
             {game.genres.length
               ? game.genres.map((genre) => genre.name).join(', ')

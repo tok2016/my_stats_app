@@ -22,8 +22,8 @@ export function ChartSkeleton({ className, type }: ChartSkeletonProps) {
   if (type === 'map')
     return (
       <div className={`chart ${ChartClasses[type].container} ${className}`}>
-        <div className='chart-legend-content'>
-          <div className='chart-core-wrapper'>
+        <div className='chart__core-legend-container'>
+          <div className='chart__core-legend-container__core'>
             <div className={ChartClasses[type].core}>
               <VectorMap
                 className='map'

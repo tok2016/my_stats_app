@@ -20,13 +20,14 @@ export default function ChartLegend<DataType extends ChartData>({
       {data.map((value, i) => {
         const percent = percentsMap?.get(value.id);
         return (
-          <li key={value.id} className='legend-key' data-rank={i}>
+          <li key={value.id} className='chart-legend__item' data-rank={i}>
             {percent ? (
-              <span className='percent'>{percent}%</span>
+              <span className='chart-legend__item__percent'>{percent}%</span>
             ) : (
-              <div className='legend-mark'></div>
+              <div className='chart-legend__item__mark'></div>
             )}
-            <span className='item-title'>{value.name}</span>
+
+            <span className='chart-legend__item__title'>{value.name}</span>
           </li>
         );
       })}

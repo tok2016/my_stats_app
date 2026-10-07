@@ -163,7 +163,7 @@ export default function AdvanceSearch({
     <Popup name={popupName} variant='light'>
       <h2>Advance search</h2>
       <form
-        id='advance-search'
+        id='advance-search__form'
         action={action}
         onReset={resetParams}
         noValidate

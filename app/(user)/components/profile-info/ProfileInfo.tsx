@@ -61,10 +61,10 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
       {loading ? (
         <ProfileCreditsSkeleton />
       ) : (
-        <div className='profile-credits'>
+        <div className='profile-info__credits'>
           <h2>{user.username}</h2>
 
-          <div className='profile-details'>
+          <div className='profile-info__credits__details'>
             <a
               className='colored'
               href={`mailto:${user.email}`}
@@ -89,9 +89,9 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
       )}
 
       {user.id === authUser.id && (
-        <div className='profile-meta'>
+        <div className='profile-info__meta'>
           <Logo />
-          <div className='profile-controlls'>
+          <div className='profile-info__meta__controlls'>
             <PublishButton isPublic={user.isPublic} loading={loading} />
 
             <IconButton

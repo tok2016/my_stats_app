@@ -13,9 +13,9 @@ const MAX_GAMES_IN_TOOLTIP = 3;
 
 const renderTopGamesValue = (value?: GameCountryChartData) =>
   value && (
-    <ol className='data-block-list'>
+    <ol className='data-block__list'>
       {value.topGames.slice(0, MAX_GAMES_IN_TOOLTIP).map((game) => (
-        <li className='data-block-item' key={`${game.id}-${value.id}`}>
+        <li className='data-block__list__item' key={`${game.id}-${value.id}`}>
           <GameTitle game={game} />
         </li>
       ))}

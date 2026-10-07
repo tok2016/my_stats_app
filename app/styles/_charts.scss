@@ -26,15 +26,15 @@ $default-color: map.get(utils.$active-colors, 'games');
 }
 
 .chart,
-.skeleton.graph {
+.skeleton__item--graph {
   border-radius: utils.$regular-radius;
 }
 
-.chart-core-wrapper {
+.chart__core-legend-container__core {
   flex: 1;
 }
 
-.chart-legend-content {
+.chart__core-legend-container {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -43,7 +43,7 @@ $default-color: map.get(utils.$active-colors, 'games');
   flex: 1;
   max-height: 100%;
 
-  .chart-core-wrapper {
+  .chart__core-legend-container__core {
     width: 100%;
     height: 100%;
   }
@@ -57,7 +57,7 @@ $default-color: map.get(utils.$active-colors, 'games');
     height: 100% !important;
   }
 
-  .switch-button {
+  .switchable-chart__button {
     position: absolute;
     top: 0;
     right: 0;
@@ -75,49 +75,49 @@ $default-color: map.get(utils.$active-colors, 'games');
   overflow: hidden;
 }
 
-.doughnut-container {
+.doughnut-chart {
   width: 32em;
   aspect-ratio: 1.8;
 
-  .chart-core-wrapper {
+  .chart__core-legend-container__core {
     flex: 0;
     width: unset;
     height: 100%;
     aspect-ratio: 1;
   }
 
-  .chart-legend-content {
+  .chart__core-legend-container {
     gap: 0.5em;
   }
 }
 
-.period-bar-container {
-  .chart-core-wrapper {
+.period-bar-chart {
+  .chart__core-legend-container__core {
     width: 85%;
   }
 }
 
-.period-bar-container,
-.bar-container {
+.period-bar-chart,
+.bar-chart {
   width: 100%;
   min-width: 32em;
   height: 26em;
 }
 
-.bar-container:has(.horizontal) {
+.bar-chart:has(.bar-chart__core--horizontal) {
   width: 100%;
   min-width: 32em;
   height: 32em;
 }
 
-.line-container {
+.line-chart {
   width: 100%;
   min-width: 32em;
   height: 24em;
 }
 
-.map-container,
-.map-chart {
+.map-chart,
+.map-chart__core {
   width: 100%;
 }
 
@@ -135,7 +135,7 @@ $default-color: map.get(utils.$active-colors, 'games');
   }
 
   .chart,
-  .skeletons:has(> .graph) {
+  .skeleton:has(> .skeleton__item--graph) {
     padding: 0.5em;
     flex: 2;
     width: unset;
@@ -144,23 +144,23 @@ $default-color: map.get(utils.$active-colors, 'games');
   }
 
   .table,
-  .skeletons:has(> .tablet) {
+  .skeleton:has(> .skeleton__item--tablet) {
     flex: 3;
     min-width: 29em;
   }
 
-  .skeletons:has(> .tablet) {
+  .skeleton:has(> .skeleton__item--tablet) {
     overflow: auto;
   }
 }
 
-.tooltip-container {
+.tooltip {
   position: absolute;
   pointer-events: none;
   z-index: 10;
 }
 
-.chart-tooltip {
+.tooltip__content {
   position: relative;
 
   box-sizing: border-box;
@@ -184,7 +184,7 @@ $default-color: map.get(utils.$active-colors, 'games');
   }
 }
 
-.tooltip-key {
+.tooltip__content__key {
   display: flex;
   flex-direction: row;
   gap: 0.25em;
@@ -195,7 +195,7 @@ $default-color: map.get(utils.$active-colors, 'games');
   }
 }
 
-.tooltip-badge {
+.tooltip__content__badge {
   position: absolute;
   right: 0;
 
@@ -209,7 +209,7 @@ $default-color: map.get(utils.$active-colors, 'games');
   max-width: $tooltip-badge-max;
 }
 
-.tooltip-rank {
+.tooltip__content__badge--rank {
   top: 0;
 
   background-color: $default-color;
@@ -221,7 +221,7 @@ $default-color: map.get(utils.$active-colors, 'games');
   }
 }
 
-.tooltip-percent {
+.tooltip__content__badge--percent {
   bottom: 0;
 
   background-color: transparent;
@@ -247,7 +247,7 @@ $default-color: map.get(utils.$active-colors, 'games');
   max-height: 100%;
   overflow-y: auto;
 
-  li {
+  .chart-legend__item {
     line-height: utils.$wide-font;
 
     display: flex;
@@ -255,27 +255,27 @@ $default-color: map.get(utils.$active-colors, 'games');
     align-items: center;
     gap: 0.25em;
 
-    .percent {
+    .chart-legend__item__percent {
       width: 3em;
       font-weight: utils.$bold-font;
       text-align: right;
     }
 
-    .legend-mark {
+    .chart-legend__item__mark {
       width: 1em;
       height: 1em;
       border-radius: utils.$max-radius;
       background-color: $default-color;
     }
 
-    .item-title {
+    .chart-legend__item__title {
       flex: 1;
     }
   }
 }
 
 @each $rank, $color in utils.$diagram-colors {
-  .chart-tooltip[data-rank='#{$rank}'] {
+  .tooltip__content[data-rank='#{$rank}'] {
     box-shadow: 0 0 utils.$blur utils.$spread $color;
     border-color: $color;
 
@@ -283,11 +283,11 @@ $default-color: map.get(utils.$active-colors, 'games');
       color: $color;
     }
 
-    .tooltip-rank {
+    .tooltip__content__badge--rank {
       background-color: $color;
     }
 
-    .tooltip-percent {
+    .tooltip__content__badge--percent {
       border-color: $color;
 
       * {
@@ -296,12 +296,12 @@ $default-color: map.get(utils.$active-colors, 'games');
     }
   }
 
-  .legend-key[data-rank='#{$rank}'] {
-    .percent {
+  .chart-legend__item[data-rank='#{$rank}'] {
+    .chart-legend__item__percent {
       color: $color;
     }
 
-    .legend-mark {
+    .chart-legend__item__mark {
       background-color: $color;
     }
   }
@@ -312,11 +312,11 @@ $default-color: map.get(utils.$active-colors, 'games');
     background-color: $bg-color;
   }
 
-  .map-container {
+  .map-chart {
     background-color: unset;
   }
 
-  .chart-tooltip {
+  .tooltip__content {
     background-color: $bg-color;
     color: $text-color;
   }
@@ -327,7 +327,7 @@ $default-color: map.get(utils.$active-colors, 'games');
     }
   }
 
-  .switch-button {
+  .switchable-chart__button {
     background-color: $bg-color !important;
   }
 

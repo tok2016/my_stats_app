@@ -99,22 +99,22 @@ $code-input-padding-x: 0.75em;
     }
   }
 
-  .input-icon {
+  .input-group__field__icon {
     color: $text-color;
   }
 
-  .input-icon.spinner {
+  .input-group__field__icon.spinner {
     border-color: $text-color;
   }
 }
 
-.input-wrapper {
+.input-group__field {
   min-width: $input-min-width + $input-padding-x * 2;
   position: relative;
   display: flex;
   flex-direction: row;
 
-  .input-icon {
+  .input-group__field__icon {
     @include utils.font(1em, utils.$bold-font, utils.$tight-font);
 
     position: absolute;
@@ -133,7 +133,7 @@ $code-input-padding-x: 0.75em;
     flex-grow: 1;
   }
 
-  &:has(> .input-icon) {
+  &:has(> .input-group__field__icon) {
     input[type='search'],
     input[type='password'],
     input[type='text'],
@@ -143,7 +143,7 @@ $code-input-padding-x: 0.75em;
   }
 }
 
-.code-input {
+.input-group__code {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -202,7 +202,7 @@ select {
   justify-content: space-between;
 }
 
-.input-select-group,
+.input-group,
 .hidden-input {
   display: flex;
   flex-direction: column;
@@ -210,25 +210,25 @@ select {
   font-size: 1em;
 }
 
-.select-picker,
-.text-select-picker {
+.input-group__select-field,
+.text-select-group__field {
   position: relative;
 }
 
-.text-select-picker {
+.text-select-group__field {
   width: max-content;
 }
 
-.picker-icon {
+.select__picker-icon {
   @include utils.font(1em, utils.$bold-font, utils.$tight-font);
   transition: rotate utils.$active-time;
 }
 
-.picker-icon * {
+.select__picker-icon * {
   stroke-width: 3px;
 }
 
-.picker-icon.expanded {
+.select__picker-icon--expanded {
   rotate: 180deg;
 }
 
@@ -271,7 +271,8 @@ select {
   display: none;
 }
 
-.select-search {
+.input-group__select-search,
+.input-group--search {
   position: relative;
 
   .picker {
@@ -286,7 +287,7 @@ select {
   }
 }
 
-.option {
+.picker__option {
   font-weight: utils.$regular-font;
   line-height: utils.$wide-font;
   font-family: utils.$inter;
@@ -297,12 +298,12 @@ select {
   cursor: pointer;
 }
 
-.option.selected {
+.picker__option--selected {
   font-weight: utils.$bold-font;
 }
 
 @mixin plain-select($outlined, $bg-color, $active-color, $text-color) {
-  .input-select-group {
+  .input-group {
     .select {
       @include input-text-basic(
         false,
@@ -317,7 +318,7 @@ select {
       }
     }
 
-    .picker-icon {
+    .select__picker-icon {
       color: $text-color;
     }
 
@@ -325,7 +326,7 @@ select {
       box-shadow: 0 0 utils.$blur utils.$spread $active-color;
     }
 
-    .option {
+    .picker__option {
       color: $text-color;
 
       &:hover,
@@ -350,7 +351,7 @@ select {
   font-size: 1em;
 }
 
-.text-select-picker {
+.text-select-group__field {
   .select {
     @include utils.header(3);
     background-color: transparent;
@@ -366,7 +367,7 @@ select {
     left: -$option-padding-x;
   }
 
-  .option.selected {
+  .picker__option--selected {
     font-family: utils.$ibm-plex;
   }
 }
@@ -402,11 +403,11 @@ select {
       box-shadow: 0 0 utils.$blur utils.$spread $active-color;
     }
 
-    .picker-icon {
+    .select__picker-icon {
       color: $main-color;
     }
 
-    .option {
+    .picker__option {
       color: $text-color;
 
       &:hover,
@@ -417,8 +418,8 @@ select {
   }
 }
 
-.number-input {
-  .input-wrapper {
+.input-group--number {
+  .input-group__field {
     min-width: 8em;
     input[type='number'] {
       min-width: 6em;
@@ -431,14 +432,14 @@ select {
     }
   }
 
-  .increment-buttons {
+  .input-group__field__increment {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
   }
 
-  .input-icon {
+  .input-group__field__icon {
     font-size: 1em;
     position: absolute;
     top: ($input-min-height - 1.5em) * 0.5;

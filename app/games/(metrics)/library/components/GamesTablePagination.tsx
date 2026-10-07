@@ -24,7 +24,7 @@ export default function GamesTablePagination({
   gamesCount
 }: GamesTablePaginationProps) {
   return (
-    <div className='table-pagination'>
+    <div className='library__pagination'>
       {!gamesCount || !currentPage ? (
         <span className='bold'>No game was found</span>
       ) : (

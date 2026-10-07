@@ -71,10 +71,12 @@ const fetchGamePlaytime =
  */
 function TopGameBlock({ game }: TopGameBlockProps) {
   return (
-    <div className='data-block top-game'>
+    <div className='data-block data-block--top-game'>
       <h4 className='colored'>{game.name}</h4>
+
       <GameCollage game={game} />
-      <div className='data-block-grid min'>
+
+      <div className='data-block__props-grid min'>
         <PropBlock title='Developer'>
           {game.developers.length
             ? game.developers.map((dev) => dev.name).join(', ')
@@ -96,17 +98,18 @@ function TopGameBlock({ game }: TopGameBlockProps) {
         </PropBlock>
       </div>
 
-      <div className='data-block-rank'>{game.index + 1}</div>
+      <div className='data-block__rank'>{game.index + 1}</div>
     </div>
   );
 }
 
 function TopGameSkeleton({ parentKey, index }: TopGameSkeletonProps) {
   return (
-    <div className='data-block top-game'>
+    <div className='data-block data-block--top-game'>
       <Skeleton type='h4' />
       <GameCollageSkeleton parentKey={parentKey} />
-      <div className='data-block-grid min'>
+
+      <div className='data-block__props-grid min'>
         <PropBlock title='Developer'>
           <Skeleton lineHeight='wide' rows={2} />
         </PropBlock>
@@ -124,7 +127,7 @@ function TopGameSkeleton({ parentKey, index }: TopGameSkeletonProps) {
         </PropBlock>
       </div>
 
-      <div className='data-block-rank'>{index + 1}</div>
+      <div className='data-block__rank'>{index + 1}</div>
     </div>
   );
 }
@@ -132,7 +135,7 @@ function TopGameSkeleton({ parentKey, index }: TopGameSkeletonProps) {
 export function GamesPlaytimeSkeleton() {
   return (
     <div className='games-playtime'>
-      <div className='top-3-games'>
+      <div className='games-playtime__top-games'>
         {Array.from({ length: SPECIAL_GAMES_COUNT }).map((_, i) => (
           <TopGameSkeleton
             key={`game-playtime-skeleton-${i}`}
@@ -165,7 +168,7 @@ export default function GamesPlaytime({ games, userId }: CoreMetricProps) {
         fetchMetricData={fetchGamePlaytime(games)}
         metric={(data) => (
           <div className='games-playtime'>
-            <div className='top-3-games'>
+            <div className='games-playtime__top-games'>
               {data.slice(0, SPECIAL_GAMES_COUNT).map((game) => (
                 <TopGameBlock game={game} key={`${game.id}-playtime`} />
               ))}

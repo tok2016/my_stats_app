@@ -1,14 +1,15 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
 import { Search } from '@mynaui/icons-react';
+import { useMemo, useRef, useState } from 'react';
 
 import { Option, TextInputProps } from '@ts/ui/components-props';
 
+import { emptyOption } from '@lib/utils';
+
+import Hint from './Hint';
 import Input from './Input';
 import Picker from './Picker';
-import Hint from './Hint';
-import { emptyOption } from '@lib/utils';
 
 type SearchSelectProps = TextInputProps & {
   options: Option[];
@@ -93,12 +94,12 @@ export default function SearchSelect({
   };
 
   return (
-    <div className={`input-select-group ${className}`}>
+    <div className={`input-group ${className}`}>
       <label htmlFor={id} id={`${id}-label`}>
         {label}
       </label>
 
-      <div className='select-picker select-search'>
+      <div className='input-group__select-field input-group__select-search'>
         <select
           id={id}
           name={name}
@@ -117,7 +118,7 @@ export default function SearchSelect({
           id={`${id}-search`}
           ref={searchRef}
           name={`${name}-search`}
-          icon={<Search className='input-icon' />}
+          icon={<Search className='input-group__field__icon' />}
           disabled={disabled}
           onChange={onQuerySearch}
           onBlur={onBlur}

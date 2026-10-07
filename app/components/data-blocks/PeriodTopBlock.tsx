@@ -30,22 +30,22 @@ export default function PeriodTopBlock<ItemType>({
 }: PeriodTopBlockProps<ItemType>) {
   return (
     <div
-      className={`data-block period-top ${className}`}
+      className={`data-block data-block--period-top ${className}`}
       style={{
         minWidth: `${blockWidthRem}rem`,
         maxWidth: `${blockWidthRem}rem`
       }}
     >
-      <div className='data-block-title'>
+      <div className='data-block__title'>
         <p className={current ? 'colored' : ''}>
           {getPeriodName[periodType](periodTop.period, false)}
         </p>
       </div>
 
-      <ol className='data-block-list'>
+      <ol className='data-block__list'>
         {periodTop.top.map((item, i) => (
           <li
-            className={`data-block-item ${i === 0 && 'colored bold'}`}
+            className={`data-block__list__item ${i === 0 && 'colored bold'}`}
             key={`${periodTop.period}-${i}`}
           >
             {listItemContent(item, i)}

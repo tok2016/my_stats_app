@@ -150,23 +150,23 @@ Chart.defaults.elements = {
  */
 export const ChartClasses: Record<CustomChartType, ChartClassName> = {
   doughnut: {
-    core: 'doughnut-chart',
-    container: 'doughnut-container'
+    core: 'doughnut-chart__core',
+    container: 'doughnut-chart'
   },
   periodBar: {
-    core: 'period-bar-chart',
-    container: 'period-bar-container'
+    core: 'period-bar-chart__core',
+    container: 'period-bar-chart'
   },
   bar: {
-    core: 'bar-chart',
-    container: 'bar-container'
+    core: 'bar-chart__core',
+    container: 'bar-chart'
   },
   line: {
-    core: 'line-chart',
-    container: 'line-container'
+    core: 'line-chart__core',
+    container: 'line-chart'
   },
   map: {
-    core: 'map-chart',
-    container: 'map-container'
+    core: 'map-chart__core',
+    container: 'map-chart'
   }
 };

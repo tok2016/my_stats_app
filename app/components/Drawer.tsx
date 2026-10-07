@@ -62,14 +62,18 @@ export default function Drawer({
   return (
     <>
       <div
-        className={`drawer ${isMenuExpanded ? 'expanded' : ''} ${className}`}
+        className={`drawer ${isMenuExpanded ? 'drawer--expanded' : ''} ${className}`}
         onClick={loading ? undefined : onExpandClick}
       >
         {label}
-        {loading ? <Spinner /> : <ChevronDown className='drawer-expand' />}
+        {loading ? (
+          <Spinner />
+        ) : (
+          <ChevronDown className='drawer__expand-icon' />
+        )}
       </div>
 
-      <div className={`drawer-submenu ${submenuClassName}`} ref={submenuRef}>
+      <div className={`drawer__submenu ${submenuClassName}`} ref={submenuRef}>
         {children}
       </div>
     </>

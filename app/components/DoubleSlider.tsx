@@ -66,8 +66,8 @@ export default function DoubleSlider({
   }, [left, right, min, max]);
 
   return (
-    <div className={`input-select-group ${className}`}>
-      <label htmlFor={leftId} className='slider-label'>
+    <div className={`input-group input-group--slider ${className}`}>
+      <label htmlFor={leftId} className='input-group__label'>
         <span>{label}</span>
         <span>
           {valueUnit}
@@ -75,8 +75,11 @@ export default function DoubleSlider({
         </span>
       </label>
 
-      <div className='double-slider'>
-        <div className='slider-background' ref={trackRef}></div>
+      <div className='input-group__double-slider'>
+        <div
+          className='input-group__double-slider__background'
+          ref={trackRef}
+        ></div>
         <input
           type='range'
           id={leftId}
@@ -97,7 +100,7 @@ export default function DoubleSlider({
           max={max}
           onChange={onRangeChange(false)}
         />
-        <div className='slider-track' ref={trackRef}></div>
+        <div className='input-group__double-slider__track' ref={trackRef}></div>
       </div>
 
       <Hint variant='error'>{errorHint}</Hint>

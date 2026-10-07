@@ -110,17 +110,17 @@ export default function AvatarInput({
   }, [defaultFile]);
 
   return (
-    <div className='avatar-field'>
+    <div className='avatar-input'>
       <Avatar username={username} avatarId={previewAvatar} />
 
-      <label htmlFor='avatar' className='avatar-label'>
+      <label htmlFor='avatar' className='avatar-input__label'>
         <Refresh />
         <span>Change avatar</span>
       </label>
 
       {!previewAvatar || (
         <IconButton
-          className='avatar-delete'
+          className='avatar-input__delete-button'
           variant='secondary'
           status='error'
           icon={<Trash />}

@@ -20,17 +20,17 @@ export default function GameTitle({
   showLink = false
 }: GameTableTitleProps) {
   return (
-    <div className='game-table-title'>
-      <GameCover game={game} className='game-table-cover' />
+    <div className='game-title'>
+      <GameCover game={game} className='game-title__cover' />
       {showLink ? (
         <Link
           href={`/games/titles/${game.id}`}
-          className='colored bold game-table-name'
+          className='colored bold game-title__name'
         >
           {game.name}
         </Link>
       ) : (
-        <p className='colored bold game-table-name'>{game.name}</p>
+        <p className='colored bold game-title__name'>{game.name}</p>
       )}
     </div>
   );

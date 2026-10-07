@@ -17,11 +17,11 @@ export default function DoubleInput({
   rightInput
 }: DoubleInputProps) {
   return (
-    <div className='input-select-group'>
+    <div className='input-group'>
       {leftInput.label && (
         <label htmlFor={leftInput.id}>{leftInput.label}</label>
       )}
-      <div className='double-input'>
+      <div className='input-group__double-group'>
         <Input {...leftInput} type={type} label={undefined} />
         <label htmlFor={rightInput.id}>
           {rightInput.label ? rightInput.label : '—'}

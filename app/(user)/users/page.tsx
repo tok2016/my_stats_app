@@ -41,14 +41,14 @@ export default async function UsersPage({
 
     return (
       <div className='users-list'>
-        <div className='users-search'>
+        <div className='users-list__search'>
           <h2>Users search</h2>
           <Suspense>
             <UserSearch id='resultsSearch' />
           </Suspense>
         </div>
 
-        <div className='found-users'>
+        <div className='users-list__results'>
           {users.slice(startIndex, endIndex).map((user) => (
             <UserPreview
               key={user.id}
@@ -68,7 +68,7 @@ export default async function UsersPage({
   } catch (err) {
     return (
       <div className='users-list'>
-        <div className='users-search'>
+        <div className='users-list__search'>
           <h2>Users search</h2>
           <Suspense>
             <UserSearch id='resultsSearch' />

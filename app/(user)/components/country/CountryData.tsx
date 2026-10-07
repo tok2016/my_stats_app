@@ -14,10 +14,10 @@ type CountryDataProps = {
 export default function CountryData({ country }: CountryDataProps) {
   return (
     <div className='country'>
-      <p>{country.name}</p>
+      <p className='country__name'>{country.name}</p>
       <FetchImage
         alt={`Flag of ${country.name}`}
-        className='flag'
+        className='country__flag'
         src={country.flag}
         width={20}
         height={20}

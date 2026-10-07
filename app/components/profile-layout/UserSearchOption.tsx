@@ -15,7 +15,7 @@ type UserOptionProps = {
  */
 export default function UserSearchOption({ user }: UserOptionProps) {
   return (
-    <Link href={`/users/${user.id}`} className='user-option'>
+    <Link href={`/users/${user.id}`} className='user-search-option'>
       <Avatar username={user.username} avatarId={user.avatarUrl} />
 
       <div className='user-credits'>

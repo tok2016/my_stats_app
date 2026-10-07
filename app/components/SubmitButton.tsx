@@ -25,7 +25,7 @@ export default function SubmitButton({
   onSubmit
 }: SubmitButtonProps) {
   return (
-    <div className='button-group'>
+    <div className='submit-buttons-group'>
       <div className='buttons-flex-box'>
         <div>
           <Button
