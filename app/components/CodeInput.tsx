@@ -1,27 +1,33 @@
 'use client';
 
-import {
+import type {
   ChangeEvent,
   ClipboardEvent,
-  createRef,
   KeyboardEvent,
-  RefObject,
-  useRef
+  RefObject
 } from 'react';
+import { createRef, useRef } from 'react';
 
-import { TextInputProps } from '@ts/ui/components-props';
+import { InputExpandedProps } from '@ts/ui/components-props';
+
+import { CODE_LENGTH } from '@lib/utils';
 
 import Hint from './Hint';
-import { CODE_LENGTH } from '@lib/utils';
+
+type CodeInputProps = InputExpandedProps & {
+  id: string;
+  name: string;
+  className?: string;
+};
 
 export default function CodeInput({
   label,
   id,
   name,
-  className,
+  className = '',
   errorHint,
   hint
-}: TextInputProps) {
+}: CodeInputProps) {
   const codeRef = useRef<HTMLInputElement>(null);
   const numberRefs = useRef<RefObject<HTMLInputElement>[]>([]);
 
@@ -100,20 +106,21 @@ export default function CodeInput({
   };
 
   return (
-    <div className={`input-select-group ${className}`}>
-      <label hidden={!label} htmlFor={`${id}-0`}>
+    <div className={`input-group ${className}`}>
+      <label hidden={!label} htmlFor={`${id}-0`} className='input-group__label'>
         {label}
       </label>
 
       <input ref={codeRef} type='text' id={id} name={name} className='hidden' />
 
-      <div className='code-input'>
+      <div className='input-group__code'>
         {Array.from({ length: CODE_LENGTH }, (_v, i) => (
           <input
             key={i}
             ref={numberRefs.current[i]}
             type='text'
             id={`${id}-${i}`}
+            className='input-group__code__input'
             onChange={onNumberChange(i)}
             onFocus={onNumberFocus(i)}
             onKeyDown={onArrowDown(i)}

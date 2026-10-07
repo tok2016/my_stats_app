@@ -11,8 +11,7 @@ $min-data-rank-width: 2em;
   flex: 1;
 }
 
-.metric,
-.submetric {
+.metric {
   font-size: utils.$regular-size;
 
   display: flex;
@@ -24,11 +23,11 @@ $min-data-rank-width: 2em;
   gap: 1.25em;
 }
 
-.submetric {
+.metric--submetric {
   gap: 0.625em;
 }
 
-.metric-title {
+.metric__title {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -47,7 +46,7 @@ $min-data-rank-width: 2em;
   }
 }
 
-.blocks-group {
+.ratings-group {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -76,13 +75,13 @@ $min-data-rank-width: 2em;
   min-width: min-content;
 }
 
-.period-top {
+.data-block--period-top {
   box-sizing: border-box;
   min-width: 11em;
   height: fit-content;
   max-height: 100%;
 
-  .data-block-title {
+  .data-block__title {
     font-size: utils.$regular-size;
     box-sizing: content-box;
     border-bottom: solid 0.125em;
@@ -96,7 +95,7 @@ $min-data-rank-width: 2em;
   }
 }
 
-.data-block-list {
+.data-block__list {
   padding: 0;
   margin: 0;
   list-style-type: none;
@@ -109,7 +108,7 @@ $min-data-rank-width: 2em;
 
     margin-bottom: 0.75em;
 
-    .skeletons {
+    .skeleton {
       width: 100%;
     }
 
@@ -147,16 +146,16 @@ $min-data-rank-width: 2em;
   padding-bottom: 0.25em;
 }
 
-.period-tops-groups,
-.period-tops-in-group,
-.years {
+.period-tops__groups,
+.period-tops__groups__blocks,
+.period-tops__years-decades {
   display: flex;
   flex-direction: row-reverse;
   gap: 1.5rem;
   width: fit-content;
 }
 
-.years .divider button {
+.period-tops__years-decades .divider button {
   padding: 2px;
   min-height: unset;
 }
@@ -167,7 +166,7 @@ $min-data-rank-width: 2em;
   gap: 1rem;
 }
 
-.data-block-rank {
+.data-block__rank {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -187,7 +186,7 @@ $min-data-rank-width: 2em;
   @include utils.header(4);
 }
 
-.data-block-grid {
+.data-block__props-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.75em;
@@ -205,13 +204,13 @@ $min-data-rank-width: 2em;
     border-color: $border-color;
   }
 
-  .period-top {
-    .data-block-title {
+  .data-block--period-top {
+    .data-block__title {
       border-color: $underline-color;
     }
   }
 
-  .data-block-rank {
+  .data-block__rank {
     background-color: $rank-bg-color;
     color: $rank-text-color;
   }
@@ -267,7 +266,7 @@ $min-data-rank-width: 2em;
 
   padding: 0 0.25em;
 
-  .rating-source {
+  .multiple-ratings__item {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -276,8 +275,8 @@ $min-data-rank-width: 2em;
   }
 }
 
-.filters-menu,
-.table-pagination {
+.library__filters-menu,
+.library__pagination {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -286,7 +285,7 @@ $min-data-rank-width: 2em;
   flex-wrap: wrap;
 }
 
-#advance-search-menu {
+#advance-search {
   z-index: 100;
 
   .card {
@@ -302,7 +301,7 @@ $min-data-rank-width: 2em;
   }
 }
 
-#advance-search {
+#advance-search__form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(15em, 1fr));
   column-gap: 1em;

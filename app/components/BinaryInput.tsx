@@ -1,52 +1,59 @@
 'use client';
 
-import { ChangeEvent } from 'react';
+import type {
+  ChangeEvent,
+  DetailedHTMLProps,
+  InputHTMLAttributes
+} from 'react';
 
-import { InputBaseProps } from '@ts/ui/components-props';
+import { InputExpandedProps } from '@ts/ui/components-props';
 
 import Hint from './Hint';
 
-type SwitchProps = InputBaseProps & {
-  type?: 'radio' | 'checkbox';
-  name: string;
-  isSwitch?: boolean;
-  defaultValue?: boolean;
-  value?: boolean;
-  onChange?: (value: boolean) => void;
-};
+type SwitchProps = Omit<
+  DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
+  'onChange' | 'value' | 'type' | 'defaultValue'
+>
+  & InputExpandedProps & {
+    type?: 'radio' | 'checkbox';
+    isSwitch?: boolean;
+    onChange?: (value: boolean) => void;
+  };
 
 export default function BinaryInput({
   label,
   id,
-  name,
   type = 'radio',
   isSwitch,
   className = '',
-  defaultValue,
-  disabled = false,
-  value,
   errorHint,
   hint,
-  onChange
+  required,
+  onChange,
+  ...props
 }: SwitchProps) {
   const onSwitch = (evt: ChangeEvent<HTMLInputElement>) => {
     onChange?.(evt.target.checked);
   };
 
   return (
-    <div className={`input-select-group ${className}`}>
-      <div className='input-binary-group'>
+    <div className={`input-group ${className}`}>
+      <div className='input-group__binary'>
         <input
-          id={id}
-          name={name}
+          {...props}
+          required={false}
           type={type}
-          defaultChecked={defaultValue}
-          checked={value}
-          className={isSwitch ? 'switch' : ''}
+          className={`input-group__binary__input ${isSwitch ? 'switch' : ''}`}
           onChange={onSwitch}
-          disabled={disabled}
         />
-        <label htmlFor={id}>{label}</label>
+
+        <label
+          hidden={!label}
+          htmlFor={id}
+          className='input-group__binary__label'
+        >
+          {label} {required && <span className='colored'>*</span>}
+        </label>
       </div>
 
       <Hint variant='error'>{errorHint}</Hint>

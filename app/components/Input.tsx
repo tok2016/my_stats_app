@@ -1,37 +1,39 @@
 'use client';
 
 import { Eye, EyeSlash } from '@mynaui/icons-react';
-import { type ChangeEvent, type Ref, useReducer } from 'react';
+import type {
+  ChangeEvent,
+  DetailedHTMLProps,
+  InputHTMLAttributes
+} from 'react';
+import { useReducer } from 'react';
 
-import { TextInputProps } from '@ts/ui/components-props';
+import { InputExpandedProps } from '@ts/ui/components-props';
 import { InputType } from '@ts/ui/components-variants';
 
 import Hint from './Hint';
 
-type InputProps = TextInputProps & {
-  ref?: Ref<HTMLInputElement>;
-  type?: InputType;
-  icon?: React.ReactNode;
-};
+type InputProps = Omit<
+  DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
+  'onChange' | 'type'
+>
+  & InputExpandedProps & {
+    type?: InputType;
+    icon?: React.ReactNode;
+    onChange?: (value: string) => void;
+  };
 
 export default function Input({
   label,
   id,
-  name,
-  value,
-  placeholder = '',
   type = 'text',
   className = '',
-  required = false,
-  disabled = false,
+  required,
   icon,
   hint,
   errorHint,
-  defaultValue,
-  ref,
   onChange,
-  onBlur,
-  onFocus
+  ...props
 }: InputProps) {
   const [isShown, show] = useReducer((value) => !value, false);
 
@@ -42,35 +44,29 @@ export default function Input({
   ) => onChange?.(evt.target.value);
 
   return (
-    <div className={`input-select-group ${className}`}>
-      <label hidden={!label} htmlFor={id}>
+    <div className={`input-group ${className}`}>
+      <label hidden={!label} htmlFor={id} className='input-group__label'>
         {label}
-        {!required || <span className='colored'>*</span>}
+        {required && <span className='colored'>*</span>}
       </label>
 
-      <div className='input-wrapper'>
+      <div className='input-group__field'>
         <input
-          id={id}
-          name={name}
-          ref={ref}
+          {...props}
+          required={false}
+          className='input-group__field__input'
           type={isShown ? 'text' : type}
-          placeholder={placeholder}
-          defaultValue={defaultValue}
-          value={value}
-          disabled={disabled}
           autoComplete={type === 'password' ? 'off' : 'on'}
           onChange={onValueChange}
-          onFocus={onFocus}
-          onBlur={onBlur}
         />
 
         {isPassword || icon}
 
         {!isPassword
           || (isShown ? (
-            <EyeSlash className='input-icon' onClick={show} />
+            <EyeSlash className='input-group__field__icon' onClick={show} />
           ) : (
-            <Eye className='input-icon' onClick={show} />
+            <Eye className='input-group__field__icon' onClick={show} />
           ))}
       </div>
 

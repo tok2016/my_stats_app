@@ -36,10 +36,10 @@ function RatedStudio({ ratedStudio, studio }: RatedStudioProps) {
   if (!topGame) return;
 
   return (
-    <div className='data-block rated-studio'>
+    <div className='data-block data-block--studio-rating'>
       <h3 className='colored'>{studio.name}</h3>
 
-      <div className='data-block-content'>
+      <div className='data-block__content'>
         <span className='min'>Best game:</span>
         <GameCover game={topGame} />
         <span className='small underline'>{topGame.name}</span>
@@ -74,15 +74,15 @@ const fetchStudiosRatings = async (
 
 export function StudiosRatingsSkeleton() {
   return (
-    <div className='blocks-group'>
+    <div className='ratings-group'>
       {Array.from({ length: MAX_SKELETONS_BLOCKS }).map((_, i) => (
         <div
-          key={`$rated-studio-skeleton-${i}`}
-          className='data-block rated-studio'
+          key={`rated-studio-skeleton-${i}`}
+          className='data-block data-block--studio-rating'
         >
           <Skeleton type='h3' />
 
-          <div className='data-block-content'>
+          <div className='data-block__content'>
             <span className='min'>Best game:</span>
             <Skeleton type='image' className='game-cover' />
             <Skeleton />
@@ -119,7 +119,7 @@ export default function StudiosRatings({
       <FetchMetric
         fetchMetricData={fetchStudiosRatings}
         metric={(data) => (
-          <div className='blocks-group'>
+          <div className='ratings-group'>
             {data.map((ratedStudio) => (
               <RatedStudio
                 key={`${ratedStudio.id}-rated`}

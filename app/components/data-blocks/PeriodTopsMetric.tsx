@@ -218,16 +218,18 @@ function PeriodTopsScroll<
       });
 
       observer?.disconnect();
-      scrollRef.current.querySelectorAll('.year-line').forEach((el) => {
-        observer?.observe(el);
-      });
+      scrollRef.current
+        .querySelectorAll('.period-tops__years-decades__line')
+        .forEach((el) => {
+          observer?.observe(el);
+        });
     }
   }, [periodMetricData, observer]);
 
   return (
     <>
       <div className='period-tops' ref={scrollRef}>
-        <div className='period-tops-groups'>
+        <div className='period-tops__groups'>
           {topsByYear
             .entries()
             .toArray()
@@ -245,7 +247,7 @@ function PeriodTopsScroll<
             ))}
         </div>
 
-        <div className='years'>
+        <div className='period-tops__years-decades'>
           {topsByYear
             .entries()
             .toArray()
@@ -253,7 +255,7 @@ function PeriodTopsScroll<
               <div
                 id={`${id}-${currentYear}`}
                 key={currentYear}
-                className='year-line'
+                className='period-tops__years-decades__line'
                 style={{
                   width: `calc(${blockWidthRem * tops.length}rem + ${gapRem * (tops.length - 1)}rem)`
                 }}

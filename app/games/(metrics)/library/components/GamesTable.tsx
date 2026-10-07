@@ -44,10 +44,10 @@ export default function GamesTable({
   };
 
   return (
-    <div className='games-library-wrapper'>
+    <div className='library__games-table-wrapper'>
       <Table
-        id='games-library'
-        className='games-library'
+        id='library__games-table-wrapper__table'
+        className='library__games-table-wrapper__table'
         data={games}
         sortField={sortField}
         sortDirection={sortDirection}
@@ -116,21 +116,21 @@ export default function GamesTable({
             title: 'Your rating',
             width: '5rem',
             sort: true,
-            bodyCellClassName: 'table-cell-rating',
+            bodyCellClassName: 'table__row__cell-rating',
             renderRow: (value) => <Rating value={value.rating} />
           },
           criticsRating: {
             title: 'Critics rating',
             width: '5rem',
             sort: true,
-            bodyCellClassName: 'table-cell-rating',
+            bodyCellClassName: 'table__row__cell-rating',
             renderRow: (value) => <Rating value={value.criticsRating} />
           },
           usersRating: {
             title: 'Users rating',
             width: '5rem',
             sort: true,
-            bodyCellClassName: 'table-cell-rating',
+            bodyCellClassName: 'table__row__cell-rating',
             renderRow: (value) => <Rating value={value.usersRating} />
           }
         }}

@@ -76,7 +76,7 @@ export default function SendAgainTimer() {
     <div className='send-again-timer'>
       <p className='colored bold'>{formatSeconds(seconds)}</p>
 
-      <div className='button-group'>
+      <div className='submit-buttons-group'>
         <Hint>Haven’t got a code yet?</Hint>
         <Button
           variant='outlined'

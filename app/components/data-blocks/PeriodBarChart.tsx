@@ -244,8 +244,8 @@ function PeriodBarCore<
   }, [data, getDataset, periodType, year, valueField]);
 
   return (
-    <div className='chart-legend-content'>
-      <div className='chart-core-wrapper'>
+    <div className='chart__core-legend-container'>
+      <div className='chart__core-legend-container__core'>
         <Bar
           className={ChartClasses.periodBar.core}
           options={{

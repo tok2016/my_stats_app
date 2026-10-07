@@ -154,13 +154,13 @@
   }
 }
 
-.radio-checkbox-group {
+.input-group__radio-checkbox {
   display: flex;
   flex-direction: column;
   gap: 0.25em;
 }
 
-.input-binary-group {
+.input-group__binary {
   display: flex;
   flex-direction: row;
   width: fit-content;
@@ -168,7 +168,7 @@
   gap: utils.$input-label-gap;
 }
 
-.input-binary-group:has(> .switch) {
+.input-group__binary:has(> .switch) {
   width: 100%;
   justify-content: space-between;
 

@@ -20,7 +20,7 @@ $frame-start-width: 200px;
     margin-bottom: 2em;
   }
 
-  .guest-page-form {
+  .guest-page__form {
     width: 17.5em;
     display: flex;
     flex-direction: column;
@@ -54,7 +54,7 @@ $frame-start-width: 200px;
   }
 }
 
-.profile-credits {
+.profile-info__credits {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -63,14 +63,14 @@ $frame-start-width: 200px;
   font-family: utils.$ibm-plex;
 }
 
-.profile-details {
+.profile-info__credits__details {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.5em;
 }
 
-.profile-meta {
+.profile-info__meta {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -78,7 +78,7 @@ $frame-start-width: 200px;
   justify-content: space-between;
 }
 
-.profile-controlls {
+.profile-info__meta__controlls {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -91,12 +91,12 @@ $frame-start-width: 200px;
   align-items: center;
   gap: 0.5em;
 
-  .flag {
+  .country__flag {
     min-width: 1em;
     height: 1em;
 
     img,
-    .skeleton {
+    .skeleton__item {
       border-radius: 2px;
 
       svg {
@@ -106,7 +106,7 @@ $frame-start-width: 200px;
   }
 }
 
-.avatar-field {
+.avatar-input {
   position: relative;
   align-self: center;
 
@@ -121,7 +121,7 @@ $frame-start-width: 200px;
   }
 }
 
-.avatar-label {
+.avatar-input__label {
   position: absolute;
   top: 0;
   left: 0;
@@ -154,7 +154,7 @@ $frame-start-width: 200px;
   }
 }
 
-.avatar-delete {
+.avatar-input__delete-button {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -178,7 +178,7 @@ $frame-start-width: 200px;
   align-items: center;
   gap: 2em;
 
-  .skeleton {
+  .skeleton__item {
     flex-grow: 1;
   }
 
@@ -188,7 +188,7 @@ $frame-start-width: 200px;
   }
 }
 
-.frame {
+.avatar-editor__cropper__frame {
   position: absolute;
   top: calc(50vh - $frame-start-width / 2);
   left: calc(50vw - $frame-start-width / 2);
@@ -240,7 +240,7 @@ $frame-start-width: 200px;
   }
 }
 
-.avatar-origin {
+.avatar-editor__cropper {
   align-self: stretch;
   flex-grow: 1;
   min-width: $frame-start-width;
@@ -287,14 +287,14 @@ $frame-start-width: 200px;
   width: 30em;
 }
 
-.users-search {
+.users-list__search {
   h2,
   .h2 {
     margin-bottom: 1em;
   }
 }
 
-.found-users {
+.users-list__results {
   display: flex;
   flex-direction: column;
   gap: inherit;
@@ -306,7 +306,7 @@ $frame-start-width: 200px;
   }
 }
 
-.user-option {
+.user-search-option {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -376,7 +376,7 @@ $frame-start-width: 200px;
 
     gap: 0.5em;
 
-    .skeleton {
+    .skeleton__item {
       width: 50%;
     }
   }

@@ -73,7 +73,7 @@ function AuthorizedSidebarRaw({ user, path, expand }: AuthorizedSidebarProps) {
 
   return (
     <>
-      <nav className='sidebar-upper'>
+      <nav className='sidebar__navigation'>
         <SidebarButton
           name='iam'
           label={user.username}

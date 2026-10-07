@@ -13,11 +13,11 @@ export default function Divider({
 }: DividerProps) {
   return (
     <div
-      className={`divider ${rounded ? 'rounded' : ''} ${colored ? 'colored' : ''} ${className}`}
+      className={`divider ${rounded ? 'divider--rounded' : ''} ${colored ? 'colored' : ''} ${className}`}
     >
-      <div className='left-hand'></div>
+      <div className='divider__left-hand'></div>
       {children}
-      <div className='right-hand'></div>
+      <div className='divider__right-hand'></div>
     </div>
   );
 }

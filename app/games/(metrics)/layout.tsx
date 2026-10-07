@@ -16,7 +16,7 @@ export default async function GamesMetricLayout({
 
   return (
     <>
-      <div className='games-page-name'>
+      <div className='games__page-name'>
         <PageName />
         <Link href='/games/add-game'>
           <Button variant='secondary' beforeIcon={<Plus />}>

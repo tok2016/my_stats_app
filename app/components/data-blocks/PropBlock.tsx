@@ -18,7 +18,7 @@ export default function PropBlock({
 }: PropBlockProps) {
   return (
     <div className={`prop-block ${className}`}>
-      <p className='prop-block-title'>{title}: </p>
+      <p className='prop-block__title'>{title}: </p>
       {children}
     </div>
   );

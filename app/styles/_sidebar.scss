@@ -7,7 +7,7 @@ $sidebar-button-gap: 0.625em;
 $sidebar-expanded-width: 16em;
 
 .sidebar,
-.sidebar-upper {
+.sidebar__navigation {
   font-size: utils.$regular-size;
 
   display: flex;
@@ -30,10 +30,10 @@ $sidebar-expanded-width: 16em;
   transition: width 100ms;
   z-index: 3;
 
-  .input-wrapper {
+  .input-group__field {
     min-width: unset;
 
-    .input-icon {
+    .input-group__field__icon {
       right: 0.75em;
     }
   }
@@ -46,7 +46,7 @@ $sidebar-expanded-width: 16em;
 }
 
 .sidebar:not(:hover) {
-  .drawer-submenu {
+  .drawer__submenu {
     display: none !important;
     max-height: 0px !important;
   }
@@ -57,14 +57,14 @@ $sidebar-expanded-width: 16em;
 }
 
 .sidebar-button,
-.sidebar-subbutton {
+.sidebar-submenu__button {
   @include utils.font(utils.$large-size, utils.$bold-font, utils.$fit-font);
   font-family: utils.$ibm-plex;
   color: utils.$white;
 }
 
-.sidebar-label,
-.sidebar-subbutton {
+.sidebar-button__label,
+.sidebar-submenu__button {
   white-space: nowrap;
   user-select: none;
   -webkit-user-select: none; //thanks to safari)))
@@ -79,23 +79,21 @@ $sidebar-expanded-width: 16em;
   position: relative;
   cursor: pointer;
 
-  .sidebar-label {
+  .sidebar-button__label {
     flex-grow: 1;
     display: none;
   }
 
-  .sidebar-icon {
+  .sidebar-button__icon {
     min-width: $sidebar-icon-width;
     min-height: $sidebar-icon-width;
     width: $sidebar-icon-width;
     height: $sidebar-icon-width;
 
-    .skeletons {
+    .skeleton {
       height: 100%;
     }
-  }
 
-  .sidebar-icon {
     .avatar,
     svg {
       width: 100%;
@@ -107,12 +105,12 @@ $sidebar-expanded-width: 16em;
     stroke-width: 3px;
   }
 
-  &.disabled {
+  &.sidebar-button--disabled {
     cursor: default;
   }
 }
 
-.sidebar-link {
+.sidebar-button__link {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -121,17 +119,17 @@ $sidebar-expanded-width: 16em;
 }
 
 .sidebar:hover,
-.sidebar.expanded {
+.sidebar--expanded {
   width: $sidebar-expanded-width;
 
-  .input-wrapper {
-    .input-icon {
+  .input-group__field {
+    .input-group__field__icon {
       right: 1em;
     }
   }
 
   .sidebar-button {
-    .sidebar-label {
+    .sidebar-button__label {
       display: initial;
     }
   }
@@ -149,18 +147,17 @@ $sidebar-expanded-width: 16em;
     border-color: $border-color;
   }
 
-  .sidebar-button,
-  .sidebar-subbutton {
+  .sidebar-button {
     color: $text-color;
 
-    &:not(.disabled) .sidebar-icon.loaded {
+    &:not(.sidebar-button--disabled) .sidebar-button__icon--loaded {
       .avatar,
       svg {
         filter: drop-shadow(0 0 2 * utils.$spread $text-color);
       }
     }
 
-    &:not(.disabled):hover {
+    &:not(.sidebar-button--disabled):hover {
       color: $text-hover-color;
 
       img {
@@ -168,20 +165,20 @@ $sidebar-expanded-width: 16em;
       }
     }
 
-    &.disabled {
+    &.sidebar-button--disabled {
       color: utils.$skeleton-color;
     }
   }
 
-  .choosen {
+  .sidebar-button--choosen {
     color: $text-active-color;
 
     span,
-    svg:not(.input-icon) {
+    svg:not(.input-group__field__icon) {
       color: inherit;
     }
 
-    .sidebar-icon.loaded {
+    .sidebar-button__icon--loaded {
       .avatar,
       svg {
         filter: drop-shadow(0 0 2 * utils.$spread $text-active-color);
@@ -189,8 +186,24 @@ $sidebar-expanded-width: 16em;
     }
   }
 
-  .sidebar:not(:hover):not(.expanded) {
-    .input-select-group.choosen {
+  .sidebar-submenu__button {
+    color: $text-color;
+
+    &:not(.sidebar-submenu__button--disabled):hover {
+      color: $text-hover-color;
+    }
+
+    &.sidebar-submenu__button--disabled {
+      color: utils.$skeleton-color;
+    }
+
+    &.sidebar-submenu__button--choosen {
+      color: $text-active-color;
+    }
+  }
+
+  .sidebar:not(:hover):not(.sidebar--expanded) {
+    .input-group.choosen {
       svg {
         color: utils.$white;
       }

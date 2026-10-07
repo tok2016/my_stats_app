@@ -25,7 +25,7 @@ function SidebarRaw({ user, authorized = false }: SidebarProps) {
   const path = usePathname().split('/')[1];
 
   return (
-    <header className={`sidebar ${isExpanded ? 'expanded' : ''}`}>
+    <header className={`sidebar ${isExpanded ? 'sidebar--expanded' : ''}`}>
       {authorized && user ? (
         <AuthorizedSidebar user={user} path={path} expand={toggleExpand} />
       ) : (

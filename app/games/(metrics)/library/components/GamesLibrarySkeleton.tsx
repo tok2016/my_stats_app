@@ -9,16 +9,16 @@ export default function GamesLibrarySkeleton() {
     <>
       <GamesFilterMenu maxHours={0} filters={{}} disabled />
 
-      <div className='games-library-wrapper'>
+      <div className='library__games-table-wrapper'>
         <Skeleton
-          className='games-library'
+          className='library__games-table-wrapper__table'
           type='tablet'
           unitClassName='game-row-skeleton'
           rows={GAMES_TABLE_SKELETON_ROWS}
         />
       </div>
 
-      <div className='table-pagination'>
+      <div className='library__pagination'>
         <Skeleton width='8rem' />
         <Skeleton width='8rem' />
       </div>

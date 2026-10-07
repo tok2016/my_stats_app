@@ -11,10 +11,10 @@ type StudiosMapChartProps = {
 
 const renderDevelopersTop = (data?: CountryStudioChartData) =>
   data && (
-    <ol className='data-block-list'>
+    <ol className='data-block__list'>
       {data.developers.map((developer, i) => (
         <li
-          className={`data-block-item ${i === 0 && 'colored bold'} ranked-entry`}
+          className={`data-block__list__item ${i === 0 && 'colored bold'} ranked-entry`}
           key={`${developer}-${data.id}`}
         >
           <RankIcon rank={i} />

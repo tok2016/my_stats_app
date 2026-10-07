@@ -16,7 +16,7 @@ export default function GuestPage() {
         Watch your interests evolve with <b>My_Stats</b>
       </h1>
 
-      <div className='guest-page-form'>
+      <div className='guest-page__form'>
         <Link href='/login'>
           <Button variant='primary'>Start</Button>
         </Link>

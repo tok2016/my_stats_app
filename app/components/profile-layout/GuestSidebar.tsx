@@ -4,7 +4,7 @@ import { LoginSolid } from '@mynaui/icons-react';
 
 import { SidebarModuleProps } from '@ts/ui/components-props';
 
-import SidebarButtonsGroup from './SidebarButtonsGroup';
+import SidebarButton from './SidebarButton';
 import UserSearch from './UserSearch';
 
 /**
@@ -15,8 +15,8 @@ import UserSearch from './UserSearch';
  */
 export default function GuestSidebar({ path, expand }: SidebarModuleProps) {
   return (
-    <nav className='sidebar-upper'>
-      <SidebarButtonsGroup
+    <nav className='sidebar__navigation'>
+      <SidebarButton
         label='Login'
         name='login'
         href='/login'

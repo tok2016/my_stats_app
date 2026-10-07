@@ -4,7 +4,7 @@ $slider-height: 0.5em;
 $circle-diameter: 7.5rem;
 $inner-circle-diameter: 5.5rem;
 
-.double-slider {
+.input-group__double-slider {
   font-size: 1em;
   position: relative;
   min-width: 12.5em;
@@ -42,7 +42,7 @@ input[type='range'].right {
   z-index: 2;
 }
 
-.slider-background {
+.input-group__double-slider__background {
   position: absolute;
   width: 100%;
   height: $slider-height;
@@ -51,7 +51,7 @@ input[type='range'].right {
   border-radius: 0.25em;
 }
 
-.slider-track {
+.input-group__double-slider__track {
   position: absolute;
   width: 100%;
   height: $slider-height;
@@ -74,23 +74,25 @@ input[type='range'].right {
     }
   }
 
-  .slider-background {
+  .input-group__double-slider__background {
     background-color: $bg-color;
   }
 
-  .slider-track {
+  .input-group__double-slider__track {
     background-color: $track-color;
   }
 }
 
-.slider-label {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+.input-group--slider {
+  .input-group__label {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
 
-.circle-slider-group {
+.circle-slider {
   display: flex;
   flex-direction: column;
   gap: 0.5em;
@@ -98,7 +100,7 @@ input[type='range'].right {
   align-self: center;
 }
 
-.circle-slider {
+.circle-slider__field {
   --angle: 0deg;
 
   display: flex;
@@ -114,7 +116,7 @@ input[type='range'].right {
     display: none;
   }
 
-  .value {
+  .circle-slider__field__value {
     @include utils.header(1);
     display: block;
     text-align: center;
@@ -130,14 +132,14 @@ input[type='range'].right {
 }
 
 @mixin circle-slider($bg-color, $track-color, $text-bg-color, $text-color) {
-  .circle-slider {
+  .circle-slider__field {
     background: conic-gradient(
       $track-color var(--angle),
       $bg-color var(--angle) 360deg
     );
     box-shadow: 0 0 utils.$blur utils.$spread $bg-color;
 
-    .value {
+    .circle-slider__field__value {
       color: $text-color;
       background-color: $text-bg-color;
       box-shadow: inset 0 0 utils.$blur utils.$spread $bg-color;
@@ -145,7 +147,7 @@ input[type='range'].right {
 
     &:hover {
       box-shadow: 0 0 utils.$blur 2 * utils.$spread $track-color;
-      .value {
+      .circle-slider__field__value {
         box-shadow: inset 0 0 utils.$blur utils.$spread $track-color;
       }
     }

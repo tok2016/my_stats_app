@@ -15,16 +15,16 @@ type RatingBlockSkeletonProps = {
 
 function GameDetailsSkeleton() {
   return (
-    <section id='details' className='game-detials'>
-      <div className='game-details-collage'>
+    <section id='details' className='game-title-page__details'>
+      <div className='game-title-page__details__collage'>
         <Skeleton type='image' className='game-cover' />
 
         <div className='screenshots-collage'>
-          <div className='title-screenshot'>
+          <div className='screenshots-collage__preview'>
             <Skeleton type='image' className='screenshot' />
           </div>
 
-          <div className='screenshots-carousel'>
+          <div className='screenshots-collage__carousel'>
             {Array.from({ length: SCREENSHOTS_SKELETONS_COUNT }).map((_, i) => (
               <Skeleton
                 type='image'
@@ -36,8 +36,8 @@ function GameDetailsSkeleton() {
         </div>
       </div>
 
-      <div className='game-detials-info'>
-        <div className='game-details-info-block'>
+      <div className='game-title-page__details__data'>
+        <div className='game-title-page__details__data__props'>
           <PropBlock title='Platfrom'>
             <Skeleton />
           </PropBlock>
@@ -51,7 +51,7 @@ function GameDetailsSkeleton() {
           </PropBlock>
         </div>
 
-        <div className='game-details-info-block'>
+        <div className='game-title-page__details__data__props'>
           <PropBlock title='Developers'>
             <Skeleton rows={2} />
           </PropBlock>
@@ -65,7 +65,7 @@ function GameDetailsSkeleton() {
           </PropBlock>
         </div>
 
-        <div className='game-details-info-block'>
+        <div className='game-title-page__details__data__props'>
           <PropBlock title='Genres'>
             <Skeleton rows={3} />
           </PropBlock>
@@ -85,15 +85,23 @@ function RatingBlockSkeleton({ children, title }: RatingBlockSkeletonProps) {
       <h3>{title}</h3>
       {children}
 
-      <div className='positions'>
-        <div className='position'>
-          <Skeleton width='100%' fontSize='large' className='position-number' />
-          <p className='position-label'>all games</p>
+      <div className='rating-block__positions'>
+        <div className='rating-block__positions__block'>
+          <Skeleton
+            width='100%'
+            fontSize='large'
+            className='rating-block__positions__block__rank'
+          />
+          <p className='rating-block__positions__block__label'>all games</p>
         </div>
 
-        <div className='position'>
-          <Skeleton width='100%' fontSize='large' className='position-number' />
-          <p className='position-label'>series</p>
+        <div className='rating-block__positions__block'>
+          <Skeleton
+            width='100%'
+            fontSize='large'
+            className='rating-block__positions__block__rank'
+          />
+          <p className='rating-block__positions__block__label'>series</p>
         </div>
       </div>
     </div>
@@ -102,7 +110,7 @@ function RatingBlockSkeleton({ children, title }: RatingBlockSkeletonProps) {
 
 function GameRatingsSkeleton() {
   return (
-    <section id='game-ratings'>
+    <section id='game-title-page__ratings'>
       <RatingBlockSkeleton title='Your rating'>
         <Rating />
       </RatingBlockSkeleton>
@@ -125,14 +133,14 @@ function GameRatingsSkeleton() {
 export default function GamePageSkeleton() {
   return (
     <>
-      <div className='games-page-name'>
+      <div className='games__page-name'>
         <Skeleton width='30%' type='h2' />
       </div>
 
-      <div className='game-page-content'>
+      <div className='game-title-page'>
         <GameDetailsSkeleton />
         <GameRatingsSkeleton />
-        <div className='similar-games'>
+        <div className='game-title-page__similar'>
           <h3>Similar games</h3>
           <div className='recommended-games'>
             {Array.from({ length: RECOMMENDED_GAMES_SKELETONS }).map((_, i) => (

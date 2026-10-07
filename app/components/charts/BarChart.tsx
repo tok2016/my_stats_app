@@ -64,7 +64,7 @@ export default function BarChart<
 
   return (
     <Bar
-      className={`${ChartClasses.bar.core} ${horizontal ? 'horizontal' : ''}`}
+      className={`${ChartClasses.bar.core} ${horizontal ? `${ChartClasses.bar.core}--horizontal` : ''}`}
       options={{
         maintainAspectRatio: false,
         layout: {

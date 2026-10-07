@@ -60,11 +60,11 @@ const fetchTopGames =
  */
 function TopGame({ game, index }: TopGameProps) {
   return (
-    <div className='data-block top-game'>
+    <div className='data-block data-block--top-game'>
       <h4 className='colored'>{game.name}</h4>
       <GameCollage game={game} />
 
-      <div className='data-block-grid min'>
+      <div className='data-block__props-grid min'>
         <PropBlock title='Developer'>
           {game.developers.length
             ? game.developers.map((dev) => dev.name).join(', ')
@@ -79,24 +79,24 @@ function TopGame({ game, index }: TopGameProps) {
       </div>
 
       <MultipleRating
-        className='pre-rank-prop'
+        className='data-block__pre-rank-prop'
         userOwnRating={game.rating}
         usersRating={game.usersRating}
         criticsRating={game.criticsRating}
       />
 
-      <div className='data-block-rank'>{index + 1}</div>
+      <div className='data-block__rank'>{index + 1}</div>
     </div>
   );
 }
 
 function TopGameSkeleton({ parentKey, index }: TopGameSkeletonProps) {
   return (
-    <div className='data-block top-game'>
+    <div className='data-block data-block--top-game'>
       <Skeleton type='h4' />
       <GameCollageSkeleton parentKey={parentKey} />
 
-      <div className='data-block-grid min'>
+      <div className='data-block__props-grid min'>
         <PropBlock title='Developer'>
           <Skeleton lineHeight='wide' rows={2} />
         </PropBlock>
@@ -106,19 +106,19 @@ function TopGameSkeleton({ parentKey, index }: TopGameSkeletonProps) {
         </PropBlock>
       </div>
 
-      <MultipleRating className='pre-rank-prop' />
-      <div className='data-block-rank'>{index + 1}</div>
+      <MultipleRating className='data-block__pre-rank-prop' />
+      <div className='data-block__rank'>{index + 1}</div>
     </div>
   );
 }
 
 export function GamesRatingsSkeleton() {
   return (
-    <div className='top-games-grid'>
+    <div className='top-rated-games'>
       {Array.from({ length: TOP_GAMES_SKELETONS }).map((_, i) => (
         <TopGameSkeleton
-          key={`top-game-skeleton-${i}`}
-          parentKey={`top-game-skeleton-${i}`}
+          key={`data-block--top-game-skeleton-${i}`}
+          parentKey={`data-block--top-game-skeleton-${i}`}
           index={i}
         />
       ))}
@@ -138,7 +138,7 @@ export default function GamesRatings({ games, userId }: CoreMetricProps) {
       <FetchMetric
         fetchMetricData={fetchTopGames(games)}
         metric={(data) => (
-          <div className='top-games-grid'>
+          <div className='top-rated-games'>
             {data.map((game, i) => (
               <TopGame key={`${game.id}-rating`} game={game} index={i} />
             ))}

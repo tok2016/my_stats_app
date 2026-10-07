@@ -47,7 +47,7 @@ export default function Rating({ value, className = '' }: RatingProps) {
         color: RatingColors[category]
       }}
     >
-      <span className='value'>{value ?? 'NR'}</span>
+      <span className='rating__value'>{value ?? 'NR'}</span>
     </div>
   );
 }

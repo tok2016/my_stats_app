@@ -65,7 +65,7 @@ export default function Picker<T>({
       {options.map((opt) => (
         <li
           key={opt.key}
-          className={`option ${isCurrent?.(opt) ? 'selected' : ''}`}
+          className={`picker__option ${isCurrent?.(opt) ? 'picker__option--selected' : ''}`}
           onClick={() => onOptionClick(opt)}
         >
           {renderOption(opt)}

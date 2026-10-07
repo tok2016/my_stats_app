@@ -17,7 +17,7 @@ export default function ProfileInfoSkeleton({
       <ProfileCreditsSkeleton />
 
       {authorized && (
-        <div className='profile-meta'>
+        <div className='profile-info__meta'>
           <Logo />
           <ProfileControlsSkeleton />
         </div>

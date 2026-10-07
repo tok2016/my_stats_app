@@ -9,5 +9,5 @@ import { ModulesPathsAndNames } from '@lib/utils';
  */
 export default function PageName() {
   const pathname = usePathname();
-  return <h2>{ModulesPathsAndNames[pathname]?.label}</h2>;
+  return <h2 className='page-name'>{ModulesPathsAndNames[pathname]?.label}</h2>;
 }

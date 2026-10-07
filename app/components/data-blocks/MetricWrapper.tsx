@@ -59,12 +59,12 @@ export default function MetricWrapper<Submetric extends boolean = false>({
   return (
     <section
       id={id}
-      className={`metric ${submetric ? 'submetric' : ''} ${className}`}
+      className={`metric ${submetric ? 'metric--submetric' : ''} ${className}`}
     >
       {submetric ? (
         <h4>{title}</h4>
       ) : (
-        <div className='metric-title'>
+        <div className='metric__title'>
           <h3>{title}</h3>
           <AddMetricButton metricId={id as MetricId} />
         </div>

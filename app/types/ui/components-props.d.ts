@@ -2,6 +2,14 @@ import { type MouseEvent, type ReactNode } from 'react';
 
 import { ButtonStatus, ButtonVariant } from './components-variants';
 
+export interface InputExpandedProps {
+  id: string;
+  name: string;
+  label?: ReactNode;
+  hint?: ReactNode;
+  errorHint?: ReactNode;
+}
+
 export interface InputBaseProps {
   label?: ReactNode;
   id: string;

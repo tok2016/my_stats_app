@@ -19,15 +19,15 @@ type ErrorMessageProps = {
 };
 
 const ErrorIconByCode: Record<number, React.ReactNode> = {
-  400: <FileXSolid className='error-message-icon' />,
-  401: <AnnoyedGhostSolid className='error-message-icon' />,
-  403: <AngryGhostSolid className='error-message-icon' />,
-  404: <SadGhostSolid className='error-message-icon' />,
-  405: <IndifferentGhostSolid className='error-message-icon' />,
-  408: <AlarmXSolid className='error-message-icon' />,
-  413: <BaggageClaimSolid className='error-message-icon' />,
-  419: <AlarmXSolid className='error-message-icon' />,
-  429: <DazeGhostSolid className='error-message-icon' />
+  400: <FileXSolid className='error-message__icon' />,
+  401: <AnnoyedGhostSolid className='error-message__icon' />,
+  403: <AngryGhostSolid className='error-message__icon' />,
+  404: <SadGhostSolid className='error-message__icon' />,
+  405: <IndifferentGhostSolid className='error-message__icon' />,
+  408: <AlarmXSolid className='error-message__icon' />,
+  413: <BaggageClaimSolid className='error-message__icon' />,
+  419: <AlarmXSolid className='error-message__icon' />,
+  429: <DazeGhostSolid className='error-message__icon' />
 };
 
 export default function ErrorMessage({
@@ -56,9 +56,9 @@ export default function ErrorMessage({
   return (
     <div className={`error-message ${className}`}>
       {ErrorIconByCode[code] ?? (
-        <DangerOctagonSolid className='error-message-icon' />
+        <DangerOctagonSolid className='error-message__icon' />
       )}
-      <p>{message}</p>
+      <p className='error-message__text'>{message}</p>
       {children}
     </div>
   );

@@ -19,7 +19,7 @@ type GamesFilterMenuProps = {
   disabled?: boolean;
 };
 
-const ADVANCE_SEARCH_POPUP = 'advance-search-menu';
+const ADVANCE_SEARCH_POPUP = 'advance-search';
 
 /**
  * @param filters - Filters from search params.
@@ -60,7 +60,7 @@ export default function GamesFilterMenu({
 
   return (
     <>
-      <div className='filters-menu'>
+      <div className='library__filters-menu'>
         <Search
           id='games-search'
           name='Search game'

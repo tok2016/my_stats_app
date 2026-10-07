@@ -1,6 +1,6 @@
 'use client';
 
-import { MouseEvent, useEffect, useRef, useState } from 'react';
+import { type MouseEvent, useEffect, useRef, useState } from 'react';
 
 import { SliderProps } from '@ts/ui/components-props';
 
@@ -77,11 +77,14 @@ export default function CircleSlider({
   }, [value, max]);
 
   return (
-    <div className={`circle-slider-group ${className}`}>
-      <label htmlFor={id}>{label}</label>
+    <div className={`circle-slider ${className}`}>
+      <label htmlFor={id} className='circle-slider__label' hidden={!label}>
+        {label}
+      </label>
+
       <div
         ref={sliderRef}
-        className='circle-slider'
+        className='circle-slider__field'
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseRelease}
@@ -95,9 +98,10 @@ export default function CircleSlider({
           min={min}
           max={max}
           onChange={() => {}}
+          className='circle-slider__field__input'
         />
 
-        <span className='value'>{value ?? 'NR'}</span>
+        <span className='circle-slider__field__value'>{value ?? 'NR'}</span>
       </div>
 
       <NumberInput

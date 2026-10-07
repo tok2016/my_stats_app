@@ -10,7 +10,7 @@ export default function RecommendedGameSkeleton({
   parentKey
 }: RecommendedGameSkeletonProps) {
   return (
-    <div className='data-block recommended-game'>
+    <div className='data-block data-block__recommended-game'>
       <Skeleton type='h4' />
 
       <GameCollageSkeleton parentKey={parentKey} />

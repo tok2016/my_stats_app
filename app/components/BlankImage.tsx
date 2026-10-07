@@ -7,7 +7,7 @@ type EmptyImageProps = {
 export default function BlankImage({ className = '' }: EmptyImageProps) {
   return (
     <div className={`blank-image ${className}`}>
-      <ImageIcon />
+      <ImageIcon className='blank-image__icon' />
     </div>
   );
 }

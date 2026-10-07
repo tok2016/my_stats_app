@@ -39,7 +39,10 @@ export default function PeriodTopsGroup<ItemType>({
   current = false
 }: PeriodTopsGroupProps<ItemType>) {
   return (
-    <div className='period-tops-in-group' style={{ gap: `${gapRem}rem` }}>
+    <div
+      className='period-tops__groups__blocks'
+      style={{ gap: `${gapRem}rem` }}
+    >
       {tops.map((top, i) => (
         <PeriodTopBlock
           key={top.period}

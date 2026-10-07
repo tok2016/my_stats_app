@@ -107,8 +107,8 @@ function GenreTopTable({ top, games, genres, index }: GenreTopBlockProps) {
     }));
 
   return (
-    <div className='genre-top'>
-      <div className='genre-top-title colored'>
+    <div className='genre-tops__top'>
+      <div className='genre-tops__top__title colored'>
         <RankIcon rank={index} />
         <h4>{genre.name}</h4>
       </div>
@@ -116,6 +116,7 @@ function GenreTopTable({ top, games, genres, index }: GenreTopBlockProps) {
       <Table
         id={`${genre}-top-table`}
         data={tableData}
+        className='genre-tops__top__table'
         headers={{
           index: {
             title: '№',
@@ -142,7 +143,7 @@ export function GenreTopsSkeleton() {
   return (
     <div className='genres-tops'>
       {Array.from({ length: SKELETONS_COUNT }).map((_, i) => (
-        <div className='genre-top' key={`genre-top-skeleton-${i}`}>
+        <div className='genre-tops__top' key={`genre-tops__top-skeleton-${i}`}>
           <Skeleton type='h4' />
           <Skeleton
             type='tablet'

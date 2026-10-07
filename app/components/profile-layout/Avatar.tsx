@@ -43,7 +43,7 @@ export default function Avatar({
   if (loading) {
     return <Skeleton type='image' className={`avatar ${className}`} />;
   } else if (!avatarId) {
-    return <UserSquareSolid className={`avatar stub ${className}`} />;
+    return <UserSquareSolid className={`avatar ${className}`} />;
   }
 
   return (

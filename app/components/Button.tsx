@@ -1,9 +1,21 @@
 'use client';
 
-import { ButtonProps } from '@ts/ui/components-props';
+import type { ButtonHTMLAttributes, DetailedHTMLProps, ReactNode } from 'react';
+
+import { ButtonStatus, ButtonVariant } from '@ts/ui/components-variants';
+
+type ButtonProps = DetailedHTMLProps<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+> & {
+  variant?: ButtonVariant;
+  status?: ButtonStatus;
+  beforeIcon?: ReactNode;
+  afterIcon?: ReactNode;
+  loading?: boolean;
+};
 
 export default function Button({
-  id,
   children,
   variant = 'primary',
   status = '',
@@ -12,16 +24,13 @@ export default function Button({
   className = '',
   disabled,
   loading,
-  type,
-  onClick
+  ...props
 }: ButtonProps) {
   return (
     <button
-      id={id}
-      type={type}
+      {...props}
       disabled={disabled || loading}
       className={`${variant} ${status} ${className}`}
-      onClick={onClick}
     >
       {beforeIcon}
       {children}

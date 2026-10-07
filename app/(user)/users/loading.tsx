@@ -10,14 +10,14 @@ const SKELETONS_NUMBER = 3;
 export default function UsersLoading() {
   return (
     <div className='users-list'>
-      <div className='users-search'>
+      <div className='users-list__search'>
         <Skeleton type='h2' />
         <Suspense>
           <UserSearch id='resultsSearch' />
         </Suspense>
       </div>
 
-      <div className='found-users'>
+      <div className='users-list__results'>
         {Array.from({ length: SKELETONS_NUMBER }).map((_, i) => (
           <UserPreviewSkeleton key={i} />
         ))}

@@ -193,8 +193,8 @@ export default function Chart<
         />
       )}
 
-      <div className='chart-legend-content'>
-        <div className='chart-core-wrapper'>
+      <div className='chart__core-legend-container'>
+        <div className='chart__core-legend-container__core'>
           {getChartCore(data, valueField, fieldsInfo, props)[type]}
         </div>
 

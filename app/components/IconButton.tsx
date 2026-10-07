@@ -1,14 +1,17 @@
 'use client';
 
-import { IconButtonVariant } from '@ts/ui/components-variants';
-import { ButtonProps } from '@ts/ui/components-props';
+import type { ButtonHTMLAttributes, DetailedHTMLProps } from 'react';
 
-type IconButtonProps = Omit<
-  ButtonProps,
-  'afterIcon' | 'beforeIcon' | 'children' | 'variant'
+import { ButtonStatus, IconButtonVariant } from '@ts/ui/components-variants';
+
+type IconButtonProps = DetailedHTMLProps<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
 > & {
   icon: React.ReactNode;
   variant?: IconButtonVariant;
+  status?: ButtonStatus;
+  loading?: boolean;
 };
 
 export default function IconButton({
@@ -18,15 +21,13 @@ export default function IconButton({
   className,
   disabled,
   loading,
-  type,
-  onClick
+  ...props
 }: IconButtonProps) {
   return (
     <button
-      type={type}
+      {...props}
       disabled={disabled || loading}
-      className={`icon ${variant} ${status} ${className}`}
-      onClick={onClick}
+      className={`button--icon ${variant} ${status} ${className}`}
     >
       {icon}
     </button>

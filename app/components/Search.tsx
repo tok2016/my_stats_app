@@ -67,8 +67,8 @@ export default function Search<T extends { key: string }>({
   }, [query, onType]);
 
   return (
-    <div className={`input-select-group select-search ${className}`}>
-      <div className='input-wrapper'>
+    <div className={`input-group input-group--search ${className}`}>
+      <div className='input-group__field'>
         <input
           id={id}
           name={name}
@@ -82,9 +82,9 @@ export default function Search<T extends { key: string }>({
         />
 
         {loading ? (
-          <Spinner className='input-icon' />
+          <Spinner className='input-group__field__icon' />
         ) : (
-          <SearchIcon className='input-icon' onClick={onSubmit} />
+          <SearchIcon className='input-group__field__icon' onClick={onSubmit} />
         )}
       </div>
 

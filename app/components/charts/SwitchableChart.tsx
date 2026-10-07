@@ -35,7 +35,7 @@ export default function SwitchableChart({
     <div className={`switchable-chart ${className}`}>
       {chartsOptions[chartIndex].chart}
       <IconButton
-        className='switch-button'
+        className='switchable-chart__button'
         variant='link'
         icon={chartsOptions[(chartIndex + 1) % chartsOptions.length].icon}
         onClick={switchChart}

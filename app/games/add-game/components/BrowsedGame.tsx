@@ -22,21 +22,21 @@ export default function BrowsedGame({ game, onClick }: BrowsedGameProps) {
 
   return (
     <div
-      className={`browsed-game ${onClick ? 'clickable' : ''}`}
+      className={`browsed-game ${onClick ? 'browsed-game--clickable' : ''}`}
       onClick={onClick}
     >
       <GameCover
-        className='browsed-game-cover'
+        className='browsed-game__cover'
         game={{ coverUrl: game.cover?.url, name: game.name }}
       />
 
-      <div className='browsed-game-data'>
-        <p className='small bold browsed-game-name'>
+      <div className='browsed-game__data'>
+        <p className='browsed-game__data__name small bold'>
           {game.name}
           {releaseYear && ` (${releaseYear})`}
         </p>
 
-        <p className='min'>
+        <p className='browsed-game__data__genres min'>
           {game.genres.map((genre) => genre.name).join(', ')}
         </p>
       </div>

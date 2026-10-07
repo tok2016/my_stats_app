@@ -28,6 +28,7 @@ type TopSeriesSkeletonProps = {
 };
 
 const MAX_SERIES_SKELETONS = 5;
+const MAX_STUDIOS = 4;
 
 /**
  * @param params - Search params with user id.
@@ -60,21 +61,21 @@ function TopSeries({ series, games }: TopSeriesProps) {
   const percent = Math.round((series.games.length / series.allGames) * 100);
 
   return (
-    <div className='data-block series-block'>
+    <div className='data-block data-block--top-series'>
       <h4 className='colored'>{series.name}</h4>
 
       <div className='series-games-collage'>
         {Array.from({ length: MAX_GAMES_IN_SERIES }).map((_, i) =>
           seriesGames[i] ? (
             <GameCover
-              key={`series-game-cover-${i}`}
+              key={`series-games-collage__cover-${i}`}
               game={seriesGames[i]}
-              className={`series-game-${i}`}
+              className={`series-games-collage__cover-${i}`}
             />
           ) : (
             <BlankImage
               key={`series-blank-image-${i}`}
-              className={`game-cover series-game-${i}`}
+              className={`game-cover series-games-collage__cover-${i}`}
             />
           )
         )}
@@ -88,16 +89,24 @@ function TopSeries({ series, games }: TopSeriesProps) {
         )}
       </PropBlock>
 
-      <div className='data-block-grid min'>
+      <div className='data-block__props-grid min'>
         <PropBlock title='Developers'>
           {series.developers.length
-            ? series.developers.map((dev) => dev.name).join(', ')
+            ? series.developers
+                .slice(0, MAX_STUDIOS)
+                .map((dev) => dev.name)
+                .join(', ')
+              + (series.developers.length > MAX_STUDIOS ? ',..' : '')
             : '—'}
         </PropBlock>
 
         <PropBlock title='Publishers'>
           {series.publishers.length
-            ? series.publishers.map((pub) => pub.name).join(', ')
+            ? series.publishers
+                .slice(0, MAX_STUDIOS)
+                .map((pub) => pub.name)
+                .join(', ')
+              + (series.publishers.length > MAX_STUDIOS ? ',..' : '')
             : '—'}
         </PropBlock>
 
@@ -122,15 +131,15 @@ function TopSeries({ series, games }: TopSeriesProps) {
 
 function TopSeriesSkeleton({ parentKey }: TopSeriesSkeletonProps) {
   return (
-    <div className='data-block series-block'>
+    <div className='data-block data-block--top-series'>
       <Skeleton type='h4' />
 
       <div className='series-games-collage'>
         {Array.from({ length: MAX_GAMES_IN_SERIES }).map((_, i) => (
           <Skeleton
-            key={`${parentKey}-series-game-cover-skeleton-${i}`}
+            key={`${parentKey}-series-games-collage__cover-cover-skeleton-${i}`}
             type='image'
-            className={`game-cover series-game-${i}`}
+            className={`game-cover series-games-collage__cover-${i}`}
           />
         ))}
       </div>
@@ -139,7 +148,7 @@ function TopSeriesSkeleton({ parentKey }: TopSeriesSkeletonProps) {
         <Skeleton lineHeight='wide' />
       </PropBlock>
 
-      <div className='data-block-grid min'>
+      <div className='data-block__props-grid min'>
         <PropBlock title='Developers'>
           <Skeleton lineHeight='wide' rows={2} />
         </PropBlock>

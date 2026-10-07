@@ -326,8 +326,9 @@ export default function AvatarEditor({
 
   return (
     <div className='avatar-editor'>
-      <div className='avatar-origin'>
+      <div className='avatar-editor__cropper'>
         <NextImage
+          className='avatar-editor__cropper__image'
           src={avatarUrl}
           alt=''
           ref={imageRef}
@@ -339,7 +340,7 @@ export default function AvatarEditor({
 
         <div
           ref={frameRef}
-          className='frame'
+          className='avatar-editor__cropper__frame'
           id='cen'
           onMouseDown={onMouseDown}
         >

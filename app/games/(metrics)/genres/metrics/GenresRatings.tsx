@@ -33,13 +33,13 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
   const topGame = ratingData.topGames[0];
   if (!topGame) return;
   return (
-    <div className='data-block genre-rating-block'>
-      <div className='rating-title'>
+    <div className='data-block data-block--genre-rating'>
+      <div className='data-block__rating-title'>
         <Rating value={ratingData.rating} />
         <h4 className='colored'>{genre.name}</h4>
       </div>
 
-      <div className='data-block-content'>
+      <div className='data-block__content'>
         <span className='min'>Best game:</span>
 
         <GameCover game={topGame} />
@@ -56,15 +56,18 @@ function RatedGenre({ ratingData, genre }: RatedGenreProps) {
 
 export function GenresRatingsSkeleton() {
   return (
-    <div className='blocks-group'>
+    <div className='ratings-group'>
       {Array.from({ length: RATED_GENRES_COUNT }).map((_, i) => (
         <div
-          className='data-block genre-rating-block'
+          className='data-block data-block--genre-rating'
           key={`rated-genre-skeleton-${i}`}
         >
-          <Skeleton type='h4' unitClassName='rating-title-skeleton' />
+          <Skeleton
+            type='h4'
+            unitClassName='data-block__rating-title-skeleton'
+          />
 
-          <div className='data-block-content'>
+          <div className='data-block__content'>
             <span className='min'>Best game:</span>
             <Skeleton type='image' className='game-cover' />
             <Skeleton />
@@ -108,7 +111,7 @@ export default function GenresRatings({ games, userId }: CoreMetricProps) {
       <FetchMetric
         fetchMetricData={fetchGenresRatings}
         metric={(data) => (
-          <div className='blocks-group'>
+          <div className='ratings-group'>
             {data.map((value) => (
               <RatedGenre
                 key={`${value.id}-rating`}

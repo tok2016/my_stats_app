@@ -31,7 +31,7 @@ function ExternalLink({ external, last }: ExternalLinkProps) {
 
 export default function RecommendedGameBlock(game: RecommendedGame) {
   return (
-    <div className='data-block recommended-game'>
+    <div className='data-block data-block__recommended-game'>
       <h4 className='colored'>{game.name}</h4>
 
       <GameCollage

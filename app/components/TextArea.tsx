@@ -1,29 +1,42 @@
 'use client';
 
-import { ChangeEvent, useRef } from 'react';
+import {
+  ChangeEvent,
+  DetailedHTMLProps,
+  TextareaHTMLAttributes,
+  useRef
+} from 'react';
 
-import { TextInputProps } from '@ts/ui/components-props';
+import { InputExpandedProps } from '@ts/ui/components-props';
 
 import Hint from './Hint';
 
-type TextAreaProps = TextInputProps & {
-  autoHeight?: boolean;
-};
+type TextAreaProps = Omit<
+  DetailedHTMLProps<
+    TextareaHTMLAttributes<HTMLTextAreaElement>,
+    HTMLTextAreaElement
+  >,
+  'defaultValue' | 'value' | 'onChange'
+>
+  & InputExpandedProps & {
+    autoHeight?: boolean;
+    value?: string;
+    defaultValue?: string;
+    onChange?: (value: string) => void;
+  };
 
 const TEXTAREA_ADDITION = 10;
 
 export default function TextArea({
   label,
   id,
-  name,
-  defaultValue,
-  value,
-  placeholder,
   className = '',
   autoHeight = false,
   hint,
   errorHint,
-  onChange
+  required,
+  onChange,
+  ...props
 }: TextAreaProps) {
   const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -41,17 +54,18 @@ export default function TextArea({
   };
 
   return (
-    <div className={`input-select-group ${className}`}>
-      <label htmlFor={id}>{label}</label>
+    <div className={`input-group ${className}`}>
+      <label htmlFor={id} hidden={!label} className='input-group__label'>
+        {label}
+        {required && <span className='colored'>*</span>}
+      </label>
 
       <textarea
+        {...props}
+        required={false}
         ref={ref}
         id={id}
-        name={name}
-        placeholder={placeholder}
-        defaultValue={defaultValue}
-        value={value}
-        className={autoHeight ? 'autoHeight' : ''}
+        className={`input-group__textarea ${autoHeight ? 'input-group__textarea--auto-height' : ''}`}
         onChange={onValueChange}
       ></textarea>
 

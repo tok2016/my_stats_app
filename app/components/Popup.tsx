@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
 import { X } from '@mynaui/icons-react';
+import { useEffect } from 'react';
+
+import { usePathname } from 'next/navigation';
 
 import { InputTheme } from '@ts/ui/components-variants';
 
-import IconButton from './IconButton';
 import { usePopupState } from '@store/popup-store';
+
+import IconButton from './IconButton';
 
 type PopupProps = {
   children: React.ReactNode;
@@ -55,7 +57,7 @@ export default function Popup({
       <div className={`card ${variant}`}>
         {children}
         <IconButton
-          className='close'
+          className='card__close-button'
           icon={<X />}
           variant='text'
           onClick={onPopupClose}

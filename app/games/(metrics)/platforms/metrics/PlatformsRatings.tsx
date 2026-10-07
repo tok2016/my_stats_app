@@ -38,13 +38,13 @@ function RatedPlatform({
   if (!platform) return;
 
   return (
-    <div className='data-block rated-platform'>
-      <div className='rating-title'>
+    <div className='data-block data-block--rated-platform'>
+      <div className='data-block__rating-title'>
         <Rating value={ratedPlatform.rating} />
         <h4 className='colored'>{platform.name}</h4>
       </div>
 
-      <div className='small'>
+      <div className='small data-block__main-genre'>
         <span>Main genre: </span>
         {topGenre ? (
           <span className='colored bold'>{topGenre.name}</span>
@@ -54,7 +54,7 @@ function RatedPlatform({
       </div>
 
       <span className='min'>Best games: </span>
-      <div className='data-block-content'>
+      <div className='data-block__content'>
         {ratedPlatform.topGames.map((topGame) => (
           <div
             key={`${ratedPlatform.id}-${topGame.id}`}
@@ -71,26 +71,29 @@ function RatedPlatform({
 
 export function PlatformsRatingsSkeleton() {
   return (
-    <div className='blocks-group'>
+    <div className='ratings-group'>
       {Array.from({ length: MAX_PLATFORMS }).map((_, i) => (
         <div
-          className='data-block rated-platform'
+          className='data-block data-block--rated-platform'
           key={`rated-platform-skeleton-${i}`}
         >
-          <Skeleton type='h4' unitClassName='rating-title-skeleton' />
-          <Skeleton />
+          <Skeleton
+            type='h4'
+            unitClassName='data-block__rating-title-skeleton'
+          />
+          <Skeleton className='small data-block__main-genre' />
           <span className='min'>Best games: </span>
-          <div className='data-block-content'>
+          <div className='data-block__content'>
             {Array.from({ length: MAX_GAMES }).map((_, j) => (
               <div
                 key={`rated-platform-skeleton-${i}-game-${j}`}
-                className='game-table-title'
+                className='game-title'
               >
                 <Skeleton
                   type='image'
-                  className='game-cover game-table-cover'
+                  className='game-cover game-title__cover'
                 />
-                <Skeleton className='game-table-name' />
+                <Skeleton className='game-title__name' />
               </div>
             ))}
           </div>
@@ -139,7 +142,7 @@ export default function PlatformsRatings({ games, userId }: CoreMetricProps) {
       <FetchMetric
         fetchMetricData={fetchPlatformsRatings}
         metric={(data) => (
-          <div className='blocks-group'>
+          <div className='ratings-group'>
             {data.map((ratedPlatform) => (
               <RatedPlatform
                 key={`${ratedPlatform.id}-rated`}

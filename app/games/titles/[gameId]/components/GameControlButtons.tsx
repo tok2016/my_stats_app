@@ -35,7 +35,7 @@ export default function GameControlButtons({ game }: GameButtonsProps) {
   };
 
   return (
-    <div className='game-buttons'>
+    <div className='games__page-name__contolls'>
       <IconButton
         variant='secondary'
         icon={<EditSolid />}

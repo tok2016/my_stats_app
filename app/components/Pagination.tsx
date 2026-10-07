@@ -3,7 +3,9 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { clamp } from '@lib/utils';
+
 import Button from './Button';
+
 type PaginationProps = {
   pages: number;
   current: number;
@@ -60,6 +62,7 @@ export default function Pagination({ pages, current }: PaginationProps) {
         <Button
           key={page}
           variant={page === currentPage ? 'primary' : 'text'}
+          className='pagination__button'
           onClick={onPageClick(page, i)}
         >
           {page < 0 ? '...' : page}
