@@ -1,6 +1,6 @@
 'use client';
 
-import { CoreMetricProps, YearCountMetric } from '@ts/games/metric';
+import { MetricCoreProps, YearCountMetric } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -42,7 +42,7 @@ const fetchGamePlayDates = async (params: {
  * @param props.userId - User whose metrics will be fetched.
  * @returns Metric of games play dates years with games count and top game.
  */
-export default function GamePlayDates({ userId }: CoreMetricProps) {
+export default function GamePlayDates({ userId }: MetricCoreProps) {
   return (
     <MetricWrapper id='games-playdate'>
       <FetchMetric

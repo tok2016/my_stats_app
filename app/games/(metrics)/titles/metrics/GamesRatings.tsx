@@ -1,11 +1,10 @@
 'use client';
 
 import Game from '@ts/games/game';
-import { CoreMetricProps } from '@ts/games/metric';
+import { MetricCoreProps } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
-import ObjectMapArray from '@lib/object-map-array';
 
 import Skeleton from '@components/Skeleton';
 import GameCollage from '@components/data-blocks/GameCollage';
@@ -29,28 +28,22 @@ type TopGameSkeletonProps = {
 const TOP_GAMES_SKELETONS = 12;
 
 /**
- * @param games - All user's games.
- * @returns Funtion to fetch top games by rating.
+ * @param params - Search params with user id.
+ * @returns Top games by rating or error data.
  */
-const fetchTopGames =
-  (games: ObjectMapArray<Game, 'id'>) =>
-  /**
-   * @param params - Search params with user id.
-   * @returns Top games by rating or error data.
-   */
-  async (params: { userId: string }): Promise<MetricResponse<Game[]>> => {
-    const gamesIds = await getMetricClient<string[]>(
-      '/api/games/titles/rating',
-      params
-    );
+const fetchTopGames = async (params: {
+  userId: string;
+}): Promise<MetricResponse<Game[]>> => {
+  const gamesIds = await getMetricClient<Game[]>(
+    '/api/games/titles/rating',
+    params
+  );
 
-    return {
-      error: gamesIds.error,
-      data: gamesIds.data
-        ?.map((id) => games.findByKey(id))
-        .filter((game) => !!game)
-    };
+  return {
+    error: gamesIds.error,
+    data: gamesIds.data
   };
+};
 
 /**
  * @param props
@@ -128,15 +121,14 @@ export function GamesRatingsSkeleton() {
 
 /**
  * @param props
- * @param props.games - Games of user.
  * @param props.userId - User whose metrics will be fetched.
  * @returns Metric component of top games by user's rating.
  */
-export default function GamesRatings({ games, userId }: CoreMetricProps) {
+export default function GamesRatings({ userId }: MetricCoreProps) {
   return (
     <MetricWrapper id='games-rating'>
       <FetchMetric
-        fetchMetricData={fetchTopGames(games)}
+        fetchMetricData={fetchTopGames}
         metric={(data) => (
           <div className='top-rated-games'>
             {data.map((game, i) => (

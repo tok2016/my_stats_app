@@ -131,7 +131,7 @@ const getDetialedRatings = (
  * @returns Detailed data of game.
  */
 const getGameById: GameEndpointAction<
-  '/api/games/titles/item/[gameId]'
+  '/api/games/titles/items/[gameId]'
 > = async (_req, params, games) => {
   //Finds game with given id.
   const { gameId } = await params;
@@ -181,7 +181,7 @@ const getGameById: GameEndpointAction<
  * @returns Response object
  */
 const putGameChangesById: ProtectedEndpointAction<
-  '/api/games/titles/item/[gameId]'
+  '/api/games/titles/items/[gameId]'
 > = async (req, params, token) => {
   //Validates game update data.
   const { gameId } = await params;
@@ -215,7 +215,7 @@ const putGameChangesById: ProtectedEndpointAction<
  * @returns Response object
  */
 const deleteGameById: ProtectedEndpointAction<
-  '/api/games/titles/item/[gameId]'
+  '/api/games/titles/items/[gameId]'
 > = async (_req, params, token) => {
   const { gameId } = await params;
   if (!gameId) throw generateErrorResponse(400, 'Game ID was not provided');

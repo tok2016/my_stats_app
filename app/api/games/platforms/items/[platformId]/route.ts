@@ -60,7 +60,7 @@ const aggregateGenre = (
  * @returns Platform full data.
  */
 const getPlatformById: GameEndpointAction<
-  '/api/games/platforms/item/[platformId]'
+  '/api/games/platforms/items/[platformId]'
 > = async (_req, params, games) => {
   //Fetches platform full data from IGDB.
   const { platformId } = await params;

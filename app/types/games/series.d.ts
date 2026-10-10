@@ -1,5 +1,5 @@
 import { IgdbItemInfo } from './api-response';
-import { IgdbGameRatingsStudios } from './game';
+import { GameShort, IgdbGameRatingsStudios } from './game';
 
 type SeriesShort = {
   title: string;
@@ -29,5 +29,5 @@ export default interface Series extends IgdbItemInfo {
 }
 
 export type SeriesCollapsed = Omit<Series, 'games'> & {
-  games: string[];
+  games: GameShort[];
 };

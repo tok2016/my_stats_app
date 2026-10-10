@@ -1,14 +1,13 @@
 'use client';
 
-import Game from '@ts/games/game';
-import { MetricId } from '@ts/games/metric';
+import { GameItemsData, MetricId } from '@ts/games/metric';
 
 import ObjectMapArray from '@lib/object-map-array';
 
 import { GameMetrics } from './GameMetrics';
 
 type MetricPageProps = {
-  games: Game[];
+  itemsData: GameItemsData;
   metrics: MetricId[];
   userId: string;
 };
@@ -16,21 +15,29 @@ type MetricPageProps = {
 /**
  * Renders metrics by given metrics and user ids.
  * @param props
- * @param props.games - Games of user.
+ * @param props.genres - Genres of user' games.
+ * @param props.platforms - Platforms of user's platforms.
+ * @param props.studios - Studios of user's games.
  * @param props.metrics - Metrics to add to the page.
  * @param props.userId - User whose metrics will be fetched.
  * @returns Rendered metric components.
  */
 export default function MetricPage({
-  games,
+  itemsData,
   metrics,
   userId
 }: MetricPageProps) {
-  const gamesMapArray = new ObjectMapArray(games, 'id');
   return (
     <>
-      {metrics.map((metric) =>
-        GameMetrics[metric]({ games: gamesMapArray, metricId: metric, userId })
+      {metrics.map((metricId) =>
+        GameMetrics[metricId]({
+          genres: new ObjectMapArray(itemsData.genres, 'id'),
+          studios: new ObjectMapArray(itemsData.studios, 'id'),
+          platforms: new ObjectMapArray(itemsData.platforms, 'id'),
+          series: new ObjectMapArray(itemsData.series, 'id'),
+          userId,
+          metricId
+        })
       )}
     </>
   );

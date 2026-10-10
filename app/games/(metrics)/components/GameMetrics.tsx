@@ -1,4 +1,4 @@
-import { GameMetricId, MetricContentProps } from '@ts/games/metric';
+import { GameMetricId, MetricCoreProps } from '@ts/games/metric';
 
 import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import PeriodTopsSkeletons from '@components/data-blocks/PeriodTopsSkeletons';
@@ -41,7 +41,9 @@ import SeriesCount, {
   SeriesCountSkeleton
 } from '../titles/metrics/SeriesCount';
 
-type MetricFunc = (props: MetricContentProps) => React.ReactNode;
+type MetricFunc = (
+  props: MetricCoreProps & { metricId: string }
+) => React.ReactNode;
 
 /**
  * Metrics components by metric id.

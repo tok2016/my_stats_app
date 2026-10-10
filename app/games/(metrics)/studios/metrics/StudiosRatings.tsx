@@ -12,7 +12,7 @@ import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import MultipleRating from '@components/data-blocks/MultipleRatings';
 
 import FetchMetric from '../../components/FetchMetric';
-import { StudiosGameCoreFields, StudiosGameFields } from '../../utils';
+import { StudiosGameCoreFields } from '../../utils';
 import { FetchStudiosParams, StudiosMetricContentProps } from '../types';
 
 type RatedStudioProps = {
@@ -97,21 +97,16 @@ export function StudiosRatingsSkeleton() {
 
 /**
  * @param props
- * @param props.games - Games of user.
+ * @param props.studios - All studios of user's games.
  * @param props.userId - User whose metrics will be fetched.
  * @param props.type - Studio type: developer or publisher.
  * @returns Metric component of top studios of given type by average rating.
  */
 export default function StudiosRatings({
-  games,
+  studios,
   type,
   userId
 }: StudiosMetricContentProps) {
-  const studios = games.flatMapByKey<Game['developers'][number], 'id'>(
-    (game) => game[StudiosGameFields[type]],
-    'id'
-  );
-
   return (
     <MetricWrapper
       id={type === 'developer' ? 'developers-rating' : 'publishers-rating'}

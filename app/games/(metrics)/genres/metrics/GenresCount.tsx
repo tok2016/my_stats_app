@@ -1,7 +1,7 @@
 'use client';
 
 import Game from '@ts/games/game';
-import { CountData } from '@ts/games/metric';
+import { CountData, MetricCoreProps } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -13,12 +13,6 @@ import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import FetchMetric from '../../components/FetchMetric';
 import GenresCountChart from '../charts/GenresCountChart';
 import { GenresCountData } from '../types';
-
-type GenresCountProps = {
-  seriesArray: ObjectMapArray<NonNullable<Game['series']>, 'id'>;
-  genres: ObjectMapArray<Game['genres'][number], 'id'>;
-  userId: string;
-};
 
 /**
  * @param genres - All genres of user's games.
@@ -57,19 +51,19 @@ const fetchGenresCount =
 /**
  * @param props
  * @param props.genres - All genres of user's games.
- * @param props.seriesArray - All series of of user's games.
+ * @param props.series - All series of of user's games.
  * @param props.userId - User whose metric will be fetched.
  * @returns Submetric component of top genres by games count.
  */
 export default function GenresCount({
-  seriesArray,
   genres,
+  series,
   userId
-}: GenresCountProps) {
+}: MetricCoreProps) {
   return (
     <MetricWrapper id='genres-count' submetric>
       <FetchMetric
-        fetchMetricData={fetchGenresCount(genres, seriesArray)}
+        fetchMetricData={fetchGenresCount(genres, series)}
         fallback={
           <ChartSkeleton type='doughnut' className='switchable-chart' />
         }

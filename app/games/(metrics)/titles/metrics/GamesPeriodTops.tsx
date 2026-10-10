@@ -1,63 +1,51 @@
 'use client';
 
-import Game from '@ts/games/game';
 import {
-  CoreMetricProps,
   FetchPeriodTopsMetricParams,
-  PeriodPlaytimeTops,
+  MetricCoreProps,
+  PeriodGamesTops,
   PeriodTopsMetric,
   PrecisePeriod
 } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
-import ObjectMapArray from '@lib/object-map-array';
 
 import GameTitle from '@components/data-blocks/GameTitle';
 import PeriodTops from '@components/data-blocks/PeriodTopsMetric';
 import RankIcon from '@components/data-blocks/RankIcon';
 
-import { GamePeriodTopData } from '../types';
+import { GamePeriodChartData } from '../types';
 
 /**
- * @param games - All user's games.
- * @returns Funtion to fetch top games by period.
+ * @param params - Search params with user id.
+ * @returns Top games by period or error data.
  */
-const fetchGamesPeriodTops =
-  (games: ObjectMapArray<Game, 'id'>) =>
-  /**
-   * @param params - Search params with user id.
-   * @returns Top games by period or error data.
-   */
-  async (
-    params: FetchPeriodTopsMetricParams
-  ): Promise<MetricResponse<PeriodTopsMetric<GamePeriodTopData>>> => {
-    const gamesTops = await getMetricClient<PeriodPlaytimeTops>(
-      '/api/games/titles/periods',
-      params
-    );
+const fetchGamesPeriodTops = async (
+  params: FetchPeriodTopsMetricParams
+): Promise<MetricResponse<PeriodTopsMetric<GamePeriodChartData>>> => {
+  const gamesTops = await getMetricClient<PeriodGamesTops>(
+    '/api/games/titles/periods',
+    params
+  );
 
-    return {
-      error: gamesTops.error,
-      data: !gamesTops.data
-        ? undefined
-        : {
-            periodType: gamesTops.data.periodType as PrecisePeriod,
-            tops: gamesTops.data.tops.map((periodTop) => ({
-              period: periodTop.period,
-              top: periodTop.top
-                .map((entry, i) => {
-                  const game = games.findByKey(entry.id.toString());
-                  if (!game) return undefined;
-                  return { ...game, index: i };
-                })
-                .filter((game) => !!game)
-            }))
-          }
-    };
+  return {
+    error: gamesTops.error,
+    data: !gamesTops.data
+      ? undefined
+      : {
+          periodType: gamesTops.data.periodType as PrecisePeriod,
+          tops: gamesTops.data.tops.map((periodTop) => ({
+            period: periodTop.period,
+            top: periodTop.top
+              .map((game, i) => ({ ...game, index: i }))
+              .filter((game) => !!game)
+          }))
+        }
   };
+};
 
-const gameItemContent = (value: GamePeriodTopData, i: number) => (
+const gameItemContent = (value: GamePeriodChartData, i: number) => (
   <div className='ranked-entry'>
     <RankIcon rank={i} />
     <GameTitle game={value} />
@@ -66,18 +54,17 @@ const gameItemContent = (value: GamePeriodTopData, i: number) => (
 
 /**
  * @param props
- * @param props.games - Games of user.
  * @param props.userId - User whose metrics will be fetched.
  * @returns Metric component for top games by period.
  */
-export default function GamesPeriodTops({ games, userId }: CoreMetricProps) {
+export default function GamesPeriodTops({ userId }: MetricCoreProps) {
   return (
     <PeriodTops
       id='games-periods'
       userId={userId}
       className='games-period-tops'
       blockWidthRem={18.5}
-      fetchPeriodMetric={fetchGamesPeriodTops(games)}
+      fetchPeriodMetric={fetchGamesPeriodTops}
       listItemContent={gameItemContent}
       displayFields={['hours']}
       valueField='hours'

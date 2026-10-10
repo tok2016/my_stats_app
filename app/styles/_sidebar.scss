@@ -150,7 +150,7 @@ $sidebar-expanded-width: 16em;
   .sidebar-button {
     color: $text-color;
 
-    &:not(.sidebar-button--disabled) .sidebar-button__icon--loaded {
+    .sidebar-button__icon--loaded {
       .avatar,
       svg {
         filter: drop-shadow(0 0 2 * utils.$spread $text-color);
@@ -167,6 +167,13 @@ $sidebar-expanded-width: 16em;
 
     &.sidebar-button--disabled {
       color: utils.$skeleton-color;
+
+      .sidebar-button__icon--loaded {
+        .avatar,
+        svg {
+          filter: none;
+        }
+      }
     }
   }
 

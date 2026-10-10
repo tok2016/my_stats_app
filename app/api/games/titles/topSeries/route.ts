@@ -7,6 +7,7 @@ import { GameEndpointAction } from '@ts/requests';
 import { gameMetricEndpoint } from '@lib/endpoint-generators';
 import {
   SERIES_EXPANDED_FIELDS,
+  gameCoreToShort,
   getAverageRating
 } from '@lib/games/games-utils';
 import { igdbRequest } from '@lib/games/igdb';
@@ -57,7 +58,7 @@ const getSeriesInfo = (
   const fullSeries: SeriesCollapsed = {
     id: igdbSeries.id,
     name: igdbSeries.name,
-    games: ownedGames.map((game) => game.id).toArray(),
+    games: ownedGames.map((game) => gameCoreToShort(game)).toArray(),
     allGames: igdbSeries.games.length,
     developers: developers.toArray(),
     publishers: publishers.toArray(),
@@ -80,7 +81,7 @@ const getSeriesInfo = (
  * @throws 404 if user is not found or no game of theirs is found.
  * @returns Top series by games count.
  */
-const getTopSeries: GameEndpointAction<'/api/games/titles/series'> = async (
+const getTopSeries: GameEndpointAction<'/api/games/titles/topSeries'> = async (
   _req,
   _params,
   games

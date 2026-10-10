@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { PrecisePeriod } from '@ts/games/metric';
+import { PeriodGamesTops, PrecisePeriod } from '@ts/games/metric';
 import { GameEndpointAction } from '@ts/requests';
 
 import { gameMetricEndpoint } from '@lib/endpoint-generators';
@@ -25,7 +25,17 @@ const getGamesPeriods: GameEndpointAction<'/api/games/titles/periods'> = async (
   const periodType =
     (req.nextUrl.searchParams.get('period') as PrecisePeriod) ?? 'year';
 
-  const gamePeriods = getPeriodMetric(games, periodType, 'id', TOP_ENTRIES);
+  const gameIdsPeriods = getPeriodMetric(games, periodType, 'id', TOP_ENTRIES);
+  const gamePeriods: PeriodGamesTops = {
+    periodType,
+    tops: gameIdsPeriods.tops.map((periodTop) => ({
+      period: periodTop.period,
+      top: periodTop.top
+        .map((gameId) => games.findByKey(gameId.id))
+        .filter((game) => !!game)
+    }))
+  };
+
   return NextResponse.json(gamePeriods, {
     status: 200,
     statusText: `TOP-3 games was calculated by ${periodType}`

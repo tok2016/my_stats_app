@@ -13,7 +13,7 @@ import { ChartSkeleton } from '@components/charts/ChartSkeleton';
 import MetricWrapper from '@components/data-blocks/MetricWrapper';
 
 import FetchMetric from '../../components/FetchMetric';
-import { StudiosGameCoreFields, StudiosGameFields } from '../../utils';
+import { StudiosGameCoreFields } from '../../utils';
 import StudiosCountChart from '../charts/StudiosCountChart';
 import {
   FetchStudiosParams,
@@ -66,21 +66,16 @@ export function StudiosCountPlaytimeSkeleton() {
 
 /**
  * @param props
- * @param props.games - Games of user.
+ * @param props.studios - All studios of user's games.
  * @param props.userId - User whose metrics will be fetched.
  * @param props.type - Studio type: developer or publisher.
  * @returns Metric of top studios of given type by games count and playtime.
  */
 export default function StudiosCountPlaytime({
-  games,
+  studios,
   type,
   userId
 }: StudiosMetricContentProps) {
-  const studios = games.flatMapByKey<Game['developers'][number], 'id'>(
-    (game) => game[StudiosGameFields[type]],
-    'id'
-  );
-
   return (
     <MetricWrapper
       id={type === 'developer' ? 'developers-playtime' : 'publishers-playtime'}

@@ -1,4 +1,4 @@
-import { getCurrentUser } from '@lib/server-actions';
+import { tryGetCurrentUser } from '@lib/server-actions';
 
 import Dashboard from '@app/(user)/components/profile-info/Dashboard';
 import ProfileInfo from '@app/(user)/components/profile-info/ProfileInfo';
@@ -7,7 +7,7 @@ import ProfileInfo from '@app/(user)/components/profile-info/ProfileInfo';
  * @returns Profile page of authorized user.
  */
 export default async function IamPage() {
-  const user = await getCurrentUser();
+  const user = await tryGetCurrentUser();
 
   return (
     <div className='metrics'>

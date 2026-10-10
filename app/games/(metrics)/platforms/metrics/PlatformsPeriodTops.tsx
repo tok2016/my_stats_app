@@ -2,8 +2,8 @@
 
 import Game from '@ts/games/game';
 import {
-  CoreMetricProps,
   FetchPeriodTopsMetricParams,
+  MetricCoreProps,
   PeriodPlaytimeTops,
   PeriodTopsMetric
 } from '@ts/games/metric';
@@ -60,19 +60,14 @@ const platformItemContent = (value: PlatformPeriodPlaytimeData) => (
 
 /**
  * @param props
- * @param props.games - Games of user.
+ * @param props.platforms - All platforms of user's games.
  * @param props.userId - User whose metrics will be fetched.
  * @returns Metric component for top platforms by period.
  */
 export default function PlatformsPeriodTops({
-  games,
+  platforms,
   userId
-}: CoreMetricProps) {
-  const platforms = games.mapByKey<Game['platform'], 'id'>(
-    (game) => game.platform,
-    'id'
-  );
-
+}: MetricCoreProps) {
   return (
     <PeriodTops
       id='platforms-periods'

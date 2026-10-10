@@ -48,7 +48,7 @@ const aggregateGenre = (
  * @returns Studio full data.
  */
 const getStudioById: GameEndpointAction<
-  '/api/games/studios/item/[studioId]'
+  '/api/games/studios/items/[studioId]'
 > = async (_req, params, games) => {
   //Filters games by given field and item id.
   const { studioId } = await params;

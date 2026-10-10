@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 
 import { GamesFilter } from '@ts/games/filter';
 import { GamesTablePageResponse } from '@ts/games/game';
+import { GameItemsData } from '@ts/games/metric';
 import Country, { CountryIso, CountryResponse } from '@ts/users/country';
 import { ServicesMap } from '@ts/users/service';
 import { User } from '@ts/users/user';
@@ -43,7 +44,7 @@ const getAuthConfig = async (): Promise<AxiosRequestConfig | undefined> => {
   };
 };
 
-export const getCurrentUser = async (): Promise<User> => {
+export const tryGetCurrentUser = async (): Promise<User> => {
   const response = await AxiosInstanse.get<User>(
     '/api/user',
     await getAuthConfig()
@@ -167,4 +168,17 @@ export const refreshSteamData = async () => {
   } catch (err) {
     return getErrorFormState(err).message;
   }
+};
+
+/**
+ * @param userId - User whose data will be fetched.
+ * @returns Data of games metadata items: genres, platforms, etc.
+ */
+export const tryGetGameItemsData = async (userId: string) => {
+  const searchParams = new URLSearchParams({ userId });
+  const response = await AxiosInstanse.get<GameItemsData>(
+    `/api/games/items?${searchParams.toString()}`
+  );
+
+  return response.data;
 };
