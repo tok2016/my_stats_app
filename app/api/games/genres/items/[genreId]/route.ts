@@ -42,7 +42,7 @@ const aggregateSeries = (
  * @returns Genre full data.
  */
 const getGenreByApiId: GameEndpointAction<
-  '/api/games/genres/item/[genreId]'
+  '/api/games/genres/items/[genreId]'
 > = async (_req, params, games) => {
   //Fetch genres from IGDB.
   const { genreId } = await params;

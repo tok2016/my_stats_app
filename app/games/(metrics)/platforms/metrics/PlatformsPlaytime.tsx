@@ -1,7 +1,7 @@
 'use client';
 
 import Game from '@ts/games/game';
-import { PlaytimeData } from '@ts/games/metric';
+import { MetricCoreProps, PlaytimeData } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -13,11 +13,6 @@ import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import FetchMetric from '../../components/FetchMetric';
 import PlatformsPlaytimeChart from '../charts/PlatformsPlaytimeChart';
 import { PlatformPlaytimeChartData } from '../types';
-
-type PlatformPlaytimeProps = {
-  platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>;
-  userId: string;
-};
 
 /**
  * @param platforms - All platforms of user's games.
@@ -60,7 +55,7 @@ const fetchPlatformPlaytime =
 export default function PlatformsPlaytime({
   platforms,
   userId
-}: PlatformPlaytimeProps) {
+}: MetricCoreProps) {
   return (
     <MetricWrapper id='platforms-playtime' submetric>
       <FetchMetric

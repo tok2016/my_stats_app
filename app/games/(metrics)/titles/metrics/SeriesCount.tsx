@@ -1,12 +1,10 @@
 'use client';
 
-import Game from '@ts/games/game';
-import { CoreMetricProps } from '@ts/games/metric';
+import { MetricCoreProps } from '@ts/games/metric';
 import { SeriesCollapsed } from '@ts/games/series';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
-import ObjectMapArray from '@lib/object-map-array';
 
 import BlankImage from '@components/BlankImage';
 import Skeleton from '@components/Skeleton';
@@ -20,7 +18,6 @@ import { MAX_GAMES_IN_SERIES } from '../../utils';
 
 type TopSeriesProps = {
   series: SeriesCollapsed;
-  games: ObjectMapArray<Game, 'id'>;
 };
 
 type TopSeriesSkeletonProps = {
@@ -38,7 +35,7 @@ const fetchTopSeries = async (params: {
   userId: string;
 }): Promise<MetricResponse<SeriesCollapsed[]>> => {
   const seriesData = await getMetricClient<SeriesCollapsed[]>(
-    '/api/games/titles/series',
+    '/api/games/titles/topSeries',
     params
   );
 
@@ -51,13 +48,10 @@ const fetchTopSeries = async (params: {
 /**
  * @param props
  * @param props.series - Full series data.
- * @param props.games - All user's games.
  * @returns Data block with series data.
  */
-function TopSeries({ series, games }: TopSeriesProps) {
-  const seriesGames = series.games
-    .slice(0, MAX_GAMES_IN_SERIES)
-    .map((game) => games.findByKey(game));
+function TopSeries({ series }: TopSeriesProps) {
+  const seriesGames = series.games.slice(0, MAX_GAMES_IN_SERIES);
   const percent = Math.round((series.games.length / series.allGames) * 100);
 
   return (
@@ -186,11 +180,10 @@ export function SeriesCountSkeleton() {
 
 /**
  * @param props
- * @param props.games - Games of user.
  * @param props.userId - User whose metrics will be fetched.
  * @returns Metric component of top series by games count that user's played.
  */
-export default function SeriesCount({ games, userId }: CoreMetricProps) {
+export default function SeriesCount({ userId }: MetricCoreProps) {
   return (
     <MetricWrapper id='top-series'>
       <FetchMetric
@@ -198,11 +191,7 @@ export default function SeriesCount({ games, userId }: CoreMetricProps) {
         metric={(data) => (
           <div className='top-series'>
             {data.map((series) => (
-              <TopSeries
-                key={`${series.id}-series`}
-                series={series}
-                games={games}
-              />
+              <TopSeries key={`${series.id}-series`} series={series} />
             ))}
           </div>
         )}

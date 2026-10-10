@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import Game from '@ts/games/game';
 import { GenreTop } from '@ts/games/genre';
-import { CoreMetricProps, GreatPeriod } from '@ts/games/metric';
+import { GreatPeriod, MetricCoreProps } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 import { Option } from '@ts/ui/components-props';
 
@@ -23,7 +23,6 @@ import FetchMetric from '../../components/FetchMetric';
 
 type GenreTopBlockProps = {
   top: GenreTop;
-  games: ObjectMapArray<Game, 'id'>;
   genres: ObjectMapArray<Game['genres'][number], 'id'>;
   index: number;
 };
@@ -86,25 +85,21 @@ const fetchGenreTops = async (
 /**
  * @param props
  * @param props.top - Top games of genre.
- * @param props.games - Games full data.
  * @param props.genres - Genres full data.
  * @param props.index - Genre index in top.
  * @returns Table of top games of genre.
  */
-function GenreTopTable({ top, games, genres, index }: GenreTopBlockProps) {
+function GenreTopTable({ top, genres, index }: GenreTopBlockProps) {
   const genre = genres.findByKey(top.id);
   if (!genre) return;
 
-  const tableData: GenreTopTableData[] = top.topGames
-    .map((gameId) => games.findByKey(gameId))
-    .filter((game) => !!game)
-    .map((game, i) => ({
-      id: game.id,
-      index: i,
-      name: game.name,
-      hours: game.hours,
-      coverUrl: game.coverUrl
-    }));
+  const tableData: GenreTopTableData[] = top.topGames.map((game, i) => ({
+    id: game.id,
+    index: i,
+    name: game.name,
+    hours: game.hours,
+    coverUrl: game.coverUrl
+  }));
 
   return (
     <div className='genre-tops__top'>
@@ -158,16 +153,12 @@ export function GenreTopsSkeleton() {
 
 /**
  * @param props
- * @param props.games - Games of user.
+ * @param props.genres - All genres of user's games.
  * @param props.userId - User whose metrics will be fetched.
  * @returns Metric component of top games of top genres by selected period (current year / all time).
  */
-export default function GenreTops({ games, userId }: CoreMetricProps) {
+export default function GenreTops({ genres, userId }: MetricCoreProps) {
   const [period, setPeriod] = useState<GreatPeriod>('allTime');
-  const genres = games.flatMapByKey<Game['genres'][number], 'id'>(
-    (game) => game.genres,
-    'id'
-  );
 
   const onPeriodSelect = (value: string) => {
     setPeriod(value as GreatPeriod);
@@ -199,7 +190,6 @@ export default function GenreTops({ games, userId }: CoreMetricProps) {
               <GenreTopTable
                 key={`${genreTop.id}-top`}
                 top={genreTop}
-                games={games}
                 genres={genres}
                 index={i}
               />

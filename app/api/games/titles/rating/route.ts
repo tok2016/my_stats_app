@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { GameEndpointAction } from '@ts/requests';
 
 import { gameMetricEndpoint } from '@lib/endpoint-generators';
+import { getFullGames } from '@lib/games/games-utils';
 import { generateErrorResponse } from '@lib/utils';
 
 const TOP_RATING_GAMES = 12;
@@ -20,17 +21,19 @@ const TOP_RATING_GAMES = 12;
 const getHighestRatedGames: GameEndpointAction<
   '/api/games/titles/rating'
 > = async (_req, _params, games) => {
-  const topGamesIds = games
-    .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+  const topGamesCore = games
     .filter((game) => typeof game.rating === 'number')
-    .slice(0, TOP_RATING_GAMES)
-    .toArray()
-    .map((game) => game.id);
+    .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+    .slice(0, TOP_RATING_GAMES);
 
-  if (!topGamesIds.length)
+  if (!topGamesCore.count)
     throw generateErrorResponse(404, 'No game was ranked');
 
-  return NextResponse.json(topGamesIds, {
+  const topGames = (await getFullGames(topGamesCore))
+    .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+    .toArray();
+
+  return NextResponse.json(topGames, {
     status: 200,
     statusText: 'TOP-12 highest rated games was calculated'
   });

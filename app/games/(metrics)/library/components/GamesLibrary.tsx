@@ -1,7 +1,7 @@
 import { GamesFilter } from '@ts/games/filter';
 import { GameTableData } from '@ts/games/game';
 
-import { getCurrentUser, tryGetGames } from '@lib/server-actions';
+import { tryGetCurrentUser, tryGetGames } from '@lib/server-actions';
 
 import ErrorMessage from '@components/ErrorMessage';
 
@@ -23,7 +23,7 @@ export default async function GamesLibrary({
 }) {
   try {
     //Searches games by given filters.
-    const user = await getCurrentUser();
+    const user = await tryGetCurrentUser();
     const gamesPage = await tryGetGames({
       ...filters,
       limit: GAMES_PAGE_LIMIT.toString(),

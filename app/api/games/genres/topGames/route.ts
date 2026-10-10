@@ -1,17 +1,18 @@
 import { NextResponse } from 'next/server';
 
-import { GameCore } from '@ts/games/game';
+import { GameCore, GameShort } from '@ts/games/game';
 import { GenreTop } from '@ts/games/genre';
 import { GreatPeriod } from '@ts/games/metric';
 import { GameEndpointAction } from '@ts/requests';
 
 import { gameMetricEndpoint } from '@lib/endpoint-generators';
+import { gameCoreToShort } from '@lib/games/games-utils';
 
 type GenreCompareData = {
   id: number;
   count: number;
   hours: number;
-  games: string[];
+  games: GameShort[];
 };
 
 const GENRES_WITH_TOPS = 3;
@@ -29,13 +30,15 @@ const aggregateGenreCompare = (
   genreId: number,
   stored?: GenreCompareData
 ) => {
-  if (stored && stored.games.length < GAMES_IN_TOP) stored.games.push(game.id);
+  const gameShort = gameCoreToShort(game);
+  if (stored && stored.games.length < GAMES_IN_TOP)
+    stored.games.push(gameShort);
 
   return {
     id: genreId,
     count: (stored?.count ?? 0) + 1,
     hours: (stored?.hours ?? 0) + game.hours,
-    games: stored ? stored.games : [game.id]
+    games: stored ? stored.games : [gameShort]
   };
 };
 

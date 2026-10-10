@@ -1,7 +1,7 @@
 'use client';
 
 import { GameCountryMetric } from '@ts/games/game';
-import { CoreMetricProps } from '@ts/games/metric';
+import { MetricCoreProps } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -44,7 +44,7 @@ const fetchGamesCountries = async (params: {
  * @param props.userId - User whose metrics will be fetched.
  * @returns Metric of top countries by games count with top games.
  */
-export default function GamesCountries({ userId }: CoreMetricProps) {
+export default function GamesCountries({ userId }: MetricCoreProps) {
   return (
     <MetricWrapper id='games-countries'>
       <FetchMetric

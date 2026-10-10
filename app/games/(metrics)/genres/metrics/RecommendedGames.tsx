@@ -1,7 +1,7 @@
 'use client';
 
 import { RecommendedGame } from '@ts/games/game';
-import { CoreMetricProps } from '@ts/games/metric';
+import { MetricCoreProps } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -48,7 +48,7 @@ export function RecommendedGamesSkeleton() {
  * @param props.userId - User whose metric will be fetched.
  * @returns Metric component of games recommended to user.
  */
-export default function RecommendedGames({ userId }: CoreMetricProps) {
+export default function RecommendedGames({ userId }: MetricCoreProps) {
   return (
     <MetricWrapper id='recommended-games' className='recommended-group'>
       <FetchMetric

@@ -1,11 +1,10 @@
 'use client';
 
 import Game, { GameTableData } from '@ts/games/game';
-import { CoreMetricProps } from '@ts/games/metric';
+import { MetricCoreProps } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
-import ObjectMapArray from '@lib/object-map-array';
 
 import Skeleton from '@components/Skeleton';
 import GameCollage from '@components/data-blocks/GameCollage';
@@ -29,40 +28,24 @@ type TopGameSkeletonProps = {
 const PLAYTIME_SKELETON_TABLE_ROWS = 7;
 
 /**
- * @param games - All user's games.
- * @returns Funtion to fetch top games by playtime.
+ * @param params - Search params with user id.
+ * @returns Top games by playtime or error data.
  */
-const fetchGamePlaytime =
-  (games: ObjectMapArray<Game, 'id'>) =>
-  /**
-   * @param params - Search params with user id.
-   * @returns Top games by playtime or error data.
-   */
-  async (params: {
-    userId: string;
-  }): Promise<MetricResponse<GameTableData[]>> => {
-    const gamesIds = await getMetricClient<string[]>(
-      '/api/games/titles/playtime',
-      params
-    );
+const fetchGamePlaytime = async (params: {
+  userId: string;
+}): Promise<MetricResponse<GameTableData[]>> => {
+  const gamesIds = await getMetricClient<Game[]>(
+    '/api/games/titles/playtime',
+    params
+  );
 
-    return {
-      error: gamesIds.error,
-      data: gamesIds.data
-        ?.map((id, i) => {
-          const game = games.findByKey(id);
-          if (!game) return;
-
-          const data: GameTableData = {
-            ...game,
-            index: i
-          };
-
-          return data;
-        })
-        .filter((game) => !!game)
-    };
+  return {
+    error: gamesIds.error,
+    data: gamesIds.data
+      ?.map((game, i) => ({ ...game, index: i }))
+      .filter((game) => !!game)
   };
+};
 
 /**
  * @param props
@@ -157,15 +140,14 @@ export function GamesPlaytimeSkeleton() {
 /**
  * Visualizes top-3 games with separated blocks and the rest ones with table.
  * @param props
- * @param props.games - Games of user.
  * @param props.userId - User whose metrics will be fetched.
  * @returns Metric of top games by playtime.
  */
-export default function GamesPlaytime({ games, userId }: CoreMetricProps) {
+export default function GamesPlaytime({ userId }: MetricCoreProps) {
   return (
     <MetricWrapper id='games-playtime'>
       <FetchMetric
-        fetchMetricData={fetchGamePlaytime(games)}
+        fetchMetricData={fetchGamePlaytime}
         metric={(data) => (
           <div className='games-playtime'>
             <div className='games-playtime__top-games'>

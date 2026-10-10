@@ -1,7 +1,7 @@
 'use client';
 
 import Game from '@ts/games/game';
-import { CountData } from '@ts/games/metric';
+import { CountData, MetricCoreProps } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -13,12 +13,6 @@ import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import FetchMetric from '../../components/FetchMetric';
 import PlatformsCountChart from '../charts/PlatformsCountChart';
 import { PlatformCountChartData } from '../types';
-
-type PlatformsCountProps = {
-  platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>;
-  seriesArray: ObjectMapArray<NonNullable<Game['series']>, 'id'>;
-  userId: string;
-};
 
 /**
  * @param platforms - All platforms of user's games.
@@ -60,19 +54,19 @@ const fetchPlatformsCount =
 /**
  * @param props
  * @param props.platforms - All platforms of user's games.
- * @param props.seriesArray - All series of of user's games.
+ * @param props.series - All series of of user's games.
  * @param props.userId - User whose metric will be fetched.
  * @returns Submetric component of top platforms by games count.
  */
 export default function PlatformsCount({
   platforms,
-  seriesArray,
+  series,
   userId
-}: PlatformsCountProps) {
+}: MetricCoreProps) {
   return (
     <MetricWrapper id='platforms-count' submetric>
       <FetchMetric
-        fetchMetricData={fetchPlatformsCount(platforms, seriesArray)}
+        fetchMetricData={fetchPlatformsCount(platforms, series)}
         metric={(data) => <PlatformsCountChart data={data} />}
         fallback={
           <ChartSkeleton type='doughnut' className='switchable-chart' />

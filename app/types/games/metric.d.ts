@@ -12,11 +12,16 @@ import { GreatPeriods, PrecisePeriods } from '@lib/utils';
 import { IgdbBasic } from './api-response';
 import Game, { GameCore, GameShort } from './game';
 
+export type GenreMetricId = (typeof GameGenresMetricsIds)[number];
+export type StudioMetricId = (typeof StudiosMetricsIds)[number];
+export type PlatformMetricId = (typeof PlatformsMetricsIds)[number];
+export type GameTitleMetricId = (typeof GameTitlesMetricsIds)[number];
+
 export type GameMetricId =
-  | (typeof GameGenresMetricsIds)[number]
-  | (typeof StudiosMetricsIds)[number]
-  | (typeof PlatformsMetricsIds)[number]
-  | (typeof GameTitlesMetricsIds)[number];
+  | GenreMetricId
+  | StudioMetricId
+  | PlatformMetricId
+  | GameTitleMetricId;
 
 export type MetricId = (typeof MetricsIds)[number];
 export type SubmetricId = (typeof SubmetricsId)[number];
@@ -90,6 +95,8 @@ export type PeriodTopsMetric<MetricData> = {
 
 export type PeriodPlaytimeTops = PeriodTopsMetric<PeriodPlaytimeData>;
 
+export type PeriodGamesTops = PeriodTopsMetric<GameShort>;
+
 export type FetchPeriodTopsMetricParams = {
   userId: string;
   period: PrecisePeriod;
@@ -101,11 +108,17 @@ export interface YearCountMetric {
   topGames: GameShort[];
 }
 
-export type CoreMetricProps = {
-  userId: string;
-  games: ObjectMapArray<Game, 'id'>;
-};
+export interface GameItemsData {
+  genres: Game['genres'];
+  studios: Game['developers'];
+  platforms: NonNullable<Game['platform']>[];
+  series: NonNullable<Game['series']>[];
+}
 
-export type MetricContentProps = CoreMetricProps & {
-  metricId: MetricId;
+export type MetricCoreProps = {
+  userId: string;
+  genres: ObjectMapArray<Game['genres'][number], 'id'>;
+  studios: ObjectMapArray<Game['developers'][number], 'id'>;
+  platforms: ObjectMapArray<NonNullable<Game['platform']>, 'id'>;
+  series: ObjectMapArray<NonNullable<Game['series']>, 'id'>;
 };

@@ -1,5 +1,5 @@
 import { GameGenresMetricsIds } from '@lib/metrics/metrics-id';
-import { getCurrentUser, tryGetGames } from '@lib/server-actions';
+import { tryGetCurrentUser, tryGetGameItemsData } from '@lib/server-actions';
 
 import ErrorMessage from '@components/ErrorMessage';
 
@@ -10,14 +10,14 @@ import MetricPage from '../components/MetricPage';
  */
 export default async function GamesGenresPage() {
   try {
-    const user = await getCurrentUser();
-    const gamesPage = await tryGetGames({ userId: user.id });
+    const user = await tryGetCurrentUser();
+    const itemsData = await tryGetGameItemsData(user.id);
 
     return (
       <MetricPage
-        games={gamesPage.games}
         metrics={GameGenresMetricsIds.slice()}
         userId={user.id}
+        itemsData={itemsData}
       />
     );
   } catch (err) {

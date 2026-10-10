@@ -1,7 +1,7 @@
 'use client';
 
 import Game from '@ts/games/game';
-import { PlaytimeData } from '@ts/games/metric';
+import { MetricCoreProps, PlaytimeData } from '@ts/games/metric';
 import { MetricResponse } from '@ts/requests';
 
 import { getMetricClient } from '@lib/actions';
@@ -13,11 +13,6 @@ import MetricWrapper from '@components/data-blocks/MetricWrapper';
 import FetchMetric from '../../components/FetchMetric';
 import GenresPlaytimeChart from '../charts/GenresPlaytimeChart';
 import { GenresPlaytimeData } from '../types';
-
-type GenresPlaytimeProps = {
-  genres: ObjectMapArray<Game['genres'][number], 'id'>;
-  userId: string;
-};
 
 /**
  * @param genres - All genres of user's games.
@@ -54,10 +49,7 @@ const fetchGenresPlaytime =
  * @param props.userId - User whose metric will be fetched.
  * @returns Submetric component of top genres by playtime.
  */
-export default function GenresPlaytime({
-  genres,
-  userId
-}: GenresPlaytimeProps) {
+export default function GenresPlaytime({ genres, userId }: MetricCoreProps) {
   return (
     <MetricWrapper id='genres-playtime' submetric>
       <FetchMetric

@@ -1,6 +1,6 @@
 import { User } from '@ts/users/user';
 
-import { refreshSteamData, tryGetGames } from '@lib/server-actions';
+import { refreshSteamData, tryGetGameItemsData } from '@lib/server-actions';
 import { generateErrorResponse } from '@lib/utils';
 
 import ErrorMessage from '@components/ErrorMessage';
@@ -24,9 +24,13 @@ export default async function Dashboard({ user }: DashboardProps) {
       throw generateErrorResponse(404, 'Dashboard is empty');
     }
 
-    const games = await tryGetGames({ userId: user.id });
+    const itemsData = await tryGetGameItemsData(user.id);
     return (
-      <MetricPage metrics={user.metrics} games={games.games} userId={user.id} />
+      <MetricPage
+        metrics={user.metrics}
+        itemsData={itemsData}
+        userId={user.id}
+      />
     );
   } catch (error) {
     return <ErrorMessage error={error} className='error-metric' />;

@@ -2,8 +2,8 @@
 
 import Game from '@ts/games/game';
 import {
-  CoreMetricProps,
   FetchPeriodTopsMetricParams,
+  MetricCoreProps,
   PeriodPlaytimeTops,
   PeriodTopsMetric
 } from '@ts/games/metric';
@@ -65,13 +65,11 @@ const genreItemContent = (genre: GenresPeriodPlaytimeData, i: number) => (
 
 /**
  * @param props
- * @param props.games - Games of user.
+ * @param props.genres - Genres of user's games.
  * @param props.userId - User whose metrics will be fetched.
  * @returns Metric component for top genres by period.
  */
-export default function GenresPeriodTops({ games, userId }: CoreMetricProps) {
-  const genres = games.flatMapByKey<Genre, 'id'>((game) => game.genres, 'id');
-
+export default function GenresPeriodTops({ genres, userId }: MetricCoreProps) {
   return (
     <PeriodTops
       id='genres-periods'

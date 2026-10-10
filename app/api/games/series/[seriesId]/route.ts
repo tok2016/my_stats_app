@@ -23,7 +23,7 @@ import ObjectMapArray from '@lib/object-map-array';
  * @returns Series full data.
  */
 const getSeriesById: GameEndpointAction<
-  '/api/games/titles/series/[seriesId]'
+  '/api/games/series/[seriesId]'
 > = async (_req, params, games) => {
   //Fetches series data from IGDB.
   const { seriesId } = await params;
